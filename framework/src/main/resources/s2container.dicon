@@ -2,8 +2,19 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
-  <component
-    class="org.seasar.cms.framework.container.FrameworkProvider">
-    <property name="hotswapMode">false</property>
-  </component>
+<!--
+	<component class="org.seasar.framework.container.hotdeploy.OndemandBehavior">
+		<property name="rootPackageName">"examples.hotdeploy"</property>
+		<initMethod name="addCreator">
+			<arg>
+				<component class="org.seasar.framework.container.hotdeploy.creator.ActionCreator"/>
+			</arg>
+		</initMethod>
+		<initMethod name="addCreator">
+			<arg>
+				<component class="org.seasar.framework.container.hotdeploy.creator.DtoCreator"/>
+			</arg>
+		</initMethod>
+	</component>
+-->
 </components>
