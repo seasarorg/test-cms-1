@@ -8,6 +8,16 @@
     <param-value>app.dicon</param-value>
   </context-param>
   <filter>
+    <filter-name>encodingfilter</filter-name>
+    <filter-class>
+      org.seasar.extension.filter.EncodingFilter
+    </filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+  <filter>
     <filter-name>s2filter</filter-name>
     <filter-class>
       org.seasar.framework.container.filter.S2ContainerFilter
@@ -22,15 +32,39 @@
     </filter>
   -->
   <filter>
-    <filter-name>encodingfilter</filter-name>
+    <filter-name>framework.request</filter-name>
     <filter-class>
-      org.seasar.extension.filter.EncodingFilter
+      org.seasar.cms.framework.FrameworkFilter
     </filter-class>
     <init-param>
-      <param-name>encoding</param-name>
-      <param-value>UTF-8</param-value>
+      <param-name>dispatcher</param-name>
+      <param-value>REQUEST</param-value>
     </init-param>
   </filter>
+  <filter>
+    <filter-name>framework.forward</filter-name>
+    <filter-class>
+      org.seasar.cms.framework.FrameworkFilter
+    </filter-class>
+    <init-param>
+      <param-name>dispatcher</param-name>
+      <param-value>FORWARD</param-value>
+    </init-param>
+  </filter>
+  <filter>
+    <filter-name>framework.include</filter-name>
+    <filter-class>
+      org.seasar.cms.framework.FrameworkFilter
+    </filter-class>
+    <init-param>
+      <param-name>dispatcher</param-name>
+      <param-value>INCLUDE</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>encodingfilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   <filter-mapping>
     <filter-name>s2filter</filter-name>
     <url-pattern>/*</url-pattern>
@@ -42,8 +76,19 @@
     </filter-mapping>
   -->
   <filter-mapping>
-    <filter-name>encodingfilter</filter-name>
+    <filter-name>framework.request</filter-name>
+    <url-pattern>*.html</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>framework.forward</filter-name>
     <url-pattern>/*</url-pattern>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>framework.include</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>INCLUDE</dispatcher>
   </filter-mapping>
   <listener>
     <listener-class>
