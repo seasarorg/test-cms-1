@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <component
+    class="org.seasar.cms.framework.impl.DefaultRequestProcessor"
+    instance="singleton">
+    <initMethod name="addIgnoreMapping">
+      <arg>"^/WEB-INF/"</arg>
+    </initMethod>
+    <initMethod name="addMapping">
+      <arg>"^/([^/]+(/)?)$"</arg>
+      <arg>"bean.${1}"</arg>
+      <arg>"act"</arg>
+      <arg>""</arg>
+    </initMethod>
+    <initMethod name="addMapping">
+      <arg>"^/([^/]+)/([^/]+(/)?)$"</arg>
+      <arg>"bean.${1}"</arg>
+      <arg>"${2}Page"</arg>
+      <arg>""</arg>
+    </initMethod>
+  </component>
+  <component
+    class="org.seasar.cms.framework.impl.DefaultResponseProcessor"
+    instance="singleton" />
+  <component
+    class="org.seasar.cms.framework.impl.ResponseConstructorSelectorImpl"
+    instance="singleton">
+    <initMethod name="add">
+      <arg>
+        <component
+          class="org.seasar.cms.framework.impl.StringResponseConstructor"
+          instance="singleton" />
+      </arg>
+    </initMethod>
+  </component>
+</components>
