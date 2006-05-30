@@ -67,6 +67,11 @@
       <version>2.4.0-beta-1</version>
     </dependency>
     <dependency>
+      <groupId>org.seasar.dao</groupId>
+      <artifactId>s2-dao</artifactId>
+      <version>1.0.34</version>
+    </dependency>
+    <dependency>
       <groupId>org.seasar.kvasir</groupId>
       <artifactId>kvasir-util</artifactId>
       <version>3.0.0-EA2</version>

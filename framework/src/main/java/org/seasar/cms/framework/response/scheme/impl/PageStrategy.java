@@ -1,7 +1,7 @@
 package org.seasar.cms.framework.response.scheme.impl;
 
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.impl.ResponseImpl;
+import org.seasar.cms.framework.impl.ForwardResponse;
 import org.seasar.cms.framework.response.scheme.Strategy;
 
 public class PageStrategy implements Strategy {
@@ -15,6 +15,6 @@ public class PageStrategy implements Strategy {
 
     public Response constructResponse(String path) {
 
-        return new ResponseImpl(path, false);
+        return new ForwardResponse(path);
     }
 }

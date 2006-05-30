@@ -1,12 +1,12 @@
 package org.seasar.cms.framework.response.scheme.impl;
 
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.impl.RedirectResponse;
+import org.seasar.cms.framework.impl.SelfContainedResponse;
 import org.seasar.cms.framework.response.scheme.Strategy;
 
-public class RedirectStrategy implements Strategy {
+public class StringStrategy implements Strategy {
 
-    private static final String SCHEME = "redirect";
+    public static final String SCHEME = "string";
 
     public String getScheme() {
 
@@ -15,6 +15,6 @@ public class RedirectStrategy implements Strategy {
 
     public Response constructResponse(String path) {
 
-        return new RedirectResponse(path);
+        return new SelfContainedResponse(path);
     }
 }

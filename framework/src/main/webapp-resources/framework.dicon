@@ -3,11 +3,36 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
   <component
+    class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
+    <initMethod name="addReferenceClass">
+      <arg>
+        @org.seasar.cms.framework.FrameworkFilter@class
+      </arg>
+    </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.framework.response.constructor.impl"</arg>
+      <arg>".*ResponseConstructor"</arg>
+    </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.framework.response.scheme.impl"</arg>
+      <arg>".*Strategy"</arg>
+    </initMethod>
+    <initMethod name="addIgnoreClassPattern">
+      <arg>"org.seasar.cms.framework.response.constructor.impl"</arg>
+      <arg>"Abstract.*"</arg>
+    </initMethod>
+    <initMethod name="addIgnoreClassPattern">
+      <arg>"org.seasar.cms.framework.response.scheme.impl"</arg>
+      <arg>"Abstract.*"</arg>
+    </initMethod>
+    <initMethod name="registerAll" />
+  </component>
+  <component
     class="org.seasar.cms.framework.impl.DefaultRequestProcessor">
     <initMethod name="addMapping">
       <arg>"^/([^/]+)\\.(.+)$"</arg>
       <arg>"bean.${1}"</arg>
-      <arg>"${2u}Page"</arg>
+      <arg>"${2}Page"</arg>
       <arg>""</arg>
     </initMethod>
     <initMethod name="addMapping">
@@ -18,27 +43,17 @@
     </initMethod>
   </component>
   <component
-    class="org.seasar.cms.framework.impl.DefaultResponseProcessor"/>
+    class="org.seasar.cms.framework.impl.DefaultResponseProcessor" />
   <component
     class="org.seasar.cms.framework.response.constructor.impl.ResponseConstructorSelectorImpl">
-    <initMethod name="add">
-      <arg>
-        <component
-          class="org.seasar.cms.framework.response.constructor.impl.StringResponseConstructor"/>
-      </arg>
-    </initMethod>
+    <property name="responseConstructors">
+      container.findComponents(@org.seasar.cms.framework.response.constructor.ResponseConstructor@class)
+    </property>
   </component>
   <component
     class="org.seasar.cms.framework.response.scheme.impl.StrategySelectorImpl">
-    <initMethod name="add">
-      <arg>
-        <component class="org.seasar.cms.framework.response.scheme.impl.PageStrategy" />
-      </arg>
-    </initMethod>
-    <initMethod name="add">
-      <arg>
-        <component class="org.seasar.cms.framework.response.scheme.impl.RedirectStrategy" />
-      </arg>
-    </initMethod>
+    <property name="strategies">
+      container.findComponents(@org.seasar.cms.framework.response.scheme.Strategy@class)
+    </property>
   </component>
 </components>

@@ -1,30 +1,39 @@
 package org.seasar.cms.framework.impl;
 
+import java.io.InputStream;
+
 import org.seasar.cms.framework.Response;
 
 public class ResponseImpl implements Response {
 
-    private boolean redirect_;
+    private static final String DEFAULT_CONTENTTYPE = "application/octet-stream";
+
+    private int type_ = TYPE_VOID;
 
     private String path_;
 
-    public ResponseImpl() {
+    private String contentType_ = DEFAULT_CONTENTTYPE;
+
+    private InputStream inputStream_;
+
+    public String getContentType() {
+
+        return contentType_;
     }
 
-    public ResponseImpl(String path, boolean redirect) {
+    public void setContentType(String contentType) {
 
-        path_ = path;
-        redirect_ = redirect;
+        contentType_ = contentType;
     }
 
-    public boolean isRedirect() {
+    public InputStream getInputStream() {
 
-        return redirect_;
+        return inputStream_;
     }
 
-    public void setRedirect(boolean redirect) {
+    public void setInputStream(InputStream inputStream) {
 
-        redirect_ = redirect;
+        inputStream_ = inputStream;
     }
 
     public String getPath() {
@@ -35,5 +44,15 @@ public class ResponseImpl implements Response {
     public void setPath(String path) {
 
         path_ = path;
+    }
+
+    public int getType() {
+
+        return type_;
+    }
+
+    public void setType(int type) {
+
+        type_ = type;
     }
 }

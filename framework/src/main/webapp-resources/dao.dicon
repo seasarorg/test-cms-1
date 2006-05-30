@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components namespace="dao">
+  <include path="j2ee.dicon" />
+  <component class="org.seasar.dao.impl.FieldAnnotationReaderFactory" />
+  <component class="org.seasar.dao.impl.DaoMetaDataFactoryImpl">
+    <property name="daoSuffixes">"Bean"</property>
+    <property name="sqlFileEncoding">"UTF-8"</property>
+  </component>
+  <component name="interceptor"
+    class="org.seasar.dao.interceptors.S2DaoInterceptor" />
+</components>

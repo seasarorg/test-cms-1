@@ -1,9 +1,9 @@
 package org.example.bean;
 
-public class Test {
+public class TestBean {
 
-    public String act() {
-        
+    public String htmlPage() {
+
         System.out.println("TEST!!");
         return "/test2.html";
     }

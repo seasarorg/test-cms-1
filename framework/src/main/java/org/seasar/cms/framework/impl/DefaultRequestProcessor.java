@@ -43,7 +43,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
             }
         }
         if (mapping == null) {
-            return null;
+            return new VoidResponse();
         }
 
         Request request = new RequestImpl(path, method, dispatcher,
@@ -71,7 +71,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         S2Container container = getRootContainer();
         if (!container.hasComponentDef(componentName)) {
-            return null;
+            return PassthroughResponse.INSTANCE;
         }
 
         Object component;
@@ -91,7 +91,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         Method method = getActionMethod(component, actionName);
         if (method == null) {
-            return null;
+            return PassthroughResponse.INSTANCE;
         }
 
         try {
@@ -125,7 +125,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     Response constructResponse(Class type, Object value) {
 
         if (type == Void.TYPE) {
-            return null;
+            return PassthroughResponse.INSTANCE;
         }
 
         ResponseConstructor constructor = responseConstructorSelector_

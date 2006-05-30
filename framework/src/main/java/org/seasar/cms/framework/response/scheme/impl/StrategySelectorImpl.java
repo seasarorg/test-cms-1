@@ -25,4 +25,11 @@ public class StrategySelectorImpl implements StrategySelector {
 
         strategies_.put(strategy.getScheme(), strategy);
     }
+
+    public void setStrategies(Object[] strategies) {
+
+        for (int i = 0; i < strategies.length; i++) {
+            add((Strategy) strategies[i]);
+        }
+    }
 }

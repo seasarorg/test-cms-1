@@ -27,4 +27,11 @@ public class ResponseConstructorSelectorImpl implements
 
         constructorMap_.put(constructor.getTargetClassName(), constructor);
     }
+
+    public void setResponseConstructors(Object[] constructors) {
+
+        for (int i = 0; i < constructors.length; i++) {
+            add((ResponseConstructor) constructors[i]);
+        }
+    }
 }
