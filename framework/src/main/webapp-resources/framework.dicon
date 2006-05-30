@@ -3,35 +3,41 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
   <component
-    class="org.seasar.cms.framework.impl.DefaultRequestProcessor"
-    instance="singleton">
-    <initMethod name="addIgnoreMapping">
-      <arg>"^/WEB-INF/"</arg>
-    </initMethod>
+    class="org.seasar.cms.framework.impl.DefaultRequestProcessor">
     <initMethod name="addMapping">
-      <arg>"^/([^/]+(/)?)$"</arg>
+      <arg>"^/([^/]+)\\.(.+)$"</arg>
       <arg>"bean.${1}"</arg>
-      <arg>"act"</arg>
+      <arg>"${2u}Page"</arg>
       <arg>""</arg>
     </initMethod>
     <initMethod name="addMapping">
-      <arg>"^/([^/]+)/([^/]+(/)?)$"</arg>
+      <arg>"^/([^/]+)/([^/]+)\\.(.+)$"</arg>
       <arg>"bean.${1}"</arg>
-      <arg>"${2}Page"</arg>
+      <arg>"${2}${3u}Page"</arg>
       <arg>""</arg>
     </initMethod>
   </component>
   <component
-    class="org.seasar.cms.framework.impl.DefaultResponseProcessor"
-    instance="singleton" />
+    class="org.seasar.cms.framework.impl.DefaultResponseProcessor"/>
   <component
-    class="org.seasar.cms.framework.impl.ResponseConstructorSelectorImpl"
-    instance="singleton">
+    class="org.seasar.cms.framework.response.constructor.impl.ResponseConstructorSelectorImpl">
     <initMethod name="add">
       <arg>
         <component
-          class="org.seasar.cms.framework.impl.StringResponseConstructor"
-          instance="singleton" />
+          class="org.seasar.cms.framework.response.constructor.impl.StringResponseConstructor"/>
+      </arg>
+    </initMethod>
+  </component>
+  <component
+    class="org.seasar.cms.framework.response.scheme.impl.StrategySelectorImpl">
+    <initMethod name="add">
+      <arg>
+        <component class="org.seasar.cms.framework.response.scheme.impl.PageStrategy" />
+      </arg>
+    </initMethod>
+    <initMethod name="add">
+      <arg>
+        <component class="org.seasar.cms.framework.response.scheme.impl.RedirectStrategy" />
       </arg>
     </initMethod>
   </component>

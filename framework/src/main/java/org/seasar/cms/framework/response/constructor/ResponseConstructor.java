@@ -1,4 +1,6 @@
-package org.seasar.cms.framework;
+package org.seasar.cms.framework.response.constructor;
+
+import org.seasar.cms.framework.Response;
 
 public interface ResponseConstructor {
 

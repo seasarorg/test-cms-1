@@ -10,16 +10,15 @@ import org.seasar.cms.framework.PathMapping;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.ResponseConstructor;
-import org.seasar.cms.framework.ResponseConstructorSelector;
 import org.seasar.cms.framework.container.ThreadLocalS2ContainerUtils;
+import org.seasar.cms.framework.response.constructor.ResponseConstructor;
+import org.seasar.cms.framework.response.constructor.ResponseConstructorSelector;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.kvasir.util.el.VariableResolver;
 
 public class DefaultRequestProcessor implements RequestProcessor {
-
-    private S2Container container_;
 
     private PathMapping[] mappings_;
 
@@ -70,17 +69,18 @@ public class DefaultRequestProcessor implements RequestProcessor {
     Response processRequest(Request request, String componentName,
         String actionName) {
 
-        if (!container_.hasComponentDef(componentName)) {
+        S2Container container = getRootContainer();
+        if (!container.hasComponentDef(componentName)) {
             return null;
         }
 
         Object component;
         try {
-            ThreadLocalS2ContainerUtils.register(request);
+            ThreadLocalS2ContainerUtils.register(container, request);
 
-            component = container_.getComponent(componentName);
+            component = container.getComponent(componentName);
         } finally {
-            ThreadLocalS2ContainerUtils.deregister(request);
+            ThreadLocalS2ContainerUtils.deregister(container, request);
         }
 
         try {
@@ -104,6 +104,11 @@ public class DefaultRequestProcessor implements RequestProcessor {
         } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    S2Container getRootContainer() {
+
+        return SingletonS2ContainerFactory.getContainer();
     }
 
     public Method getActionMethod(Object component, String actionName) {
@@ -160,8 +165,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return newPatterns;
     }
 
-    public void setContainer(S2Container container) {
+    public void setResponseConstructorSelector(
+        ResponseConstructorSelector responseConstructorSelector) {
 
-        container_ = container;
+        responseConstructorSelector_ = responseConstructorSelector;
     }
 }

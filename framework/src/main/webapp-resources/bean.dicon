@@ -2,4 +2,10 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components namespace="bean">
+<component class="org.seasar.framework.container.autoregister.FileSystemComponentAutoRegister">
+  <initMethod name="addClassPattern">
+    <arg>"org.example.bean"</arg>
+    <arg>".*"</arg>
+  </initMethod>
+</component>
 </components>

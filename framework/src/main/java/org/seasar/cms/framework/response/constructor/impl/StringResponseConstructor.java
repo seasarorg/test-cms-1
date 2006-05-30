@@ -1,7 +1,10 @@
-package org.seasar.cms.framework.impl;
+package org.seasar.cms.framework.response.constructor.impl;
 
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.ResponseConstructor;
+import org.seasar.cms.framework.response.constructor.ResponseConstructor;
+import org.seasar.cms.framework.response.scheme.Strategy;
+import org.seasar.cms.framework.response.scheme.StrategySelector;
+import org.seasar.cms.framework.response.scheme.impl.PageStrategy;
 
 public class StringResponseConstructor implements ResponseConstructor {
 
@@ -37,18 +40,6 @@ public class StringResponseConstructor implements ResponseConstructor {
                 + "' is specified: " + string);
         }
         return strategy.constructResponse(path);
-    }
-
-    public static interface StrategySelector {
-
-        Strategy getStrategy(String scheme);
-    }
-
-    public static interface Strategy {
-
-        String getScheme();
-
-        Response constructResponse(String path);
     }
 
     public void setStrategySelector(StrategySelector strategySelector) {
