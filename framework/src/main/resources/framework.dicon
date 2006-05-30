@@ -11,7 +11,7 @@
     <initMethod name="addMapping">
       <arg>"^/([^/]+(/)?)$"</arg>
       <arg>"bean.${1}"</arg>
-      <arg>"process"</arg>
+      <arg>"act"</arg>
       <arg>""</arg>
     </initMethod>
     <initMethod name="addMapping">

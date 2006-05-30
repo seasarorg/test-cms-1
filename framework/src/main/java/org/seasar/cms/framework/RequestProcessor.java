@@ -13,5 +13,5 @@ public interface RequestProcessor {
     String DISPATCHER_ERROR = "ERROR";
 
     Response process(String path, String method, String dispatcher,
-        Map parameterMap);
+        Map parameterMap) throws PageNotFoundException;
 }

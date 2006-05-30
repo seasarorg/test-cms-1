@@ -19,15 +19,12 @@ import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
 public class FrameworkFilter implements Filter {
 
-    private FilterConfig config_;
-
     private String dispatcher_;
 
     private ServletContext context_;
 
     public void init(FilterConfig config) throws ServletException {
 
-        config_ = config;
         context_ = config.getServletContext();
 
         String dispatcher = config.getInitParameter("dispatcher");
@@ -47,17 +44,21 @@ public class FrameworkFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) req;
         HttpServletResponse httpResponse = (HttpServletResponse) res;
 
-        Response response = processRequest(ServletUtils.getPath(httpRequest),
-            httpRequest.getMethod().toUpperCase(), dispatcher_, httpRequest
-                .getParameterMap());
+        try {
+            Response response = processRequest(ServletUtils
+                .getPath(httpRequest), httpRequest.getMethod().toUpperCase(),
+                dispatcher_, httpRequest.getParameterMap());
 
-        if (processResponse(httpRequest, httpResponse, response)) {
-            chain.doFilter(httpRequest, httpResponse);
+            if (processResponse(httpRequest, httpResponse, response)) {
+                chain.doFilter(httpRequest, httpResponse);
+            }
+        } catch (PageNotFoundException ex) {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
     Response processRequest(String path, String method, String dispatcher,
-        Map parameterMap) {
+        Map parameterMap) throws PageNotFoundException {
 
         return ((RequestProcessor) getContainer().getComponent(
             RequestProcessor.class)).process(path, method, dispatcher,

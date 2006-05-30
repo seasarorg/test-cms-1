@@ -69,7 +69,7 @@
     <dependency>
       <groupId>org.seasar.kvasir</groupId>
       <artifactId>kvasir-util</artifactId>
-      <version>3.0.0-EA3-SNAPSHOT</version>
+      <version>3.0.0-EA2</version>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>

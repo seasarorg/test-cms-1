@@ -5,24 +5,21 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.seasar.cms.framework.PageNotFoundRuntimeException;
+import org.seasar.cms.framework.PageNotFoundException;
 import org.seasar.cms.framework.PathMapping;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.ResponseConstructor;
 import org.seasar.cms.framework.ResponseConstructorSelector;
+import org.seasar.cms.framework.container.ThreadLocalS2ContainerUtils;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
-import org.seasar.kvasir.util.el.TextTemplateEvaluator;
 import org.seasar.kvasir.util.el.VariableResolver;
-import org.seasar.kvasir.util.el.impl.SimpleTextTemplateEvaluator;
 
 public class DefaultRequestProcessor implements RequestProcessor {
 
     private S2Container container_;
-
-    private TextTemplateEvaluator evaluator_ = new SimpleTextTemplateEvaluator();
 
     private PathMapping[] mappings_;
 
@@ -31,7 +28,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     private ResponseConstructorSelector responseConstructorSelector_;
 
     public Response process(String path, String method, String dispatcher,
-        Map parameterMap) {
+        Map parameterMap) throws PageNotFoundException {
 
         checkIfPathShouldBeIgnored(path, dispatcher);
 
@@ -59,12 +56,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     void checkIfPathShouldBeIgnored(String path, String dispatcher)
-        throws PageNotFoundRuntimeException {
+        throws PageNotFoundException {
 
         if (DISPATCHER_REQUEST.equals(dispatcher) && ignoreMappings_ != null) {
             for (int i = 0; i < ignoreMappings_.length; i++) {
                 if (ignoreMappings_[i].match(path) != null) {
-                    throw new PageNotFoundRuntimeException(path);
+                    throw new PageNotFoundException(path);
                 }
             }
         }
@@ -76,15 +73,21 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (!container_.hasComponentDef(componentName)) {
             return null;
         }
-        Object component = container_.getComponent(componentName);
+
+        Object component;
+        try {
+            ThreadLocalS2ContainerUtils.register(request);
+
+            component = container_.getComponent(componentName);
+        } finally {
+            ThreadLocalS2ContainerUtils.deregister(request);
+        }
 
         try {
             BeanUtils.populate(component, request.getParameterMap());
         } catch (IllegalAccessException ex) {
         } catch (InvocationTargetException ex) {
         }
-
-        // TODO componentにrequestをinjectしたい！
 
         Method method = getActionMethod(component, actionName);
         if (method == null) {
@@ -103,6 +106,17 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
+    public Method getActionMethod(Object component, String actionName) {
+
+        try {
+            return component.getClass().getMethod(actionName, new Class[0]);
+        } catch (SecurityException ex) {
+            return null;
+        } catch (NoSuchMethodException ex) {
+            return null;
+        }
+    }
+
     Response constructResponse(Class type, Object value) {
 
         if (type == Void.TYPE) {
@@ -118,11 +132,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         return constructor.constructResponse(value);
-    }
-
-    Method getActionMethod(Object component, String actionName) {
-
-        return null;
     }
 
     public void addMapping(String patternString, String componentNameTemplate,

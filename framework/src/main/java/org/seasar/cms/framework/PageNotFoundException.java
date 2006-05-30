@@ -1,12 +1,12 @@
 package org.seasar.cms.framework;
 
-public class PageNotFoundRuntimeException extends RuntimeException {
+public class PageNotFoundException extends Exception {
 
     private static final long serialVersionUID = 4300901393295361786L;
 
     private String path_;
 
-    public PageNotFoundRuntimeException(String path) {
+    public PageNotFoundException(String path) {
 
         path_ = path;
     }
