@@ -6,7 +6,7 @@
   <component
     class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
     <initMethod name="addReferenceClass">
-      <arg>@org.example.bean.Test@class</arg>
+      <arg>@org.example.bean.TestBean@class</arg>
     </initMethod>
     <initMethod name="addClassPattern">
       <arg>"org.example.bean"</arg>

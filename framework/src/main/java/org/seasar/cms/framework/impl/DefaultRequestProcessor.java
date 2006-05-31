@@ -85,8 +85,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         try {
             BeanUtils.populate(component, request.getParameterMap());
-        } catch (IllegalAccessException ex) {
-        } catch (InvocationTargetException ex) {
+        } catch (Throwable t) {
         }
 
         Method method = getActionMethod(component, actionName);

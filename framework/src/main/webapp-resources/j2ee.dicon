@@ -67,9 +67,7 @@
       <!--
         "jdbc:hsqldb:hsql://localhost:9001"
       -->
-      "jdbc:hsqldb:file:" +
-      @org.seasar.framework.util.EclipseUtil@getProjectRoot("cms-framework").getAbsolutePath()
-      + "/src/main/webapp/WEB-INF/hsqldb"
+      "jdbc:hsqldb:file:" + application.getRealPath("/") + "WEB-INF/hsqldb"
     </property>
     <property name="user">"sa"</property>
     <property name="password">""</property>

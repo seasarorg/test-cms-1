@@ -56,11 +56,14 @@ public class DefaultResponseProcessor implements ResponseProcessor {
                 bos.flush();
             } finally {
                 if (is != null) {
-                    is.close();
+                    try {
+                        is.close();
+                    } catch (IOException ex) {
+                        ;
+                    }
                 }
-                if (os != null) {
-                    os.close();
-                }
+                // httpResponseのoutputStreamのクローズはservletContainerに
+                // 任せて良い（と思う）。
             }
             return false;
 
