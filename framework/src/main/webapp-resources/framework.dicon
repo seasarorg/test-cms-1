@@ -32,13 +32,13 @@
     <initMethod name="addMapping">
       <arg>"^/([^/]+)\\.(.+)$"</arg>
       <arg>"bean.${1}"</arg>
-      <arg>"${2}Page"</arg>
+      <arg>"_${method}"</arg>
       <arg>""</arg>
     </initMethod>
     <initMethod name="addMapping">
       <arg>"^/([^/]+)/([^/]+)\\.(.+)$"</arg>
       <arg>"bean.${1}"</arg>
-      <arg>"${2}${3u}Page"</arg>
+      <arg>"_${method}${2u}"</arg>
       <arg>""</arg>
     </initMethod>
   </component>

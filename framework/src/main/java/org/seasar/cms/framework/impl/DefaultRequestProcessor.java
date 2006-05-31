@@ -20,6 +20,8 @@ import org.seasar.kvasir.util.el.VariableResolver;
 
 public class DefaultRequestProcessor implements RequestProcessor {
 
+    private static final String ACTION_RENDER = "_render";
+
     private PathMapping[] mappings_;
 
     private PathMapping[] ignoreMappings_;
@@ -29,13 +31,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public Response process(String path, String method, String dispatcher,
         Map parameterMap) throws PageNotFoundException {
 
-        checkIfPathShouldBeIgnored(path, dispatcher);
+        checkIfPathShouldBeIgnored(path, method, dispatcher);
 
         PathMapping mapping = null;
         VariableResolver resolver = null;
         if (mappings_ != null) {
             for (int i = 0; i < mappings_.length; i++) {
-                resolver = mappings_[i].match(path);
+                resolver = mappings_[i].match(path, method);
                 if (resolver != null) {
                     mapping = mappings_[i];
                     break;
@@ -54,12 +56,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return processRequest(request, componentName, actionName);
     }
 
-    void checkIfPathShouldBeIgnored(String path, String dispatcher)
-        throws PageNotFoundException {
+    void checkIfPathShouldBeIgnored(String path, String method,
+        String dispatcher) throws PageNotFoundException {
 
-        if (DISPATCHER_REQUEST.equals(dispatcher) && ignoreMappings_ != null) {
+        if (Request.DISPATCHER_REQUEST.equals(dispatcher)
+            && ignoreMappings_ != null) {
             for (int i = 0; i < ignoreMappings_.length; i++) {
-                if (ignoreMappings_[i].match(path) != null) {
+                if (ignoreMappings_[i].match(path, method) != null) {
                     throw new PageNotFoundException(path);
                 }
             }
@@ -77,7 +80,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
         Object component;
         try {
             ThreadLocalS2ContainerUtils.register(container, request);
-
             component = container.getComponent(componentName);
         } finally {
             ThreadLocalS2ContainerUtils.deregister(container, request);
@@ -88,6 +90,25 @@ public class DefaultRequestProcessor implements RequestProcessor {
         } catch (Throwable t) {
         }
 
+        Response response;
+        if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
+            // Actionの呼び出しはdispatcherがREQUESTの時だけ。
+            response = invokeAction(component, actionName);
+        } else {
+            response = PassthroughResponse.INSTANCE;
+        }
+
+        if (response.getType() == Response.TYPE_PASSTHROUGH) {
+            // dispatcherがREQUEST以外の場合やActionの呼び出し後に処理が
+            // スルーされてきた場合は、画面描画のためのAction呼び出しを
+            // 行なう。
+            response = invokeAction(component, ACTION_RENDER);
+        }
+
+        return response;
+    }
+
+    Response invokeAction(Object component, String actionName) {
         Method method = getActionMethod(component, actionName);
         if (method == null) {
             return PassthroughResponse.INSTANCE;

@@ -74,7 +74,7 @@ public class PathMapping {
         pattern_ = pattern;
     }
 
-    public VariableResolver match(String path) {
+    public VariableResolver match(String path, String method) {
 
         Matcher matcher = pattern_.matcher(path);
         if (matcher.find()) {
@@ -89,6 +89,8 @@ public class PathMapping {
             prop.put("`", path.substring(0, matcher.start()));
             prop.put("&", path.substring(matcher.start(), matcher.end()));
             prop.put("'", path.substring(matcher.end()));
+            prop.put("method", method.toLowerCase());
+            prop.put("Method", upper(method));
 
             return new MapVariableResolver(prop);
         } else {

@@ -2,7 +2,7 @@ package org.example.bean;
 
 public class TestBean {
 
-    public String htmlPage() {
+    public String _get() {
 
         System.out.println("TEST!!");
         return "/test2.html";
