@@ -1,0 +1,981 @@
+/**
+ * Wiki.jjt
+ * Wiki Syntax Difinition (based on Japanese popular wiki engine syntax)
+ */ 
+
+options{
+	STATIC = false;
+	DEBUG_PARSER = true;
+//	DEBUG_TOKEN_MANAGER = true;
+//	DEBUG_LOOKAHEAD = true;
+	JAVA_UNICODE_ESCAPE = true;
+	MULTI = true;
+	NODE_PREFIX = "Wiki";
+	NODE_PACKAGE = "org.seasar.cms.wiki.parser";
+	VISITOR = true;
+	ERROR_REPORTING = false; // don't throw Error LookAheadSuccess
+}
+
+PARSER_BEGIN(WikiParser)
+
+package org.seasar.cms.wiki.parser;
+ 
+import java.util.List;
+import java.util.ArrayList;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.seasar.cms.wiki.util.GenerateNodeHelper;
+
+/**
+ * @author someda
+ *
+ * NOT TO IMPLMENT: (2005/10)
+ * - Table format ('h','c', at the end of table line)
+ * - Interwiki
+ *
+ * NOTE:
+ * - Token Specification Policy
+ *   Token is defined as simple as possible.
+ *   As the lexical tips (https://javacc.dev.java.net/doc/lexertips.html) says,
+ *   the complex RE in token definition is avoided as much as possible,
+ *   otherwise most of such jobs will be done by parser using LOOKAHEAD.   
+ * - ParseException Handling Policy
+ *   In GenerateTree(),BlockElement() and InlineElement(),
+ *   ParseException will be caught, that is 3-level error handling.
+ *   The one caught in GenerateTree() is thought as Fatal Exception,
+ *   because syntax error should be caught in try-catch clause of
+ *   BlockElement() or InlineElement().
+ *   In BlockElement(), when exception occurs, it will proceed 
+ *   TokenManager consumption until next newline token will apear, 
+ *   as to InlineElement it'll do nothing about TokenManager.
+ *   During exception handling in both BlockElement() and InlineElement(), 
+ *   it pushes WikiErrors node on top of the stack for not losing 
+ *   error position itself.
+ *   NT Errors() is just only for this purpose and will not be generated 
+ *   during regular parsing.
+*/ 
+public class WikiParser{
+	
+	private static final int[] BLOCKELEMENT_KIND = 
+		{NL,EXCERPT1,EXCERPT2,EXCERPT3,LIST1,LIST2,LIST3,NLIST1,NLIST2,NLIST3,
+		 DLIST,PRESHAPED,TABLE,CTABLE,HEADING1,HEADING2,HEADING3,ALIGN1,ALIGN2,ALIGN3,
+		 FALIGN1,FALIGN2,HORIZONTAL,BLOCKPLUGIN,EOF};
+		 		 
+	private static final int[] EXCERPT_KIND = {EXCERPT1,EXCERPT2,EXCERPT3};
+	private static final int[] LIST_KIND = {LIST1,LIST2,LIST3,NLIST1,NLIST2,NLIST3};
+	private static final int[] PRESHAPED_KIND = {PRESHAPED};
+	private static final int[] HEADING_KIND = {HEADING1,HEADING2,HEADING3};
+	private static final int[] ALIGN_KIND = {ALIGN1,ALIGN2,ALIGN3};
+	private static final int[] FALIGN_KIND = {FALIGN1,FALIGN2};
+	private static final int[] HORIZONTAL_KIND = {HORIZONTAL};
+	private static final int[] BLOCKPLUGIN_KIND = {BLOCKPLUGIN};
+ 	
+ 	private List toc_ = new ArrayList();
+ 	private List annotation_ = new ArrayList();
+ 	private int nParseErrors_ = 0;
+ 	private int startpos_ = -1;
+ 	
+ 	private Log log_ = LogFactory.getLog(getClass());
+ 	
+ 	public WikiParser(){
+ 	}
+ 	
+ 	public int addAnnotation(SimpleNode node){
+ 		annotation_.add(node);
+ 		return annotation_.size();
+ 	}
+ 	
+ 	public int addTOC(SimpleNode node){
+ 		toc_.add(node);
+ 		return toc_.size();
+ 	}
+	
+ 	public int getNParseErrors(){
+ 		return nParseErrors_;
+ 	}
+ 	
+ 	public int getNLexicalErrors(){
+ 		return token_source.getNLexicalErrors();
+ 	}
+ 	
+ 	/**
+ 	 * Setting current buffer position of JavaCharacterStream
+ 	 * for error recovery.
+ 	 * JavaCharacterStream uses ring buffer to store the character
+ 	 * stream inside its instance.
+ 	 */
+ 	// NOTE: 08/24
+ 	// This doesn't work propery, more detail investigation needed.
+ 	// In some cases (like []+ construction), it seems not to
+ 	// get buffer current position index (bufpos) properly.
+ 	// At the token consumption, the methods will be
+ 	// called in the following order, 
+ 	// 
+ 	// method : WikiParser#jj_consume_token()
+ 	//          WikiParserTokenManager#getNextToken()
+ 	//          JavaCharacterStream#BeginToken()
+ 	//          JavaCharacterStream#readChar()
+ 	//          JavaCharacterStream#ReadByte()
+ 	protected void setStartPosition(){
+ 		this.startpos_ = jj_input_stream.bufpos;
+ 	}
+ 	
+ 	protected void initStartPosition(){
+ 		this.startpos_ = -1;
+ 	}
+        
+    protected String getErrorLine(){
+    	
+    	if(startpos_ == -1) return "";
+        	
+        int curpos = jj_input_stream.bufpos;
+    	log_.error("current position :" + curpos);
+    	log_.error("start position :" + startpos_);
+    	log_.error("Token Begin :" + jj_input_stream.tokenBegin);
+    	log_.error("Token Source Matched Position :" + token_source.jjmatchedPos);
+
+        if(curpos >= startpos_)
+       		return new String(jj_input_stream.buffer,startpos_,curpos - startpos_ + 1);
+        else
+        	return new String(jj_input_stream.buffer,startpos_,jj_input_stream.bufsize-startpos_)+
+					new String(jj_input_stream.buffer,0,curpos+1);        	
+	}
+	
+	/* [Start] ----- methods for LOOKAHEAD ----- */
+ 	 	
+ 	/* For LOOKAHEAD(<NL> <NL>), to detect sequential <NL>*/
+ 	protected boolean isBlankline(){
+ 		Token t1 = getToken(1);
+ 		Token t2 = getToken(2);
+ 		return (t1.kind == NL && (t2.kind == NL || t2.kind == EOF || t2.kind == TABLE || t2.kind == CTABLE || t2.kind == DLIST)); 		
+ 	}
+ 	
+ 	/* For LOOKAHEAD(<NL> "NOT BLOCKELEMENT TOPMARK") */
+ 	protected boolean isParagraph(){
+ 		boolean flag = true;
+ 		if(isNewline(1)){
+ 			for(int i=0;i<BLOCKELEMENT_KIND.length;i++){
+ 				Token t = getToken(2);
+ 				if(t.kind == BLOCKELEMENT_KIND[i]){
+ 					flag = false;
+ 					break;
+ 				}
+ 			}
+ 		}else{
+ 			flag = false;
+ 		}
+ 		
+ 		if(isTable()) flag = false;
+		if(isCSVTable()) flag = false;
+  		if(isDefineList()) flag = false;
+ 		return flag;
+ 	}
+ 	
+ 	/* */
+ 	protected boolean isNormalBlockElement(int[] types){
+ 		// getNewline should not be used for here, 
+ 		// for example, string "| foo |" is considered as Preshaped
+ 		if(getToken(1).kind == NL){
+ 			Token t = getToken(2);
+ 			for(int i=0; i < types.length; i++){
+ 				if(t.kind == types[i]) return true;
+ 			}
+ 		}
+ 		return false;
+ 	}
+ 	
+ 	/* For LOOKAHEAD(<TABLE>), LOOKAHEAD(<CTABLE>), LOOKAHEAD(<DLIST>) */
+ 	protected boolean isChangeStateBlockElement(int type){
+ 		Token t = getToken(1);
+ 		return (t.kind == type);	
+ 	} 	
+ 	
+ 	/* For LOOKAHEAD(<NL> <EXCERPT1>|<EXCERPT2>|<EXCERPT3>) */
+	protected boolean isExcerpt(){
+		return isNormalBlockElement(EXCERPT_KIND);
+	}
+	
+ 	/* For LOOKAHEAD(<NL> <LIST1>|<LIST2>|<LIST3>|<NLIST1>|<NLIST2>|<NLIST3>) */
+ 	protected boolean isList(){
+ 		return isNormalBlockElement(LIST_KIND);
+ 	}
+ 	
+ 	/* For LOOKAHEAD(<DLIST>) */
+ 	protected boolean isDefineList(){
+		return isChangeStateBlockElement(DLIST);
+ 	}
+	
+	/* For LOOKAHEAD(<NL> <PRESHAPED>) */
+	protected boolean isPreshaped(){
+		return isNormalBlockElement(PRESHAPED_KIND);
+	}
+	
+	/* For LOOKAHEAD(<TABLE>) */
+	protected boolean isTable(){
+		return isChangeStateBlockElement(TABLE);
+	}
+	
+	/* For LOOKAHEAD(<CTABLE>) */
+	protected boolean isCSVTable(){
+		return isChangeStateBlockElement(CTABLE);
+	}
+		
+	/* For LOOKAHEAD(<NL> <HEADING1>|<HEADING2>|<HEADING3>) */
+	protected boolean isHeading(){
+		return isNormalBlockElement(HEADING_KIND);
+	}
+	
+	/* For LOOKAHEAD(<NL> <ALIGN1>|<ALIGN2>|<ALIGN3>) */
+	protected boolean isAlign(){
+		return isNormalBlockElement(ALIGN_KIND);
+	}
+	
+	protected boolean isFloatAlign(){
+		return isNormalBlockElement(FALIGN_KIND);
+	}
+	
+	/* For LOOKAHEAD(<NL> <HORIZONTAL>) */
+	protected boolean isHorizontalline(){
+		return isNormalBlockElement(HORIZONTAL_KIND);
+	}
+	
+	/* For LOOKAHEAD(<NL> <BLOCKPLUGIN>)*/
+	protected boolean isBlockPlugin(){
+		return isNormalBlockElement(BLOCKPLUGIN_KIND);
+	}		
+	
+	protected boolean isNewline(int pos){
+		Token t = getToken(pos);
+		return (t.kind == NL || t.kind == TABLE || t.kind == CTABLE || t.kind == DLIST);
+	}
+	
+	/* [End] ----- methods for LOOKAHEAD ----- */
+ 	
+ 	/* error processing method */
+ 	private void processError(String msg, boolean inline,ParseException pe){
+ 		++nParseErrors_;
+		WikiErrors enode = new WikiErrors(JJTERRORS);
+//		StringBuffer buf = new StringBuffer(getErrorLine());
+		StringBuffer buf = new StringBuffer();
+		buf.append(getToken(0).image);
+		jjtree.openNodeScope(enode);				
+		
+//		initStartPosition();
+		
+		// this is important to avoid infinite loop
+		// when exception occured at choice point of BlockElement.
+		if(isNewline(0)) getNextToken();
+		
+		if(inline){
+			if(!isNewline(1)) getNextToken();
+ 		}else{
+			while(!isNewline(1)){
+				buf.append(getNextToken().image);
+			}
+		}		
+		enode.letter = buf.toString();
+		jjtree.closeNodeScope(enode,true);
+		log_.error(msg);
+		log_.error(enode.letter);
+ 	} 	
+}
+
+PARSER_END(WikiParser)
+
+TOKEN_MGR_DECLS :
+{
+	private Log tokenLog = LogFactory.getLog(getClass());
+	
+	private int nLexicalErrors_ = 0;
+	
+	public int getNLexicalErrors(){
+		return nLexicalErrors_;
+	}
+}
+
+/* Comment Line */
+<*> SKIP :
+{
+	< "\r" >
+	| < "\n" "//" (~["\n","\r"])* >
+}
+
+/* Named TOKEN */
+/**
+ * <NOASCII>
+ * For any language inputs other than english,
+ * based on UNICODE version 4.1.0 specification, 
+ * NOASCII TOKEN covers almost all range other than
+ *
+ *   0000-007f Basic Latin
+ *   0080-00ff Latin-1 Supplement
+ *   d800-db7f High Surrogates
+ *   db80-dbff High Private Use Surrogates
+ *   dc00-dfff Low Surrogates
+ *
+ * SEE:
+ * http://www.unicode.org/Public/4.1.0/ucd/Blocks.txt
+ * http://www.unicode.org/charts/
+ *
+ * The following token sepcification shows that there
+ * is a hole from \ud7b0 to \ud7ff, this means no
+ * character for those code point could not be located.
+ *
+ * <HOSTNAME>
+ * this does NOT support internationalized domain names (IDN),
+ * if needed, check the following guideline.
+ *
+ * SEE
+ * - Guidelines for the Implementation of Internationalized Domain Names
+ * http://www.icann.org/general/idn-guidelines-20jun03.htm
+ * - Available character in japan iDNs (Japanese)
+ * http://jprs.jp/info/jp-dom/character.html
+ */
+<*> TOKEN :
+{
+	< #ALPHABET: ["a"-"z","A"-"Z"] >
+	| < #HEX: ["0"-"9","a"-"f","A"-"F"] >
+	| < #DIGIT: ["0"-"9"] >
+	| < #NOASCII: ["\u0100"-"\ud7af","\ue000"-"\uffff"] >
+	| < #HOSTNAME: (<ALPHABET>|<DIGIT>|"-")+ ("." (<ALPHABET>|<DIGIT>|"-")+)* >
+	| < #PLUGINNAME: (<ALPHABET>|<DIGIT>|"_")+ >
+}
+
+/* Single TOKEN */
+<*> TOKEN :
+{
+	< NL: "\n" > : DEFAULT
+	| < TILDE: "~" >
+	| < SEMICOLON: ";" >
+	| < LPAREN: "(" >
+	| < RPAREN: ")" >
+	| < LBRACKET: "[" >
+	| < RBRACKET: "]" >
+	| < LBRACE: "{" >
+	| < RBRACE: "}" >
+	| < SLASH: "/" >
+	| < LT: "<" >
+}
+
+/* BlockElement TOKEN */
+<*>TOKEN :
+{
+	< EXCERPT1: ">" >
+	| < EXCERPT2: ">>" >
+	| < EXCERPT3: ">>>" >
+	| < LIST1: "-" >
+	| < LIST2: "--" >
+	| < LIST3: "---" >
+	| < NLIST1: "+" >
+	| < NLIST2: "++" >
+	| < NLIST3: "+++" >
+	| < PRESHAPED: " " >
+	| < HEADING1: "*" >
+	| < HEADING2: "**" >
+	| < HEADING3: "***" >
+	| < ALIGN1: "LEFT:" >
+	| < ALIGN2: "CENTER:" >
+	| < ALIGN3: "RIGHT:" >
+	| < FALIGN1: "FLEFT" ("(" (<DIGIT>)+ ")")? ":" >
+	| < FALIGN2: "FRIGHT" ("(" (<DIGIT>)+ ")")? ":" >
+	| < HORIZONTAL: "----" >
+	| < BLOCKPLUGIN: "#" <PLUGINNAME> >
+	| < COLORWORD: "COLOR" "(" ((<ALPHABET>)+|"#"(<HEX>)+) ")" ":" >
+	| < BGCOLORWORD: "BGCOLOR" "(" ((<ALPHABET>)+|"#"(<HEX>)+) ")" ":" >
+	| < SIZEWORD: "SIZE" "(" (<DIGIT>)+ ")" ":" >
+	| < COLSPAN: "==" >
+}
+
+/* TOKEN which switches the STATE */
+<*> TOKEN:
+{
+	< TABLE: "\n|" > : NTAB
+	| < DLIST: "\n:" > : NTAB
+	| < CTABLE: "\n," > : CTAB	
+}
+
+/* STATE dependent TOKEN */
+<DEFAULT>TOKEN:
+{
+	< PIPE: "|" >
+	| < COLON: ":" >
+	| < COMMA: "," >
+}
+
+<NTAB>TOKEN:
+{
+	< TABLEDEL: "|" >
+	| <NTABCOLSPAN: ">|" >
+	| <NTABROWSPAN: "~|" >
+}
+
+<CTAB>TOKEN:
+{
+	<CTABLEDEL: "," >
+}
+
+/* InlineElement TOKEN */
+
+ 
+/**
+ * - InlineElement TOKEN specification Policy
+ * This includes lots of complex REs, although the basic policy
+ * is to use as simple RE as possible.
+ * For it is difficult to distingish some alphabet sequential words,
+ * like URL or e-mail addrss.
+ * If you'll do that at the parser level, it needs deeper LOOKAHEAD.
+ */
+<*> TOKEN :
+{
+	< #ANCHORNAME: "#" <ALPHABET> (<ALPHABET>|<DIGIT>)+>
+	| < #URL: ("http"|"https"|"ftp"|"news") "://" <HOSTNAME> (":" (<DIGIT>)+)? ("/" (["A"-"Z","a"-"z","0"-"9","-","~","&","?","=","%",".","_","#"])*)* >
+	| < #EMAIL: (["A"-"Z","a"-"z","0"-"9","-",".","_"])+ "@" <HOSTNAME> >
+	| < #NAME: (~["\"","#","&","<",">",":","[","]","\n","\r"])+ >
+//	| < #PLUGINARG: (~["\"","#","&","(",")","[","]","<",">",",","\n","\r"])+ >
+//	| < #PLUGINARG: (~["\"","%","{","}","[","]","<",">","|",";","\n","\r"])+ >
+	| < #PLUGINARG: (~["\"","%","{","}","(","[","]","<",">","|",";","\n","\r"]) (~["\"","%","{","}","[","]","<",">","|",";","\n","\r"])* > // for Annotation
+	| < DELETELINE : "%%" >
+	| < STRONGITALIC: ("\'\'"|"\'\'\'"|"\'\'\'\'\'") >
+	| < WIKINAME: (["A"-"Z"])+ (["a"-"z"])+ ((["A"-"Z"])+ (["a"-"z"])+)+>
+	| < NATIVELINK: (<URL>|<EMAIL>) >
+	| < ANCHOR: "[" <ANCHORNAME> "]" >
+	| < PAGENAME: "[[" <NAME> (<ANCHORNAME>)? "]]" >
+	| < LINK: "[[" <NAME> ":" (<URL>|<EMAIL>) "]]" >
+	| < INTERWIKI: "[[" <NAME> ":" <NAME> (<ANCHORNAME>)? "]]" >
+	| < ALIASLINK: "[["<NAME> ">" (<URL>|<EMAIL>) "]]" >
+	| < ALIAS: "[[" <NAME> ">" (<NAME> (<ANCHORNAME>)?|<ANCHORNAME>) "]]" > // Interwiki not implemented
+	| < IDENTIFIER: (<ALPHABET>|<DIGIT>|<NOASCII>|"."|"_"|"/"|"^"|"?")+ >
+//	| < ARGS: "(" <PLUGINARG> ("," <PLUGINARG>)* ")">
+	| < ARGS: "(" <PLUGINARG> ")" >
+	| < INLINEPLUGIN: "&" <PLUGINNAME> >
+}
+
+/* Any character matched TOKEN */
+<*>TOKEN :
+{
+	< ANYOTHER: ~[]> 
+	{
+		++nLexicalErrors_;
+		tokenLog.info("unknown token " + image);
+	}
+}
+
+/* JAVACODE */
+/**
+ * This JAVACODE production should not be generated while parsing.
+ * Because WIKI syntax is supposed to be made of the combination
+ * of NT BlockElement().
+ * If you find this node within the generated tree, it indicates that
+ * there's some syntax error in the wiki document.
+ */
+JAVACODE
+void SyntaxError(){
+	ParseException e = generateParseException();
+	StringBuffer buf = new StringBuffer();
+	buf.append(getToken(0));
+	Token t;
+	while(!isNewline(1)){
+		t=getNextToken();
+		buf.append(t.image);
+	}
+	jjtThis.letter = buf.toString();
+	throw e;
+}
+
+/**
+ * SkipToNewline is for Preshaped() and Horizontal().
+ * As to these NTs, they are not care about the characters
+ * after its starting token.
+ *
+ * As you know, in this case we can use lexical state, though
+ * it is difficult to return from another state to DEFAULT
+ * because its discriminated token is <NL> and this JJTree
+ * uses <NL> as key discriminator for other BlockElements:
+ * Consuming <ANOTHERNL> defined in that state in returning,
+ * the parser might not to be able to recognize the next
+ * BlockElement in DEFAULT state.
+ * It also makes it difficult to get the matched characters 
+ * even if we would specified <NL> as the one will be matched
+ * under any lexical state to avoid the parser issue described
+ * above.
+ * Other way, we can specify Preshaped or Horizonal like
+ *   <PRESHAPED: "\n" " " (~["\n","\r"])*>
+ * It seems to be good here.
+ * The reason why not to use this is just to avoid the complex 
+ * RE (~[])* in lexical analisys.
+ * If the reason doesn't matter, the last one is thought 
+ * to be the simplest.
+ */
+JAVACODE
+void SkipToNewline(){
+	StringBuffer buf = new StringBuffer();	
+	while(!isNewline(1)){
+		Token t=getNextToken();
+		buf.append(t.image);		
+	}
+	jjtThis.letter = buf.toString();
+}
+
+/* Syntax Definition */
+void GenerateTree():
+{
+}
+{
+	(
+		try{
+			BlockElement()
+			| <EOF> 
+			  {
+			  	jjtThis.annotation = annotation_;
+			  	jjtThis.toc = toc_;
+			  	return;
+			  }
+			| SyntaxError()
+		}catch(ParseException pe){
+			++nParseErrors_;
+			processError("critical parsing error at syntax level.",false,pe);
+		}
+	)+
+}
+
+void BlockElement() #void: 
+{
+}
+{
+	(
+		try{
+			// BlockElement choice point
+			LOOKAHEAD({isExcerpt()})Excerpt()
+			| LOOKAHEAD({isList()}) List()
+			| LOOKAHEAD({isDefineList()}) DefineList()
+			| LOOKAHEAD({isPreshaped()}) Preshaped()
+			| LOOKAHEAD({isTable()}) Table()
+			| LOOKAHEAD({isCSVTable()}) CSVTable()
+			| LOOKAHEAD({isHeading()}) Heading()
+			| LOOKAHEAD({isAlign()}) Align()
+			| LOOKAHEAD({isFloatAlign()}) FloatAlign()
+			| LOOKAHEAD({isHorizontalline()}) Horizontalline()
+			| LOOKAHEAD({isBlankline()}) Blankline()
+			| LOOKAHEAD({isBlockPlugin()}) BlockPlugin()			
+			| Paragraph()
+		}catch(ParseException pe){
+			processError("parsing error for block element.",false,pe);
+		}
+	)
+}
+
+void InlineElement() #void:
+{
+}
+{
+	(
+		try{
+			StrongItalic()
+			| Deleteline()
+			| Annotation()
+			| Linker()
+			| InlinePlugin()
+			| Letters()
+			| AnyOther()
+		}catch(ParseException pe){
+			processError("parsing error for inline element.",true,pe);
+		}
+	)
+}
+
+/* BlockElement Definition */
+void Paragraph():
+{
+}
+{
+	(
+		LOOKAHEAD({isParagraph()}) <NL> [LOOKAHEAD(<TILDE>,{!isNewline(2)}) <TILDE>] (InlineElement())+
+	)+
+}
+
+void Excerpt():
+{
+	Token t;
+}
+{
+	<NL> (t=<EXCERPT1>|t=<EXCERPT2>|t=<EXCERPT3>) (InlineElement())*
+	(
+		LOOKAHEAD({isExcerpt()})Excerpt()
+		| LOOKAHEAD({isList()}) List()
+		| LOOKAHEAD({isDefineList()}) DefineList()
+		| LOOKAHEAD({isPreshaped()}) Preshaped()
+		| LOOKAHEAD({isTable()}) Table()
+		| LOOKAHEAD({isCSVTable()}) CSVTable()
+		| LOOKAHEAD({isAlign()}) Align()
+		| LOOKAHEAD({isBlockPlugin()}) BlockPlugin()	
+		| LOOKAHEAD({isParagraph()})Paragraph()
+	)*
+	{jjtThis.level = t.image.length();}
+}
+
+void List():
+{
+	Token t;
+}
+{	
+	(
+		(
+			LOOKAHEAD({isList()}) <NL> (t=<LIST1>|t=<LIST2>|t=<LIST3>|t=<NLIST1>|t=<NLIST2>|t=<NLIST3>) (InlineElement())*
+			(
+				LOOKAHEAD({isExcerpt()})Excerpt()
+				//| LOOKAHEAD({isList()}) List()
+				| LOOKAHEAD({isDefineList()}) DefineList()
+				| LOOKAHEAD({isPreshaped()}) Preshaped()
+				| LOOKAHEAD({isTable()}) Table()
+				| LOOKAHEAD({isCSVTable()}) CSVTable()
+				| LOOKAHEAD({isAlign()}) Align()
+				| LOOKAHEAD({isBlockPlugin()}) BlockPlugin()	
+				| LOOKAHEAD({isParagraph()}) Paragraph()
+			)*
+			{
+				jjtThis.level = t.image.length();
+				jjtThis.type = GenerateNodeHelper.getListType(t.image);
+			}
+		) #ListMember
+	)+
+}
+
+void DefineList():
+{
+}
+{
+	(
+		LOOKAHEAD({isDefineList()}) <DLIST> {setStartPosition();} ((InlineElement())* #DefinedWord )
+		(<TABLEDEL>|<NTABCOLSPAN>|<NTABROWSPAN>)
+		(
+			[LOOKAHEAD(1) <TILDE>] (InlineElement())*
+			(
+				LOOKAHEAD({isExcerpt()})Excerpt()
+				| LOOKAHEAD({isList()}) List()
+				//| LOOKAHEAD({isDefineList()}) DefineList()
+				| LOOKAHEAD({isPreshaped()}) Preshaped()
+				| LOOKAHEAD({isTable()}) Table()
+				| LOOKAHEAD({isCSVTable()}) CSVTable()
+				| LOOKAHEAD({isAlign()}) Align()
+				| LOOKAHEAD({isBlockPlugin()}) BlockPlugin()	
+				| LOOKAHEAD({isParagraph()}) Paragraph()
+			)*
+		 )#ExplanationWord
+	)+
+}
+
+void Preshaped():
+{
+}
+{
+	(LOOKAHEAD({isPreshaped()}) <NL> <PRESHAPED> SkipToNewline())+
+}
+
+void Table():
+{
+	Token t;
+}
+{
+	(
+		LOOKAHEAD({isTable()}) <TABLE> {setStartPosition();}
+		try{
+			(( 
+				(
+//					LOOKAHEAD(<EXCERPT1> <TABLEDEL>) <EXCERPT1> <TABLEDEL> {jjtThis.iscolspan = true;}
+					<NTABCOLSPAN> {jjtThis.iscolspan = true;}
+					| <NTABROWSPAN> {jjtThis.isrowspan = true;}
+					| [
+						(
+							t=<ALIGN1> {jjtThis.align = t.image.substring(0,t.image.length()-1);}
+							| t=<ALIGN2> {jjtThis.align = t.image.substring(0,t.image.length()-1);}
+							| t=<ALIGN3> {jjtThis.align = t.image.substring(0,t.image.length()-1);}
+							| t=<COLORWORD> {jjtThis.color=GenerateNodeHelper.deleteParenthesis(t.image,"(",")");}
+							| t=<BGCOLORWORD> {jjtThis.bgcolor = GenerateNodeHelper.deleteParenthesis(t.image,"(",")");}						
+							| t=<SIZEWORD> {jjtThis.size = GenerateNodeHelper.deleteParenthesis(t.image,"(",")");}
+						)+
+					  ] LOOKAHEAD({!(getToken(1).kind==IDENTIFIER && isNewline(2))}) 
+					  (InlineElement())* (<TABLEDEL>|<NTABCOLSPAN>|<NTABROWSPAN>)					  
+				) #Tablecolumn
+			)+  [t=<IDENTIFIER> {jjtThis.type=GenerateNodeHelper.getTableType(t.image);}] ) #Tablemember
+		}catch(ParseException pe){
+			processError("parsing error for table.",false,pe);
+		}		
+	)+
+}
+
+void CSVTable():
+{
+}
+{
+	(
+		LOOKAHEAD({isCSVTable()}) <CTABLE> {setStartPosition();}
+		try{
+			(
+				(
+					LOOKAHEAD(2) <COLSPAN> <CTABLEDEL> {jjtThis.iscolspan=true;}
+					| (InlineElement())* <CTABLEDEL>
+				) #Tablecolumn
+			)+ #Tablemember
+		}catch(ParseException pe){
+			processError("parsing error for table.",false,pe);
+		}
+	)+
+}
+
+void Heading():
+{
+	Token t;
+}
+{
+	<NL> (t=<HEADING1>|t=<HEADING2>|t=<HEADING3>) (InlineElement())+ 
+	{
+		jjtThis.level=t.image.length();
+		jjtThis.num=addTOC(jjtThis);
+	}
+}
+
+void Align():
+{
+	Token t;
+}
+{
+	<NL> (t=<ALIGN1>|t=<ALIGN2>|t=<ALIGN3>) (InlineElement())*
+	(
+		LOOKAHEAD({!isBlankline()})	<NL> (InlineElement())+	
+	)*
+	{jjtThis.image = t.image;}
+}
+
+void FloatAlign():
+{
+	Token t;
+}
+{
+	<NL> (t=<FALIGN1>|t=<FALIGN2>) (InlineElement())*
+	(
+		LOOKAHEAD({isExcerpt()})Excerpt()
+		| LOOKAHEAD({isList()}) List()
+		| LOOKAHEAD({isDefineList()}) DefineList()
+		| LOOKAHEAD({isPreshaped()}) Preshaped()
+		| LOOKAHEAD({isTable()}) Table()
+		| LOOKAHEAD({isCSVTable()}) CSVTable()
+		| LOOKAHEAD({isBlockPlugin()}) BlockPlugin()	
+		| LOOKAHEAD({isParagraph()})Paragraph()
+	)*
+	{jjtThis.image = t.image;}
+}
+
+void Horizontalline():
+{
+}
+{
+	<NL> <HORIZONTAL> SkipToNewline()
+}
+
+void Blankline() #void:
+{
+}
+{
+	<NL>
+}
+
+void BlockPlugin():
+{
+	Token t;
+}
+{
+	<NL> t=<BLOCKPLUGIN> [Args()] SkipToNewline() {jjtThis.name = t.image.substring(1);}
+}
+
+/* InlineElement Definition */
+
+/**
+ * 
+ */
+void Letters():
+{
+	Token t;
+}
+{
+	(t=<NATIVELINK> 
+	{
+		if(GenerateNodeHelper.isEmail(t.image)){
+			jjtThis.isEmail = true;
+		}else{
+			jjtThis.isURL = true;
+		}			
+	}
+	| t=<WIKINAME> {jjtThis.isWikiname = true;}
+	| t=<ANCHOR> 
+	{
+		jjtThis.isAnchor = true;
+		jjtThis.letter = GenerateNodeHelper.deleteParenthesis(t.image,"[","]");
+	}
+	| t=<IDENTIFIER>
+	| t=<TILDE>
+	{
+		// Inline newline implimentation, by action, not NT.
+		// it is not clear for syntax structure, though,
+		// <NL> token works as delimiter between BlockElement,
+		// it is not good idea to consume <NL> at the inline newline.
+		if(isNewline(1)) jjtThis.isNewline = true;	
+	}
+	| t=<SEMICOLON>
+	| t=<LPAREN>
+	| t=<RPAREN>
+	| t=<LBRACKET>
+	| t=<RBRACKET>
+	| t=<LBRACE>
+	| t=<RBRACE>
+	| t=<SLASH>
+	| t=<EXCERPT1> {jjtThis.isHTMLescape = true;}
+	| t=<EXCERPT2> {jjtThis.isHTMLescape = true;}	
+	| t=<EXCERPT3> {jjtThis.isHTMLescape = true;}	
+	| t=<LT> {jjtThis.isHTMLescape = true;}
+	| t=<LIST1>
+	| t=<LIST2>
+	| t=<LIST3>
+	| t=<NLIST1>
+	| t=<NLIST2>
+	| t=<NLIST3>
+	| t=<ALIGN1>
+	| t=<ALIGN2>
+	| t=<ALIGN3>
+	| t=<FALIGN1>
+	| t=<FALIGN2>
+	| t=<COLON>
+	| t=<PRESHAPED>
+	| t=<HEADING1>
+	| t=<HEADING2>
+	| t=<HEADING3>
+	| t=<HORIZONTAL>
+	| t=<PIPE>
+	| t=<COMMA>
+	| t=<COLSPAN>
+	| t=<ARGS>
+	| t=<BLOCKPLUGIN>
+	)
+	{if(!jjtThis.isAnchor) jjtThis.letter = t.image;}
+}
+
+void AnyOther():
+{
+	Token t;
+}
+{
+	t=<ANYOTHER> 
+	{
+		jjtThis.letter = t.image;
+		log_.warn("AnyOther token : " + t.image);
+	}
+}
+
+void StrongItalic():
+{
+	Token t;
+}
+{
+	t=<STRONGITALIC> {jjtThis.prelevel = t.image.length();}
+	(
+//		| StrongItalic()
+		Deleteline()
+		| Annotation()
+		| Linker()
+		| InlinePlugin()
+		| Letters()
+		| AnyOther()
+	)+
+	t=<STRONGITALIC> {jjtThis.postlevel = t.image.length();}
+}
+
+void Deleteline():
+{
+}
+{
+	<DELETELINE>
+	(
+		StrongItalic()
+//		| Deleteline()
+		| Annotation()
+		| Linker()
+		| InlinePlugin()
+		| Letters()
+		| AnyOther()
+	)+
+	<DELETELINE>
+}
+
+void Annotation():
+{
+}
+{
+	"(("
+	(
+		StrongItalic()
+		| Deleteline()
+//		| Annotation()
+		| Linker()
+		| InlinePlugin()
+		| Letters()
+		| AnyOther()
+	)+	
+	"))" 
+	{
+		int i = addAnnotation(jjtThis);
+		jjtThis.num = i;
+	}
+}
+
+void Linker() #void:
+{
+	Token t;
+}
+{
+	(
+		(t=<INTERWIKI> {jjtThis.image = t.image.substring(2,t.image.length()-2);})#Interwiki
+		| (t=<LINK> {jjtThis.image=t.image.substring(2,t.image.length()-2);})#Link
+		| ((t=<ALIAS>
+		|  t=<ALIASLINK> {jjtThis.islink=true;}){jjtThis.image=t.image.substring(2,t.image.length()-2);})#Alias
+		| (t=<PAGENAME> {jjtThis.image = t.image.substring(2,t.image.length()-2);})#Pagename
+	)
+}
+
+void InlinePlugin():
+{
+	Token t;
+}
+{
+	t=<INLINEPLUGIN> [Args()]
+	(
+		[ <LBRACE>
+		(
+			StrongItalic()
+			| Deleteline()
+			| Annotation()
+			| Linker()
+			| InlinePlugin()
+			| LOOKAHEAD({!(getToken(1).kind==RBRACE && getToken(2).kind == SEMICOLON)}) Letters()
+		)+
+		<RBRACE>]
+	) 
+	<SEMICOLON> {jjtThis.name = t.image.substring(1);}
+}
+
+/* Other Element Definition */
+void Args():
+{
+	Token t;
+}
+{
+	t=<ARGS>
+	{jjtThis.args = GenerateNodeHelper.splitArgs(t.image);}
+}
+
+void Errors():
+{
+}
+{
+	{}
+}
