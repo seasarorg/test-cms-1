@@ -6,6 +6,9 @@
   <include path="dao.dicon" />
   <component
     class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
+    <property name="instanceDef">
+      @org.seasar.framework.container.deployer.InstanceDefFactory@REQUEST
+    </property>
     <initMethod name="addReferenceClass">
       <arg>@org.example.bean.TestBean@class</arg>
     </initMethod>

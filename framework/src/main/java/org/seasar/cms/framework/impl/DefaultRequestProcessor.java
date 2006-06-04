@@ -85,14 +85,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
             ThreadLocalS2ContainerUtils.deregister(container, request);
         }
 
-        try {
-            BeanUtils.populate(component, request.getParameterMap());
-        } catch (Throwable t) {
-        }
-
         Response response;
         if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
-            // Actionの呼び出しはdispatcherがREQUESTの時だけ。
+            // リクエストパラメータのinjectionとActionの呼び出しは
+            // dispatcherがREQUESTの時だけ。
+            try {
+                BeanUtils.populate(component, request.getParameterMap());
+            } catch (Throwable t) {
+            }
             response = invokeAction(component, actionName);
         } else {
             response = PassthroughResponse.INSTANCE;
