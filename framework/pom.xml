@@ -40,6 +40,23 @@
           <excludes>WEB-INF/lib/*</excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sample</id>
+            <phase>package</phase>
+            <goals>
+              <goal>assembly</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/sample.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <repositories>

@@ -2,6 +2,7 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components namespace="j2ee">
+  <include path="common.dicon" />
   <component name="transactionManager"
     class="org.seasar.extension.jta.TransactionManagerImpl" />
   <component name="requiredTx"
@@ -22,55 +23,15 @@
     <component class="org.seasar.extension.jdbc.impl.BooleanToIntStatementFactory"/>
   -->
 
-  <!--
-    <component name="xaDataSource"
-    class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
-    <property name="driverClassName">
-    "oracle.jdbc.driver.OracleDriver"
-    </property>
-    <property name="URL">
-    "jdbc:oracle:thin:@xxx:1521:xxx"
-    </property>
-    <property name="user">"xxx"</property>
-    <property name="password">"xxx"</property>
-    </component>
-    
-    <component name="xaDataSource"
-    class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
-    <property name="driverClassName">
-    "org.postgresql.Driver"
-    </property>
-    <property name="URL">
-    "jdbc:postgresql://localhost/TEST"
-    </property>
-    <property name="user">"xxxx"</property>
-    <property name="password">"xxxx"</property>
-    </component>
-    
-    <component name="xaDataSource"
-    class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
-    <property name="driverClassName">
-    "net.sourceforge.jtds.jdbc.Driver"
-    </property>
-    <property name="URL">
-    "jdbc:jtds:sqlserver://localhost/TEST;instance=SQLEXPRESS"
-    </property>
-    <property name="user">"xxxx"</property>
-    <property name="password">"xxxx"</property>
-    </component>
-  -->
-
   <component name="xaDataSource"
     class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
-    <property name="driverClassName">"org.hsqldb.jdbcDriver"</property>
+    <property name="driverClassName">config.getProperty("j2ee.xaDataSource.driverClassName", "org.hsqldb.jdbcDriver")</property>
     <property name="URL">
-      <!--
-        "jdbc:hsqldb:hsql://localhost:9001"
-      -->
-      "jdbc:hsqldb:file:" + application.getRealPath("/") + "WEB-INF/hsqldb"
+      config.getProperty("j2ee.xaDataSource.URL",
+        "jdbc:hsqldb:file:" + application.getRealPath("/") + "WEB-INF/hsqldb")
     </property>
-    <property name="user">"sa"</property>
-    <property name="password">""</property>
+    <property name="user">config.getProperty("j2ee.xaDataSource.user", "sa")</property>
+    <property name="password">config.getProperty("j2ee.xaDataSource.password", "")</property>
   </component>
 
   <component name="connectionPool"

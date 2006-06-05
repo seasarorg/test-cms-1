@@ -2,6 +2,5 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
- <include path="framework.dicon" />
- <include path="bean.dicon" />
+  <include path="common.dicon" />
 </components>

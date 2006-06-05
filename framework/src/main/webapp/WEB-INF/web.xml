@@ -5,7 +5,7 @@
   version="2.4">
   <context-param>
     <param-name>org.seasar.framework.container.configPath</param-name>
-    <param-value>app.dicon</param-value>
+    <param-value>framework.dicon</param-value>
   </context-param>
   <filter>
     <filter-name>encodingfilter</filter-name>
