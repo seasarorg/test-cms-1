@@ -35,6 +35,16 @@ public class Configuration {
 
     public String getProperty(String key) {
 
-        return properties_.getProperty(key);
+        String value = properties_.getProperty(key);
+        if (value != null) {
+            return value;
+        } else {
+            throw new RuntimeException("Property does not exist: key=" + key);
+        }
+    }
+
+    public String getProperty(String key, String defaultValue) {
+
+        return properties_.getProperty(key, defaultValue);
     }
 }
