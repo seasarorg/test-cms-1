@@ -35,23 +35,17 @@
         </executions>
       </plugin>
       <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <excludes>WEB-INF/lib/*</excludes>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>sample</id>
+            <id>bin</id>
             <phase>package</phase>
             <goals>
               <goal>assembly</goal>
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/assembly/sample.xml</descriptor>
+                <descriptor>src/main/assembly/bin.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
