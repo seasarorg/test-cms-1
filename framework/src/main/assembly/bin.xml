@@ -14,8 +14,8 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>src/sample/resources</directory>
-      <outputDirectory>resources</outputDirectory>
+      <directory>src/sample</directory>
+      <outputDirectory>sample</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target</directory>
