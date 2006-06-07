@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.seasar.cms.framework.PageNotFoundException;
 import org.seasar.cms.framework.PathMapping;
@@ -21,6 +23,8 @@ import org.seasar.kvasir.util.el.VariableResolver;
 public class DefaultRequestProcessor implements RequestProcessor {
 
     private static final String ACTION_RENDER = "_render";
+
+    public static final String ATTR_PAGE = "PAGE";
 
     private PathMapping[] mappings_;
 
@@ -104,6 +108,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
             // 行なう。
             response = invokeAction(component, ACTION_RENDER);
         }
+
+        // コンポーネント自体をrequestにバインドしておく。
+        ((HttpServletRequest) container.getExternalContext().getRequest())
+            .setAttribute(ATTR_PAGE, component);
 
         return response;
     }
