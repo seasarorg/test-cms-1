@@ -13,6 +13,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.container.ThreadLocalS2ContainerUtils;
+import org.seasar.cms.framework.generator.PageClassUpdater;
 import org.seasar.cms.framework.response.constructor.ResponseConstructor;
 import org.seasar.cms.framework.response.constructor.ResponseConstructorSelector;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
@@ -31,6 +32,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
     private PathMapping[] ignoreMappings_;
 
     private ResponseConstructorSelector responseConstructorSelector_;
+
+    private PageClassUpdater updater_;
 
     public Response process(String path, String method, String dispatcher,
         Map parameterMap) throws PageNotFoundException {
@@ -54,10 +57,19 @@ public class DefaultRequestProcessor implements RequestProcessor {
             return new VoidResponse();
         }
 
+        String componentName = mapping.getComponentName(resolver);
+
+        if (updater_ != null) {
+            Response response = updater_.update(getRootContainer(),
+                componentName, path);
+            if (response != null) {
+                return response;
+            }
+        }
+
+        String actionName = mapping.getActionName(resolver);
         Request request = new RequestImpl(path, method, dispatcher,
             parameterMap, mapping.getPathInfo(resolver));
-        String componentName = mapping.getComponentName(resolver);
-        String actionName = mapping.getActionName(resolver);
 
         return processRequest(request, componentName, actionName);
     }
@@ -210,5 +222,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
         ResponseConstructorSelector responseConstructorSelector) {
 
         responseConstructorSelector_ = responseConstructorSelector;
+    }
+
+    public void setPageClassUpdater(PageClassUpdater updater) {
+
+        updater_ = updater;
     }
 }
