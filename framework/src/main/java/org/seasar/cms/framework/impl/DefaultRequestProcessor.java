@@ -35,7 +35,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public Response process(String path, String method, String dispatcher,
         Map parameterMap) throws PageNotFoundException {
 
-        checkIfPathShouldBeIgnored(path, method, dispatcher);
+        if (isPathIgnored(path, method, dispatcher)) {
+            throw new PageNotFoundException(path);
+        }
 
         PathMapping mapping = null;
         VariableResolver resolver = null;
@@ -60,17 +62,18 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return processRequest(request, componentName, actionName);
     }
 
-    void checkIfPathShouldBeIgnored(String path, String method,
-        String dispatcher) throws PageNotFoundException {
+    boolean isPathIgnored(String path, String method, String dispatcher)
+        throws PageNotFoundException {
 
         if (Request.DISPATCHER_REQUEST.equals(dispatcher)
             && ignoreMappings_ != null) {
             for (int i = 0; i < ignoreMappings_.length; i++) {
                 if (ignoreMappings_[i].match(path, method) != null) {
-                    throw new PageNotFoundException(path);
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     Response processRequest(Request request, String componentName,
@@ -167,11 +170,21 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return constructor.constructResponse(value);
     }
 
+    public PathMapping[] getPathMappings() {
+
+        return mappings_;
+    }
+
     public void addMapping(String patternString, String componentNameTemplate,
         String actionNameTemplate, String pathInfoTemplate) {
 
         mappings_ = addMapping(mappings_, new PathMapping(patternString,
             componentNameTemplate, actionNameTemplate, pathInfoTemplate));
+    }
+
+    public PathMapping[] getIgnorePathMappings() {
+
+        return ignoreMappings_;
     }
 
     public void addIgnoreMapping(String patternString) {
