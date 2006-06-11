@@ -14,6 +14,7 @@ import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
 import org.seasar.framework.container.hotdeploy.HotdeployListener;
 import org.seasar.framework.container.hotdeploy.OndemandCreator;
 import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
+import org.seasar.framework.container.impl.S2ContainerImpl;
 import org.seasar.framework.container.util.S2ContainerUtil;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 import org.seasar.framework.exception.EmptyRuntimeException;
@@ -77,9 +78,11 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         hotdeployClassLoader = new HotdeployClassLoader(originalClassLoader);
         hotdeployClassLoader.setPackageName(rootPackageName);
         hotdeployClassLoader.addHotdeployListener(this);
+        ((S2ContainerImpl)container).setClassLoader(hotdeployClassLoader);
     }
 
     public void stop() {
+        ((S2ContainerImpl)container).setClassLoader(originalClassLoader);
         hotdeployClassLoader = null;
         originalClassLoader = null;
         BeanDescFactory.clear();

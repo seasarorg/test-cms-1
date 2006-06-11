@@ -7,10 +7,8 @@
   <artifactId>framework</artifactId>
   <name>CMS Framework</name>
   <version>0.0.1</version>
-  <description>
-    CMS Framework is a framework for developing light-weight web
-    application.
-  </description>
+  <description>CMS Framework is a framework for developing light-weight web
+    application.</description>
   <build>
     <defaultGoal>install</defaultGoal>
     <pluginManagement>
@@ -79,12 +77,12 @@
       <version>1.7.0</version>
       <exclusions>
         <exclusion>
-          <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
+          <groupId>log4j</groupId>
         </exclusion>
         <exclusion>
-          <groupId>logkit</groupId>
           <artifactId>logkit</artifactId>
+          <groupId>logkit</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -102,6 +100,16 @@
       <groupId>org.seasar.kvasir</groupId>
       <artifactId>kvasir-util</artifactId>
       <version>3.0.0-EA2</version>
+    </dependency>
+    <dependency>
+      <groupId>net.skirnir.freyja</groupId>
+      <artifactId>freyja</artifactId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>2.3.6</version>
     </dependency>
   </dependencies>
 </project>

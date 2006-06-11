@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
 public class OndemandFilter implements Filter {
@@ -22,11 +23,17 @@ public class OndemandFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
         FilterChain chain) throws IOException, ServletException {
 
-        OndemandUtils.start(SingletonS2ContainerFactory.getContainer());
+        ClassLoader originalClassLoader = Thread.currentThread()
+            .getContextClassLoader();
+        S2Container container = SingletonS2ContainerFactory.getContainer();
+        OndemandUtils.start(container);
+        Thread.currentThread()
+            .setContextClassLoader(container.getClassLoader());
         try {
             chain.doFilter(request, response);
         } finally {
-            OndemandUtils.stop(SingletonS2ContainerFactory.getContainer());
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
+            OndemandUtils.stop(container);
         }
     }
 }

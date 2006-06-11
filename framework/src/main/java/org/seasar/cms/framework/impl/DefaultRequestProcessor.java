@@ -2,23 +2,27 @@ package org.seasar.cms.framework.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.seasar.cms.framework.MatchedPathMapping;
 import org.seasar.cms.framework.PageNotFoundException;
 import org.seasar.cms.framework.PathMapping;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.ResponseCreator;
 import org.seasar.cms.framework.container.ThreadLocalS2ContainerUtils;
-import org.seasar.cms.framework.generator.PageClassUpdater;
+import org.seasar.cms.framework.generator.ClassDesc;
+import org.seasar.cms.framework.generator.PageClassGenerator;
 import org.seasar.cms.framework.response.constructor.ResponseConstructor;
 import org.seasar.cms.framework.response.constructor.ResponseConstructorSelector;
+import org.seasar.cms.framework.zpt.ZptResponseCreator;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
-import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.kvasir.util.el.VariableResolver;
 
 public class DefaultRequestProcessor implements RequestProcessor {
@@ -33,7 +37,11 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private ResponseConstructorSelector responseConstructorSelector_;
 
-    private PageClassUpdater updater_;
+    private S2Container container_;
+
+    private PageClassGenerator generator_;
+
+    private ResponseCreator creator_ = new ZptResponseCreator();
 
     public Response process(String path, String method, String dispatcher,
         Map parameterMap) throws PageNotFoundException {
@@ -42,36 +50,43 @@ public class DefaultRequestProcessor implements RequestProcessor {
             throw new PageNotFoundException(path);
         }
 
-        PathMapping mapping = null;
+        MatchedPathMapping matched = findMatchedPathMapping(path, method);
+        if (matched == null) {
+            return new VoidResponse();
+        }
+        PathMapping mapping = matched.getPathMapping();
+        VariableResolver resolver = matched.getVariableResolver();
+
+        String componentName = mapping.getComponentName(resolver);
+        String actionName = mapping.getActionName(resolver);
+        Request request = new RequestImpl(path, method, dispatcher,
+            parameterMap, mapping.getPathInfo(resolver));
+
+        if (generator_ != null) {
+            ClassDesc[] descriptors = generator_.update(path);
+            if (descriptors != null) {
+                Map variableMap = new HashMap();
+                variableMap.put("request", request);
+                variableMap.put("classDescriptors", descriptors);
+                return creator_.createResponse("template/updated", variableMap);
+            }
+        }
+
+        return processRequest(request, componentName, actionName);
+    }
+
+    public MatchedPathMapping findMatchedPathMapping(String path, String method) {
+
         VariableResolver resolver = null;
         if (mappings_ != null) {
             for (int i = 0; i < mappings_.length; i++) {
                 resolver = mappings_[i].match(path, method);
                 if (resolver != null) {
-                    mapping = mappings_[i];
-                    break;
+                    return new MatchedPathMapping(mappings_[i], resolver);
                 }
             }
         }
-        if (mapping == null) {
-            return new VoidResponse();
-        }
-
-        String componentName = mapping.getComponentName(resolver);
-
-        if (updater_ != null) {
-            Response response = updater_.update(getRootContainer(),
-                componentName, path);
-            if (response != null) {
-                return response;
-            }
-        }
-
-        String actionName = mapping.getActionName(resolver);
-        Request request = new RequestImpl(path, method, dispatcher,
-            parameterMap, mapping.getPathInfo(resolver));
-
-        return processRequest(request, componentName, actionName);
+        return null;
     }
 
     boolean isPathIgnored(String path, String method, String dispatcher)
@@ -91,17 +106,16 @@ public class DefaultRequestProcessor implements RequestProcessor {
     Response processRequest(Request request, String componentName,
         String actionName) {
 
-        S2Container container = getRootContainer();
-        if (!container.hasComponentDef(componentName)) {
+        if (!container_.hasComponentDef(componentName)) {
             return PassthroughResponse.INSTANCE;
         }
 
         Object component;
         try {
-            ThreadLocalS2ContainerUtils.register(container, request);
-            component = container.getComponent(componentName);
+            ThreadLocalS2ContainerUtils.register(container_, request);
+            component = container_.getComponent(componentName);
         } finally {
-            ThreadLocalS2ContainerUtils.deregister(container, request);
+            ThreadLocalS2ContainerUtils.deregister(container_, request);
         }
 
         Response response;
@@ -125,7 +139,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         // コンポーネント自体をrequestにバインドしておく。
-        ((HttpServletRequest) container.getExternalContext().getRequest())
+        ((HttpServletRequest) container_.getExternalContext().getRequest())
             .setAttribute(ATTR_PAGE, component);
 
         return response;
@@ -149,9 +163,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
-    S2Container getRootContainer() {
+    public void setS2Container(S2Container container) {
 
-        return SingletonS2ContainerFactory.getContainer();
+        container_ = container;
     }
 
     public Method getActionMethod(Object component, String actionName) {
@@ -224,8 +238,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
         responseConstructorSelector_ = responseConstructorSelector;
     }
 
-    public void setPageClassUpdater(PageClassUpdater updater) {
+    public void setPageClassGenerator(PageClassGenerator generator) {
 
-        updater_ = updater;
+        generator_ = generator;
+    }
+
+    public void setResponseCreaator(ResponseCreator creator) {
+
+        creator_ = creator;
     }
 }

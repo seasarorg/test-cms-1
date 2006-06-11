@@ -11,6 +11,7 @@ public class OndemandUtils {
     }
 
     public static void start(S2Container container) {
+
         if (!hasLocalOndemandCreatorContainer(container)) {
             return;
         }
@@ -18,6 +19,7 @@ public class OndemandUtils {
     }
 
     public static void stop(S2Container container) {
+
         if (!hasLocalOndemandCreatorContainer(container)) {
             return;
         }
@@ -26,12 +28,14 @@ public class OndemandUtils {
 
     protected static boolean hasLocalOndemandCreatorContainer(
         S2Container container) {
+
         return container.hasComponentDef(LocalOndemandCreatorContainer.class);
     }
 
     protected static LocalOndemandCreatorContainer getLocalOndemandCreatorContainer(
         S2Container container) throws ComponentNotFoundRuntimeException,
         TooManyRegistrationRuntimeException, CyclicReferenceRuntimeException {
+
         return (LocalOndemandCreatorContainer) container
             .getComponent(LocalOndemandCreatorContainer.class);
     }

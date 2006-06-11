@@ -1,0 +1,9 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <p tal:content="PAGE/body">BODY</p>
+  </body>
+</html>
+  
