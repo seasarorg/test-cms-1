@@ -17,8 +17,9 @@ public class ZptAnalyzerTest extends TestCase {
 
     private Map classDescriptorMap_ = new HashMap();
 
-    private void act(String methodName) {
+    protected void setUp() throws Exception {
 
+        analyzer_ = new ZptAnalyzer();
         PageClassGeneratorImpl generator = new PageClassGeneratorImpl() {
             public String getComponentName(String path) {
                 return path;
@@ -39,10 +40,13 @@ public class ZptAnalyzerTest extends TestCase {
             }
         };
         generator.setDtoPackageName("com.example.dto");
+        analyzer_.setPageClassGenerator(generator);
+    }
 
-        analyzer_.analyze(generator, classDescriptorMap_, getClass()
-            .getResourceAsStream("ZptAnalyzerTest_" + methodName + ".zpt"),
-            "UTF-8", CLASSNAME);
+    private void act(String methodName) {
+
+        analyzer_.analyze(classDescriptorMap_, getClass().getResourceAsStream(
+            "ZptAnalyzerTest_" + methodName + ".zpt"), "UTF-8", CLASSNAME);
     }
 
     private ClassDesc getClassDescriptor(String name) {
@@ -85,7 +89,8 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(pd);
         assertTrue(pd.isReadable());
         assertTrue(pd.isArray());
-        assertEquals("com.example.dto.Entity", pd.getType());
+        assertNull(pd.getType());
+        assertEquals("com.example.dto.Entity", pd.getDefaultType());
         ClassDesc cd2 = getClassDescriptor("com.example.dto.Entity");
         assertNotNull(cd2);
         PropertyDesc pd2 = cd2.getPropertyDesc("content");

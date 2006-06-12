@@ -7,7 +7,7 @@ public class ClassDesc {
 
     private String name_;
 
-    private Map propertyMap_ = new LinkedHashMap();
+    private Map propertyDescMap_ = new LinkedHashMap();
 
     public ClassDesc(String name) {
         setName(name);
@@ -50,24 +50,24 @@ public class ClassDesc {
         PropertyDesc descriptor = getPropertyDesc(name);
         if (descriptor == null) {
             descriptor = new PropertyDesc(name);
-            propertyMap_.put(name, descriptor);
+            propertyDescMap_.put(name, descriptor);
         }
         descriptor.addMode(mode);
     }
 
     public PropertyDesc getPropertyDesc(String name) {
 
-        return (PropertyDesc) propertyMap_.get(name);
+        return (PropertyDesc) propertyDescMap_.get(name);
     }
 
     public void setPropertyDesc(PropertyDesc propertyDesc) {
 
-        propertyMap_.put(propertyDesc.getName(), propertyDesc);
+        propertyDescMap_.put(propertyDesc.getName(), propertyDesc);
     }
 
     public PropertyDesc[] getPropertyDescs() {
 
-        return (PropertyDesc[]) propertyMap_.values().toArray(
+        return (PropertyDesc[]) propertyDescMap_.values().toArray(
             new PropertyDesc[0]);
     }
 }

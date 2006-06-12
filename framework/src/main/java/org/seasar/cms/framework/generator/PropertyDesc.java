@@ -16,6 +16,8 @@ public class PropertyDesc {
 
     private String type_;
 
+    private String defaultType_;
+
     private int mode_;
 
     public PropertyDesc(String name) {
@@ -33,27 +35,42 @@ public class PropertyDesc {
         return type_;
     }
 
+    public void setType(String type) {
+
+        type_ = type;
+    }
+
+    public String getDefaultType() {
+
+        return defaultType_;
+    }
+
+    public void setDefaultType(String defaultType) {
+
+        defaultType_ = defaultType;
+    }
+
     public String getTypeString() {
 
-        if (type_ == null) {
-            return "String";
+        String type;
+        if (type_ != null) {
+            type = type_;
+        } else if (defaultType_ != null) {
+            type = defaultType_;
+        } else {
+            type = "String";
         }
 
         StringBuffer sb = new StringBuffer();
-        if (type_.startsWith(PACKAGE_JAVA_LANG)) {
-            sb.append(type_.substring(PACKAGE_JAVA_LANG.length()));
+        if (type.startsWith(PACKAGE_JAVA_LANG)) {
+            sb.append(type.substring(PACKAGE_JAVA_LANG.length()));
         } else {
-            sb.append(type_);
+            sb.append(type);
         }
         if (isArray()) {
             sb.append("[]");
         }
         return sb.toString();
-    }
-
-    public void setType(String type) {
-
-        type_ = type;
     }
 
     public int getMode() {

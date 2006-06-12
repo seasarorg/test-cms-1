@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <include path="app.dicon" />
+  <include path="common.dicon" />
+  <include path="dao.dicon" />
+  <component
+    class="org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer">
+    <property name="rootPackageName">
+      config.getProperty("rootPackageName")
+    </property>
+    <initMethod name="addCreator">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.creator.PageCreator">
+           <initMethod name="addCustomizer">
+            <arg>
+              <component
+                class="org.seasar.framework.container.autoregister.AspectCustomizer">
+                <property name="interceptor">dao.interceptor</property>
+              </component>
+            </arg>
+          </initMethod>
+        </component>
+      </arg>
+    </initMethod>
+    <initMethod name="addCreator">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.creator.DtoCreator" />
+      </arg>
+    </initMethod>
+  </component>
+</components>

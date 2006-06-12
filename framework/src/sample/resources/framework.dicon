@@ -2,9 +2,7 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
-  <include path="app.dicon" />
-  <include path="bean.dicon" />
-  <include path="common.dicon" />
+  <include path="convention.dicon" />
   <component
     class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
     <initMethod name="addReferenceClass">
@@ -33,14 +31,20 @@
   <component
     class="org.seasar.cms.framework.impl.DefaultRequestProcessor">
     <initMethod name="addMapping">
+      <arg>"^$"</arg>
+      <arg>"DefaultPage"</arg>
+      <arg>"_${method}"</arg>
+      <arg>""</arg>
+    </initMethod>
+    <initMethod name="addMapping">
       <arg>"^/([^/]+)\\.(.+)$"</arg>
-      <arg>"bean.${1}"</arg>
+      <arg>"${1}Page"</arg>
       <arg>"_${method}"</arg>
       <arg>""</arg>
     </initMethod>
     <initMethod name="addMapping">
       <arg>"^/([^/]+)/([^/]+)\\.(.+)$"</arg>
-      <arg>"bean.${1}"</arg>
+      <arg>"${1}Page"</arg>
       <arg>"_${method}${2u}"</arg>
       <arg>""</arg>
     </initMethod>
@@ -58,5 +62,9 @@
     <property name="strategies">
       container.findComponents(@org.seasar.cms.framework.response.scheme.Strategy@class)
     </property>
+  </component>
+  <component class="org.seasar.cms.framework.generator.impl.PageClassGeneratorImpl">
+    <property name="templateAnalyzer">new org.seasar.cms.framework.zpt.ZptAnalyzer()</property>
+    <property name="javaSourceGenerator">new org.seasar.cms.framework.freemarker.FreemarkerJavaSourceGenerator()</property>
   </component>
 </components>

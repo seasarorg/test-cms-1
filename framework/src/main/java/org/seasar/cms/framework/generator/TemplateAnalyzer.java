@@ -5,7 +5,6 @@ import java.util.Map;
 
 public interface TemplateAnalyzer {
 
-    void analyze(PageClassGenerator generator,
-        Map classDescriptorMap, InputStream inputStream, String encoding,
-        String className);
+    void analyze(Map classDescriptorMap, InputStream inputStream,
+        String encoding, String className);
 }

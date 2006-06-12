@@ -53,7 +53,7 @@ public class AnalyzerContext extends ZptTemplateContext {
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
             pd.addMode(PropertyDesc.ARRAY);
-            pd.setType(dtoClassName_);
+            pd.setDefaultType(dtoClassName_);
         }
 
         return super.pushRepeatInfo(name, objs);
@@ -64,7 +64,7 @@ public class AnalyzerContext extends ZptTemplateContext {
         if (getClassDescriptor(dtoClassName_, false) == null) {
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
-            pd.setType(null);
+            pd.setDefaultType(null);
         }
 
         dtoName_ = null;

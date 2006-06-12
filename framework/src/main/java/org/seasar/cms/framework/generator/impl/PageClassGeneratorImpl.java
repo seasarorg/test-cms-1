@@ -17,16 +17,16 @@ import java.util.Map;
 
 import org.seasar.cms.framework.MatchedPathMapping;
 import org.seasar.cms.framework.Request;
+import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
-import org.seasar.cms.framework.freemarker.FreemarkerJavaSourceGenerator;
 import org.seasar.cms.framework.generator.ClassDesc;
 import org.seasar.cms.framework.generator.JavaSourceGenerator;
 import org.seasar.cms.framework.generator.PageClassGenerator;
 import org.seasar.cms.framework.generator.PropertyDesc;
 import org.seasar.cms.framework.generator.TemplateAnalyzer;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
+import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
-import org.seasar.framework.container.hotdeploy.OndemandCreator;
 import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 
@@ -36,7 +36,7 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
 
     private DefaultRequestProcessor defaultRequestProcessor_;
 
-    private OndemandCreator[] creators_;
+    private LocalOndemandCreatorContainer creatorContainer_;
 
     private File sourceDirectory_;
 
@@ -50,7 +50,7 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
 
     private String dtoPackageName_;
 
-    private JavaSourceGenerator javaSourceGenerator_ = new FreemarkerJavaSourceGenerator();
+    private JavaSourceGenerator javaSourceGenerator_;
 
     public ClassDesc[] update(String path) {
 
@@ -72,7 +72,7 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
 
         Map classDescriptorMap = new HashMap();
         try {
-            analyzer_.analyze(this, classDescriptorMap, new FileInputStream(
+            analyzer_.analyze(classDescriptorMap, new FileInputStream(
                 templateFile), encoding_, className);
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
@@ -106,10 +106,12 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
         } else if (container_.hasComponentDef(componentName)) {
             return container_.getComponentDef(componentName)
                 .getComponentClass().getName();
-        } else if (creators_ != null) {
-            for (int i = 0; i < creators_.length; i++) {
+        } else {
+            int size = creatorContainer_.getCreatorSize();
+            for (int i = 0; i < size; i++) {
                 try {
-                    creators_[i].getComponentDef(container_, componentName);
+                    creatorContainer_.getCreator(i).getComponentDef(container_,
+                        componentName);
                 } catch (ClassNotFoundRuntimeException ex) {
                     return ex.getCause().getMessage();
                 }
@@ -204,7 +206,11 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
         ClassDesc classDesc = new ClassDesc(className);
         PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
         for (int i = 0; i < pds.length; i++) {
-            PropertyDesc propertyDesc = new PropertyDesc(pds[i].getName());
+            String name = pds[i].getName();
+            if ("class".equals(name)) {
+                continue;
+            }
+            PropertyDesc propertyDesc = new PropertyDesc(name);
             int mode = PropertyDesc.NONE;
             if (pds[i].getReadMethod() != null) {
                 mode |= PropertyDesc.READ;
@@ -219,6 +225,7 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
                 propertyType = propertyType.getComponentType();
             }
             propertyDesc.setType(propertyType.getName());
+            propertyDesc.setMode(mode);
             classDesc.setPropertyDesc(propertyDesc);
         }
 
@@ -244,21 +251,26 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
     public void setOndemandCreatorContainer(OndemandCreatorContainer container) {
 
         if (container instanceof LocalOndemandCreatorContainer) {
-            LocalOndemandCreatorContainer localContainer = (LocalOndemandCreatorContainer) container;
-            creators_ = new OndemandCreator[localContainer.getCreatorSize()];
-            for (int i = 0; i < creators_.length; i++) {
-                creators_[i] = localContainer.getCreator(i);
-            }
+            creatorContainer_ = (LocalOndemandCreatorContainer) container;
         } else {
-            creators_ = new OndemandCreator[0];
+            throw new ComponentNotFoundRuntimeException(
+                "LocalOndemandCreatorContainer");
         }
     }
 
     public void setS2Container(S2Container container) {
 
         container_ = container;
-        defaultRequestProcessor_ = (DefaultRequestProcessor) container
-            .getComponent(DefaultRequestProcessor.class);
+    }
+
+    public void setRequestProcessor(RequestProcessor requestProcessor) {
+
+        if (requestProcessor instanceof DefaultRequestProcessor) {
+            defaultRequestProcessor_ = (DefaultRequestProcessor) requestProcessor;
+        } else {
+            throw new ComponentNotFoundRuntimeException(
+                "DefaultRequestProcessor");
+        }
     }
 
     public void setSourceDirectoryPath(String sourceDirectoryPath) {

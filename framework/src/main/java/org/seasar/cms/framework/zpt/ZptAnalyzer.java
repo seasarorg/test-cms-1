@@ -50,11 +50,13 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         }.addTypePrefix("path", new AnalyzerPathTypePrefixHandler('/')
             .addPathResolver(new BeanPathResolver()), true));
 
-    public void analyze(PageClassGenerator generator, Map classDescriptorMap,
-        InputStream inputStream, String encoding, String className) {
+    private PageClassGenerator generator_;
+
+    public void analyze(Map classDescriptorMap, InputStream inputStream,
+        String encoding, String className) {
 
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
-        context.setPageClassGenerator(generator);
+        context.setPageClassGenerator(generator_);
         context.setClassDescriptorMap(classDescriptorMap);
         context.setPageClassName(className);
         try {
@@ -75,5 +77,10 @@ public class ZptAnalyzer implements TemplateAnalyzer {
             } catch (IOException ignore) {
             }
         }
+    }
+
+    public void setPageClassGenerator(PageClassGenerator generator) {
+
+        generator_ = generator;
     }
 }
