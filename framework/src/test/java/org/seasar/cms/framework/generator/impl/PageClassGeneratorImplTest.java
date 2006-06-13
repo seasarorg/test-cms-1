@@ -37,6 +37,8 @@ public class PageClassGeneratorImplTest extends TestCase {
             .setProvider(new HttpServletComponentDeployerProvider());
         S2ContainerBehavior.setProvider(new DistributedOndemandBehavoir());
         container_ = new S2ContainerImpl();
+        ((S2ContainerImpl) container_).setClassLoader(getClass()
+            .getClassLoader());
         container_.setExternalContext(new HttpServletExternalContext());
         container_
             .setExternalContextComponentDefRegister(new HttpServletExternalContextComponentDefRegister());
