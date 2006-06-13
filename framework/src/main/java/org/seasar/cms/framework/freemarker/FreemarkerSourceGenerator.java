@@ -5,14 +5,14 @@ import java.io.StringWriter;
 import java.util.Locale;
 
 import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.JavaSourceGenerator;
+import org.seasar.cms.framework.generator.SourceGenerator;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
 
-public class FreemarkerJavaSourceGenerator implements JavaSourceGenerator {
+public class FreemarkerSourceGenerator implements SourceGenerator {
 
     public String generatePageSource(ClassDesc classDesc) {
 

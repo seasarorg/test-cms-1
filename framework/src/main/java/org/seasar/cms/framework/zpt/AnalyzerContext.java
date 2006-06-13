@@ -3,7 +3,7 @@ package org.seasar.cms.framework.zpt;
 import java.util.Map;
 
 import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.PageClassGenerator;
+import org.seasar.cms.framework.generator.SourceCreator;
 import org.seasar.cms.framework.generator.PropertyDesc;
 
 import net.skirnir.freyja.VariableResolver;
@@ -13,7 +13,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private VariableResolver variableResolver_;
 
-    private PageClassGenerator pageClassGenerator_;
+    private SourceCreator sourceCreator_;
 
     private Map classDescriptorMap_;
 
@@ -48,7 +48,7 @@ public class AnalyzerContext extends ZptTemplateContext {
             && objs[0] instanceof DummyRepeatObject) {
             dtoName_ = name;
             dtoCollectionName_ = ((DummyRepeatObject) objs[0]).getName();
-            dtoClassName_ = pageClassGenerator_.getDtoPackageName() + "."
+            dtoClassName_ = sourceCreator_.getDtoPackageName() + "."
                 + Character.toUpperCase(name.charAt(0)) + name.substring(1);
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
@@ -94,14 +94,14 @@ public class AnalyzerContext extends ZptTemplateContext {
         pageClassName_ = pageClassName;
     }
 
-    public PageClassGenerator getPageClassGenerator() {
+    public SourceCreator getSourceCreator() {
 
-        return pageClassGenerator_;
+        return sourceCreator_;
     }
 
-    public void setPageClassGenerator(PageClassGenerator pageClassGenerator) {
+    public void setSourceCreator(SourceCreator sourceCreator) {
 
-        pageClassGenerator_ = pageClassGenerator;
+        sourceCreator_ = sourceCreator;
     }
 
     public ClassDesc getPageClassDescriptor() {

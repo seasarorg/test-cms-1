@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 import org.seasar.cms.framework.generator.ClassDesc;
 import org.seasar.cms.framework.generator.PropertyDesc;
-import org.seasar.cms.framework.generator.impl.PageClassGeneratorImpl;
+import org.seasar.cms.framework.generator.impl.SourceCreatorImpl;
 
 public class ZptAnalyzerTest extends TestCase {
 
@@ -20,7 +20,7 @@ public class ZptAnalyzerTest extends TestCase {
     protected void setUp() throws Exception {
 
         analyzer_ = new ZptAnalyzer();
-        PageClassGeneratorImpl generator = new PageClassGeneratorImpl() {
+        SourceCreatorImpl generator = new SourceCreatorImpl() {
             public String getComponentName(String path) {
                 return path;
             }

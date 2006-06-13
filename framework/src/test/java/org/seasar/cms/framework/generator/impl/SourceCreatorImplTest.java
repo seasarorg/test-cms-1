@@ -1,17 +1,23 @@
 package org.seasar.cms.framework.generator.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 import javax.servlet.ServletContext;
 
-import junit.framework.TestCase;
-
+import org.seasar.cms.framework.FrameworkTestCase;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.container.hotdeploy.DistributedOndemandBehavoir;
 import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
 import org.seasar.cms.framework.container.hotdeploy.OndemandUtils;
+import org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator;
 import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.PageClassGenerator;
 import org.seasar.cms.framework.generator.PropertyDesc;
+import org.seasar.cms.framework.generator.SourceCreator;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
+import org.seasar.cms.framework.zpt.ZptAnalyzer;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.deployer.ComponentDeployerFactory;
 import org.seasar.framework.container.deployer.HttpServletComponentDeployerProvider;
@@ -24,12 +30,23 @@ import org.seasar.framework.container.impl.S2ContainerImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
+import org.seasar.framework.util.ResourceUtil;
+import org.seasar.kvasir.util.io.IOUtils;
 
-public class PageClassGeneratorImplTest extends TestCase {
+public class SourceCreatorImplTest extends FrameworkTestCase {
 
     private S2Container container_;
 
-    private PageClassGeneratorImpl target_;
+    private SourceCreatorImpl target_;
+
+    private ClassDesc constructClassDesc() {
+        ClassDesc classDesc = new ClassDesc("com.example.web.TestPage");
+        PropertyDesc pd = new PropertyDesc("param1");
+        pd.setType("java.lang.String");
+        pd.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
+        classDesc.setPropertyDesc(pd);
+        return classDesc;
+    }
 
     protected void setUp() throws Exception {
 
@@ -48,9 +65,10 @@ public class PageClassGeneratorImplTest extends TestCase {
         container_.getExternalContext().setRequest(request);
         container_.getExternalContext().setResponse(
             new MockHttpServletResponseImpl(request));
-        container_.register(PageClassGeneratorImpl.class);
+        container_.register(SourceCreatorImpl.class);
         container_.register(DefaultRequestProcessor.class);
         container_.register(LocalOndemandCreatorContainer.class);
+        container_.register(ZptAnalyzer.class);
 
         DefaultRequestProcessor processor = (DefaultRequestProcessor) container_
             .getComponent(RequestProcessor.class);
@@ -61,8 +79,16 @@ public class PageClassGeneratorImplTest extends TestCase {
         creatorContainer.addCreator(new PageCreator());
         OndemandUtils.start(container_);
 
-        target_ = (PageClassGeneratorImpl) container_
-            .getComponent(PageClassGenerator.class);
+        target_ = (SourceCreatorImpl) container_
+            .getComponent(SourceCreator.class);
+        target_.setDtoPackageName("com.example.dto");
+        target_.setSourceDirectoryPath(ResourceUtil.getBuildDir(getClass())
+            .getCanonicalPath());
+        target_.setClassesDirectoryPath(ResourceUtil.getBuildDir(getClass())
+            .getCanonicalPath());
+        target_.setWebappDirectoryPath(new File(ResourceUtil
+            .getBuildDir(getClass()), "webapp").getCanonicalPath());
+        target_.setSourceGenerator(new FreemarkerSourceGenerator());
     }
 
     protected void tearDown() throws Exception {
@@ -125,8 +151,7 @@ public class PageClassGeneratorImplTest extends TestCase {
         pd.addMode(PropertyDesc.ARRAY);
         cd2.setPropertyDesc(pd);
 
-        ClassDesc actual = new PageClassGeneratorImpl().mergeClassDescs(cd1,
-            cd2);
+        ClassDesc actual = new SourceCreatorImpl().mergeClassDescs(cd1, cd2);
 
         assertEquals(6, actual.getPropertyDescs().length);
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
@@ -173,5 +198,72 @@ public class PageClassGeneratorImplTest extends TestCase {
         assertTrue(pd.isArray());
         assertFalse(pd.isReadable());
         assertTrue(pd.isWritable());
+    }
+
+    public void testWriteSourceFile1() throws Exception {
+
+        ClassDesc classDesc = constructClassDesc();
+        File testPage = new File(ResourceUtil.getBuildDir(getClass()),
+            classDesc.getName().replace('.', '/') + ".java");
+        File testPageBase = new File(ResourceUtil.getBuildDir(getClass()),
+            classDesc.getName().replace('.', '/') + "Base.java");
+
+        testPage.delete();
+
+        target_.writeSourceFile(classDesc);
+
+        assertTrue(testPage.exists());
+        assertTrue(testPageBase.exists());
+    }
+
+    public void testWriteSourceFile2() throws Exception {
+
+        ClassDesc classDesc = constructClassDesc();
+        File testPage = new File(ResourceUtil.getBuildDir(getClass()),
+            classDesc.getName().replace('.', '/') + ".java");
+        File testPageBase = new File(ResourceUtil.getBuildDir(getClass()),
+            classDesc.getName().replace('.', '/') + "Base.java");
+
+        testPage.getParentFile().mkdirs();
+        testPageBase.getParentFile().mkdirs();
+        OutputStream os = new FileOutputStream(testPage);
+        os.write(32);
+        os.close();
+        os = new FileOutputStream(testPageBase);
+        os.write(32);
+        os.close();
+
+        target_.writeSourceFile(classDesc);
+
+        String actual = IOUtils.readString(new FileInputStream(testPage),
+            "UTF-8", false);
+        assertEquals(" ", actual);
+        actual = IOUtils.readString(new FileInputStream(testPageBase), "UTF-8",
+            false);
+        assertFalse(" ".equals(actual));
+    }
+
+    public void testUpdate() throws Exception {
+
+        File sourceDir = clean(new File(ResourceUtil.getBuildDir(getClass())
+            .getParentFile(), "src"));
+        target_.setSourceDirectoryPath(sourceDir.getCanonicalPath());
+
+        ClassDesc[] actual = target_.update("/test.html");
+
+        assertNotNull(actual);
+        assertEquals(2, actual.length);
+        assertEquals("com.example.web.TestPage", actual[0].getName());
+        assertEquals("com.example.dto.Entity", actual[1].getName());
+        assertTrue(new File(sourceDir, "com/example/web/TestPage.java")
+            .exists());
+        assertTrue(new File(sourceDir, "com/example/web/TestPageBase.java")
+            .exists());
+        assertTrue(new File(sourceDir, "com/example/dto/Entity.java").exists());
+        assertTrue(new File(sourceDir, "com/example/dto/EntityBase.java")
+            .exists());
+
+        actual = target_.update("/test.html");
+        assertNull(actual);
     }
 }

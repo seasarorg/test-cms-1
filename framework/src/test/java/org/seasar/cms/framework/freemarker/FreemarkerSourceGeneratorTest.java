@@ -1,20 +1,12 @@
 package org.seasar.cms.framework.freemarker;
 
+import org.seasar.cms.framework.FrameworkTestCase;
 import org.seasar.cms.framework.generator.ClassDesc;
 import org.seasar.cms.framework.generator.PropertyDesc;
-import org.seasar.kvasir.util.io.IOUtils;
 
-import junit.framework.TestCase;
+public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
-public class FreemarkerJavaSourceGeneratorTest extends TestCase {
-
-    private FreemarkerJavaSourceGenerator generator_ = new FreemarkerJavaSourceGenerator();
-
-    private String readResource(String name) {
-
-        return IOUtils.readString(getClass().getResourceAsStream(
-            "FreemarkerJavaSourceGeneratorTest_" + name), "UTF-8", false);
-    }
+    private FreemarkerSourceGenerator generator_ = new FreemarkerSourceGenerator();
 
     private ClassDesc prepareClassDesc() {
 
@@ -43,7 +35,8 @@ public class FreemarkerJavaSourceGeneratorTest extends TestCase {
 
         String actual = generator_.generatePageSource(classDesc);
 
-        assertEquals(readResource("testGeneratePageSource.expected"), actual);
+        assertEquals(
+            readResource(getClass(), "testGeneratePageSource.expected"), actual);
     }
 
     public void testGeneratePageBaseSource() throws Exception {
@@ -52,7 +45,7 @@ public class FreemarkerJavaSourceGeneratorTest extends TestCase {
 
         String actual = generator_.generatePageBaseSource(classDesc);
 
-        assertEquals(readResource("testGeneratePageBaseSource.expected"),
-            actual);
+        assertEquals(readResource(getClass(),
+            "testGeneratePageBaseSource.expected"), actual);
     }
 }

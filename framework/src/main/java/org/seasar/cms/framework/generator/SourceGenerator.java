@@ -1,6 +1,6 @@
 package org.seasar.cms.framework.generator;
 
-public interface JavaSourceGenerator {
+public interface SourceGenerator {
 
     String generatePageSource(ClassDesc classDesc);
 

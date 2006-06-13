@@ -129,7 +129,7 @@ public class PathMapping {
                 return evaluator_.evaluateAsString(componentNameTemplate_,
                     resolver);
             } catch (EvaluationException ex) {
-                throw new RuntimeException("Can't evaluate template: "
+                throw new RuntimeException("Can't evaluate webapp: "
                     + componentNameTemplate_ + ", resolver=" + resolver, ex);
             }
         }
@@ -144,7 +144,7 @@ public class PathMapping {
                 return evaluator_.evaluateAsString(actionNameTemplate_,
                     resolver);
             } catch (EvaluationException ex) {
-                throw new RuntimeException("Can't evaluate template: "
+                throw new RuntimeException("Can't evaluate webapp: "
                     + actionNameTemplate_ + ", resolver=" + resolver, ex);
             }
         }
@@ -158,7 +158,7 @@ public class PathMapping {
             try {
                 return evaluator_.evaluateAsString(pathInfoTemplate_, resolver);
             } catch (EvaluationException ex) {
-                throw new RuntimeException("Can't evaluate template: "
+                throw new RuntimeException("Can't evaluate webapp: "
                     + pathInfoTemplate_ + ", resolver=" + resolver, ex);
             }
 

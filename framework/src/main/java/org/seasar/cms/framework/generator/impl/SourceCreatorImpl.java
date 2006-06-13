@@ -12,7 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.seasar.cms.framework.MatchedPathMapping;
@@ -20,9 +20,9 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
 import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.JavaSourceGenerator;
-import org.seasar.cms.framework.generator.PageClassGenerator;
 import org.seasar.cms.framework.generator.PropertyDesc;
+import org.seasar.cms.framework.generator.SourceCreator;
+import org.seasar.cms.framework.generator.SourceGenerator;
 import org.seasar.cms.framework.generator.TemplateAnalyzer;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
@@ -30,7 +30,7 @@ import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 
-public class PageClassGeneratorImpl implements PageClassGenerator {
+public class SourceCreatorImpl implements SourceCreator {
 
     private S2Container container_;
 
@@ -50,7 +50,7 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
 
     private String dtoPackageName_;
 
-    private JavaSourceGenerator javaSourceGenerator_;
+    private SourceGenerator javaSourceGenerator_;
 
     public ClassDesc[] update(String path) {
 
@@ -64,13 +64,13 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
             return null;
         }
 
-        File classFile = getClassFile(className + "Base");
-        if (classFile.exists()
-            && classFile.lastModified() >= templateFile.lastModified()) {
+        File sourceFile = getSourceFile(className + "Base");
+        if (sourceFile.exists()
+            && sourceFile.lastModified() >= templateFile.lastModified()) {
             return null;
         }
 
-        Map classDescriptorMap = new HashMap();
+        Map classDescriptorMap = new LinkedHashMap();
         try {
             analyzer_.analyze(classDescriptorMap, new FileInputStream(
                 templateFile), encoding_, className);
@@ -126,10 +126,10 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
             classDesc = mergeClassDescs(classDesc, getClassDesc(classDesc
                 .getName()));
         }
-        writePageSourceFile(classDesc);
+        writeSourceFile(classDesc);
     }
 
-    void writePageSourceFile(ClassDesc classDesc) {
+    void writeSourceFile(ClassDesc classDesc) {
 
         writeString(javaSourceGenerator_.generatePageBaseSource(classDesc),
             getSourceFile(classDesc.getName() + "Base"));
@@ -308,7 +308,7 @@ public class PageClassGeneratorImpl implements PageClassGenerator {
         dtoPackageName_ = dtoPackageName;
     }
 
-    public void setJavaSourceGenerator(JavaSourceGenerator javaSourceGenerator) {
+    public void setSourceGenerator(SourceGenerator javaSourceGenerator) {
 
         javaSourceGenerator_ = javaSourceGenerator;
     }

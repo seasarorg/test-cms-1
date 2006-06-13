@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.cms.framework.generator.PageClassGenerator;
+import org.seasar.cms.framework.generator.SourceCreator;
 import org.seasar.cms.framework.generator.PropertyDesc;
 
 import net.skirnir.freyja.Attribute;
@@ -82,7 +82,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         if (actionAttr == null) {
             return null;
         } else {
-            PageClassGenerator generator = context.getPageClassGenerator();
+            SourceCreator generator = context.getSourceCreator();
             return generator.getClassName(generator
                 .getComponentName(TagEvaluatorUtils.defilter(actionAttr
                     .getValue())));

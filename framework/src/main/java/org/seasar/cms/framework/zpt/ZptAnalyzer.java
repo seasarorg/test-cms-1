@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.framework.generator.PageClassGenerator;
+import org.seasar.cms.framework.generator.SourceCreator;
 import org.seasar.cms.framework.generator.TemplateAnalyzer;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
@@ -50,13 +50,13 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         }.addTypePrefix("path", new AnalyzerPathTypePrefixHandler('/')
             .addPathResolver(new BeanPathResolver()), true));
 
-    private PageClassGenerator generator_;
+    private SourceCreator sourceCreator_;
 
     public void analyze(Map classDescriptorMap, InputStream inputStream,
         String encoding, String className) {
 
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
-        context.setPageClassGenerator(generator_);
+        context.setSourceCreator(sourceCreator_);
         context.setClassDescriptorMap(classDescriptorMap);
         context.setPageClassName(className);
         try {
@@ -79,8 +79,8 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         }
     }
 
-    public void setPageClassGenerator(PageClassGenerator generator) {
+    public void setPageClassGenerator(SourceCreator generator) {
 
-        generator_ = generator;
+        sourceCreator_ = generator;
     }
 }

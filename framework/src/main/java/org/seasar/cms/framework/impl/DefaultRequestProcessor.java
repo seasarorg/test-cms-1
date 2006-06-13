@@ -17,7 +17,7 @@ import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.ResponseCreator;
 import org.seasar.cms.framework.container.ThreadLocalS2ContainerUtils;
 import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.PageClassGenerator;
+import org.seasar.cms.framework.generator.SourceCreator;
 import org.seasar.cms.framework.response.constructor.ResponseConstructor;
 import org.seasar.cms.framework.response.constructor.ResponseConstructorSelector;
 import org.seasar.cms.framework.zpt.ZptResponseCreator;
@@ -39,9 +39,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private S2Container container_;
 
-    private PageClassGenerator generator_;
+    private SourceCreator sourceCreator_;
 
-    private ResponseCreator creator_ = new ZptResponseCreator();
+    private ResponseCreator responseCreator_ = new ZptResponseCreator();
 
     public Response process(String path, String method, String dispatcher,
         Map parameterMap) throws PageNotFoundException {
@@ -62,13 +62,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
         Request request = new RequestImpl(path, method, dispatcher,
             parameterMap, mapping.getPathInfo(resolver));
 
-        if (generator_ != null) {
-            ClassDesc[] descriptors = generator_.update(path);
+        if (sourceCreator_ != null) {
+            ClassDesc[] descriptors = sourceCreator_.update(path);
             if (descriptors != null) {
                 Map variableMap = new HashMap();
                 variableMap.put("request", request);
                 variableMap.put("classDescriptors", descriptors);
-                return creator_.createResponse("template/updated", variableMap);
+                return responseCreator_.createResponse("webapp/updated", variableMap);
             }
         }
 
@@ -238,13 +238,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
         responseConstructorSelector_ = responseConstructorSelector;
     }
 
-    public void setPageClassGenerator(PageClassGenerator generator) {
+    public void setSourceCreator(SourceCreator sourceCreator) {
 
-        generator_ = generator;
+        sourceCreator_ = sourceCreator;
     }
 
-    public void setResponseCreaator(ResponseCreator creator) {
+    public void setResponseCreaator(ResponseCreator responseCreator) {
 
-        creator_ = creator;
+        responseCreator_ = responseCreator;
     }
 }

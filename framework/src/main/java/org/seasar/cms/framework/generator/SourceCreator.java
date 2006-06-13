@@ -1,6 +1,6 @@
 package org.seasar.cms.framework.generator;
 
-public interface PageClassGenerator {
+public interface SourceCreator {
 
     String getDtoPackageName();
 
