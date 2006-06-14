@@ -63,8 +63,12 @@
       container.findComponents(@org.seasar.cms.framework.response.scheme.Strategy@class)
     </property>
   </component>
-  <component class="org.seasar.cms.framework.generator.impl.PageClassGeneratorImpl">
-    <property name="templateAnalyzer">new org.seasar.cms.framework.zpt.ZptAnalyzer()</property>
-    <property name="javaSourceGenerator">new org.seasar.cms.framework.freemarker.FreemarkerJavaSourceGenerator()</property>
+  <component class="org.seasar.cms.framework.generator.impl.SourceCreatorImpl">
+    <property name="sourceDirectoryPath">config.getProperty("sourceDirectory", config.getProperty("projectRoot") + "/src/main/java")</property>
+    <property name="classesDirectoryPath">config.getProperty("classesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot") + "/src/main/webapp"))</property>
+    <property name="webappDirectoryPath">config.getProperty("webappDirectory", config.getProperty("projectRoot") + "/src/main/webapp")</property>
+    <property name="dtoPackageName">config.getProperty("rootPackageName") + ".dto"</property>
   </component>
+  <component class="org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator" />
+  <component class="org.seasar.cms.framework.zpt.ZptAnalyzer" />
 </components>

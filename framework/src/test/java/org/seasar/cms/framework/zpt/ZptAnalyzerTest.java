@@ -90,8 +90,8 @@ public class ZptAnalyzerTest extends TestCase {
         assertTrue(pd.isReadable());
         assertTrue(pd.isArray());
         assertNull(pd.getType());
-        assertEquals("com.example.dto.Entity", pd.getDefaultType());
-        ClassDesc cd2 = getClassDescriptor("com.example.dto.Entity");
+        assertEquals("com.example.dto.EntityDto", pd.getDefaultType());
+        ClassDesc cd2 = getClassDescriptor("com.example.dto.EntityDto");
         assertNotNull(cd2);
         PropertyDesc pd2 = cd2.getPropertyDesc("content");
         assertNotNull(pd2);

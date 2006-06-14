@@ -49,7 +49,8 @@ public class AnalyzerContext extends ZptTemplateContext {
             dtoName_ = name;
             dtoCollectionName_ = ((DummyRepeatObject) objs[0]).getName();
             dtoClassName_ = sourceCreator_.getDtoPackageName() + "."
-                + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+                + Character.toUpperCase(name.charAt(0)) + name.substring(1)
+                + "Dto";
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
             pd.addMode(PropertyDesc.ARRAY);

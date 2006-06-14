@@ -19,15 +19,24 @@ public abstract class FrameworkTestCase extends TestCase {
             className + "_" + name), "UTF-8", false);
     }
 
-    protected File clean(File file) {
-        if (!file.exists()) {
-            file.mkdirs();
-            return file;
+    protected File clean(File dir) {
+        if (!dir.exists()) {
+            dir.mkdirs();
+            return dir;
+        } else {
+            File[] files = dir.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                clean0(files[i]);
+            }
         }
+        return dir;
+    }
+
+    File clean0(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (int i = 0; i < files.length; i++) {
-                clean(files[i]);
+                clean0(files[i]);
             }
         }
         file.delete();

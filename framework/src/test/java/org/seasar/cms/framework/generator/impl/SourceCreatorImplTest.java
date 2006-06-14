@@ -254,13 +254,13 @@ public class SourceCreatorImplTest extends FrameworkTestCase {
         assertNotNull(actual);
         assertEquals(2, actual.length);
         assertEquals("com.example.web.TestPage", actual[0].getName());
-        assertEquals("com.example.dto.Entity", actual[1].getName());
+        assertEquals("com.example.dto.EntityDto", actual[1].getName());
         assertTrue(new File(sourceDir, "com/example/web/TestPage.java")
             .exists());
         assertTrue(new File(sourceDir, "com/example/web/TestPageBase.java")
             .exists());
-        assertTrue(new File(sourceDir, "com/example/dto/Entity.java").exists());
-        assertTrue(new File(sourceDir, "com/example/dto/EntityBase.java")
+        assertTrue(new File(sourceDir, "com/example/dto/EntityDto.java").exists());
+        assertTrue(new File(sourceDir, "com/example/dto/EntityDtoBase.java")
             .exists());
 
         actual = target_.update("/test.html");
