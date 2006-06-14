@@ -1,5 +1,6 @@
 package org.seasar.cms.framework.zpt;
 
+import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
@@ -37,8 +38,9 @@ public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
             DummyObject dummyObject = (DummyObject) obj;
             int mode = (dummyObject.isDto() ? (PropertyDesc.READ | PropertyDesc.WRITE)
                 : PropertyDesc.READ);
-            toAnalyzerContext(context).getClassDescriptor(
-                dummyObject.getClassName()).addProperty(segment, mode);
+            ClassDesc classDesc = toAnalyzerContext(context).getClassDesc(
+                dummyObject.getClassName());
+            classDesc.addProperty(segment, mode);
             return new Object[] { new DummyRepeatObject(segment) };
         } else {
             return super.resolveSegment(context, varResolver, obj, segment);

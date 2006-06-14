@@ -49,7 +49,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         Map attrMap = evaluate(context, attrs);
         Attribute attr = (Attribute) attrMap.get("name");
         if (attr != null) {
-            context.getClassDescriptor(className).addProperty(
+            context.getClassDesc(className).addProperty(
                 TagEvaluatorUtils.defilter(attr.getValue()),
                 PropertyDesc.WRITE);
         }

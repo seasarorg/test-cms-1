@@ -131,13 +131,13 @@ public class SourceCreatorImpl implements SourceCreator {
 
     void writeSourceFile(ClassDesc classDesc) {
 
-        writeString(javaSourceGenerator_.generatePageBaseSource(classDesc),
+        writeString(javaSourceGenerator_.generateBaseSource(classDesc),
             getSourceFile(classDesc.getName() + "Base"));
 
         // gap側のクラスは存在しない場合のみ生成する。
         File sourceFile = getSourceFile(classDesc.getName());
         if (!sourceFile.exists()) {
-            writeString(javaSourceGenerator_.generatePageSource(classDesc),
+            writeString(javaSourceGenerator_.generateGapSource(classDesc),
                 sourceFile);
         }
     }

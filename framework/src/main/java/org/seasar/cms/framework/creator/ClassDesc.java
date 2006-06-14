@@ -3,15 +3,29 @@ package org.seasar.cms.framework.creator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 public class ClassDesc {
+
+    public static final String KIND_PAGE = "Page";
+
+    public static final String KIND_DTO = "Dto";
+
+    private static final String[] KINDS = new String[] { KIND_PAGE, KIND_DTO };
 
     private String name_;
 
     private Map propertyDescMap_ = new LinkedHashMap();
 
+    private String kind_ = KIND_PAGE;
+
     public ClassDesc(String name) {
+
         setName(name);
+        for (int i = 0; i < KINDS.length; i++) {
+            if (name.endsWith(KINDS[i])) {
+                setKind(KINDS[i]);
+                break;
+            }
+        }
     }
 
     public String toString() {
@@ -70,5 +84,13 @@ public class ClassDesc {
 
         return (PropertyDesc[]) propertyDescMap_.values().toArray(
             new PropertyDesc[0]);
+    }
+
+    public String getKind() {
+        return kind_;
+    }
+
+    public void setKind(String kind) {
+        kind_ = kind;
     }
 }

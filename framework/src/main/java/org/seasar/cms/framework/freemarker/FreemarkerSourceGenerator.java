@@ -14,14 +14,14 @@ import freemarker.template.TemplateException;
 
 public class FreemarkerSourceGenerator implements SourceGenerator {
 
-    public String generatePageSource(ClassDesc classDesc) {
+    public String generateGapSource(ClassDesc classDesc) {
 
-        return generateSource("Page", classDesc);
+        return generateSource(classDesc.getKind(), classDesc);
     }
 
-    public String generatePageBaseSource(ClassDesc classDesc) {
+    public String generateBaseSource(ClassDesc classDesc) {
 
-        return generateSource("PageBase", classDesc);
+        return generateSource(classDesc.getKind() + "Base", classDesc);
     }
 
     String generateSource(String templateName, Object root) {

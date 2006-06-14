@@ -63,12 +63,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
             parameterMap, mapping.getPathInfo(resolver));
 
         if (sourceCreator_ != null) {
-            ClassDesc[] descriptors = sourceCreator_.update(path);
-            if (descriptors != null) {
+            ClassDesc[] classDescs = sourceCreator_.update(path);
+            if (classDescs != null) {
                 Map variableMap = new HashMap();
                 variableMap.put("request", request);
-                variableMap.put("classDescriptors", descriptors);
-                return responseCreator_.createResponse("webapp/updated", variableMap);
+                variableMap.put("classDescs", classDescs);
+                return responseCreator_.createResponse("updated", variableMap);
             }
         }
 

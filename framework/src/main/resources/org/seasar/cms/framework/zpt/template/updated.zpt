@@ -1,1 +1,13 @@
-いくつかのクラスが更新されました。
+<html>
+  <head>
+    <title>Class Files Updated</title>
+  </head>
+  <body>
+<h1>SYSTEM NOTIFICATION</h1>
+<p>以下のクラスが追加・更新されました。</p>
+<ul>
+  <li tal:repeat="classDesc classDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+<p>EclipseでプロジェクトルートをRefreshした後、ブラウザのリロードボタンを押して下さい。</p>
+  </body>
+</html>

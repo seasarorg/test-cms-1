@@ -107,7 +107,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public ClassDesc getPageClassDescriptor() {
 
-        return getClassDescriptor(pageClassName_);
+        return getClassDesc(pageClassName_);
     }
 
     public String getFormActionPageClassName() {
@@ -120,7 +120,7 @@ public class AnalyzerContext extends ZptTemplateContext {
         formActionPageClassName_ = formActionPageClassName;
     }
 
-    public ClassDesc getClassDescriptor(String className) {
+    public ClassDesc getClassDesc(String className) {
 
         return getClassDescriptor(className, true);
     }

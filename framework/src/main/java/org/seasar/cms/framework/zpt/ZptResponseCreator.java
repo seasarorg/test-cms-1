@@ -18,6 +18,8 @@ import net.skirnir.freyja.zpt.tales.TalesExpressionEvaluator;
 
 public class ZptResponseCreator implements ResponseCreator {
 
+    private static final String TEMPLATE_PREFIX = "template/";
+
     private static final String TEMPLATE_SUFFIX = ".zpt";
 
     private TemplateEvaluator evaluator_ = new TemplateEvaluator(
@@ -38,7 +40,7 @@ public class ZptResponseCreator implements ResponseCreator {
         try {
             return new SelfContainedResponse(evaluator_.evaluate(context,
                 new InputStreamReader(getClass().getResourceAsStream(
-                    path + TEMPLATE_SUFFIX), "UTF-8")));
+                    TEMPLATE_PREFIX + path + TEMPLATE_SUFFIX), "UTF-8")));
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }

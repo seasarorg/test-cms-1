@@ -29,23 +29,25 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         return classDesc;
     }
 
-    public void testGeneratePageSource() throws Exception {
+    public void testGenerateGapSource() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
+        classDesc.setKind(ClassDesc.KIND_DTO);
 
-        String actual = generator_.generatePageSource(classDesc);
+        String actual = generator_.generateGapSource(classDesc);
 
         assertEquals(
-            readResource(getClass(), "testGeneratePageSource.expected"), actual);
+            readResource(getClass(), "testGenerateGapSource.expected"), actual);
     }
 
-    public void testGeneratePageBaseSource() throws Exception {
+    public void testGenerateBaseSource() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
+        classDesc.setKind(ClassDesc.KIND_DTO);
 
-        String actual = generator_.generatePageBaseSource(classDesc);
+        String actual = generator_.generateBaseSource(classDesc);
 
         assertEquals(readResource(getClass(),
-            "testGeneratePageBaseSource.expected"), actual);
+            "testGenerateBaseSource.expected"), actual);
     }
 }
