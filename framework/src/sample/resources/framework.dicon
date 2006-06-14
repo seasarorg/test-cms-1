@@ -63,7 +63,7 @@
       container.findComponents(@org.seasar.cms.framework.response.scheme.Strategy@class)
     </property>
   </component>
-  <component class="org.seasar.cms.framework.generator.impl.SourceCreatorImpl">
+  <component class="org.seasar.cms.framework.creator.impl.SourceCreatorImpl">
     <property name="sourceDirectoryPath">config.getProperty("sourceDirectory", config.getProperty("projectRoot") + "/src/main/java")</property>
     <property name="classesDirectoryPath">config.getProperty("classesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot") + "/src/main/webapp"))</property>
     <property name="webappDirectoryPath">config.getProperty("webappDirectory", config.getProperty("projectRoot") + "/src/main/webapp")</property>

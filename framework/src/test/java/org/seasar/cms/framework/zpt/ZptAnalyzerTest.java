@@ -5,9 +5,9 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.PropertyDesc;
-import org.seasar.cms.framework.generator.impl.SourceCreatorImpl;
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 public class ZptAnalyzerTest extends TestCase {
 
@@ -20,7 +20,7 @@ public class ZptAnalyzerTest extends TestCase {
     protected void setUp() throws Exception {
 
         analyzer_ = new ZptAnalyzer();
-        SourceCreatorImpl generator = new SourceCreatorImpl() {
+        SourceCreatorImpl creator = new SourceCreatorImpl() {
             public String getComponentName(String path) {
                 return path;
             }
@@ -39,8 +39,8 @@ public class ZptAnalyzerTest extends TestCase {
                     + componentName.substring(1) + "Page";
             }
         };
-        generator.setDtoPackageName("com.example.dto");
-        analyzer_.setPageClassGenerator(generator);
+        creator.setDtoPackageName("com.example.dto");
+        analyzer_.setSourceCreator(creator);
     }
 
     private void act(String methodName) {

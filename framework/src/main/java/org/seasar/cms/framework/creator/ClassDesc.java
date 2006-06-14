@@ -1,7 +1,8 @@
-package org.seasar.cms.framework.generator;
+package org.seasar.cms.framework.creator;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 
 public class ClassDesc {
 

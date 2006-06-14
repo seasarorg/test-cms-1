@@ -1,6 +1,6 @@
 package org.seasar.cms.framework.zpt;
 
-import org.seasar.cms.framework.generator.PropertyDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
 import net.skirnir.freyja.TemplateContext;

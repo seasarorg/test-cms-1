@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Locale;
 
-import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.SourceGenerator;
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.SourceGenerator;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;

@@ -9,8 +9,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.framework.generator.SourceCreator;
-import org.seasar.cms.framework.generator.TemplateAnalyzer;
+import org.seasar.cms.framework.creator.SourceCreator;
+import org.seasar.cms.framework.creator.TemplateAnalyzer;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
@@ -79,8 +79,8 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         }
     }
 
-    public void setPageClassGenerator(SourceCreator generator) {
+    public void setSourceCreator(SourceCreator sourceCreator) {
 
-        sourceCreator_ = generator;
+        sourceCreator_ = sourceCreator;
     }
 }

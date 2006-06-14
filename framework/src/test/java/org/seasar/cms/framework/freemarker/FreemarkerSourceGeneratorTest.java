@@ -1,8 +1,8 @@
 package org.seasar.cms.framework.freemarker;
 
 import org.seasar.cms.framework.FrameworkTestCase;
-import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.PropertyDesc;
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
 
 public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 

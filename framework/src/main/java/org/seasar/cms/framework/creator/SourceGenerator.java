@@ -1,4 +1,5 @@
-package org.seasar.cms.framework.generator;
+package org.seasar.cms.framework.creator;
+
 
 public interface SourceGenerator {
 

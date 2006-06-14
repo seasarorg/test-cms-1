@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.generator.impl;
+package org.seasar.cms.framework.creator.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,10 +12,10 @@ import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.container.hotdeploy.DistributedOndemandBehavoir;
 import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
 import org.seasar.cms.framework.container.hotdeploy.OndemandUtils;
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator;
-import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.PropertyDesc;
-import org.seasar.cms.framework.generator.SourceCreator;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 import org.seasar.cms.framework.zpt.ZptAnalyzer;
 import org.seasar.framework.container.S2Container;

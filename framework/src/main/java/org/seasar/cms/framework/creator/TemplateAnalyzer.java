@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.generator;
+package org.seasar.cms.framework.creator;
 
 import java.io.InputStream;
 import java.util.Map;

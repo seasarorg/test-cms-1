@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.cms.framework.generator.SourceCreator;
-import org.seasar.cms.framework.generator.PropertyDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.SourceCreator;
 
 import net.skirnir.freyja.Attribute;
 import net.skirnir.freyja.Element;
@@ -82,8 +82,8 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         if (actionAttr == null) {
             return null;
         } else {
-            SourceCreator generator = context.getSourceCreator();
-            return generator.getClassName(generator
+            SourceCreator creator = context.getSourceCreator();
+            return creator.getClassName(creator
                 .getComponentName(TagEvaluatorUtils.defilter(actionAttr
                     .getValue())));
         }

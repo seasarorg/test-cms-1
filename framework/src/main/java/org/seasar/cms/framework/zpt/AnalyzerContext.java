@@ -2,9 +2,9 @@ package org.seasar.cms.framework.zpt;
 
 import java.util.Map;
 
-import org.seasar.cms.framework.generator.ClassDesc;
-import org.seasar.cms.framework.generator.SourceCreator;
-import org.seasar.cms.framework.generator.PropertyDesc;
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.SourceCreator;
 
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
