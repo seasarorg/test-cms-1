@@ -5,6 +5,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
@@ -21,7 +22,7 @@ public class ZptAnalyzerTest extends TestCase {
 
         analyzer_ = new ZptAnalyzer();
         SourceCreatorImpl creator = new SourceCreatorImpl() {
-            public String getComponentName(String path) {
+            public String getComponentName(String path, String method) {
                 return path;
             }
 
@@ -38,6 +39,10 @@ public class ZptAnalyzerTest extends TestCase {
                     + Character.toUpperCase(componentName.charAt(0))
                     + componentName.substring(1) + "Page";
             }
+
+            public String getActionName(String path, String method) {
+                return method;
+            }
         };
         creator.setDtoPackageName("com.example.dto");
         analyzer_.setSourceCreator(creator);
@@ -45,8 +50,9 @@ public class ZptAnalyzerTest extends TestCase {
 
     private void act(String methodName) {
 
-        analyzer_.analyze(classDescriptorMap_, getClass().getResourceAsStream(
-            "ZptAnalyzerTest_" + methodName + ".zpt"), "UTF-8", CLASSNAME);
+        analyzer_.analyze(Request.METHOD_GET, classDescriptorMap_, getClass()
+            .getResourceAsStream("ZptAnalyzerTest_" + methodName + ".zpt"),
+            "UTF-8", CLASSNAME);
     }
 
     private ClassDesc getClassDescriptor(String name) {
@@ -61,6 +67,8 @@ public class ZptAnalyzerTest extends TestCase {
         ClassDesc cd = getClassDescriptor(CLASSNAME);
         assertNotNull(cd);
         assertNotNull(cd.getPropertyDesc("body"));
+        assertNull("TemplateAnalyzerではリクエストメソッドのためのメソッド定義を生成しないこと", cd
+            .getMethodDesc("GET"));
     }
 
     public void testAnalyze2() throws Exception {
@@ -88,9 +96,8 @@ public class ZptAnalyzerTest extends TestCase {
         PropertyDesc pd = cd.getPropertyDesc("entities");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
-        assertTrue(pd.isArray());
         assertNull(pd.getType());
-        assertEquals("com.example.dto.EntityDto", pd.getDefaultType());
+        assertEquals("com.example.dto.EntityDto[]", pd.getDefaultType());
         ClassDesc cd2 = getClassDescriptor("com.example.dto.EntityDto");
         assertNotNull(cd2);
         PropertyDesc pd2 = cd2.getPropertyDesc("content");
@@ -108,7 +115,7 @@ public class ZptAnalyzerTest extends TestCase {
         PropertyDesc pd = cd.getPropertyDesc("entities");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
-        assertTrue(pd.isArray());
         assertNull(pd.getType());
+        assertEquals("java.lang.String[]", pd.getDefaultType());
     }
 }

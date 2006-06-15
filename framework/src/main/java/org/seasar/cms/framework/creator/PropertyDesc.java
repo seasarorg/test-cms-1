@@ -1,16 +1,12 @@
 package org.seasar.cms.framework.creator;
 
-public class PropertyDesc {
-
-    private static final String PACKAGE_JAVA_LANG = "java.lang.";
+public class PropertyDesc extends AbstractDesc{
 
     public static final int NONE = 0;
 
     public static final int READ = 1;
 
     public static final int WRITE = 2;
-
-    public static final int ARRAY = 4;
 
     private String name_;
 
@@ -52,25 +48,7 @@ public class PropertyDesc {
 
     public String getTypeString() {
 
-        String type;
-        if (type_ != null) {
-            type = type_;
-        } else if (defaultType_ != null) {
-            type = defaultType_;
-        } else {
-            type = "String";
-        }
-
-        StringBuffer sb = new StringBuffer();
-        if (type.startsWith(PACKAGE_JAVA_LANG)) {
-            sb.append(type.substring(PACKAGE_JAVA_LANG.length()));
-        } else {
-            sb.append(type);
-        }
-        if (isArray()) {
-            sb.append("[]");
-        }
-        return sb.toString();
+        return getTypeString(type_, defaultType_, "String");
     }
 
     public int getMode() {
@@ -96,10 +74,5 @@ public class PropertyDesc {
     public boolean isWritable() {
 
         return ((mode_ & WRITE) != 0);
-    }
-
-    public boolean isArray() {
-
-        return ((mode_ & ARRAY) != 0);
     }
 }

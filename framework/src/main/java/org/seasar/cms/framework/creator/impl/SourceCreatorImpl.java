@@ -16,10 +16,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.seasar.cms.framework.MatchedPathMapping;
-import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.creator.SourceGenerator;
@@ -52,9 +52,9 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private SourceGenerator javaSourceGenerator_;
 
-    public ClassDesc[] update(String path) {
+    public ClassDesc[] update(String path, String method) {
 
-        String className = getClassName(getComponentName(path));
+        String className = getClassName(getComponentName(path, method));
         if (className == null) {
             return null;
         }
@@ -72,29 +72,49 @@ public class SourceCreatorImpl implements SourceCreator {
 
         Map classDescriptorMap = new LinkedHashMap();
         try {
-            analyzer_.analyze(classDescriptorMap, new FileInputStream(
+            analyzer_.analyze(method, classDescriptorMap, new FileInputStream(
                 templateFile), encoding_, className);
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
-        ClassDesc[] descriptors = (ClassDesc[]) classDescriptorMap.values()
+        ClassDesc[] classDescs = (ClassDesc[]) classDescriptorMap.values()
             .toArray(new ClassDesc[0]);
-
-        for (int i = 0; i < descriptors.length; i++) {
-            updateClass(descriptors[i], true);
+        if (classDescs.length == 0) {
+            return null;
         }
 
-        return descriptors;
+        ClassDesc classDesc = (ClassDesc) classDescriptorMap.get(className);
+        classDesc.setMethodDesc(new MethodDesc(getActionName(path, method)));
+        classDesc.setMethodDesc(new MethodDesc(
+            DefaultRequestProcessor.ACTION_RENDER));
+
+        for (int i = 0; i < classDescs.length; i++) {
+            updateClass(classDescs[i], true);
+        }
+
+        return classDescs;
     }
 
-    public String getComponentName(String path) {
+    public String getComponentName(String path, String method) {
 
         MatchedPathMapping matched = defaultRequestProcessor_
-            .findMatchedPathMapping(path, Request.METHOD_GET);
+            .findMatchedPathMapping(path, method);
         if (matched == null) {
             return null;
         } else {
             return matched.getPathMapping().getComponentName(
+                matched.getVariableResolver());
+        }
+    }
+
+    public String getActionName(String path, String method) {
+
+        MatchedPathMapping matched = defaultRequestProcessor_
+            .findMatchedPathMapping(path, method);
+        if (matched == null) {
+            return null;
+        } else {
+            return matched.getPathMapping().getActionName(
                 matched.getVariableResolver());
         }
     }
@@ -181,7 +201,7 @@ public class SourceCreatorImpl implements SourceCreator {
                 if (pd.getType() == null) {
                     pd.setType(pd2s[i].getType());
                 }
-                pd.addMode(pd2s[i].getMode() & ~PropertyDesc.ARRAY);
+                pd.addMode(pd2s[i].getMode());
             }
         }
         return classDesc1;
@@ -220,11 +240,13 @@ public class SourceCreatorImpl implements SourceCreator {
             }
             propertyDesc.setMode(mode);
             Class propertyType = pds[i].getPropertyType();
+            String type;
             if (propertyType.isArray()) {
-                mode |= PropertyDesc.ARRAY;
-                propertyType = propertyType.getComponentType();
+                type = propertyType.getComponentType().getName() + "[]";
+            } else {
+                type = propertyType.getName();
             }
-            propertyDesc.setType(propertyType.getName());
+            propertyDesc.setType(type);
             propertyDesc.setMode(mode);
             classDesc.setPropertyDesc(propertyDesc);
         }

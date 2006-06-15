@@ -85,7 +85,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             SourceCreator creator = context.getSourceCreator();
             return creator.getClassName(creator
                 .getComponentName(TagEvaluatorUtils.defilter(actionAttr
-                    .getValue())));
+                    .getValue()), context.getMethod()));
         }
     }
 

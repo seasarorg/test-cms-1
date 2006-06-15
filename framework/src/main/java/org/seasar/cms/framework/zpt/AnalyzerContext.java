@@ -15,6 +15,8 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private SourceCreator sourceCreator_;
 
+    private String method_;
+
     private Map classDescriptorMap_;
 
     private String pageClassName_;
@@ -53,8 +55,7 @@ public class AnalyzerContext extends ZptTemplateContext {
                 + "Dto";
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
-            pd.addMode(PropertyDesc.ARRAY);
-            pd.setDefaultType(dtoClassName_);
+            pd.setDefaultType(dtoClassName_ + "[]");
         }
 
         return super.pushRepeatInfo(name, objs);
@@ -65,7 +66,7 @@ public class AnalyzerContext extends ZptTemplateContext {
         if (getClassDescriptor(dtoClassName_, false) == null) {
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
-            pd.setDefaultType(null);
+            pd.setDefaultType("java.lang.String[]");
         }
 
         dtoName_ = null;
@@ -73,6 +74,16 @@ public class AnalyzerContext extends ZptTemplateContext {
         dtoClassName_ = null;
 
         super.popRepeatInfo(name);
+    }
+
+    public String getMethod() {
+
+        return method_;
+    }
+
+    public void setMethod(String method) {
+
+        method_ = method;
     }
 
     public Map getClassDescriptorMap() {

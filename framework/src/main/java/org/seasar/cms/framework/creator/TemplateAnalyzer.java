@@ -5,6 +5,6 @@ import java.util.Map;
 
 public interface TemplateAnalyzer {
 
-    void analyze(Map classDescriptorMap, InputStream inputStream,
-        String encoding, String className);
+    void analyze(String method, Map classDescriptorMap,
+        InputStream inputStream, String encoding, String className);
 }

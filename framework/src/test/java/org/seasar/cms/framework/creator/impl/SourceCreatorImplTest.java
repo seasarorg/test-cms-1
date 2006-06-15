@@ -8,11 +8,13 @@ import java.io.OutputStream;
 import javax.servlet.ServletContext;
 
 import org.seasar.cms.framework.FrameworkTestCase;
+import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.container.hotdeploy.DistributedOndemandBehavoir;
 import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
 import org.seasar.cms.framework.container.hotdeploy.OndemandUtils;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator;
@@ -98,7 +100,8 @@ public class SourceCreatorImplTest extends FrameworkTestCase {
 
     public void testGetComponentName() throws Exception {
 
-        String actual = target_.getComponentName("/index.html");
+        String actual = target_.getComponentName("/index.html",
+            Request.METHOD_GET);
 
         assertEquals("indexPage", actual);
     }
@@ -128,7 +131,7 @@ public class SourceCreatorImplTest extends FrameworkTestCase {
         pd.setType("java.lang.String");
         cd1.setPropertyDesc(pd);
         pd = new PropertyDesc("param4");
-        pd.addMode(PropertyDesc.ARRAY);
+        pd.setDefaultType("java.lang.String[]");
         cd1.setPropertyDesc(pd);
         pd = new PropertyDesc("param6");
         pd.setDefaultType("java.lang.Integer");
@@ -147,8 +150,7 @@ public class SourceCreatorImplTest extends FrameworkTestCase {
         pd.setType("java.lang.Integer");
         cd2.setPropertyDesc(pd);
         pd = new PropertyDesc("param5");
-        pd.setType("java.lang.Integer");
-        pd.addMode(PropertyDesc.ARRAY);
+        pd.setType("java.lang.Integer[]");
         cd2.setPropertyDesc(pd);
 
         ClassDesc actual = new SourceCreatorImpl().mergeClassDescs(cd1, cd2);
@@ -166,10 +168,10 @@ public class SourceCreatorImplTest extends FrameworkTestCase {
             .getType());
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
             .getPropertyDesc("param1").getMode());
-        assertTrue(actual.getPropertyDesc("param4").isArray());
-        assertEquals("java.lang.Integer", actual.getPropertyDesc("param5")
+        assertTrue(actual.getPropertyDesc("param4").getTypeString().endsWith(
+            "[]"));
+        assertEquals("java.lang.Integer[]", actual.getPropertyDesc("param5")
             .getType());
-        assertTrue(actual.getPropertyDesc("param5").isArray());
         assertEquals("Integer", actual.getPropertyDesc("param6")
             .getTypeString());
     }
@@ -189,13 +191,11 @@ public class SourceCreatorImplTest extends FrameworkTestCase {
         PropertyDesc pd = actual.getPropertyDesc("param1");
         assertNotNull(pd);
         assertEquals("java.lang.String", pd.getType());
-        assertFalse(pd.isArray());
         assertTrue(pd.isReadable());
         assertFalse(pd.isWritable());
         pd = actual.getPropertyDesc("param2");
         assertNotNull(pd);
-        assertEquals("java.lang.Integer", pd.getType());
-        assertTrue(pd.isArray());
+        assertEquals("java.lang.Integer[]", pd.getType());
         assertFalse(pd.isReadable());
         assertTrue(pd.isWritable());
     }
@@ -249,7 +249,7 @@ public class SourceCreatorImplTest extends FrameworkTestCase {
             .getParentFile(), "src"));
         target_.setSourceDirectoryPath(sourceDir.getCanonicalPath());
 
-        ClassDesc[] actual = target_.update("/test.html");
+        ClassDesc[] actual = target_.update("/test.html", Request.METHOD_GET);
 
         assertNotNull(actual);
         assertEquals(2, actual.length);
@@ -259,11 +259,16 @@ public class SourceCreatorImplTest extends FrameworkTestCase {
             .exists());
         assertTrue(new File(sourceDir, "com/example/web/TestPageBase.java")
             .exists());
-        assertTrue(new File(sourceDir, "com/example/dto/EntityDto.java").exists());
+        assertTrue(new File(sourceDir, "com/example/dto/EntityDto.java")
+            .exists());
         assertTrue(new File(sourceDir, "com/example/dto/EntityDtoBase.java")
             .exists());
+        MethodDesc md = actual[0].getMethodDesc("_get");
+        assertNotNull(md);
+        assertNull(md.getDefaultReturnType());
+        assertNotNull(actual[0].getMethodDesc("_render"));
 
-        actual = target_.update("/test.html");
+        actual = target_.update("/test.html", Request.METHOD_GET);
         assertNull(actual);
     }
 }

@@ -21,9 +21,8 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
         classDesc.setPropertyDesc(propertyDesc);
         propertyDesc = new PropertyDesc("param4");
-        propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE
-            | PropertyDesc.ARRAY);
-        propertyDesc.setType("java.lang.Integer");
+        propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
+        propertyDesc.setType("java.lang.Integer[]");
         classDesc.setPropertyDesc(propertyDesc);
 
         return classDesc;

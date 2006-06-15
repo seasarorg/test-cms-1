@@ -27,7 +27,7 @@ import org.seasar.kvasir.util.el.VariableResolver;
 
 public class DefaultRequestProcessor implements RequestProcessor {
 
-    private static final String ACTION_RENDER = "_render";
+    public static final String ACTION_RENDER = "_render";
 
     public static final String ATTR_PAGE = "PAGE";
 
@@ -63,7 +63,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
             parameterMap, mapping.getPathInfo(resolver));
 
         if (sourceCreator_ != null) {
-            ClassDesc[] classDescs = sourceCreator_.update(path);
+            ClassDesc[] classDescs = sourceCreator_.update(path, request
+                .getMethod());
             if (classDescs != null) {
                 Map variableMap = new HashMap();
                 variableMap.put("request", request);

@@ -14,6 +14,7 @@ public class ClassDesc {
     private String name_;
 
     private Map propertyDescMap_ = new LinkedHashMap();
+    private Map methodDescMap_ = new LinkedHashMap();
 
     private String kind_ = KIND_PAGE;
 
@@ -92,5 +93,20 @@ public class ClassDesc {
 
     public void setKind(String kind) {
         kind_ = kind;
+    }
+    
+    public MethodDesc getMethodDesc(String name) {
+
+        return (MethodDesc) methodDescMap_.get(name);
+    }
+
+    public void setMethodDesc(MethodDesc methodDesc) {
+        
+        methodDescMap_.put(methodDesc.getName(), methodDesc);
+    }
+    
+    public MethodDesc[] getMethodDescs() {
+        
+        return (MethodDesc[])methodDescMap_.values().toArray(new MethodDesc[0]);
     }
 }

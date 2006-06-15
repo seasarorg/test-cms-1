@@ -52,11 +52,12 @@ public class ZptAnalyzer implements TemplateAnalyzer {
 
     private SourceCreator sourceCreator_;
 
-    public void analyze(Map classDescriptorMap, InputStream inputStream,
-        String encoding, String className) {
+    public void analyze(String method, Map classDescriptorMap,
+        InputStream inputStream, String encoding, String className) {
 
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
         context.setSourceCreator(sourceCreator_);
+        context.setMethod(method);
         context.setClassDescriptorMap(classDescriptorMap);
         context.setPageClassName(className);
         try {
