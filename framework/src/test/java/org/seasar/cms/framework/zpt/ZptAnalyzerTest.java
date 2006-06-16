@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
@@ -117,5 +118,20 @@ public class ZptAnalyzerTest extends TestCase {
         assertTrue(pd.isReadable());
         assertNull(pd.getType());
         assertEquals("java.lang.String[]", pd.getDefaultType());
+    }
+
+    public void testAnalyze5() throws Exception {
+
+        act("testAnalyze5");
+
+        ClassDesc cd = getClassDescriptor("com.example.page.UpdatePage");
+        assertNotNull(cd);
+        PropertyDesc pd = cd.getPropertyDesc("text");
+        assertNotNull(pd);
+        assertFalse(pd.isReadable());
+        assertTrue(pd.isWritable());
+        MethodDesc md = cd.getMethodDesc("POST");
+        assertNotNull(md);
+        assertEquals("void", md.getReturnTypeString());
     }
 }
