@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
 
@@ -23,8 +24,20 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 
         if ("form".equals(name)) {
             AnalyzerContext analyzeContext = toAnalyzeContext(context);
-            analyzeContext.setFormActionPageClassName(getActionClassName(
-                analyzeContext, attrs));
+            SourceCreator creator = analyzeContext.getSourceCreator();
+            Map attrMap = evaluate(analyzeContext, attrs);
+            String action = getAttributeValue(attrMap, "action", null);
+            String method = getAttributeValue(attrMap, "method", "GET")
+                .toUpperCase();
+            String className = creator.getClassName(creator.getComponentName(
+                action, method));
+            String actionName = creator.getActionName(action, method);
+            if (actionName != null) {
+                analyzeContext.getClassDesc(className).setMethodDesc(
+                    new MethodDesc(actionName));
+            }
+
+            analyzeContext.setFormActionPageClassName(className);
             try {
                 return super.evaluate(context, name, attrs, body);
             } finally {
@@ -49,9 +62,9 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         Map attrMap = evaluate(context, attrs);
         Attribute attr = (Attribute) attrMap.get("name");
         if (attr != null) {
-            context.getClassDesc(className).addProperty(
-                TagEvaluatorUtils.defilter(attr.getValue()),
-                PropertyDesc.WRITE);
+            context.getClassDesc(className)
+                .addProperty(TagEvaluatorUtils.defilter(attr.getValue()),
+                    PropertyDesc.WRITE);
         }
     }
 
@@ -75,22 +88,19 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             varResolver, attributesAttr, attrs, true));
     }
 
-    String getActionClassName(AnalyzerContext context, Attribute[] attrs) {
-
-        Map attrMap = evaluate(context, attrs);
-        Attribute actionAttr = (Attribute) attrMap.get("action");
-        if (actionAttr == null) {
-            return null;
-        } else {
-            SourceCreator creator = context.getSourceCreator();
-            return creator.getClassName(creator
-                .getComponentName(TagEvaluatorUtils.defilter(actionAttr
-                    .getValue()), context.getMethod()));
-        }
-    }
-
     AnalyzerContext toAnalyzeContext(TemplateContext context) {
 
         return (AnalyzerContext) context;
+    }
+
+    String getAttributeValue(Map attrMap, String name, String defaultValue) {
+
+        Attribute attr = (Attribute) attrMap.get(name);
+        if (attr != null) {
+
+            return TagEvaluatorUtils.defilter(attr.getValue());
+        } else {
+            return defaultValue;
+        }
     }
 }

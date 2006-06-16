@@ -97,6 +97,9 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public String getComponentName(String path, String method) {
 
+        if (path == null) {
+            return null;
+        }
         MatchedPathMapping matched = defaultRequestProcessor_
             .findMatchedPathMapping(path, method);
         if (matched == null) {
@@ -109,6 +112,9 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public String getActionName(String path, String method) {
 
+        if (path == null) {
+            return null;
+        }
         MatchedPathMapping matched = defaultRequestProcessor_
             .findMatchedPathMapping(path, method);
         if (matched == null) {
