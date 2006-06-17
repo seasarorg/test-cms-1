@@ -136,6 +136,10 @@
       <param-name>variableResolverFactory</param-name>
       <param-value></param-value>
     </init-param>
+    <init-param>
+      <param-name>context.behavior.unknown-tag</param-name>
+      <param-value>ignore</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>zpt</servlet-name>
