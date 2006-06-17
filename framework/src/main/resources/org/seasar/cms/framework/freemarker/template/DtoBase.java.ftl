@@ -6,6 +6,17 @@ abstract public class ${shortName}Base
     protected ${propertyDesc.typeString} ${propertyDesc.name}_;
 
 </#list>
+
+    public ${shortName}Base()
+    {
+    }
+
+    public ${shortName}Base(<#list propertyDescs as propertyDesc>${propertyDesc.typeString} ${propertyDesc.name}<#if propertyDesc_has_next>, </#if></#list>)
+    {
+<#list propertyDescs as propertyDesc>
+        ${propertyDesc.name}_ = ${propertyDesc.name};
+</#list>
+    }
 <#list propertyDescs as propertyDesc>
 <#if propertyDesc.readable>
 

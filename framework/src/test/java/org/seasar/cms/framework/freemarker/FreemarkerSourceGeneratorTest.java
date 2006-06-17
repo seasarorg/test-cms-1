@@ -39,7 +39,18 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
             readResource(getClass(), "testGenerateGapSource.expected"), actual);
     }
 
-    public void testGenerateBaseSource() throws Exception {
+    public void testGenerateBaseSource_Page() throws Exception {
+
+        ClassDesc classDesc = prepareClassDesc();
+        classDesc.setKind(ClassDesc.KIND_PAGE);
+
+        String actual = generator_.generateBaseSource(classDesc);
+
+        assertEquals(readResource(getClass(),
+            "testGenerateBaseSource_Page.expected"), actual);
+    }
+
+    public void testGenerateBaseSource_Dto() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
         classDesc.setKind(ClassDesc.KIND_DTO);
@@ -47,6 +58,6 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         String actual = generator_.generateBaseSource(classDesc);
 
         assertEquals(readResource(getClass(),
-            "testGenerateBaseSource.expected"), actual);
+            "testGenerateBaseSource_Dto.expected"), actual);
     }
 }
