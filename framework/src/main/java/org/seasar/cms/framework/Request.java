@@ -34,9 +34,15 @@ public interface Request {
 
     String DISPATCHER_ERROR = "ERROR";
 
+    String getContextPath();
+
+    void setContextPath(String contextPath);
+
     String getPath();
 
     void setPath(String path);
+
+    String getAbsolutePath();
 
     String getMethod();
 

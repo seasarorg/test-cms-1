@@ -6,6 +6,8 @@ import org.seasar.cms.framework.Request;
 
 public class RequestImpl implements Request {
 
+    private String contextPath_;
+
     private String path_;
 
     private String method_;
@@ -19,9 +21,10 @@ public class RequestImpl implements Request {
     public RequestImpl() {
     }
 
-    public RequestImpl(String path, String method, String dispatcher,
-        Map parameterMap, String pathInfo) {
+    public RequestImpl(String contextPath, String path, String method,
+        String dispatcher, Map parameterMap, String pathInfo) {
 
+        contextPath_ = contextPath;
         path_ = path;
         method_ = method;
         dispatcher_ = dispatcher;
@@ -49,6 +52,16 @@ public class RequestImpl implements Request {
         method_ = method;
     }
 
+    public String getContextPath() {
+
+        return contextPath_;
+    }
+
+    public void setContextPath(String contextPath) {
+
+        contextPath_ = contextPath;
+    }
+
     public String getPath() {
 
         return path_;
@@ -57,6 +70,11 @@ public class RequestImpl implements Request {
     public void setPath(String path) {
 
         path_ = path;
+    }
+
+    public String getAbsolutePath() {
+
+        return contextPath_ + path_;
     }
 
     public Map getParameterMap() {

@@ -37,8 +37,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private SourceCreator sourceCreator_;
 
-    public Response process(String path, String method, String dispatcher,
-        Map parameterMap) throws PageNotFoundException {
+    public Response process(String contextPath, String path, String method,
+        String dispatcher, Map parameterMap) throws PageNotFoundException {
 
         if (isPathIgnored(path, method, dispatcher)) {
             throw new PageNotFoundException(path);
@@ -53,12 +53,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         String componentName = mapping.getComponentName(resolver);
         String actionName = mapping.getActionName(resolver);
-        Request request = new RequestImpl(path, method, dispatcher,
-            parameterMap, mapping.getPathInfo(resolver));
+        Request request = new RequestImpl(contextPath, path, method,
+            dispatcher, parameterMap, mapping.getPathInfo(resolver));
 
         if (sourceCreator_ != null) {
-            Response response = sourceCreator_
-                .update(path, request.getMethod(), request);
+            Response response = sourceCreator_.update(path,
+                request.getMethod(), request);
             if (response != null) {
                 return response;
             }

@@ -46,8 +46,9 @@ public class FrameworkFilter implements Filter {
 
         try {
             Response response = processRequest(ServletUtils
-                .getPath(httpRequest), httpRequest.getMethod().toUpperCase(),
-                dispatcher_, httpRequest.getParameterMap());
+                .getContextPath(httpRequest),
+                ServletUtils.getPath(httpRequest), httpRequest.getMethod()
+                    .toUpperCase(), dispatcher_, httpRequest.getParameterMap());
 
             if (processResponse(httpRequest, httpResponse, response)) {
                 chain.doFilter(httpRequest, httpResponse);
@@ -57,12 +58,12 @@ public class FrameworkFilter implements Filter {
         }
     }
 
-    Response processRequest(String path, String method, String dispatcher,
-        Map parameterMap) throws PageNotFoundException {
+    Response processRequest(String contextPath, String path, String method,
+        String dispatcher, Map parameterMap) throws PageNotFoundException {
 
         return ((RequestProcessor) getContainer().getComponent(
-            RequestProcessor.class)).process(path, method, dispatcher,
-            parameterMap);
+            RequestProcessor.class)).process(contextPath, path, method,
+            dispatcher, parameterMap);
     }
 
     boolean processResponse(HttpServletRequest httpRequest,
