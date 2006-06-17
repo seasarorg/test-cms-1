@@ -27,6 +27,10 @@ public class ZptAnalyzer implements TemplateAnalyzer {
 
     private TemplateEvaluator evaluator_ = new TemplateEvaluator(
         new MetalTagEvaluator(new AnalyzerTalTagEvaluator()) {
+            public String[] getSpecialTagPatternStrings() {
+                return new String[] { "form", "input", "select", "textarea" };
+            }
+
             public TemplateContext newContext() {
                 return new AnalyzerContext();
             }

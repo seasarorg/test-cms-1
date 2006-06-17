@@ -130,6 +130,14 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(pd);
         assertFalse(pd.isReadable());
         assertTrue(pd.isWritable());
+        pd = cd.getPropertyDesc("select");
+        assertNotNull(pd);
+        assertFalse(pd.isReadable());
+        assertTrue(pd.isWritable());
+        pd = cd.getPropertyDesc("textarea");
+        assertNotNull(pd);
+        assertFalse(pd.isReadable());
+        assertTrue(pd.isWritable());
         MethodDesc md = cd.getMethodDesc("POST");
         assertNotNull(md);
         assertEquals("void", md.getReturnTypeString());

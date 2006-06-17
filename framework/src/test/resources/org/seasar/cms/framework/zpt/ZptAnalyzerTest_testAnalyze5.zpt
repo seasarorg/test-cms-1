@@ -4,7 +4,13 @@
   </head>
   <body>
     <form method="post" tal:attributes="action page:/update.do" action="#">
-      <input type="text" name="text" tal:attributes="value PAGE/text" value="TEXT" />
+      <input type="text" name="text" value="" />
+      <select name="select">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+      <textarea name="textarea"></textarea>
     </form>
   </body>
 </html>

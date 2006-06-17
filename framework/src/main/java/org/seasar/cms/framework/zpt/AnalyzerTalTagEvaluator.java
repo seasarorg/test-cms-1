@@ -43,16 +43,15 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             } finally {
                 analyzeContext.setFormActionPageClassName(null);
             }
-        }
-
-        if ("input".equals(name)) {
-            processInput(toAnalyzeContext(context), attrs);
+        } else if ("input".equals(name) || "select".equals(name)
+            || "textarea".equals(name)) {
+            processParameterTag(toAnalyzeContext(context), attrs);
         }
 
         return super.evaluate(context, name, attrs, body);
     }
 
-    void processInput(AnalyzerContext context, Attribute[] attrs) {
+    void processParameterTag(AnalyzerContext context, Attribute[] attrs) {
 
         String className = context.getFormActionPageClassName();
         if (className == null) {
@@ -84,8 +83,11 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
                 attrList.add(attrs[i]);
             }
         }
-        return TagEvaluatorUtils.toMap(processAttributes(context, expEvaluator,
-            varResolver, attributesAttr, attrs, true));
+        if (attributesAttr != null) {
+            attrs = processAttributes(context, expEvaluator, varResolver,
+                attributesAttr, attrs, true);
+        }
+        return TagEvaluatorUtils.toMap(attrs);
     }
 
     AnalyzerContext toAnalyzeContext(TemplateContext context) {
