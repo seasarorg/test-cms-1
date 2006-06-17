@@ -71,6 +71,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
             if (ex.getCause() instanceof IllegalSyntaxException) {
                 // TODO 文法エラーがあったのでスキップする旨
                 // 通知しよう。
+                ex.printStackTrace();
             } else {
                 throw ex;
             }

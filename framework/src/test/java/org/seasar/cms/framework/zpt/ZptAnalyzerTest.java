@@ -138,6 +138,8 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(pd);
         assertFalse(pd.isReadable());
         assertTrue(pd.isWritable());
+        assertNull(cd.getPropertyDesc("button"));
+        assertNull(cd.getPropertyDesc("submit"));
         MethodDesc md = cd.getMethodDesc("POST");
         assertNotNull(md);
         assertEquals("void", md.getReturnTypeString());

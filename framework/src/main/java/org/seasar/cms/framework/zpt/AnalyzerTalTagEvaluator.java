@@ -27,8 +27,8 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         String annotation = result.getAnnotation();
         attrs = result.getTheOtherAttributes();
 
+        AnalyzerContext analyzeContext = toAnalyzeContext(context);
         if ("form".equals(name)) {
-            AnalyzerContext analyzeContext = toAnalyzeContext(context);
             SourceCreator creator = analyzeContext.getSourceCreator();
             Map attrMap = evaluate(analyzeContext, attrs);
             String action = getAttributeValue(attrMap, "action", null);
@@ -48,9 +48,14 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             } finally {
                 analyzeContext.setFormActionPageClassName(null);
             }
-        } else if ("input".equals(name) || "select".equals(name)
-            || "textarea".equals(name)) {
-
+        } else if ("input".equals(name)) {
+            Map attrMap = evaluate(analyzeContext, attrs);
+            String type = getAttributeValue(attrMap, "type", null);
+            if (!("button".equals(type) || "submit".equals(type))) {
+                processParameterTag(toAnalyzeContext(context), attrs,
+                    annotation);
+            }
+        } else if ("select".equals(name) || "textarea".equals(name)) {
             processParameterTag(toAnalyzeContext(context), attrs, annotation);
         }
 
