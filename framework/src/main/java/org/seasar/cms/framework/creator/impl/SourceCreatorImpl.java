@@ -12,11 +12,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.seasar.cms.framework.MatchedPathMapping;
+import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
+import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.ResponseCreator;
 import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
@@ -25,6 +29,7 @@ import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.creator.SourceGenerator;
 import org.seasar.cms.framework.creator.TemplateAnalyzer;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
+import org.seasar.cms.framework.zpt.ZptResponseCreator;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
@@ -52,8 +57,22 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private SourceGenerator javaSourceGenerator_;
 
-    public ClassDesc[] update(String path, String method) {
+    private ResponseCreator responseCreator_ = new ZptResponseCreator();
 
+    public Response update(String path, String method, Request request) {
+
+        ClassDesc[] classDescs = update(path, method);
+        if (classDescs != null) {
+            Map variableMap = new HashMap();
+            variableMap.put("request", request);
+            variableMap.put("classDescs", classDescs);
+            return responseCreator_.createResponse("updated", variableMap);
+        } else {
+            return null;
+        }
+    }
+
+    ClassDesc[] update(String path, String method) {
         String className = getClassName(getComponentName(path, method));
         if (className == null) {
             return null;
@@ -339,5 +358,10 @@ public class SourceCreatorImpl implements SourceCreator {
     public void setSourceGenerator(SourceGenerator javaSourceGenerator) {
 
         javaSourceGenerator_ = javaSourceGenerator;
+    }
+
+    public void setResponseCreaator(ResponseCreator responseCreator) {
+
+        responseCreator_ = responseCreator;
     }
 }

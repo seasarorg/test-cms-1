@@ -1,5 +1,8 @@
 package org.seasar.cms.framework.creator;
 
+import org.seasar.cms.framework.Request;
+import org.seasar.cms.framework.Response;
+
 public interface SourceCreator {
 
     String getDtoPackageName();
@@ -10,5 +13,5 @@ public interface SourceCreator {
 
     String getClassName(String componentName);
 
-    ClassDesc[] update(String path, String method);
+    Response update(String path, String method, Request request);
 }

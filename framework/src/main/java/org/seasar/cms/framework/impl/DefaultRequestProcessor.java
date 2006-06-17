@@ -2,7 +2,6 @@ package org.seasar.cms.framework.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,13 +13,10 @@ import org.seasar.cms.framework.PathMapping;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.ResponseCreator;
 import org.seasar.cms.framework.container.ThreadLocalS2ContainerUtils;
-import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.response.constructor.ResponseConstructor;
 import org.seasar.cms.framework.response.constructor.ResponseConstructorSelector;
-import org.seasar.cms.framework.zpt.ZptResponseCreator;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.kvasir.util.el.VariableResolver;
@@ -40,8 +36,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
     private S2Container container_;
 
     private SourceCreator sourceCreator_;
-
-    private ResponseCreator responseCreator_ = new ZptResponseCreator();
 
     public Response process(String path, String method, String dispatcher,
         Map parameterMap) throws PageNotFoundException {
@@ -63,13 +57,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
             parameterMap, mapping.getPathInfo(resolver));
 
         if (sourceCreator_ != null) {
-            ClassDesc[] classDescs = sourceCreator_.update(path, request
-                .getMethod());
-            if (classDescs != null) {
-                Map variableMap = new HashMap();
-                variableMap.put("request", request);
-                variableMap.put("classDescs", classDescs);
-                return responseCreator_.createResponse("updated", variableMap);
+            Response response = sourceCreator_
+                .update(path, request.getMethod(), request);
+            if (response != null) {
+                return response;
             }
         }
 
@@ -242,10 +233,5 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public void setSourceCreator(SourceCreator sourceCreator) {
 
         sourceCreator_ = sourceCreator;
-    }
-
-    public void setResponseCreaator(ResponseCreator responseCreator) {
-
-        responseCreator_ = responseCreator;
     }
 }
