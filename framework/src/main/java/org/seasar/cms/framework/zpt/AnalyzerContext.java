@@ -17,7 +17,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private String method_;
 
-    private Map classDescriptorMap_;
+    private Map classDescMap_;
 
     private String pageClassName_;
 
@@ -63,7 +63,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public void popRepeatInfo(String name) {
 
-        if (getClassDescriptor(dtoClassName_, false) == null) {
+        if (getClassDesc(dtoClassName_, false) == null) {
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
             pd.setDefaultType("java.lang.String[]");
@@ -86,14 +86,14 @@ public class AnalyzerContext extends ZptTemplateContext {
         method_ = method;
     }
 
-    public Map getClassDescriptorMap() {
+    public Map getClassDescMap() {
 
-        return classDescriptorMap_;
+        return classDescMap_;
     }
 
-    public void setClassDescriptorMap(Map classDescriptorMap) {
+    public void setClassDescMap(Map classDescriptorMap) {
 
-        classDescriptorMap_ = classDescriptorMap;
+        classDescMap_ = classDescriptorMap;
     }
 
     public String getPageClassName() {
@@ -133,16 +133,15 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public ClassDesc getClassDesc(String className) {
 
-        return getClassDescriptor(className, true);
+        return getClassDesc(className, true);
     }
 
-    public ClassDesc getClassDescriptor(String className,
-        boolean createIfNotExist) {
+    public ClassDesc getClassDesc(String className, boolean createIfNotExist) {
 
-        ClassDesc descriptor = (ClassDesc) classDescriptorMap_.get(className);
+        ClassDesc descriptor = (ClassDesc) classDescMap_.get(className);
         if (descriptor == null && createIfNotExist) {
             descriptor = new ClassDesc(className);
-            classDescriptorMap_.put(className, descriptor);
+            classDescMap_.put(className, descriptor);
         }
         return descriptor;
     }

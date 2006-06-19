@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.ResponseProcessor;
+import org.seasar.cms.framework.util.ServletUtils;
 
 public class DefaultResponseProcessor implements ResponseProcessor {
 
@@ -32,7 +33,14 @@ public class DefaultResponseProcessor implements ResponseProcessor {
             return false;
 
         case Response.TYPE_REDIRECT:
-            httpResponse.sendRedirect(response.getPath());
+            String path = response.getPath();
+            if (path.startsWith("/")) {
+                path = ServletUtils.getContextPath(httpRequest) + path;
+                if ("".equals(path)) {
+                    path = "/";
+                }
+            }
+            httpResponse.sendRedirect(path);
             return false;
 
         case Response.TYPE_SELF_CONTAINED:

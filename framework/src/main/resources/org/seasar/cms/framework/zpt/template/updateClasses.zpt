@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Class Files Updated</title>
+    <title>SYSTEM NOTIFICATION</title>
   </head>
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
@@ -10,7 +10,7 @@
 </ul>
 <p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
 <form tal:attributes="method request/method; action request/absolutePath">
-  <div tal:omit-tag="" tal:repeat="entry java:((org.seasar.cms.framework.Request)request).getParameterMap().entrySet()"><input type="hidden" tal:repeat="value entry/value" tal:attributes="name entry/key; value value" /></div>
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
   <input type="submit" value=" OK " />
 </form>
   </body>

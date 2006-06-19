@@ -2,6 +2,7 @@ package org.seasar.cms.framework.zpt;
 
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
 import net.skirnir.freyja.TemplateContext;
@@ -18,11 +19,19 @@ public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
     protected Object getProperty(TemplateContext context,
         VariableResolver varResolver, String arg) {
 
-        if (DefaultRequestProcessor.ATTR_PAGE.equals(arg)) {
-            return new DummyObject(toAnalyzerContext(context)
-                .getPageClassName(), false);
-        }
         AnalyzerContext analyzerContext = toAnalyzerContext(context);
+        SourceCreator sourceCreator = analyzerContext.getSourceCreator();
+
+        if (DefaultRequestProcessor.ATTR_PAGE.equals(arg)) {
+            return new DummyObject(analyzerContext.getPageClassName(), false);
+        }
+
+        String className = sourceCreator.getClassName(arg);
+        if (className != null
+            && className.startsWith(sourceCreator.getPagePackageName() + ".")) {
+            return new DummyObject(className, false);
+        }
+
         String dtoName = analyzerContext.getDtoName();
         if (arg.equals(dtoName)) {
             return new DummyObject(analyzerContext.getDtoClassName(), true);

@@ -1,20 +1,11 @@
 package org.seasar.cms.framework.creator.impl;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 import org.seasar.cms.framework.MatchedPathMapping;
 import org.seasar.cms.framework.Request;
@@ -22,20 +13,29 @@ import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.ResponseCreator;
 import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.MethodDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.creator.SourceGenerator;
 import org.seasar.cms.framework.creator.TemplateAnalyzer;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
+import org.seasar.cms.framework.impl.RedirectResponse;
 import org.seasar.cms.framework.zpt.ZptResponseCreator;
+import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 
+import net.skirnir.xom.IllegalSyntaxException;
+import net.skirnir.xom.ValidationException;
+import net.skirnir.xom.XMLParserFactory;
+import net.skirnir.xom.XOMapper;
+import net.skirnir.xom.XOMapperFactory;
+
 public class SourceCreatorImpl implements SourceCreator {
+
+    public static final String PARAM_PREFIX = "__cms__";
+
+    public static final String PARAM_TASK = PARAM_PREFIX + "task";
 
     private S2Container container_;
 
@@ -53,65 +53,111 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private String encoding_ = "UTF-8";
 
+    private String pagePackageName_;
+
     private String dtoPackageName_;
 
-    private SourceGenerator javaSourceGenerator_;
+    private SourceGenerator sourceGenerator_;
 
     private ResponseCreator responseCreator_ = new ZptResponseCreator();
 
+    private UpdateActionSelector actionSelector_ = new UpdateActionSelector()
+        .register(new Condition(false, false, false, Request.METHOD_GET),
+            new CreateTemplateAction(this)).register(
+            new Condition(true, false, false, Request.METHOD_GET),
+            new CreateTemplateAction(this)).register(
+            new Condition(true, false, true, Request.METHOD_GET),
+            new UpdateClassesAction(this)).register(
+            new Condition(true, true, false, Request.METHOD_GET),
+            new CreateTemplateAction(this)).register(
+            new Condition(true, true, true, Request.METHOD_GET),
+            new UpdateClassesAction(this)).register(
+            new Condition(false, false, false, Request.METHOD_POST),
+            new CreateClassAndTemplateAction(this)).register(
+            new Condition(true, false, false, Request.METHOD_POST),
+            new CreateClassAndTemplateAction(this)).register(
+            new Condition(true, false, true, Request.METHOD_POST),
+            new UpdateClassesAction(this)).register(
+            new Condition(true, true, false, Request.METHOD_POST),
+            new CreateTemplateAction(this)).register(
+            new Condition(true, true, true, Request.METHOD_POST),
+            new UpdateClassesAction(this)).register("createClass",
+            new CreateClassAction(this)).register("createTemplate",
+            new CreateTemplateAction(this)).register("createClassAndTemplate",
+            new CreateClassAndTemplateAction(this));
+
     public Response update(String path, String method, Request request) {
 
-        ClassDesc[] classDescs = update(path, method);
-        if (classDescs != null) {
-            Map variableMap = new HashMap();
-            variableMap.put("request", request);
-            variableMap.put("classDescs", classDescs);
-            return responseCreator_.createResponse("updated", variableMap);
+        String className = getClassName(getComponentName(path, method));
+        File sourceFile = getSourceFile(className + "Base");
+        File templateFile = getTemplateFile(path);
+
+        Object condition;
+
+        String task = request.getParameter(PARAM_TASK);
+        if (task != null) {
+            condition = task;
+        } else {
+            if ("".equals(path)) {
+                String welcomeFile = getWelcomeFile();
+                if (welcomeFile != null) {
+                    return new RedirectResponse("/" + welcomeFile);
+                }
+                if (className == null || sourceFile.exists()) {
+                    return null;
+                }
+                condition = "createClass";
+            } else {
+                condition = new Condition((className != null), sourceFile
+                    .exists(), templateFile.exists(), method);
+            }
+        }
+
+        UpdateAction action = actionSelector_.getAction(condition);
+        if (action != null) {
+            return action.act(request, className, sourceFile, templateFile);
         } else {
             return null;
         }
     }
 
-    ClassDesc[] update(String path, String method) {
-        String className = getClassName(getComponentName(path, method));
-        if (className == null) {
+    String getWelcomeFile() {
+
+        XOMapper mapper = XOMapperFactory.newInstance();
+        mapper.setStrict(false);
+        File webXml = new File(getWebappDirectory(), "WEB-INF/web.xml");
+        if (!webXml.exists()) {
             return null;
         }
 
-        File templateFile = getTemplateFile(path);
-        if (!templateFile.exists()) {
-            return null;
-        }
-
-        File sourceFile = getSourceFile(className + "Base");
-        if (sourceFile.exists()
-            && sourceFile.lastModified() >= templateFile.lastModified()) {
-            return null;
-        }
-
-        Map classDescriptorMap = new LinkedHashMap();
+        WebApp webApp;
         try {
-            analyzer_.analyze(method, classDescriptorMap, new FileInputStream(
-                templateFile), encoding_, className);
+            webApp = (WebApp) mapper.toBean(
+                XMLParserFactory.newInstance()
+                    .parse(
+                        new InputStreamReader(new FileInputStream(webXml),
+                            "UTF-8")).getRootElement(), WebApp.class);
+        } catch (ValidationException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalSyntaxException ex) {
+            throw new RuntimeException(ex);
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
-        ClassDesc[] classDescs = (ClassDesc[]) classDescriptorMap.values()
-            .toArray(new ClassDesc[0]);
-        if (classDescs.length == 0) {
+        WelcomeFileList welcomeFileList = webApp.getWelcomeFileList();
+        if (welcomeFileList == null) {
             return null;
         }
-
-        ClassDesc classDesc = (ClassDesc) classDescriptorMap.get(className);
-        classDesc.setMethodDesc(new MethodDesc(getActionName(path, method)));
-        classDesc.setMethodDesc(new MethodDesc(
-            DefaultRequestProcessor.ACTION_RENDER));
-
-        for (int i = 0; i < classDescs.length; i++) {
-            updateClass(classDescs[i], true);
+        String[] welcomeFiles = welcomeFileList.getWelcomeFiles();
+        if (welcomeFiles.length > 0) {
+            return welcomeFiles[0];
+        } else {
+            return null;
         }
-
-        return classDescs;
     }
 
     public String getComponentName(String path, String method) {
@@ -148,135 +194,46 @@ public class SourceCreatorImpl implements SourceCreator {
 
         if (componentName == null) {
             return null;
-        } else if (container_.hasComponentDef(componentName)) {
-            return container_.getComponentDef(componentName)
-                .getComponentClass().getName();
+            // TODO 自動生成対象外のコンポーネントを取得する必要はないため。
+            //        } else if (container_.hasComponentDef(componentName)) {
+            //            return container_.getComponentDef(componentName)
+            //                .getComponentClass().getName();
         } else {
-            int size = creatorContainer_.getCreatorSize();
-            for (int i = 0; i < size; i++) {
-                try {
-                    creatorContainer_.getCreator(i).getComponentDef(container_,
-                        componentName);
-                } catch (ClassNotFoundRuntimeException ex) {
-                    return ex.getCause().getMessage();
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(
+                    creatorContainer_.getClassLoader());
+                int size = creatorContainer_.getCreatorSize();
+                for (int i = 0; i < size; i++) {
+                    try {
+                        ComponentDef componentDef = creatorContainer_
+                            .getCreator(i).getComponentDef(container_,
+                                componentName);
+                        if (componentDef != null) {
+                            return componentDef.getComponentClass().getName();
+                        }
+                    } catch (ClassNotFoundRuntimeException ex) {
+                        return ex.getCause().getMessage();
+                    }
                 }
+            } finally {
+                Thread.currentThread().setContextClassLoader(cl);
             }
         }
         return null;
     }
 
-    void updateClass(ClassDesc classDesc, boolean merge) {
+    public Class getClass(String className) {
 
-        if (merge) {
-            classDesc = mergeClassDescs(classDesc, getClassDesc(classDesc
-                .getName()));
+        if (className == null) {
+            return null;
         }
-        writeSourceFile(classDesc);
-    }
-
-    void writeSourceFile(ClassDesc classDesc) {
-
-        writeString(javaSourceGenerator_.generateBaseSource(classDesc),
-            getSourceFile(classDesc.getName() + "Base"));
-
-        // gap側のクラスは存在しない場合のみ生成する。
-        File sourceFile = getSourceFile(classDesc.getName());
-        if (!sourceFile.exists()) {
-            writeString(javaSourceGenerator_.generateGapSource(classDesc),
-                sourceFile);
-        }
-    }
-
-    void writeString(String string, File file) {
-
-        file.getParentFile().mkdirs();
-
-        OutputStream os = null;
         try {
-            os = new FileOutputStream(file);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                os, encoding_));
-            writer.write(string);
-            writer.flush();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException ignore) {
-                }
-            }
-        }
-    }
-
-    ClassDesc mergeClassDescs(ClassDesc classDesc1, ClassDesc classDesc2) {
-
-        if (classDesc1 == null) {
-            return classDesc2;
-        } else if (classDesc2 == null) {
-            return classDesc1;
-        }
-        PropertyDesc[] pd2s = classDesc2.getPropertyDescs();
-        for (int i = 0; i < pd2s.length; i++) {
-            PropertyDesc pd = classDesc1.getPropertyDesc(pd2s[i].getName());
-            if (pd == null) {
-                classDesc1.setPropertyDesc(pd2s[i]);
-            } else {
-                if (pd.getType() == null) {
-                    pd.setType(pd2s[i].getType());
-                }
-                pd.addMode(pd2s[i].getMode());
-            }
-        }
-        return classDesc1;
-    }
-
-    ClassDesc getClassDesc(String className) {
-
-        Class clazz = null;
-        try {
-            clazz = Class.forName(className, true, container_.getClassLoader());
+            return Class.forName(className, true, creatorContainer_
+                .getClassLoader());
         } catch (ClassNotFoundException ex) {
             return null;
         }
-
-        BeanInfo beanInfo;
-        try {
-            beanInfo = Introspector.getBeanInfo(clazz);
-        } catch (IntrospectionException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        ClassDesc classDesc = new ClassDesc(className);
-        PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
-        for (int i = 0; i < pds.length; i++) {
-            String name = pds[i].getName();
-            if ("class".equals(name)) {
-                continue;
-            }
-            PropertyDesc propertyDesc = new PropertyDesc(name);
-            int mode = PropertyDesc.NONE;
-            if (pds[i].getReadMethod() != null) {
-                mode |= PropertyDesc.READ;
-            }
-            if (pds[i].getWriteMethod() != null) {
-                mode |= PropertyDesc.WRITE;
-            }
-            propertyDesc.setMode(mode);
-            Class propertyType = pds[i].getPropertyType();
-            String type;
-            if (propertyType.isArray()) {
-                type = propertyType.getComponentType().getName() + "[]";
-            } else {
-                type = propertyType.getName();
-            }
-            propertyDesc.setType(type);
-            propertyDesc.setMode(mode);
-            classDesc.setPropertyDesc(propertyDesc);
-        }
-
-        return classDesc;
     }
 
     File getTemplateFile(String path) {
@@ -305,7 +262,12 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    public void setS2Container(S2Container container) {
+    public S2Container getContainer() {
+
+        return container_;
+    }
+
+    public void setContainer(S2Container container) {
 
         container_ = container;
     }
@@ -330,9 +292,19 @@ public class SourceCreatorImpl implements SourceCreator {
         classesDirectory_ = new File(classesDirectoryPath);
     }
 
+    public File getWebappDirectory() {
+
+        return webappDirectory_;
+    }
+
     public void setWebappDirectoryPath(String webappDirectoryPath) {
 
         webappDirectory_ = new File(webappDirectoryPath);
+    }
+
+    public TemplateAnalyzer getTemplateAnalyzer() {
+
+        return analyzer_;
     }
 
     public void setTemplateAnalyzer(TemplateAnalyzer analyzer) {
@@ -340,9 +312,24 @@ public class SourceCreatorImpl implements SourceCreator {
         analyzer_ = analyzer;
     }
 
+    public String getEncoding() {
+
+        return encoding_;
+    }
+
     public void setEncoding(String encoding) {
 
         encoding_ = encoding;
+    }
+
+    public String getPagePackageName() {
+
+        return pagePackageName_;
+    }
+
+    public void setPagePackageName(String pagePackageName) {
+
+        pagePackageName_ = pagePackageName;
     }
 
     public String getDtoPackageName() {
@@ -355,9 +342,19 @@ public class SourceCreatorImpl implements SourceCreator {
         dtoPackageName_ = dtoPackageName;
     }
 
-    public void setSourceGenerator(SourceGenerator javaSourceGenerator) {
+    public SourceGenerator getSourceGenerator() {
 
-        javaSourceGenerator_ = javaSourceGenerator;
+        return sourceGenerator_;
+    }
+
+    public void setSourceGenerator(SourceGenerator sourceGenerator) {
+
+        sourceGenerator_ = sourceGenerator;
+    }
+
+    public ResponseCreator getResponseCreator() {
+
+        return responseCreator_;
     }
 
     public void setResponseCreaator(ResponseCreator responseCreator) {

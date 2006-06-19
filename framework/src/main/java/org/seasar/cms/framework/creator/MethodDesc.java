@@ -8,6 +8,8 @@ public class MethodDesc extends AbstractDesc {
 
     private String defaultReturnType_;
 
+    private String body_;
+
     public MethodDesc(String name) {
 
         name_ = name;
@@ -41,5 +43,15 @@ public class MethodDesc extends AbstractDesc {
     public String getReturnTypeString() {
 
         return getTypeString(returnType_, defaultReturnType_, TYPE_VOID);
+    }
+
+    public String getBody() {
+
+        return body_;
+    }
+
+    public void setBody(String body) {
+
+        body_ = body;
     }
 }

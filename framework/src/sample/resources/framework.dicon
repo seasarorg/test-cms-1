@@ -67,6 +67,7 @@
     <property name="sourceDirectoryPath">config.getProperty("projectRoot") + "/" + config.getProperty("sourceDirectory", "src/main/java")</property>
     <property name="classesDirectoryPath">config.getProperty("projectRoot") + "/" + config.getProperty("classesDirectory", config.getProperty("webappDirectory", "src/main/webapp") + "/WEB-INF/classes")</property>
     <property name="webappDirectoryPath">config.getProperty("projectRoot") + "/" + config.getProperty("webappDirectory", "/src/main/webapp")</property>
+    <property name="pagePackageName">config.getProperty("rootPackageName") + ".web"</property>
     <property name="dtoPackageName">config.getProperty("rootPackageName") + ".dto"</property>
   </component>
   <component class="org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator" />

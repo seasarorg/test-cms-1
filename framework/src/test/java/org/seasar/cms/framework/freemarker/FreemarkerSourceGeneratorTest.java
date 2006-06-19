@@ -2,6 +2,7 @@ package org.seasar.cms.framework.freemarker;
 
 import org.seasar.cms.framework.FrameworkTestCase;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 
 public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
@@ -43,6 +44,10 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
         ClassDesc classDesc = prepareClassDesc();
         classDesc.setKind(ClassDesc.KIND_PAGE);
+        MethodDesc methodDesc = new MethodDesc("_get");
+        methodDesc.setDefaultReturnType(String.class.getName());
+        methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
+        classDesc.setMethodDesc(methodDesc);
 
         String actual = generator_.generateBaseSource(classDesc);
 
@@ -59,5 +64,20 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
         assertEquals(readResource(getClass(),
             "testGenerateBaseSource_Dto.expected"), actual);
+    }
+
+    public void testGenerateGapSource_Page() throws Exception {
+
+        ClassDesc classDesc = prepareClassDesc();
+        classDesc.setKind(ClassDesc.KIND_PAGE);
+        MethodDesc methodDesc = new MethodDesc("_get");
+        methodDesc.setDefaultReturnType(String.class.getName());
+        methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
+        classDesc.setMethodDesc(methodDesc);
+
+        String actual = generator_.generateGapSource(classDesc);
+
+        assertEquals(readResource(getClass(),
+            "testGenerateGapSource_Page.expected"), actual);
     }
 }

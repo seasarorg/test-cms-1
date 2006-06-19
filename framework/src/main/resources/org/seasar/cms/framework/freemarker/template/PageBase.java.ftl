@@ -22,4 +22,11 @@ abstract public class ${shortName}Base
     }
 </#if>
 </#list>
+<#list methodDescs as methodDesc>
+
+    public ${methodDesc.returnTypeString} ${methodDesc.name}()
+    {
+        <#if methodDesc.returnTypeString != "void">return null;</#if>
+    }
+</#list>
 }

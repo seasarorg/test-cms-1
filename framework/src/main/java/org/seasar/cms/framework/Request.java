@@ -52,6 +52,8 @@ public interface Request {
 
     void setDispatcher(String dispatcher);
 
+    String getParameter(String name);
+
     Map getParameterMap();
 
     void setParameterMap(Map parameterMap);

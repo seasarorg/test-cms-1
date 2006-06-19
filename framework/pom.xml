@@ -7,8 +7,10 @@
   <artifactId>framework</artifactId>
   <name>CMS Framework</name>
   <version>0.0.1</version>
-  <description>CMS Framework is a framework for developing light-weight web
-    application.</description>
+  <description>
+    CMS Framework is a framework for developing light-weight web
+    application.
+  </description>
   <build>
     <defaultGoal>install</defaultGoal>
     <pluginManagement>
@@ -105,6 +107,11 @@
       <groupId>net.skirnir.freyja</groupId>
       <artifactId>freyja</artifactId>
       <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>net.skirnir.xom</groupId>
+      <artifactId>xom</artifactId>
+      <version>0.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>freemarker</groupId>

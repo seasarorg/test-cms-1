@@ -78,11 +78,11 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         hotdeployClassLoader = new HotdeployClassLoader(originalClassLoader);
         hotdeployClassLoader.setPackageName(rootPackageName);
         hotdeployClassLoader.addHotdeployListener(this);
-        ((S2ContainerImpl)container).setClassLoader(hotdeployClassLoader);
+        ((S2ContainerImpl) container).setClassLoader(hotdeployClassLoader);
     }
 
     public void stop() {
-        ((S2ContainerImpl)container).setClassLoader(originalClassLoader);
+        ((S2ContainerImpl) container).setClassLoader(originalClassLoader);
         hotdeployClassLoader = null;
         originalClassLoader = null;
         BeanDescFactory.clear();
@@ -102,18 +102,12 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         if (cd != null) {
             return cd;
         }
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(hotdeployClassLoader);
-            if (key instanceof Class) {
-                return getComponentDef0((Class) key);
-            } else if (key instanceof String) {
-                return getComponentDef0((String) key);
-            } else {
-                throw new IllegalArgumentException("key");
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(cl);
+        if (key instanceof Class) {
+            return getComponentDef0((Class) key);
+        } else if (key instanceof String) {
+            return getComponentDef0((String) key);
+        } else {
+            throw new IllegalArgumentException("key");
         }
     }
 
@@ -122,38 +116,56 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
     }
 
     protected void loadComponentDef(Class clazz) {
-        for (int i = 0; i < getCreatorSize(); ++i) {
-            OndemandCreator creator = getCreator(i);
-            if (creator.loadComponentDef(container, clazz)) {
-                break;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(hotdeployClassLoader);
+            for (int i = 0; i < getCreatorSize(); ++i) {
+                OndemandCreator creator = getCreator(i);
+                if (creator.loadComponentDef(container, clazz)) {
+                    break;
+                }
             }
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
         }
     }
 
     protected ComponentDef getComponentDef0(Class clazz) {
-        for (int i = 0; i < getCreatorSize(); ++i) {
-            OndemandCreator creator = getCreator(i);
-            ComponentDef cd = creator.getComponentDef(container, clazz);
-            if (cd != null) {
-                return cd;
-            }
-        }
-        return null;
-    }
-
-    protected ComponentDef getComponentDef0(String componentName) {
-        for (int i = 0; i < getCreatorSize(); ++i) {
-            OndemandCreator creator = getCreator(i);
-            try {
-                ComponentDef cd = creator.getComponentDef(container,
-                    componentName);
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(hotdeployClassLoader);
+            for (int i = 0; i < getCreatorSize(); ++i) {
+                OndemandCreator creator = getCreator(i);
+                ComponentDef cd = creator.getComponentDef(container, clazz);
                 if (cd != null) {
                     return cd;
                 }
-            } catch (ClassNotFoundRuntimeException ignore) {
             }
+            return null;
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
         }
-        return null;
+    }
+
+    protected ComponentDef getComponentDef0(String componentName) {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(hotdeployClassLoader);
+            for (int i = 0; i < getCreatorSize(); ++i) {
+                OndemandCreator creator = getCreator(i);
+                try {
+                    ComponentDef cd = creator.getComponentDef(container,
+                        componentName);
+                    if (cd != null) {
+                        return cd;
+                    }
+                } catch (ClassNotFoundRuntimeException ignore) {
+                }
+            }
+            return null;
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
     public void register(ComponentDef componentDef) {
@@ -185,5 +197,9 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
 
     public void setContainer(S2Container container) {
         this.container = container;
+    }
+
+    public ClassLoader getClassLoader() {
+        return container.getClassLoader();
     }
 }

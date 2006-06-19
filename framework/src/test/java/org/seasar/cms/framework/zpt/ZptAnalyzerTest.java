@@ -13,7 +13,7 @@ import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 public class ZptAnalyzerTest extends TestCase {
 
-    private static final String CLASSNAME = "com.example.page.Page";
+    private static final String CLASSNAME = "com.example.web.IndexPage";
 
     private ZptAnalyzer analyzer_ = new ZptAnalyzer();
 
@@ -24,27 +24,32 @@ public class ZptAnalyzerTest extends TestCase {
         analyzer_ = new ZptAnalyzer();
         SourceCreatorImpl creator = new SourceCreatorImpl() {
             public String getComponentName(String path, String method) {
-                return path;
+                int slash = path.lastIndexOf('/');
+                if (slash >= 0) {
+                    path = path.substring(slash + 1);
+                }
+                int dot = path.lastIndexOf('.');
+                if (dot >= 0) {
+                    path = path.substring(0, dot);
+                }
+                return path + "Page";
             }
 
             public String getClassName(String componentName) {
-                int slash = componentName.lastIndexOf('/');
-                if (slash >= 0) {
-                    componentName = componentName.substring(slash + 1);
+                if (componentName.endsWith("Page")) {
+                    return "com.example.web."
+                        + Character.toUpperCase(componentName.charAt(0))
+                        + componentName.substring(1);
+                } else {
+                    return null;
                 }
-                int dot = componentName.lastIndexOf('.');
-                if (dot >= 0) {
-                    componentName = componentName.substring(0, dot);
-                }
-                return "com.example.page."
-                    + Character.toUpperCase(componentName.charAt(0))
-                    + componentName.substring(1) + "Page";
             }
 
             public String getActionName(String path, String method) {
                 return method;
             }
         };
+        creator.setPagePackageName("com.example.web");
         creator.setDtoPackageName("com.example.dto");
         analyzer_.setSourceCreator(creator);
     }
@@ -81,7 +86,7 @@ public class ZptAnalyzerTest extends TestCase {
         PropertyDesc pd = cd.getPropertyDesc("text");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
-        ClassDesc cd2 = getClassDescriptor("com.example.page.ActionPage");
+        ClassDesc cd2 = getClassDescriptor("com.example.web.ActionPage");
         assertNotNull(cd2);
         PropertyDesc pd2 = cd2.getPropertyDesc("text");
         assertNotNull(pd2);
@@ -124,7 +129,7 @@ public class ZptAnalyzerTest extends TestCase {
 
         act("testAnalyze5");
 
-        ClassDesc cd = getClassDescriptor("com.example.page.UpdatePage");
+        ClassDesc cd = getClassDescriptor("com.example.web.UpdatePage");
         assertNotNull(cd);
         PropertyDesc pd = cd.getPropertyDesc("text");
         assertNotNull(pd);
@@ -143,5 +148,14 @@ public class ZptAnalyzerTest extends TestCase {
         MethodDesc md = cd.getMethodDesc("POST");
         assertNotNull(md);
         assertEquals("void", md.getReturnTypeString());
+    }
+
+    public void testAnalyze6() throws Exception {
+
+        act("testAnalyze6");
+
+        ClassDesc cd = getClassDescriptor("com.example.web.TestPage");
+        assertNotNull("コンポーネント名が指定されている場合は対応するクラスのためのClassDescを生成すること", cd);
+        assertNotNull(cd.getPropertyDesc("body"));
     }
 }

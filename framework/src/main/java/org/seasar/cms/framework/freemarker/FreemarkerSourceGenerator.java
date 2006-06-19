@@ -1,5 +1,6 @@
 package org.seasar.cms.framework.freemarker;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Locale;
@@ -16,12 +17,17 @@ public class FreemarkerSourceGenerator implements SourceGenerator {
 
     public String generateGapSource(ClassDesc classDesc) {
 
-        return generateSource(classDesc.getKind(), classDesc);
+        return generateSource(classDesc.getKind() + ".java", classDesc);
     }
 
     public String generateBaseSource(ClassDesc classDesc) {
 
-        return generateSource(classDesc.getKind() + "Base", classDesc);
+        return generateSource(classDesc.getKind() + "Base.java", classDesc);
+    }
+
+    public String generateTemplateSource(String suffix, Object root) {
+
+        return generateSource("Template" + suffix, root);
     }
 
     String generateSource(String templateName, Object root) {
@@ -33,9 +39,11 @@ public class FreemarkerSourceGenerator implements SourceGenerator {
 
         StringWriter sw = new StringWriter();
         try {
-            cfg.getTemplate(templateName + ".java.ftl").process(root, sw);
+            cfg.getTemplate(templateName + ".ftl").process(root, sw);
         } catch (TemplateException ex) {
             throw new RuntimeException(ex);
+        } catch (FileNotFoundException ex) {
+            return null;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

@@ -5,6 +5,8 @@ import org.seasar.cms.framework.Response;
 
 public interface SourceCreator {
 
+    String getPagePackageName();
+
     String getDtoPackageName();
 
     String getComponentName(String path, String method);

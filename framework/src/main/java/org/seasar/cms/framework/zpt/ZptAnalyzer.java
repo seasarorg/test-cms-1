@@ -62,7 +62,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
         context.setSourceCreator(sourceCreator_);
         context.setMethod(method);
-        context.setClassDescriptorMap(classDescriptorMap);
+        context.setClassDescMap(classDescriptorMap);
         context.setPageClassName(className);
         try {
             evaluator_.evaluate(context, new InputStreamReader(inputStream,

@@ -1,0 +1,10 @@
+package com.example.page;
+
+public class TestPage extends TestPageBase
+{
+
+    public String _get()
+    {
+        return "redirect:/path/to/redirect.html";
+    }
+}

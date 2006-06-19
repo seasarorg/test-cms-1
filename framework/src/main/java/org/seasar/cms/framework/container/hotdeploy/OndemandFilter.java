@@ -26,14 +26,14 @@ public class OndemandFilter implements Filter {
         ClassLoader originalClassLoader = Thread.currentThread()
             .getContextClassLoader();
         S2Container container = SingletonS2ContainerFactory.getContainer();
-        OndemandUtils.start(container);
+        OndemandUtils.start(container, true);
         Thread.currentThread()
             .setContextClassLoader(container.getClassLoader());
         try {
             chain.doFilter(request, response);
         } finally {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
-            OndemandUtils.stop(container);
+            OndemandUtils.stop(container, true);
         }
     }
 }

@@ -74,7 +74,21 @@ public class RequestImpl implements Request {
 
     public String getAbsolutePath() {
 
-        return contextPath_ + path_;
+        if ("".equals(path_)) {
+            return contextPath_ + "/";
+        } else {
+            return contextPath_ + path_;
+        }
+    }
+
+    public String getParameter(String name) {
+
+        String[] values = (String[]) parameterMap_.get(name);
+        if (values != null) {
+            return values[0];
+        } else {
+            return null;
+        }
     }
 
     public Map getParameterMap() {
