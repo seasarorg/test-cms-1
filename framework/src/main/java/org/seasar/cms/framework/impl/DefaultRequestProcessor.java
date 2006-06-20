@@ -110,34 +110,41 @@ public class DefaultRequestProcessor implements RequestProcessor {
             ThreadLocalS2ContainerUtils.deregister(container_, request);
         }
 
-        Response response;
-        if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
-            // リクエストパラメータのinjectionとActionの呼び出しは
-            // dispatcherがREQUESTの時だけ。
+        Response response = PassthroughResponse.INSTANCE;
+
+        if (component != ((HttpServletRequest) container_.getExternalContext()
+            .getRequest()).getAttribute(ATTR_PAGE)) {
+            // 同一リクエストで直前に同一コンポーネントについて処理済みの
+            // 場合はリクエストパラメータのinjectionもrenderメソッドの
+            // 呼び出しもしない。そうでない場合のみ処理を行なう。
+
             try {
                 BeanUtils.populate(component, request.getParameterMap());
             } catch (Throwable t) {
             }
-            response = invokeAction(component, actionName);
-        } else {
-            response = PassthroughResponse.INSTANCE;
-        }
 
-        if (response.getType() == Response.TYPE_PASSTHROUGH) {
-            // dispatcherがREQUEST以外の場合やActionの呼び出し後に処理が
-            // スルーされてきた場合は、画面描画のためのAction呼び出しを
-            // 行なう。
-            response = invokeAction(component, ACTION_RENDER);
-        }
+            if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
+                // Actionの呼び出しはdispatcherがREQUESTの時だけ。
+                response = invokeAction(component, actionName);
+            }
 
-        // コンポーネント自体をrequestにバインドしておく。
-        ((HttpServletRequest) container_.getExternalContext().getRequest())
-            .setAttribute(ATTR_PAGE, component);
+            if (response.getType() == Response.TYPE_PASSTHROUGH) {
+                // dispatcherがREQUEST以外の場合やActionの呼び出し後に処理が
+                // スルーされてきた場合は、画面描画のためのAction呼び出しを
+                // 行なう。
+                invokeAction(component, ACTION_RENDER);
+            }
+
+            // コンポーネント自体をrequestにバインドしておく。
+            ((HttpServletRequest) container_.getExternalContext().getRequest())
+                .setAttribute(ATTR_PAGE, component);
+        }
 
         return response;
     }
 
     Response invokeAction(Object component, String actionName) {
+
         Method method = getActionMethod(component, actionName);
         if (method == null) {
             return PassthroughResponse.INSTANCE;
