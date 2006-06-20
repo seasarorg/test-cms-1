@@ -13,7 +13,7 @@ public class PageStrategy implements Strategy {
         return SCHEME;
     }
 
-    public Response constructResponse(String path) {
+    public Response constructResponse(String path, Object component) {
 
         return new ForwardResponse(path);
     }

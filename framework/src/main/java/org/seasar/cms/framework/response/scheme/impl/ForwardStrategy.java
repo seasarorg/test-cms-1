@@ -1,12 +1,12 @@
 package org.seasar.cms.framework.response.scheme.impl;
 
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.impl.SelfContainedResponse;
+import org.seasar.cms.framework.impl.ForwardResponse;
 import org.seasar.cms.framework.response.scheme.Strategy;
 
-public class StringStrategy implements Strategy {
+public class ForwardStrategy implements Strategy {
 
-    public static final String SCHEME = "string";
+    private static final String SCHEME = "forward";
 
     public String getScheme() {
 
@@ -15,6 +15,6 @@ public class StringStrategy implements Strategy {
 
     public Response constructResponse(String path, Object component) {
 
-        return new SelfContainedResponse(path);
+        return new ForwardResponse(path);
     }
 }

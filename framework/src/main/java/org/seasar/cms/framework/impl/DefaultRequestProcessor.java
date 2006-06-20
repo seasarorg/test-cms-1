@@ -151,8 +151,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         try {
-            return constructResponse(method.getReturnType(), method.invoke(
-                component, new Object[0]));
+            return constructResponse(component, method.getReturnType(), method
+                .invoke(component, new Object[0]));
         } catch (IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         } catch (IllegalAccessException ex) {
@@ -178,7 +178,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
-    Response constructResponse(Class type, Object value) {
+    Response constructResponse(Object component, Class type, Object returnValue) {
 
         if (type == Void.TYPE) {
             return PassthroughResponse.INSTANCE;
@@ -192,7 +192,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     + "' in ResponseConstructorSelector");
         }
 
-        return constructor.constructResponse(value);
+        return constructor.constructResponse(component, returnValue);
     }
 
     public PathMapping[] getPathMappings() {

@@ -9,5 +9,5 @@ public interface Strategy {
 
     String getScheme();
 
-    Response constructResponse(String path);
+    Response constructResponse(String path, Object component);
 }

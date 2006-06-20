@@ -13,7 +13,7 @@ public class PassthroughStrategy implements Strategy {
         return SCHEME;
     }
 
-    public Response constructResponse(String path) {
+    public Response constructResponse(String path, Object component) {
 
         return PassthroughResponse.INSTANCE;
     }

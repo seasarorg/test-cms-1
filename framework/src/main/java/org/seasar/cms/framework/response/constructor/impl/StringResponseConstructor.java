@@ -12,9 +12,9 @@ public class StringResponseConstructor extends AbstractResponseConstructor {
         return String.class.getName();
     }
 
-    public Response constructResponse(Object value) {
+    public Response constructResponse(Object component, Object returnValue) {
 
-        String string = (String) value;
+        String string = (String) returnValue;
         if (string == null) {
             return VoidResponse.INSTANCE;
         }
@@ -34,6 +34,6 @@ public class StringResponseConstructor extends AbstractResponseConstructor {
             throw new RuntimeException("Unknown scheme '" + scheme
                 + "' is specified: " + string);
         }
-        return strategy.constructResponse(path);
+        return strategy.constructResponse(path, component);
     }
 }

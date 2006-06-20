@@ -6,5 +6,5 @@ public interface ResponseConstructor {
 
     String getTargetClassName();
 
-    Response constructResponse(Object value);
+    Response constructResponse(Object component, Object returnValue);
 }

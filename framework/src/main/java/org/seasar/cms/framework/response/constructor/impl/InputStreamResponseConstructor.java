@@ -13,9 +13,9 @@ public class InputStreamResponseConstructor extends AbstractResponseConstructor 
         return InputStream.class.getName();
     }
 
-    public Response constructResponse(Object value) {
+    public Response constructResponse(Object component, Object returnValue) {
 
-        InputStream inputStream = (InputStream) value;
+        InputStream inputStream = (InputStream) returnValue;
         if (inputStream == null) {
             return VoidResponse.INSTANCE;
         } else {
