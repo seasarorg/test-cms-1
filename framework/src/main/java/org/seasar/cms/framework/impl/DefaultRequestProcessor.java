@@ -168,7 +168,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         } catch (IllegalAccessException ex) {
             throw new RuntimeException(ex);
         } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getCause());
         }
     }
 

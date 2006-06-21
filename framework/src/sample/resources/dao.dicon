@@ -4,10 +4,13 @@
 <components namespace="dao">
   <include path="j2ee.dicon" />
   <component class="org.seasar.dao.impl.FieldAnnotationReaderFactory" />
-  <component class="org.seasar.dao.impl.DaoMetaDataFactoryImpl">
-    <property name="daoSuffixes">new String[]{"Bean","Dao","Page"}</property>
+  <component class="org.seasar.cms.framework.dao.OndemandDaoMetaDataFactory">
+    <property name="daoSuffixes">new String[]{"Dao","Page"}</property>
     <property name="sqlFileEncoding">"UTF-8"</property>
   </component>
   <component name="interceptor"
     class="org.seasar.dao.interceptors.S2DaoInterceptor" />
+  <component class="org.seasar.dao.impl.ValueTypeFactoryImpl" />
+  <component name="stringClobType"
+    class="org.seasar.extension.jdbc.types.StringClobType" />
 </components>

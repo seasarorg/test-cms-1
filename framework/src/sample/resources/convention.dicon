@@ -14,6 +14,14 @@
       <arg>
         <component
           class="org.seasar.framework.container.hotdeploy.creator.PageCreator">
+           <property name="autoBindingDef">@org.seasar.framework.container.assembler.AutoBindingDefFactory@AUTO</property>
+        </component>
+      </arg>
+    </initMethod>
+    <initMethod name="addCreator">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.creator.DaoCreator">
            <initMethod name="addCustomizer">
             <arg>
               <component
@@ -23,12 +31,6 @@
             </arg>
           </initMethod>
         </component>
-      </arg>
-    </initMethod>
-    <initMethod name="addCreator">
-      <arg>
-        <component
-          class="org.seasar.framework.container.hotdeploy.creator.DtoCreator" />
       </arg>
     </initMethod>
   </component>

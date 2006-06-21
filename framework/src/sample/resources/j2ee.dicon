@@ -28,7 +28,7 @@
     <property name="driverClassName">config.getProperty("j2ee.xaDataSource.driverClassName", "org.hsqldb.jdbcDriver")</property>
     <property name="URL">
       config.getProperty("j2ee.xaDataSource.URL",
-        "jdbc:hsqldb:file:" + application.getRealPath("/") + "WEB-INF/hsqldb")
+        "jdbc:hsqldb:file:" + application.getRealPath("/") + "WEB-INF/hsqldb/hsqldb")
     </property>
     <property name="user">config.getProperty("j2ee.xaDataSource.user", "sa")</property>
     <property name="password">config.getProperty("j2ee.xaDataSource.password", "")</property>
