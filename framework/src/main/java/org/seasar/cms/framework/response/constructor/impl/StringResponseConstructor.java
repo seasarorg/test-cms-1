@@ -7,9 +7,9 @@ import org.seasar.cms.framework.response.scheme.impl.PageStrategy;
 
 public class StringResponseConstructor extends AbstractResponseConstructor {
 
-    public String getTargetClassName() {
+    public Class getTargetClass() {
 
-        return String.class.getName();
+        return String.class;
     }
 
     public Response constructResponse(Object component, Object returnValue) {

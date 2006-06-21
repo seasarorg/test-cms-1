@@ -4,7 +4,7 @@ import org.seasar.cms.framework.Response;
 
 public interface ResponseConstructor {
 
-    String getTargetClassName();
+    Class getTargetClass();
 
     Response constructResponse(Object component, Object returnValue);
 }

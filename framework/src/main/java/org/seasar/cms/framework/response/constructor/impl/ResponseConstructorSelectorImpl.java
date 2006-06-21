@@ -14,7 +14,7 @@ public class ResponseConstructorSelectorImpl implements
     public ResponseConstructor getResponseConstructor(Class type) {
 
         ResponseConstructor constructor = (ResponseConstructor) constructorMap_
-            .get(type.getName());
+            .get(type);
         if (constructor != null) {
             return constructor;
         } else {
@@ -25,7 +25,7 @@ public class ResponseConstructorSelectorImpl implements
 
     public void add(ResponseConstructor constructor) {
 
-        constructorMap_.put(constructor.getTargetClassName(), constructor);
+        constructorMap_.put(constructor.getTargetClass(), constructor);
     }
 
     public void setResponseConstructors(Object[] constructors) {

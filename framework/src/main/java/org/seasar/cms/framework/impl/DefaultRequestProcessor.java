@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.seasar.cms.framework.MatchedPathMapping;
+import org.seasar.cms.framework.MultipartServletRequest;
 import org.seasar.cms.framework.PageNotFoundException;
 import org.seasar.cms.framework.PathMapping;
 import org.seasar.cms.framework.Request;
@@ -112,15 +113,25 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         Response response = PassthroughResponse.INSTANCE;
 
-        if (component != ((HttpServletRequest) container_.getExternalContext()
-            .getRequest()).getAttribute(ATTR_PAGE)) {
+        HttpServletRequest httpRequest = ((HttpServletRequest) container_
+            .getExternalContext().getRequest());
+        if (component != httpRequest.getAttribute(ATTR_PAGE)) {
             // 同一リクエストで直前に同一コンポーネントについて処理済みの
             // 場合はリクエストパラメータのinjectionもrenderメソッドの
             // 呼び出しもしない。そうでない場合のみ処理を行なう。
 
             try {
                 BeanUtils.populate(component, request.getParameterMap());
+
+                Map formFileMap = (Map) httpRequest
+                    .getAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
+                if (formFileMap != null) {
+                    httpRequest
+                        .removeAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
+                    BeanUtils.populate(component, formFileMap);
+                }
             } catch (Throwable t) {
+                ;
             }
 
             if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
@@ -136,8 +147,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
             }
 
             // コンポーネント自体をrequestにバインドしておく。
-            ((HttpServletRequest) container_.getExternalContext().getRequest())
-                .setAttribute(ATTR_PAGE, component);
+            httpRequest.setAttribute(ATTR_PAGE, component);
         }
 
         return response;

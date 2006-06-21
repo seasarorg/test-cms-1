@@ -8,9 +8,9 @@ import org.seasar.cms.framework.impl.VoidResponse;
 
 public class InputStreamResponseConstructor extends AbstractResponseConstructor {
 
-    public String getTargetClassName() {
+    public Class getTargetClass() {
 
-        return InputStream.class.getName();
+        return InputStream.class;
     }
 
     public Response constructResponse(Object component, Object returnValue) {
