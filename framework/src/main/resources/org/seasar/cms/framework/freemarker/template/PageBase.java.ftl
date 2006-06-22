@@ -1,6 +1,6 @@
 <#if packageName != "">package ${packageName};</#if>
 
-abstract public class ${shortName}Base
+abstract public class ${shortName}Base<#if superclassName?exists> extends ${superclassName}</#if>
 {
 <#list propertyDescs as propertyDesc>
     protected ${propertyDesc.typeString} ${propertyDesc.name}_;

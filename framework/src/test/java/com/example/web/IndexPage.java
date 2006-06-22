@@ -1,6 +1,6 @@
 package com.example.web;
 
-public class IndexPage {
+public class IndexPage extends IndexPageBase {
 
     protected String param1_;
 

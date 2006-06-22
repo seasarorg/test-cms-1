@@ -13,6 +13,8 @@ public class ClassDesc {
 
     private String name_;
 
+    private String superclassName_;
+
     private Map propertyDescMap_ = new LinkedHashMap();
 
     private Map methodDescMap_ = new LinkedHashMap();
@@ -110,5 +112,15 @@ public class ClassDesc {
 
         return (MethodDesc[]) methodDescMap_.values()
             .toArray(new MethodDesc[0]);
+    }
+
+    public String getSuperclassName() {
+
+        return superclassName_;
+    }
+
+    public void setSuperclassName(String superclassName) {
+
+        superclassName_ = superclassName;
     }
 }

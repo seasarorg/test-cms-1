@@ -114,6 +114,12 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         }
 
         ClassDesc classDesc = new ClassDesc(className);
+
+        Class superclass = clazz.getSuperclass();
+        if (superclass != null && superclass != Object.class) {
+            classDesc.setSuperclassName(superclass.getName());
+        }
+
         PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
         for (int i = 0; i < pds.length; i++) {
             String name = pds[i].getName();

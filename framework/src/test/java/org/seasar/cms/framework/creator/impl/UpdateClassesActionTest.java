@@ -91,6 +91,8 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
 
         assertNotNull(actual);
         assertEquals("com.example.web.IndexPage", actual.getName());
+        assertEquals("com.example.web.IndexPageBase", actual
+            .getSuperclassName());
         assertEquals(2, actual.getPropertyDescs().length);
         PropertyDesc pd = actual.getPropertyDesc("param1");
         assertNotNull(pd);

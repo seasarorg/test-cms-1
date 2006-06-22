@@ -12,6 +12,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
     private ClassDesc prepareClassDesc() {
 
         ClassDesc classDesc = new ClassDesc("com.example.page.TestPage");
+        classDesc.setSuperclassName("com.example.page.SuperPage");
         PropertyDesc propertyDesc = new PropertyDesc("param1");
         propertyDesc.setMode(PropertyDesc.READ);
         classDesc.setPropertyDesc(propertyDesc);
