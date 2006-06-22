@@ -9,7 +9,14 @@ public class ClassDesc {
 
     public static final String KIND_DTO = "Dto";
 
-    private static final String[] KINDS = new String[] { KIND_PAGE, KIND_DTO };
+    public static final String KIND_DAO = "Dao";
+
+    public static final String KIND_BEAN = "Bean";
+
+    public static final String KIND_UNKNOWN = "Unknown";
+
+    private static final String[] AUTODETECTED_KINDS = new String[] {
+        KIND_PAGE, KIND_DTO, KIND_DAO };
 
     private String name_;
 
@@ -19,14 +26,14 @@ public class ClassDesc {
 
     private Map methodDescMap_ = new LinkedHashMap();
 
-    private String kind_ = KIND_PAGE;
+    private String kind_ = KIND_UNKNOWN;
 
     public ClassDesc(String name) {
 
         setName(name);
-        for (int i = 0; i < KINDS.length; i++) {
-            if (name.endsWith(KINDS[i])) {
-                setKind(KINDS[i]);
+        for (int i = 0; i < AUTODETECTED_KINDS.length; i++) {
+            if (name.endsWith(AUTODETECTED_KINDS[i])) {
+                setKind(AUTODETECTED_KINDS[i]);
                 break;
             }
         }
@@ -51,6 +58,16 @@ public class ClassDesc {
             return name_;
         } else {
             return name_.substring(dot + 1);
+        }
+    }
+
+    public String getBaseName() {
+
+        String shortName = getShortName();
+        if (shortName.endsWith(kind_)) {
+            return shortName.substring(0, shortName.length() - kind_.length());
+        } else {
+            return shortName;
         }
     }
 
