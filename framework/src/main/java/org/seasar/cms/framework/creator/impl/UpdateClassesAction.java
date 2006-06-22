@@ -7,8 +7,10 @@ import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.cms.framework.Request;
@@ -37,12 +39,60 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             return null;
         }
 
+        List beanList = new ArrayList();
+        for (int i = 0; i < classDescs.length; i++) {
+            if (ClassDesc.KIND_DTO.equals(classDescs[i].getKind())) {
+                ClassDesc classDesc = copy(classDescs[i]);
+                classDesc.setKind(ClassDesc.KIND_BEAN);
+                beanList.add(classDesc);
+            }
+        }
+
         Map variableMap = new HashMap();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("classDescs", classDescs);
+        variableMap.put("beanClassDescs", (ClassDesc[]) beanList
+            .toArray(new ClassDesc[0]));
         return getSourceCreator().getResponseCreator().createResponse(
             "updateClasses", variableMap);
+    }
+
+    ClassDesc copy(ClassDesc classDesc) {
+
+        ClassDesc copied = new ClassDesc(classDesc.getName());
+        copied.setKind(classDesc.getKind());
+        copied.setSuperclassName(classDesc.getSuperclassName());
+        PropertyDesc[] propertyDescs = classDesc.getPropertyDescs();
+        for (int i = 0; i < propertyDescs.length; i++) {
+            copied.setPropertyDesc(copy(propertyDescs[i]));
+        }
+        MethodDesc[] methodDescs = classDesc.getMethodDescs();
+        for (int i = 0; i < methodDescs.length; i++) {
+            copied.setMethodDesc(copy(methodDescs[i]));
+        }
+
+        return copied;
+    }
+
+    PropertyDesc copy(PropertyDesc propertyDesc) {
+
+        PropertyDesc copied = new PropertyDesc(propertyDesc.getName());
+        copied.setDefaultType(propertyDesc.getDefaultType());
+        copied.setType(propertyDesc.getType());
+        copied.setMode(propertyDesc.getMode());
+
+        return copied;
+    }
+
+    MethodDesc copy(MethodDesc methodDesc) {
+
+        MethodDesc copied = new MethodDesc(methodDesc.getName());
+        copied.setDefaultReturnType(methodDesc.getDefaultReturnType());
+        copied.setReturnType(methodDesc.getReturnType());
+        copied.setBody(methodDesc.getBody());
+
+        return copied;
     }
 
     boolean shouldUpdate(File sourceFile, File templateFile) {

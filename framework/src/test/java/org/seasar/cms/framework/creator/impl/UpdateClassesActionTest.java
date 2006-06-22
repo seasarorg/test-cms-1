@@ -184,4 +184,8 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
             "com.example.web.TestPage"), getSourceCreator().getTemplateFile(
             "/test.html")));
     }
+    
+    public void testCopyClassDesc() throws Exception {
+        // TODO ここから。
+    }
 }
