@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.seasar.cms.framework.Configuration;
-import org.seasar.cms.framework.Globals;
 import org.seasar.cms.framework.MatchedPathMapping;
 import org.seasar.cms.framework.MultipartServletRequest;
 import org.seasar.cms.framework.PageNotFoundException;
@@ -61,7 +60,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         Request request = new RequestImpl(contextPath, path, method,
             dispatcher, parameterMap, mapping.getPathInfo(resolver));
 
-        if (Globals.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
+        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
             && sourceCreator_ != null) {
             Response response = sourceCreator_.update(path,
                 request.getMethod(), request);
