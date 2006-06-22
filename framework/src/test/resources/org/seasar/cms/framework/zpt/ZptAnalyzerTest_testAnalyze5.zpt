@@ -12,6 +12,7 @@
       </select>
       <textarea name="textarea"></textarea>
       <input type="button" name="button" value="BUTTON" />
+      <input type="image" name="image" src="image.jpg" />
       <input type="submit" name="submit" value="SUBMIT" />
     </form>
   </body>

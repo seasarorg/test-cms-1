@@ -51,7 +51,8 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         } else if ("input".equals(name)) {
             Map attrMap = evaluate(analyzeContext, attrs);
             String type = getAttributeValue(attrMap, "type", null);
-            if (!("button".equals(type) || "submit".equals(type))) {
+            if (!("button".equals(type) || "image".equals(type) || "submit"
+                .equals(type))) {
                 processParameterTag(toAnalyzeContext(context), attrs,
                     annotation);
             }
@@ -98,9 +99,11 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         Map attrMap = evaluate(context, attrs);
         Attribute attr = (Attribute) attrMap.get("name");
         if (attr != null) {
+            // 最低限必要なのはWRITEだけだが、利便性を考えてREADも生成する
+            // ようにしている。
             context.getClassDesc(className)
                 .addProperty(TagEvaluatorUtils.defilter(attr.getValue()),
-                    PropertyDesc.WRITE);
+                    PropertyDesc.WRITE | PropertyDesc.READ);
         }
     }
 
