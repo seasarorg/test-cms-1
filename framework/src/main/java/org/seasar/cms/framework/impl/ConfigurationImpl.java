@@ -1,14 +1,16 @@
-package org.seasar.cms.framework.util;
+package org.seasar.cms.framework.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class Configuration {
+import org.seasar.cms.framework.Configuration;
+
+public class ConfigurationImpl implements Configuration {
 
     private Properties properties_ = new Properties();
 
-    public Configuration() {
+    public ConfigurationImpl() {
     }
 
     public void load(String configPath) {

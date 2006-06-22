@@ -2,7 +2,7 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components namespace="common">
-  <component name="config" class="org.seasar.cms.framework.util.Configuration">
+  <component name="config" class="org.seasar.cms.framework.ConfigurationImpl">
     <initMethod name="load">
       <arg>"app.properties"</arg>
     </initMethod>

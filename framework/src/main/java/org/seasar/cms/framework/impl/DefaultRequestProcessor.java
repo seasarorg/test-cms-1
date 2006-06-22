@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.seasar.cms.framework.Configuration;
+import org.seasar.cms.framework.Globals;
 import org.seasar.cms.framework.MatchedPathMapping;
 import org.seasar.cms.framework.MultipartServletRequest;
 import org.seasar.cms.framework.PageNotFoundException;
@@ -38,6 +40,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private SourceCreator sourceCreator_;
 
+    private Configuration configuration_;
+
     public Response process(String contextPath, String path, String method,
         String dispatcher, Map parameterMap) throws PageNotFoundException {
 
@@ -57,7 +61,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
         Request request = new RequestImpl(contextPath, path, method,
             dispatcher, parameterMap, mapping.getPathInfo(resolver));
 
-        if (sourceCreator_ != null) {
+        if (Globals.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
+            && sourceCreator_ != null) {
             Response response = sourceCreator_.update(path,
                 request.getMethod(), request);
             if (response != null) {
@@ -66,6 +71,15 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         return processRequest(request, componentName, actionName);
+    }
+
+    String getProjectStatus() {
+
+        if (configuration_ != null) {
+            return configuration_.getProperty(Configuration.KEY_PROJECTSTATUS);
+        } else {
+            return null;
+        }
     }
 
     public MatchedPathMapping findMatchedPathMapping(String path, String method) {
@@ -250,5 +264,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public void setSourceCreator(SourceCreator sourceCreator) {
 
         sourceCreator_ = sourceCreator;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+
+        configuration_ = configuration;
     }
 }
