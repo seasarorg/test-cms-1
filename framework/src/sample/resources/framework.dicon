@@ -69,6 +69,7 @@
     <property name="webappDirectoryPath">config.getProperty("projectRoot") + "/" + config.getProperty("webappDirectory", "/src/main/webapp")</property>
     <property name="pagePackageName">config.getProperty("rootPackageName") + ".web"</property>
     <property name="dtoPackageName">config.getProperty("rootPackageName") + ".dto"</property>
+    <property name="daoPackageName">config.getProperty("rootPackageName") + ".dao"</property>
   </component>
   <component class="org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator" />
   <component class="org.seasar.cms.framework.zpt.ZptAnalyzer" />

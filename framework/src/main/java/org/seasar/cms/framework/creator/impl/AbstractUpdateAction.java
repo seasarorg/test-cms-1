@@ -75,6 +75,10 @@ abstract public class AbstractUpdateAction implements UpdateAction {
 
     protected void writeString(String string, File file) {
 
+        if (string == null) {
+            return;
+        }
+
         file.getParentFile().mkdirs();
 
         OutputStream os = null;

@@ -57,6 +57,8 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private String dtoPackageName_;
 
+    private String daoPackageName_;
+
     private SourceGenerator sourceGenerator_;
 
     private ResponseCreator responseCreator_ = new ZptResponseCreator();
@@ -84,7 +86,8 @@ public class SourceCreatorImpl implements SourceCreator {
             new UpdateClassesAction(this)).register("createClass",
             new CreateClassAction(this)).register("createTemplate",
             new CreateTemplateAction(this)).register("createClassAndTemplate",
-            new CreateClassAndTemplateAction(this));
+            new CreateClassAndTemplateAction(this)).register("updateClasses",
+            new UpdateClassesAction(this));
 
     public Response update(String path, String method, Request request) {
 
@@ -194,10 +197,6 @@ public class SourceCreatorImpl implements SourceCreator {
 
         if (componentName == null) {
             return null;
-            // TODO 自動生成対象外のコンポーネントを取得する必要はないため。
-            //        } else if (container_.hasComponentDef(componentName)) {
-            //            return container_.getComponentDef(componentName)
-            //                .getComponentClass().getName();
         } else {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             try {
@@ -340,6 +339,16 @@ public class SourceCreatorImpl implements SourceCreator {
     public void setDtoPackageName(String dtoPackageName) {
 
         dtoPackageName_ = dtoPackageName;
+    }
+
+    public String getDaoPackageName() {
+
+        return daoPackageName_;
+    }
+
+    public void setDaoPackageName(String daoPackageName) {
+
+        daoPackageName_ = daoPackageName;
     }
 
     public SourceGenerator getSourceGenerator() {

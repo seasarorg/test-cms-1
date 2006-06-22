@@ -13,4 +13,7 @@ public class IndexPage extends IndexPageBase {
     public void setParam2(Integer[] param2) {
         param2_ = param2;
     }
+
+    public void _render() {
+    }
 }

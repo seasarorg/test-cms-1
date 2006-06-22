@@ -1,9 +1,10 @@
 package org.seasar.cms.framework.creator;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ClassDesc {
+public class ClassDesc implements Cloneable {
 
     public static final String KIND_PAGE = "Page";
 
@@ -37,6 +38,30 @@ public class ClassDesc {
                 break;
             }
         }
+    }
+
+    public Object clone() {
+
+        ClassDesc cloned;
+        try {
+            cloned = (ClassDesc) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException(ex);
+        }
+        cloned.propertyDescMap_ = new LinkedHashMap();
+        for (Iterator itr = propertyDescMap_.entrySet().iterator(); itr
+            .hasNext();) {
+            Map.Entry entry = (Map.Entry) itr.next();
+            cloned.propertyDescMap_.put(entry.getKey(), ((PropertyDesc) entry
+                .getValue()).clone());
+        }
+        cloned.methodDescMap_ = new LinkedHashMap();
+        for (Iterator itr = methodDescMap_.entrySet().iterator(); itr.hasNext();) {
+            Map.Entry entry = (Map.Entry) itr.next();
+            cloned.methodDescMap_.put(entry.getKey(), ((MethodDesc) entry
+                .getValue()).clone());
+        }
+        return cloned;
     }
 
     public String toString() {
@@ -139,5 +164,42 @@ public class ClassDesc {
     public void setSuperclassName(String superclassName) {
 
         superclassName_ = superclassName;
+    }
+
+    public ClassDesc merge(ClassDesc classDesc) {
+
+        if (classDesc == null) {
+            return this;
+        }
+
+        setSuperclassName(classDesc.getSuperclassName());
+
+        PropertyDesc[] pds = classDesc.getPropertyDescs();
+        for (int i = 0; i < pds.length; i++) {
+            PropertyDesc pd = getPropertyDesc(pds[i].getName());
+            if (pd == null) {
+                setPropertyDesc((PropertyDesc) pds[i].clone());
+            } else {
+                if (pd.getType() == null) {
+                    pd.setType(pds[i].getType());
+                }
+                pd.addMode(pds[i].getMode());
+            }
+        }
+
+        MethodDesc[] mds = classDesc.getMethodDescs();
+        for (int i = 0; i < mds.length; i++) {
+            MethodDesc md = getMethodDesc(mds[i].getName());
+            if (md == null) {
+                setMethodDesc((MethodDesc) mds[i].clone());
+            } else {
+                if (md.getReturnType() == null) {
+                    md.setReturnType(mds[i].getReturnType());
+                }
+                md.setBody(mds[i].getBody());
+            }
+        }
+
+        return this;
     }
 }

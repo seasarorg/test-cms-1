@@ -91,6 +91,11 @@ public class RequestImpl implements Request {
         }
     }
 
+    public String[] getParameterValues(String name) {
+
+        return (String[]) parameterMap_.get(name);
+    }
+
     public Map getParameterMap() {
 
         return parameterMap_;

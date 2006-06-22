@@ -1,6 +1,6 @@
 package org.seasar.cms.framework.creator;
 
-public class PropertyDesc extends AbstractDesc{
+public class PropertyDesc extends AbstractDesc {
 
     public static final int NONE = 0;
 

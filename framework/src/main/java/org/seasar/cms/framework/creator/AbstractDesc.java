@@ -1,10 +1,19 @@
 package org.seasar.cms.framework.creator;
 
-abstract public class AbstractDesc {
+abstract public class AbstractDesc implements Cloneable {
 
     private static final String PACKAGE_JAVA_LANG = "java.lang.";
 
     public static final String TYPE_VOID = "void";
+
+    protected Object clone() {
+
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     protected String getTypeString(String first, String second, String third) {
 

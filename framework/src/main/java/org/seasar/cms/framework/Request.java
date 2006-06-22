@@ -54,6 +54,8 @@ public interface Request {
 
     String getParameter(String name);
 
+    String[] getParameterValues(String name);
+
     Map getParameterMap();
 
     void setParameterMap(Map parameterMap);

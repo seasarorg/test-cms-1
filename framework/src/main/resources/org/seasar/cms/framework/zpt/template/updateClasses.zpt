@@ -4,14 +4,38 @@
   </head>
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
-<p>以下のクラスが追加・更新されました。</p>
-<ul>
-  <li tal:repeat="classDesc classDescs" tal:content="classDesc/name">CLASS</li>
-</ul>
-<p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
-<form tal:attributes="method request/method; action request/absolutePath">
+<form tal:attributes="action request/absolutePath" method="post">
+  <p>テンプレート<span tal:replace="templateFile/name">TEMPLATE</span>の変更を検出しました。テンプレートに関連する以下のクラスを追加・更新します。</p>
+  <p tal:condition="createdClassDescs"><strong>追加されるクラス：</strong>
+  <ul>
+    <li tal:repeat="classDesc createdClassDescs" tal:content="classDesc/name">CLASS</li>
+  </ul>
+  </p>
+  <p tal:condition="updatedClassDescs"><strong>更新されるクラス：</strong>
+  <ul>
+    <li tal:repeat="classDesc updatedClassDescs" tal:content="classDesc/name">CLASS</li>
+  </ul>
+  </p>
+  <div tal:condition="daoClassDescExists">
+    <p>また、追加・更新されるDTOクラスに対応する以下のDaoクラスやBeanクラスのうち、追加・更新したいものにチェックを入れて下さい。</p>
+    <p tal:condition="createdDaoClassDescs"><strong>追加したいクラス：</strong>
+    <ul>
+      <li tal:repeat="classDesc createdDaoClassDescs"><input type="checkbox" name="__cms__dao" tal:attributes="value classDesc/name" /> <span tal:replace="classDesc/name">CLASS</span></li>
+    </ul>
+    </p>
+    <p tal:condition="updatedDaoClassDescs"><strong>更新したいクラス：</strong>
+    <ul>
+      <li tal:repeat="classDesc updatedDaoClassDescs"><input type="checkbox" name="__cms__dao" tal:attributes="value classDesc/name" /> <span tal:replace="classDesc/name">CLASS</span></li>
+    </ul>
+    </p>
+  </div>
+  <p>よろしいですか？</p>
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="hidden" name="__cms__task" value="updateClasses" />
+  <input type="hidden" name="__cms__subTask" value="update" />
+  <input type="hidden" name="__cms__method" tal:attributes="value request/method" />
   <input type="submit" value=" OK " />
+  <input type="button" value="戻る" onclick="history.back()" /></p>
 </form>
   </body>
 </html>
