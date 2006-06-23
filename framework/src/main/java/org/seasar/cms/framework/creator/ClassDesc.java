@@ -106,14 +106,15 @@ public class ClassDesc implements Cloneable {
         }
     }
 
-    public void addProperty(String name, int mode) {
+    public PropertyDesc addProperty(String name, int mode) {
 
-        PropertyDesc descriptor = getPropertyDesc(name);
-        if (descriptor == null) {
-            descriptor = new PropertyDesc(name);
-            propertyDescMap_.put(name, descriptor);
+        PropertyDesc propertyDesc = getPropertyDesc(name);
+        if (propertyDesc == null) {
+            propertyDesc = new PropertyDesc(name);
+            propertyDescMap_.put(name, propertyDesc);
         }
-        descriptor.addMode(mode);
+        propertyDesc.addMode(mode);
+        return propertyDesc;
     }
 
     public PropertyDesc getPropertyDesc(String name) {

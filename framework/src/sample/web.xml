@@ -98,7 +98,7 @@
   </filter-mapping>
   <listener>
     <listener-class>
-      org.seasar.framework.container.servlet.S2ContainerListener
+      org.seasar.cms.framework.FrameworkListener
     </listener-class>
   </listener>
   <servlet>

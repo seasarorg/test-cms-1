@@ -12,7 +12,9 @@ public interface Response {
 
     int TYPE_SELF_CONTAINED = 3;
 
-    int TYPE_VOID = 4;
+    int TYPE_STATUS = 4;
+
+    int TYPE_VOID = 5;
 
     int getType();
 
@@ -29,4 +31,8 @@ public interface Response {
     String getContentType();
 
     void setContentType(String contentType);
+
+    int getStatus();
+
+    void setStatus(int status);
 }

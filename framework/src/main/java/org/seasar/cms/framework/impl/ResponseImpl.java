@@ -16,6 +16,8 @@ public class ResponseImpl implements Response {
 
     private InputStream inputStream_;
 
+    private int status_;
+
     public String getContentType() {
 
         return contentType_;
@@ -54,5 +56,15 @@ public class ResponseImpl implements Response {
     public void setType(int type) {
 
         type_ = type;
+    }
+
+    public int getStatus() {
+
+        return status_;
+    }
+
+    public void setStatus(int status) {
+
+        status_ = status;
     }
 }

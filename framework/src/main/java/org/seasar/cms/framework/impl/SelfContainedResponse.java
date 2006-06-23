@@ -4,9 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.seasar.cms.framework.Response;
-
-public class SelfContainedResponse implements Response {
+public class SelfContainedResponse extends ResponseBase {
 
     private static final String DEFAULT_CONTENTTYPE = "application/octet-stream";
 
@@ -44,21 +42,6 @@ public class SelfContainedResponse implements Response {
     public int getType() {
 
         return TYPE_SELF_CONTAINED;
-    }
-
-    public void setType(int type) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public String getPath() {
-
-        return null;
-    }
-
-    public void setPath(String path) {
-
-        throw new UnsupportedOperationException();
     }
 
     public InputStream getInputStream() {

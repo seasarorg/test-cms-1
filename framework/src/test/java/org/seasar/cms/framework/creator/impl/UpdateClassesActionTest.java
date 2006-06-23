@@ -33,8 +33,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
 
         assertNotNull(actual);
         assertEquals("com.example.web.IndexPage", actual.getName());
-        assertEquals("com.example.web.IndexPageBase", actual
-            .getSuperclassName());
+        assertNull(actual.getSuperclassName());
         assertEquals(2, actual.getPropertyDescs().length);
         PropertyDesc pd = actual.getPropertyDesc("param1");
         assertNotNull(pd);
@@ -94,7 +93,27 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         assertFalse(" ".equals(actual));
     }
 
-    public void testUpdate() throws Exception {
+    public void testGatherClassDescs() throws Exception {
+
+        File sourceDir = clean(new File(ResourceUtil.getBuildDir(getClass())
+            .getParentFile(), "src"));
+        getSourceCreator().setSourceDirectoryPath(sourceDir.getCanonicalPath());
+
+        ClassDesc[] actual = target_.gatherClassDescs("/test.html",
+            Request.METHOD_GET, "com.example.web.TestPage", getSourceCreator()
+                .getTemplateFile("/test.html"));
+
+        assertNotNull(actual);
+        assertEquals(2, actual.length);
+        assertEquals("com.example.web.TestPage", actual[0].getName());
+        assertEquals("com.example.dto.EntityDto", actual[1].getName());
+        MethodDesc md = actual[0].getMethodDesc("_get");
+        assertNotNull(md);
+        assertNull(md.getDefaultReturnType());
+        assertNotNull(actual[0].getMethodDesc("_render"));
+    }
+
+    public void testShouldUpdate() throws Exception {
 
         File sourceDir = clean(new File(ResourceUtil.getBuildDir(getClass())
             .getParentFile(), "src"));
@@ -104,14 +123,14 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
             "com.example.web.TestPage"), getSourceCreator().getTemplateFile(
             "/test.html")));
 
-        ClassDesc[] actual = target_.update("/test.html", Request.METHOD_GET,
-            "com.example.web.TestPage", getSourceCreator().getTemplateFile(
-                "/test.html"));
+        ClassDesc[] classDescs = target_.gatherClassDescs("/test.html",
+            Request.METHOD_GET, "com.example.web.TestPage", getSourceCreator()
+                .getTemplateFile("/test.html"));
+        for (int i = 0; i < classDescs.length; i++) {
+            target_.writeSourceFile(classDescs[i].merge(target_
+                .getClassDesc(classDescs[i].getName())));
+        }
 
-        assertNotNull(actual);
-        assertEquals(2, actual.length);
-        assertEquals("com.example.web.TestPage", actual[0].getName());
-        assertEquals("com.example.dto.EntityDto", actual[1].getName());
         assertTrue(new File(sourceDir, "com/example/web/TestPage.java")
             .exists());
         assertTrue(new File(sourceDir, "com/example/web/TestPageBase.java")
@@ -120,10 +139,6 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
             .exists());
         assertTrue(new File(sourceDir, "com/example/dto/EntityDtoBase.java")
             .exists());
-        MethodDesc md = actual[0].getMethodDesc("_get");
-        assertNotNull(md);
-        assertNull(md.getDefaultReturnType());
-        assertNotNull(actual[0].getMethodDesc("_render"));
 
         assertFalse(target_.shouldUpdate(getSourceCreator().getSourceFile(
             "com.example.web.TestPage"), getSourceCreator().getTemplateFile(

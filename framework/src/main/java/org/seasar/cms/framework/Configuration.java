@@ -8,6 +8,8 @@ public interface Configuration {
 
     String KEY_PROJECTROOT = "projectRoot";
 
+    String KEY_WEBAPPROOT = "webappRoot";
+
     String KEY_PROJECTSTATUS = "projectStatus";
 
     String KEY_ROOTPACKAGENAME = "rootPackageName";
@@ -15,4 +17,6 @@ public interface Configuration {
     String getProperty(String key);
 
     String getProperty(String key, String defaultValue);
+
+    void setProperty(String key, String value);
 }

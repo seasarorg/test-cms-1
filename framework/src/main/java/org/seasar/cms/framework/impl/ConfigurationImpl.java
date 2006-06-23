@@ -49,4 +49,9 @@ public class ConfigurationImpl implements Configuration {
 
         return properties_.getProperty(key, defaultValue);
     }
+
+    public void setProperty(String key, String value) {
+
+        properties_.setProperty(key, value);
+    }
 }

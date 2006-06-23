@@ -85,9 +85,6 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         ClassDesc[] classDescs = gatherClassDescs(request.getPath(), method,
             className, templateFile);
-        for (int i = 0; i < classDescs.length; i++) {
-            writeSourceFile(classDescs[i], true);
-        }
 
         ClassDescBag classDescBag = classifyClassDescs(classDescs);
 
@@ -99,10 +96,40 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         ClassDesc[] daoClassDescs = (ClassDesc[]) classDescBag.getDaoList()
             .toArray(new ClassDesc[0]);
+        Map daoClassDescMap = new HashMap();
         for (int i = 0; i < daoClassDescs.length; i++) {
-            if (daoClassNameSet.contains(daoClassDescs[i].getName())) {
-                writeSourceFile(daoClassDescs[i], false);
+            String daoClassName = daoClassDescs[i].getName();
+            if (daoClassNameSet.contains(daoClassName)) {
+                writeSourceFile(daoClassDescs[i]);
+                daoClassDescMap.put(daoClassName, daoClassDescs[i]);
             }
+        }
+
+        for (int i = 0; i < classDescs.length; i++) {
+            // 既存のクラスがあればマージする。
+            classDescs[i].merge(getClassDesc(classDescs[i].getName()));
+
+            // Pageクラスの場合、Beanに触るようなプロパティを持っているなら
+            // Daoのsetterを自動生成する。
+            if (ClassDesc.KIND_PAGE.equals(classDescs[i].getKind())) {
+                PropertyDesc[] pds = classDescs[i].getPropertyDescs();
+                for (int j = 0; j < pds.length; j++) {
+                    ClassDesc beanClassDesc = (ClassDesc) daoClassDescMap
+                        .get(pds[j].getTypeString());
+                    if (beanClassDesc != null
+                        && ClassDesc.KIND_BEAN.equals(beanClassDesc.getKind())) {
+                        String daoBaseName = beanClassDesc.getBaseName()
+                            + "Dao";
+                        classDescs[i].addProperty(daoBaseName,
+                            PropertyDesc.WRITE).setDefaultType(
+                            getSourceCreator().getDaoPackageName() + "."
+                                + daoBaseName);
+                    }
+                }
+            }
+
+            // ソースコードを生成する。
+            writeSourceFile(classDescs[i]);
         }
 
         classDescBag.getCreatedList().addAll(classDescBag.getCreatedDaoList());
@@ -164,17 +191,6 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             .lastModified());
     }
 
-    ClassDesc[] update(String path, String method, String className,
-        File templateFile) {
-
-        ClassDesc[] classDescs = gatherClassDescs(path, method, className,
-            templateFile);
-        for (int i = 0; i < classDescs.length; i++) {
-            writeSourceFile(classDescs[i], true);
-        }
-        return classDescs;
-    }
-
     ClassDesc[] gatherClassDescs(String path, String method, String className,
         File templateFile) {
 
@@ -203,14 +219,6 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         return (ClassDesc[]) classDescriptorMap.values().toArray(
             new ClassDesc[0]);
-    }
-
-    void writeSourceFile(ClassDesc classDesc, boolean merge) {
-
-        if (merge) {
-            classDesc.merge(getClassDesc(classDesc.getName()));
-        }
-        writeSourceFile(classDesc);
     }
 
     ClassDesc getClassDesc(String className) {

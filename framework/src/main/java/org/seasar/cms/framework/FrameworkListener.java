@@ -1,54 +1,65 @@
 package org.seasar.cms.framework;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 
+import org.seasar.cms.framework.container.hotdeploy.OndemandUtils;
+import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
+import org.seasar.framework.container.servlet.S2ContainerListener;
+import org.seasar.framework.log.Logger;
 
-public class FrameworkListener implements ServletContextListener {
+public class FrameworkListener extends S2ContainerListener {
 
-    public static final String NAME_CONFIG = "config";
-
-    public static final String CONFIG_PATH_KEY = "org.seasar.cms.framework.configPath";
-
-    private static final String PROP_ROOTPATH = "webapp.rootPath";
+    private static Logger logger = Logger.getLogger(FrameworkListener.class);
 
     public void contextInitialized(ServletContextEvent sce) {
 
-        ServletContext servletContext = sce.getServletContext();
-        String configPath = servletContext.getInitParameter(CONFIG_PATH_KEY);
+        super.contextInitialized(sce);
 
-        Properties config = new Properties();
+        logger.debug("Framework initialize start");
 
-        config.setProperty(PROP_ROOTPATH, servletContext.getRealPath("/"));
-
-        InputStream inputStream = Thread.currentThread()
-            .getContextClassLoader().getResourceAsStream(configPath);
-        if (inputStream == null) {
-            throw new RuntimeException("Configuration '" + configPath
-                + "' does not exist in contextClassLoader");
+        Configuration config = getConfiguration();
+        if (config.getProperty(Configuration.KEY_WEBAPPROOT) == null) {
+            config.setProperty(Configuration.KEY_WEBAPPROOT, sce
+                .getServletContext().getRealPath("/"));
         }
-        try {
-            config.load(inputStream);
-        } catch (IOException ex) {
-            throw new RuntimeException("Can't read configuration '"
-                + configPath + "'", ex);
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException ex) {
-                ;
-            }
+
+        String projectStatus = config
+            .getProperty(Configuration.KEY_PROJECTSTATUS);
+        logger.info("Project status is: "
+            + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
+
+        // developモード以外の時はhotdeployを無効にするために
+        // こうしている。
+        if (!Configuration.PROJECTSTATUS_DEVELOP.equals(projectStatus)) {
+            OndemandUtils.start(getContainer(), true);
         }
-        SingletonS2ContainerFactory.getContainer()
-            .register(config, NAME_CONFIG);
+
+        logger.debug("Framework initialize end");
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
+
+        logger.debug("Framework destroy start");
+
+        if (!Configuration.PROJECTSTATUS_DEVELOP.equals(getConfiguration()
+            .getProperty(Configuration.KEY_PROJECTSTATUS))) {
+
+            OndemandUtils.stop(getContainer(), true);
+        }
+
+        super.contextDestroyed(sce);
+
+        logger.debug("Framework destroy end");
+    }
+
+    S2Container getContainer() {
+
+        return SingletonS2ContainerFactory.getContainer();
+    }
+
+    Configuration getConfiguration() {
+
+        return (Configuration) getContainer().getComponent(Configuration.class);
     }
 }

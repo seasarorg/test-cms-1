@@ -78,6 +78,10 @@ public class DefaultResponseProcessor implements ResponseProcessor {
         case Response.TYPE_VOID:
             return false;
 
+        case Response.TYPE_STATUS:
+            response.setStatus(response.getStatus());
+            return false;
+
         default:
             throw new RuntimeException("Unknown response type:"
                 + response.getType());
