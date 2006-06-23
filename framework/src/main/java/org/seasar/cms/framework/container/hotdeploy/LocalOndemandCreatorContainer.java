@@ -38,6 +38,8 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
 
     private ConventionNaming conventionNaming = new DefaultConventionNaming();
 
+    private int counter = 0;
+
     public OndemandCreator getCreator(int index) {
         return (OndemandCreator) creators.get(index);
     }
@@ -67,26 +69,32 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         this.conventionNaming = conventionNaming;
     }
 
-    public void start() {
+    public synchronized void start() {
         if (container == null) {
             throw new EmptyRuntimeException("container");
         }
         if (rootPackageName == null) {
             throw new EmptyRuntimeException("rootPackageName");
         }
-        originalClassLoader = container.getClassLoader();
-        hotdeployClassLoader = new HotdeployClassLoader(originalClassLoader);
-        hotdeployClassLoader.setPackageName(rootPackageName);
-        hotdeployClassLoader.addHotdeployListener(this);
-        ((S2ContainerImpl) container).setClassLoader(hotdeployClassLoader);
+        if (counter++ == 0) {
+            originalClassLoader = container.getClassLoader();
+            hotdeployClassLoader = new HotdeployClassLoader(originalClassLoader);
+            hotdeployClassLoader.setPackageName(rootPackageName);
+            hotdeployClassLoader.addHotdeployListener(this);
+            ((S2ContainerImpl) container).setClassLoader(hotdeployClassLoader);
+        }
     }
 
-    public void stop() {
-        ((S2ContainerImpl) container).setClassLoader(originalClassLoader);
-        hotdeployClassLoader = null;
-        originalClassLoader = null;
-        BeanDescFactory.clear();
-        componentDefCache.clear();
+    public synchronized void stop() {
+        if (--counter == 0) {
+            ((S2ContainerImpl) container).setClassLoader(originalClassLoader);
+            hotdeployClassLoader = null;
+            originalClassLoader = null;
+            BeanDescFactory.clear();
+            componentDefCache.clear();
+        } else if (counter < 0) {
+            throw new IllegalStateException("Unbalanced stop() calling");
+        }
     }
 
     public void definedClass(Class clazz) {
