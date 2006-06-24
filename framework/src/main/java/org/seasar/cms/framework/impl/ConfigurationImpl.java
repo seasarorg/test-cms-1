@@ -5,24 +5,36 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.seasar.cms.framework.Configuration;
+import org.seasar.framework.log.Logger;
 
 public class ConfigurationImpl implements Configuration {
 
     private Properties properties_ = new Properties();
 
-    public ConfigurationImpl() {
-    }
+    private Logger log_ = Logger.getLogger(getClass());
 
     public void load(String configPath) {
+
+        load(new String[] { configPath });
+    }
+
+    public void load(String[] configPaths) {
+
+        properties_.clear();
+        for (int i = 0; i < configPaths.length; i++) {
+            load0(configPaths[i]);
+        }
+    }
+
+    void load0(String configPath) {
 
         InputStream is = Thread.currentThread().getContextClassLoader()
             .getResourceAsStream(configPath);
         if (is == null) {
-            throw new IllegalArgumentException(
-                "Configuration resource does not exist: path=" + configPath);
+            log_.info("Configuration resource does not exist: path="
+                + configPath);
         }
         try {
-            properties_.clear();
             properties_.load(is);
         } catch (IOException ex) {
             throw new RuntimeException(
@@ -37,12 +49,7 @@ public class ConfigurationImpl implements Configuration {
 
     public String getProperty(String key) {
 
-        String value = properties_.getProperty(key);
-        if (value != null) {
-            return value;
-        } else {
-            throw new RuntimeException("Property does not exist: key=" + key);
-        }
+        return properties_.getProperty(key);
     }
 
     public String getProperty(String key, String defaultValue) {

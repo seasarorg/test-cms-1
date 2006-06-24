@@ -6,17 +6,15 @@ import org.seasar.cms.framework.Response;
 
 public class ResponseImpl implements Response {
 
-    private static final String DEFAULT_CONTENTTYPE = "application/octet-stream";
-
     private int type_ = TYPE_VOID;
 
     private String path_;
 
-    private String contentType_ = DEFAULT_CONTENTTYPE;
+    private String contentType_;
 
     private InputStream inputStream_;
 
-    private int status_;
+    private int status_ = STATUS_UNDEFINED;
 
     public String getContentType() {
 

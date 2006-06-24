@@ -6,6 +6,8 @@ import org.seasar.cms.framework.Response;
 
 abstract public class ResponseBase implements Response {
 
+    private int status_ = STATUS_UNDEFINED;
+
     public void setType(int type) {
 
         throw new UnsupportedOperationException();
@@ -33,7 +35,7 @@ abstract public class ResponseBase implements Response {
 
     public String getContentType() {
 
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public void setContentType(String contentType) {
@@ -43,11 +45,11 @@ abstract public class ResponseBase implements Response {
 
     public int getStatus() {
 
-        throw new UnsupportedOperationException();
+        return status_;
     }
 
     public void setStatus(int status) {
 
-        throw new UnsupportedOperationException();
+        status_ = status;
     }
 }

@@ -23,6 +23,13 @@ public class DefaultResponseProcessor implements ResponseProcessor {
         HttpServletRequest httpRequest, HttpServletResponse httpResponse,
         Response response) throws IOException, ServletException {
 
+        if (response.getStatus() != Response.STATUS_UNDEFINED) {
+            httpResponse.setStatus(response.getStatus());
+        }
+        if (response.getContentType() != null) {
+            httpResponse.setContentType(response.getContentType());
+        }
+
         switch (response.getType()) {
         case Response.TYPE_PASSTHROUGH:
             return true;
@@ -44,10 +51,6 @@ public class DefaultResponseProcessor implements ResponseProcessor {
             return false;
 
         case Response.TYPE_SELF_CONTAINED:
-            String contentType = response.getContentType();
-            if (contentType != null) {
-                httpResponse.setContentType(contentType);
-            }
             InputStream is = null;
             OutputStream os = null;
             try {
@@ -76,10 +79,6 @@ public class DefaultResponseProcessor implements ResponseProcessor {
             return false;
 
         case Response.TYPE_VOID:
-            return false;
-
-        case Response.TYPE_STATUS:
-            response.setStatus(response.getStatus());
             return false;
 
         default:

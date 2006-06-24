@@ -215,7 +215,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     + "' in ResponseConstructorSelector");
         }
 
-        return constructor.constructResponse(component, returnValue);
+        ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(
+                component.getClass().getClassLoader());
+            return constructor.constructResponse(component, returnValue);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldLoader);
+        }
     }
 
     public PathMapping[] getPathMappings() {

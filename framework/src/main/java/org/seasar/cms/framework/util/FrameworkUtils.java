@@ -35,7 +35,7 @@ public class FrameworkUtils {
         return dest;
     }
 
-    public static Object copyProperties(Object[] dests, List srcList) {
+    public static Object[] copyProperties(Object[] dests, List srcList) {
 
         Class destClass = dests.getClass().getComponentType();
         if (dests.length < srcList.size()) {

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,18 +60,46 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         ClassDescBag classDescBag = classifyClassDescs(classDescs);
 
+        List createdClassDescList = new ArrayList();
+        for (Iterator itr = classDescBag.getCreatedClassDescMap().values()
+            .iterator(); itr.hasNext();) {
+            ClassDesc classDesc = (ClassDesc) itr.next();
+            String kind = classDesc.getKind();
+            if (ClassDesc.KIND_DAO.equals(kind)
+                || ClassDesc.KIND_BEAN.equals(kind)) {
+                continue;
+            }
+            createdClassDescList.add(classDesc);
+        }
+        List updatedClassDescList = new ArrayList();
+        for (Iterator itr = classDescBag.getUpdatedClassDescMap().values()
+            .iterator(); itr.hasNext();) {
+            ClassDesc classDesc = (ClassDesc) itr.next();
+            String kind = classDesc.getKind();
+            if (ClassDesc.KIND_DAO.equals(kind)
+                || ClassDesc.KIND_BEAN.equals(kind)) {
+                continue;
+            }
+            updatedClassDescList.add(classDesc);
+        }
+
         Map variableMap = new HashMap();
         variableMap.put("request", request);
         variableMap.put("templateFile", templateFile);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("createdClassDescs", classDescBag.getCreatedList());
-        variableMap.put("updatedClassDescs", classDescBag.getUpdatedList());
+        variableMap.put("createdClassDescs", createdClassDescList);
+        variableMap.put("updatedClassDescs", updatedClassDescList);
         variableMap.put("daoClassDescExists", Boolean.valueOf(classDescBag
-            .getDaoList().size() > 0));
+            .getClassDescMap(ClassDesc.KIND_DAO).size()
+            + classDescBag.getClassDescMap(ClassDesc.KIND_BEAN).size() > 0));
         variableMap.put("createdDaoClassDescs", classDescBag
-            .getCreatedDaoList());
+            .getCreatedClassDescs(ClassDesc.KIND_DAO));
         variableMap.put("updatedDaoClassDescs", classDescBag
-            .getUpdatedDaoList());
+            .getUpdatedClassDescs(ClassDesc.KIND_DAO));
+        variableMap.put("createdBeanClassDescs", classDescBag
+            .getCreatedClassDescs(ClassDesc.KIND_BEAN));
+        variableMap.put("updatedBeanClassDescs", classDescBag
+            .getUpdatedClassDescs(ClassDesc.KIND_BEAN));
         return getSourceCreator().getResponseCreator().createResponse(
             "updateClasses", variableMap);
     }
@@ -94,36 +123,62 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             daoClassNameSet.addAll(Arrays.asList(daoClassNames));
         }
 
-        ClassDesc[] daoClassDescs = (ClassDesc[]) classDescBag.getDaoList()
-            .toArray(new ClassDesc[0]);
-        Map daoClassDescMap = new HashMap();
+        Set processedClassNameSet = new HashSet();
+
+        ClassDesc[] daoClassDescs = classDescBag
+            .getClassDescs(ClassDesc.KIND_DAO);
         for (int i = 0; i < daoClassDescs.length; i++) {
             String daoClassName = daoClassDescs[i].getName();
             if (daoClassNameSet.contains(daoClassName)) {
                 writeSourceFile(daoClassDescs[i]);
-                daoClassDescMap.put(daoClassName, daoClassDescs[i]);
+                processedClassNameSet.add(daoClassName);
+            } else {
+                classDescBag.remove(daoClassName);
             }
         }
 
+        ClassDesc[] beanClassDescs = classDescBag
+            .getClassDescs(ClassDesc.KIND_BEAN);
+        for (int i = 0; i < beanClassDescs.length; i++) {
+            String beanClassName = beanClassDescs[i].getName();
+            if (daoClassNameSet.contains(beanClassName)) {
+                writeSourceFile(beanClassDescs[i]);
+                processedClassNameSet.add(beanClassName);
+            } else {
+                classDescBag.remove(beanClassName);
+            }
+        }
+
+        Map classDescMap = classDescBag.getClassDescMap();
         for (int i = 0; i < classDescs.length; i++) {
+            if (processedClassNameSet.contains(classDescs[i].getName())) {
+                continue;
+            }
+
             // 既存のクラスがあればマージする。
             classDescs[i].merge(getClassDesc(classDescs[i].getName()));
 
-            // Pageクラスの場合、Beanに触るようなプロパティを持っているなら
-            // Daoのsetterを自動生成する。
+            // Pageクラスの場合、Dtoに触るようなプロパティを持っているなら
+            // Dtoに対応するBeanに対応するDaoのsetterを自動生成する。
             if (ClassDesc.KIND_PAGE.equals(classDescs[i].getKind())) {
                 PropertyDesc[] pds = classDescs[i].getPropertyDescs();
                 for (int j = 0; j < pds.length; j++) {
-                    ClassDesc beanClassDesc = (ClassDesc) daoClassDescMap
-                        .get(pds[j].getTypeString());
-                    if (beanClassDesc != null
-                        && ClassDesc.KIND_BEAN.equals(beanClassDesc.getKind())) {
-                        String daoBaseName = beanClassDesc.getBaseName()
+                    ClassDesc dtoClassDesc = findClassDesc(classDescMap, pds[j]
+                        .getTypeString());
+                    if (dtoClassDesc != null
+                        && ClassDesc.KIND_DTO.equals(dtoClassDesc.getKind())) {
+                        String daoShortName = dtoClassDesc.getBaseName()
                             + "Dao";
-                        classDescs[i].addProperty(daoBaseName,
-                            PropertyDesc.WRITE).setDefaultType(
-                            getSourceCreator().getDaoPackageName() + "."
-                                + daoBaseName);
+                        String daoClassName = getSourceCreator()
+                            .getDaoPackageName()
+                            + "." + daoShortName;
+                        if (findClassDesc(classDescMap, daoClassName) != null) {
+                            classDescs[i].addProperty(
+                                Character.toLowerCase(daoShortName.charAt(0))
+                                    + daoShortName.substring(1),
+                                PropertyDesc.WRITE)
+                                .setDefaultType(daoClassName);
+                        }
                     }
                 }
             }
@@ -132,18 +187,41 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             writeSourceFile(classDescs[i]);
         }
 
-        classDescBag.getCreatedList().addAll(classDescBag.getCreatedDaoList());
-        classDescBag.getUpdatedList().addAll(classDescBag.getUpdatedDaoList());
-
         Map variableMap = new HashMap();
         variableMap.put("request", request);
         variableMap.put("method", method);
-        variableMap.put("templateFile", templateFile);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("createdClassDescs", classDescBag.getCreatedList());
-        variableMap.put("updatedClassDescs", classDescBag.getUpdatedList());
+        variableMap.put("templateFile", templateFile);
+        variableMap.put("createdClassDescs", classDescBag
+            .getCreatedClassDescs());
+        variableMap.put("updatedClassDescs", classDescBag
+            .getUpdatedClassDescs());
+        variableMap.put("actionName", getSourceCreator().getActionName(
+            request.getPath(), method));
+        variableMap.put("suggestionExists", Boolean
+            .valueOf(classDescBag.getClassDescMap(ClassDesc.KIND_PAGE).size()
+                + classDescBag.getCreatedClassDescMap(ClassDesc.KIND_BEAN)
+                    .size() > 0));
+        variableMap.put("pageClassDescs", classDescBag
+            .getClassDescs(ClassDesc.KIND_PAGE));
+        variableMap.put("renderActionName",
+            DefaultRequestProcessor.ACTION_RENDER);
+        variableMap.put("createdBeanClassDescs", classDescBag
+            .getCreatedClassDescs(ClassDesc.KIND_BEAN));
         return getSourceCreator().getResponseCreator().createResponse(
             "updateClasses_update", variableMap);
+    }
+
+    ClassDesc findClassDesc(Map classDescMap, String type) {
+
+        if (type.endsWith("[]")) {
+            type = type.substring(0, type.length() - "[]".length());
+        }
+        ClassDesc classDesc = (ClassDesc) classDescMap.get(type);
+        if (classDesc == null) {
+            classDesc = getClassDesc(type);
+        }
+        return classDesc;
     }
 
     ClassDescBag classifyClassDescs(ClassDesc[] classDescs) {
@@ -162,9 +240,9 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                     + classDescs[i].getBaseName() + "Dao");
                 classDesc.setKind(ClassDesc.KIND_DAO);
                 if (getClassDesc(classDesc.getName()) == null) {
-                    classDescBag.addAsCreatedDao(classDesc);
+                    classDescBag.addAsCreated(classDesc);
                 } else {
-                    classDescBag.addAsUpdatedDao(classDesc);
+                    classDescBag.addAsUpdated(classDesc);
                 }
 
                 classDesc = (ClassDesc) classDescs[i].clone();
@@ -172,9 +250,9 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                     + classDescs[i].getBaseName());
                 classDesc.setKind(ClassDesc.KIND_BEAN);
                 if (getClassDesc(classDesc.getName()) == null) {
-                    classDescBag.addAsCreatedDao(classDesc);
+                    classDescBag.addAsCreated(classDesc);
                 } else {
-                    classDescBag.addAsUpdatedDao(classDesc);
+                    classDescBag.addAsUpdated(classDesc);
                 }
             }
         }
@@ -295,52 +373,112 @@ public class UpdateClassesAction extends AbstractUpdateAction {
     }
 
     private static class ClassDescBag {
-        private List createdList_ = new ArrayList();
+        private Map map_ = new HashMap();
 
-        private List updatedList_ = new ArrayList();
+        private Map createdMap_ = new HashMap();
 
-        private List createdDaoList_ = new ArrayList();
+        private Map updatedMap_ = new HashMap();
 
-        private List updatedDaoList_ = new ArrayList();
-
-        private List daoList_ = new ArrayList();
-
-        public List getCreatedList() {
-            return createdList_;
+        public Map getClassDescMap() {
+            return getClassDescMap(map_, null);
         }
 
-        public List getDaoList() {
-            return daoList_;
+        public ClassDesc[] getClassDescs() {
+            return getClassDescs(map_, null);
+        }
+
+        public Map getClassDescMap(String kind) {
+            return getClassDescMap(map_, kind);
+        }
+
+        public ClassDesc[] getClassDescs(String kind) {
+            return (ClassDesc[]) getClassDescMap(kind).values().toArray(
+                new ClassDesc[0]);
+        }
+
+        public Map getCreatedClassDescMap() {
+            return getClassDescMap(createdMap_, null);
+        }
+
+        public ClassDesc[] getCreatedClassDescs() {
+            return (ClassDesc[]) getCreatedClassDescMap().values().toArray(
+                new ClassDesc[0]);
+        }
+
+        public Map getCreatedClassDescMap(String kind) {
+            return getClassDescMap(createdMap_, kind);
+        }
+
+        public ClassDesc[] getCreatedClassDescs(String kind) {
+            return (ClassDesc[]) getCreatedClassDescMap(kind).values().toArray(
+                new ClassDesc[0]);
+        }
+
+        public Map getUpdatedClassDescMap() {
+            return getClassDescMap(updatedMap_, null);
+        }
+
+        public ClassDesc[] getUpdatedClassDescs() {
+            return (ClassDesc[]) getUpdatedClassDescMap().values().toArray(
+                new ClassDesc[0]);
+        }
+
+        public Map getUpdatedClassDescMap(String kind) {
+            return getClassDescMap(updatedMap_, kind);
+        }
+
+        public ClassDesc[] getUpdatedClassDescs(String kind) {
+            return (ClassDesc[]) getUpdatedClassDescMap(kind).values().toArray(
+                new ClassDesc[0]);
+        }
+
+        Map getClassDescMap(Map map, String kind) {
+            return getMap(map, kind);
+        }
+
+        ClassDesc[] getClassDescs(Map map, String kind) {
+            return (ClassDesc[]) getClassDescMap(map, kind).values().toArray(
+                new ClassDesc[0]);
+        }
+
+        Map getMap(Map map, Object key) {
+            Map got = (Map) map.get(key);
+            if (got == null) {
+                got = new HashMap();
+                map.put(key, got);
+            }
+            return got;
         }
 
         public void addAsCreated(ClassDesc classDesc) {
-            createdList_.add(classDesc);
-        }
-
-        public List getUpdatedList() {
-            return updatedList_;
+            getClassDescMap().put(classDesc.getName(), classDesc);
+            getClassDescMap(classDesc.getKind()).put(classDesc.getName(),
+                classDesc);
+            getCreatedClassDescMap().put(classDesc.getName(), classDesc);
+            getCreatedClassDescMap(classDesc.getKind()).put(
+                classDesc.getName(), classDesc);
         }
 
         public void addAsUpdated(ClassDesc classDesc) {
-            updatedList_.add(classDesc);
+            getClassDescMap().put(classDesc.getName(), classDesc);
+            getClassDescMap(classDesc.getKind()).put(classDesc.getName(),
+                classDesc);
+            getUpdatedClassDescMap().put(classDesc.getName(), classDesc);
+            getUpdatedClassDescMap(classDesc.getKind()).put(
+                classDesc.getName(), classDesc);
         }
 
-        public List getCreatedDaoList() {
-            return createdDaoList_;
+        public void remove(String className) {
+            remove(map_, className);
+            remove(createdMap_, className);
+            remove(updatedMap_, className);
         }
 
-        public void addAsCreatedDao(ClassDesc classDesc) {
-            createdDaoList_.add(classDesc);
-            daoList_.add(classDesc);
-        }
-
-        public List getUpdatedDaoList() {
-            return updatedDaoList_;
-        }
-
-        public void addAsUpdatedDao(ClassDesc classDesc) {
-            updatedDaoList_.add(classDesc);
-            daoList_.add(classDesc);
+        void remove(Map map, String className) {
+            for (Iterator itr = map.values().iterator(); itr.hasNext();) {
+                Map kindMap = (Map) itr.next();
+                kindMap.remove(className);
+            }
         }
     }
 }

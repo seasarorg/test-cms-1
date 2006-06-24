@@ -12,9 +12,9 @@ public interface Response {
 
     int TYPE_SELF_CONTAINED = 3;
 
-    int TYPE_STATUS = 4;
+    int TYPE_VOID = 4;
 
-    int TYPE_VOID = 5;
+    int STATUS_UNDEFINED = -1;
 
     int getType();
 

@@ -4,7 +4,7 @@
 <components namespace="common">
   <component name="config" class="org.seasar.cms.framework.impl.ConfigurationImpl">
     <initMethod name="load">
-      <arg>"app.properties"</arg>
+      <arg>new String[]{ "app.properties", "status.properties" }</arg>
     </initMethod>
   </component>
 </components>

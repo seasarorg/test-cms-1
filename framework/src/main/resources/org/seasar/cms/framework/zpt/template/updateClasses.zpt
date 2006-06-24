@@ -21,11 +21,13 @@
     <p tal:condition="createdDaoClassDescs"><strong>追加したいクラス：</strong>
     <ul>
       <li tal:repeat="classDesc createdDaoClassDescs"><input type="checkbox" name="__cms__dao" tal:attributes="value classDesc/name" /> <span tal:replace="classDesc/name">CLASS</span></li>
+      <li tal:repeat="classDesc createdBeanClassDescs"><input type="checkbox" name="__cms__dao" tal:attributes="value classDesc/name" /> <span tal:replace="classDesc/name">CLASS</span></li>
     </ul>
     </p>
     <p tal:condition="updatedDaoClassDescs"><strong>更新したいクラス：</strong>
     <ul>
       <li tal:repeat="classDesc updatedDaoClassDescs"><input type="checkbox" name="__cms__dao" tal:attributes="value classDesc/name" /> <span tal:replace="classDesc/name">CLASS</span></li>
+      <li tal:repeat="classDesc updatedBeanClassDescs"><input type="checkbox" name="__cms__dao" tal:attributes="value classDesc/name" /> <span tal:replace="classDesc/name">CLASS</span></li>
     </ul>
     </p>
   </div>

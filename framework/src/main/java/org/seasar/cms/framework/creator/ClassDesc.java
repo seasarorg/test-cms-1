@@ -14,8 +14,6 @@ public class ClassDesc implements Cloneable {
 
     public static final String KIND_BEAN = "Bean";
 
-    public static final String KIND_UNKNOWN = "Unknown";
-
     private static final String[] AUTODETECTED_KINDS = new String[] {
         KIND_PAGE, KIND_DTO, KIND_DAO };
 
@@ -27,7 +25,7 @@ public class ClassDesc implements Cloneable {
 
     private Map methodDescMap_ = new LinkedHashMap();
 
-    private String kind_ = KIND_UNKNOWN;
+    private String kind_ = KIND_BEAN;
 
     public ClassDesc(String name) {
 
