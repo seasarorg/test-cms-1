@@ -2,4 +2,12 @@ package com.example.page;
 
 public class TestPage extends TestPageBase
 {
+    public TestPage()
+    {
+    }
+
+    public TestPage(String param1, String param2, String param3, Integer[] param4)
+    {
+        super(param1, param2, param3, param4);
+    }
 }

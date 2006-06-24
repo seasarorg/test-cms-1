@@ -17,13 +17,13 @@ import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 import org.seasar.cms.framework.zpt.ZptAnalyzer;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.deployer.ComponentDeployerFactory;
-import org.seasar.framework.container.deployer.HttpServletComponentDeployerProvider;
+import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;
 import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
 import org.seasar.framework.container.hotdeploy.creator.PageCreator;
-import org.seasar.framework.container.impl.HttpServletExternalContext;
-import org.seasar.framework.container.impl.HttpServletExternalContextComponentDefRegister;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.container.impl.S2ContainerImpl;
+import org.seasar.framework.container.impl.servlet.HttpServletExternalContext;
+import org.seasar.framework.container.impl.servlet.HttpServletExternalContextComponentDefRegister;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
@@ -52,7 +52,7 @@ abstract public class SourceCreatorImplTestBase extends FrameworkTestCase {
     protected void setUp() throws Exception {
 
         ComponentDeployerFactory
-            .setProvider(new HttpServletComponentDeployerProvider());
+            .setProvider(new ExternalComponentDeployerProvider());
         S2ContainerBehavior.setProvider(new DistributedOndemandBehavoir());
         container_ = new S2ContainerImpl();
         ((S2ContainerImpl) container_).setClassLoader(getClass()

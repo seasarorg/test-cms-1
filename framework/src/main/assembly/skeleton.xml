@@ -1,25 +1,19 @@
 <assembly>
-  <id>bin</id>
+  <id>skeleton</id>
   <formats>
     <format>tar.gz</format>
     <format>zip</format>
     <format>tar.bz2</format>
   </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <includes>
-        <include>README*</include>
-        <include>LICENSE*</include>
-        <include>NOTICE*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>src/sample</directory>
-      <outputDirectory>sample</outputDirectory>
+      <directory>src/main/skeleton</directory>
+      <outputDirectory>skeleton</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target</directory>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>skeleton/src/main/webapp/WEB-INF/lib</outputDirectory>
       <includes>
         <include>*.jar</include>
       </includes>
@@ -31,7 +25,7 @@
   </fileSets>
   <dependencySets>
     <dependencySet>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>skeleton/src/main/webapp/WEB-INF/lib</outputDirectory>
       <scope>runtime</scope>
     </dependencySet>
   </dependencySets>
