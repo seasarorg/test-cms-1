@@ -5,6 +5,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.seasar.cms.framework.FormFile;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
@@ -143,6 +144,9 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(pd);
         assertTrue(pd.isReadable());
         assertTrue(pd.isWritable());
+        pd = cd.getPropertyDesc("file");
+        assertNotNull(pd);
+        assertEquals(FormFile.class.getName(), pd.getDefaultType());
         assertNull(cd.getPropertyDesc("button"));
         assertNull(cd.getPropertyDesc("image"));
         assertNull(cd.getPropertyDesc("submit"));

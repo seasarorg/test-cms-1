@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.cms.framework.FormFile;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
@@ -53,8 +54,11 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             String type = getAttributeValue(attrMap, "type", null);
             if (!("button".equals(type) || "image".equals(type) || "submit"
                 .equals(type))) {
-                processParameterTag(toAnalyzeContext(context), attrs,
-                    annotation);
+                PropertyDesc propertyDesc = processParameterTag(
+                    toAnalyzeContext(context), attrs, annotation);
+                if ("file".equals(type) && propertyDesc != null) {
+                    propertyDesc.setDefaultType(FormFile.class.getName());
+                }
             }
         } else if ("select".equals(name) || "textarea".equals(name)) {
             processParameterTag(toAnalyzeContext(context), attrs, annotation);
@@ -88,12 +92,12 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             .toArray(new Attribute[0]));
     }
 
-    void processParameterTag(AnalyzerContext context, Attribute[] attrs,
-        String annotation) {
+    PropertyDesc processParameterTag(AnalyzerContext context,
+        Attribute[] attrs, String annotation) {
 
         String className = context.getFormActionPageClassName();
         if (className == null) {
-            return;
+            return null;
         }
 
         Map attrMap = evaluate(context, attrs);
@@ -101,10 +105,11 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         if (attr != null) {
             // 最低限必要なのはWRITEだけだが、利便性を考えてREADも生成する
             // ようにしている。
-            context.getClassDesc(className)
-                .addProperty(TagEvaluatorUtils.defilter(attr.getValue()),
-                    PropertyDesc.WRITE | PropertyDesc.READ);
+            return context.getClassDesc(className).addProperty(
+                TagEvaluatorUtils.defilter(attr.getValue()),
+                PropertyDesc.WRITE | PropertyDesc.READ);
         }
+        return null;
     }
 
     Map evaluate(ZptTemplateContext context, Attribute[] attrs) {
