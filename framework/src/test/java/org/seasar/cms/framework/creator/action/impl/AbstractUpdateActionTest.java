@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.framework.creator.action.impl;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.creator.impl.AbstractUpdateAction.Parameter;
+import org.seasar.cms.framework.creator.action.impl.AbstractUpdateAction.Parameter;
 import org.seasar.cms.framework.impl.RequestImpl;
 
 public class AbstractUpdateActionTest extends TestCase {

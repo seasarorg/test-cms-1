@@ -2,7 +2,7 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components namespace="dao">
-  <include path="j2ee.dicon" />
+  <include path="jdbc.dicon" />
   <component class="org.seasar.dao.impl.FieldAnnotationReaderFactory" />
   <component class="org.seasar.cms.framework.dao.OndemandDaoMetaDataFactory">
     <property name="daoSuffixes">new String[]{"Dao","Page"}</property>

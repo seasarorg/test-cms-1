@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.framework.creator.action.impl;
 
 import java.io.File;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
+import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 public class CreateClassAction extends AbstractUpdateAction {
 

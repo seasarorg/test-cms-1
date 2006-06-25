@@ -1,5 +1,8 @@
 package org.seasar.cms.framework;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 public interface Configuration {
 
     String PROJECTSTATUS_DEVELOP = "develop";
@@ -19,4 +22,8 @@ public interface Configuration {
     String getProperty(String key, String defaultValue);
 
     void setProperty(String key, String value);
+
+    void removeProperty(String key);
+
+    void save(OutputStream out, String header) throws IOException;
 }

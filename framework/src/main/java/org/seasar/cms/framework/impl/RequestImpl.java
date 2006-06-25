@@ -1,5 +1,6 @@
 package org.seasar.cms.framework.impl;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.seasar.cms.framework.Request;
@@ -83,17 +84,37 @@ public class RequestImpl implements Request {
 
     public String getParameter(String name) {
 
+        return getParameter(name, null);
+    }
+
+    public String getParameter(String name, String defaultValue) {
+
         String[] values = (String[]) parameterMap_.get(name);
         if (values != null) {
             return values[0];
         } else {
-            return null;
+            return defaultValue;
+        }
+    }
+
+    public String[] getParameterValues(String name, String[] defaultValues) {
+
+        String[] values = (String[]) parameterMap_.get(name);
+        if (values != null) {
+            return values;
+        } else {
+            return defaultValues;
         }
     }
 
     public String[] getParameterValues(String name) {
 
-        return (String[]) parameterMap_.get(name);
+        return getParameterValues(name, null);
+    }
+
+    public Iterator getParameterNames() {
+
+        return parameterMap_.keySet().iterator();
     }
 
     public Map getParameterMap() {

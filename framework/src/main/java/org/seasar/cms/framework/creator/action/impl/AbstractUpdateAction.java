@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.framework.creator.action.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,6 +13,8 @@ import java.util.Map;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.action.UpdateAction;
+import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 abstract public class AbstractUpdateAction implements UpdateAction {
 

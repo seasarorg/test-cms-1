@@ -1,6 +1,6 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.framework.creator.action;
 
-class Condition {
+public class Condition {
 
     private boolean classBound_;
 

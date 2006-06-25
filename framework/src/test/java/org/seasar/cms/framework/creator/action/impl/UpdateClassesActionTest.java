@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.framework.creator.action.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +9,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.impl.SourceCreatorImplTestBase;
 import org.seasar.framework.util.ResourceUtil;
 import org.seasar.kvasir.util.io.IOUtils;
 

@@ -2,6 +2,7 @@ package org.seasar.cms.framework.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import org.seasar.cms.framework.Configuration;
@@ -60,5 +61,15 @@ public class ConfigurationImpl implements Configuration {
     public void setProperty(String key, String value) {
 
         properties_.setProperty(key, value);
+    }
+
+    public void removeProperty(String key) {
+
+        properties_.remove(key);
+    }
+
+    public void save(OutputStream out, String header) throws IOException {
+
+        properties_.store(out, header);
     }
 }

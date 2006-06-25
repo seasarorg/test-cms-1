@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
+import org.seasar.cms.framework.Configuration;
 import org.seasar.cms.framework.MatchedPathMapping;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
@@ -16,6 +17,14 @@ import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContaine
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.creator.SourceGenerator;
 import org.seasar.cms.framework.creator.TemplateAnalyzer;
+import org.seasar.cms.framework.creator.action.Condition;
+import org.seasar.cms.framework.creator.action.UpdateAction;
+import org.seasar.cms.framework.creator.action.UpdateActionSelector;
+import org.seasar.cms.framework.creator.action.impl.CreateClassAction;
+import org.seasar.cms.framework.creator.action.impl.CreateClassAndTemplateAction;
+import org.seasar.cms.framework.creator.action.impl.CreateConfigurationAction;
+import org.seasar.cms.framework.creator.action.impl.CreateTemplateAction;
+import org.seasar.cms.framework.creator.action.impl.UpdateClassesAction;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 import org.seasar.cms.framework.impl.RedirectResponse;
 import org.seasar.cms.framework.zpt.ZptResponseCreator;
@@ -38,6 +47,8 @@ public class SourceCreatorImpl implements SourceCreator {
     public static final String PARAM_TASK = PARAM_PREFIX + "task";
 
     private S2Container container_;
+
+    private Configuration configuration_;
 
     private DefaultRequestProcessor defaultRequestProcessor_;
 
@@ -87,7 +98,8 @@ public class SourceCreatorImpl implements SourceCreator {
             new CreateClassAction(this)).register("createTemplate",
             new CreateTemplateAction(this)).register("createClassAndTemplate",
             new CreateClassAndTemplateAction(this)).register("updateClasses",
-            new UpdateClassesAction(this));
+            new UpdateClassesAction(this)).register("createConfiguration",
+            new CreateConfigurationAction(this));
 
     public Response update(String path, String method, Request request) {
 
@@ -97,9 +109,10 @@ public class SourceCreatorImpl implements SourceCreator {
 
         Object condition;
 
-        String task = request.getParameter(PARAM_TASK);
-        if (task != null) {
-            condition = task;
+        if (!validateConfiguration()) {
+            condition = "createConfiguration";
+        } else if (request.getParameter(PARAM_TASK) != null) {
+            condition = request.getParameter(PARAM_TASK);
         } else {
             if ("".equals(path)) {
                 String welcomeFile = getWelcomeFile();
@@ -122,6 +135,19 @@ public class SourceCreatorImpl implements SourceCreator {
         } else {
             return null;
         }
+    }
+
+    boolean validateConfiguration() {
+
+        if (configuration_ == null) {
+            return false;
+        } else if (configuration_.getProperty(Configuration.KEY_PROJECTROOT) == null) {
+            return false;
+        } else if (configuration_
+            .getProperty(Configuration.KEY_ROOTPACKAGENAME) == null) {
+            return false;
+        }
+        return true;
     }
 
     String getWelcomeFile() {
@@ -235,12 +261,12 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    File getTemplateFile(String path) {
+    public File getTemplateFile(String path) {
 
         return new File(webappDirectory_, path);
     }
 
-    File getSourceFile(String className) {
+    public File getSourceFile(String className) {
 
         return new File(sourceDirectory_, className.replace('.', '/') + ".java");
     }
@@ -369,5 +395,15 @@ public class SourceCreatorImpl implements SourceCreator {
     public void setResponseCreaator(ResponseCreator responseCreator) {
 
         responseCreator_ = responseCreator;
+    }
+
+    public Configuration getConfiguration() {
+
+        return configuration_;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+
+        configuration_ = configuration;
     }
 }

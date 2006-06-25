@@ -15,7 +15,7 @@
 
   <component name="xaDataSource"
     class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
-    <property name="driverClassName">config.getProperty("j2ee.xaDataSource.driverClassName", "org.hsqldb.jdbcDriver")</property>
+    <property name="driverClassName">config.getProperty("jdbc.xaDataSource.driverClassName", "org.hsqldb.jdbcDriver")</property>
     <property name="URL">
       config.getProperty("jdbc.xaDataSource.URL",
         "jdbc:hsqldb:file:" + application.getRealPath("/") + "WEB-INF/hsqldb/hsqldb")

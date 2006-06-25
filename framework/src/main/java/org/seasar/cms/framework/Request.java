@@ -1,5 +1,6 @@
 package org.seasar.cms.framework;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public interface Request {
@@ -54,7 +55,13 @@ public interface Request {
 
     String getParameter(String name);
 
+    String getParameter(String name, String defaultValue);
+
     String[] getParameterValues(String name);
+
+    String[] getParameterValues(String name, String[] defaultValues);
+
+    Iterator getParameterNames();
 
     Map getParameterMap();
 

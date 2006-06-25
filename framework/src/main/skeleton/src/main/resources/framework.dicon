@@ -64,12 +64,12 @@
     </property>
   </component>
   <component class="org.seasar.cms.framework.creator.impl.SourceCreatorImpl">
-    <property name="sourceDirectoryPath">config.getProperty("sourceDirectory", config.getProperty("projectRoot") + "/src/main/java")</property>
-    <property name="classesDirectoryPath">config.getProperty("classesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot") + "/src/main/webapp"))</property>
-    <property name="webappDirectoryPath">config.getProperty("webappDirectory", config.getProperty("projectRoot") + "/src/main/webapp")</property>
-    <property name="pagePackageName">config.getProperty("rootPackageName") + ".web"</property>
-    <property name="dtoPackageName">config.getProperty("rootPackageName") + ".dto"</property>
-    <property name="daoPackageName">config.getProperty("rootPackageName") + ".dao"</property>
+    <property name="sourceDirectoryPath">config.getProperty("sourceDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/java")</property>
+    <property name="classesDirectoryPath">config.getProperty("classesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/webapp"))</property>
+    <property name="webappDirectoryPath">config.getProperty("webappDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/webapp")</property>
+    <property name="pagePackageName">config.getProperty("rootPackageName", "skeleton") + ".web"</property>
+    <property name="dtoPackageName">config.getProperty("rootPackageName", "skeleton") + ".dto"</property>
+    <property name="daoPackageName">config.getProperty("rootPackageName", "skeleton") + ".dao"</property>
   </component>
   <component class="org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator" />
   <component class="org.seasar.cms.framework.zpt.ZptAnalyzer" />

@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>SYSTEM NOTIFICATION</title>
+  </head>
+  <body>
+<h1>SYSTEM NOTIFICATION</h1>
+<p>CMS Frameworkへようこそ！</p>
+<p>Webアプリケーションを構築する前に、プロジェクトの設定を行ないます。
+以下の項目を埋めて「OK」ボタンを押して下さい。</p>
+<form tal:attributes="action request/absolutePath" method="post">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="hidden" name="__cms__task" value="createConfiguration" />
+  <input type="hidden" name="__cms__subTask" value="create" />
+  <input type="hidden" name="__cms__method" tal:attributes="value request/method" />
+  <ul>
+    <li>
+      <strong>projectRoot</strong><br />
+      このWebアプリケーションのためのEclipseプロジェクトのパスを入力して下さい。<br />
+      <input type="text" name="__cms__key_projectRoot" size="64" />
+    </li>
+    <li>
+      <strong>rootPackageName</strong><br />
+      このWebアプリケーションのJavaソースコードのルートパッケージ名を入力して下さい。<br />
+      <input type="text" name="__cms__key_rootPackageName" size="64" />
+    </li>
+  </ul>
+  <p><input type="submit" value=" OK " />
+  <input type="button" value="戻る" onclick="history.back()" /></p>
+</form>
+  </body>
+</html>

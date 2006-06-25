@@ -1,9 +1,10 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.framework.creator.action;
 
 import java.util.HashMap;
 import java.util.Map;
 
-class UpdateActionSelector {
+
+public class UpdateActionSelector {
 
     private Map strategyMap_ = new HashMap();
 

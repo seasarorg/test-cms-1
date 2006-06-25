@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.framework.creator.action.impl;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -23,6 +23,7 @@ import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
 public class UpdateClassesAction extends AbstractUpdateAction {
