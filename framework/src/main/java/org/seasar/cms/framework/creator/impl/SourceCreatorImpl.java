@@ -392,7 +392,7 @@ public class SourceCreatorImpl implements SourceCreator {
         return responseCreator_;
     }
 
-    public void setResponseCreaator(ResponseCreator responseCreator) {
+    public void setResponseCreator(ResponseCreator responseCreator) {
 
         responseCreator_ = responseCreator;
     }
