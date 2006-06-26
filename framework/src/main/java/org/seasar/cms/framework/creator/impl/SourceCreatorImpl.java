@@ -7,6 +7,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
+import net.skirnir.xom.IllegalSyntaxException;
+import net.skirnir.xom.ValidationException;
+import net.skirnir.xom.XMLParserFactory;
+import net.skirnir.xom.XOMapper;
+import net.skirnir.xom.XOMapperFactory;
+
 import org.seasar.cms.framework.Configuration;
 import org.seasar.cms.framework.MatchedPathMapping;
 import org.seasar.cms.framework.Request;
@@ -33,12 +39,6 @@ import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
-
-import net.skirnir.xom.IllegalSyntaxException;
-import net.skirnir.xom.ValidationException;
-import net.skirnir.xom.XMLParserFactory;
-import net.skirnir.xom.XOMapper;
-import net.skirnir.xom.XOMapperFactory;
 
 public class SourceCreatorImpl implements SourceCreator {
 
@@ -405,5 +405,10 @@ public class SourceCreatorImpl implements SourceCreator {
     public void setConfiguration(Configuration configuration) {
 
         configuration_ = configuration;
+    }
+
+    public void registerUpdateAction(Object condition, UpdateAction updateAction) {
+
+        actionSelector_.register(condition, updateAction);
     }
 }
