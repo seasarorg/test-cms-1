@@ -2,7 +2,7 @@ package com.example.page;
 
 abstract public class TestPageBase
 {
-    protected String param1_;
+    protected boolean param1_;
 
     protected String param2_;
 
@@ -15,7 +15,7 @@ abstract public class TestPageBase
     {
     }
 
-    public TestPageBase(String param1, String param2, String param3, Integer[] param4)
+    public TestPageBase(boolean param1, String param2, String param3, Integer[] param4)
     {
         param1_ = param1;
         param2_ = param2;
@@ -23,7 +23,7 @@ abstract public class TestPageBase
         param4_ = param4;
     }
 
-    public String getParam1()
+    public boolean isParam1()
     {
         return param1_;
     }

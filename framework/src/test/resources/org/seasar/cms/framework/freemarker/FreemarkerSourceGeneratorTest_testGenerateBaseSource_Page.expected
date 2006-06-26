@@ -2,7 +2,7 @@ package com.example.page;
 
 abstract public class TestPageBase extends com.example.page.SuperPage
 {
-    protected String param1_;
+    protected boolean param1_;
 
     protected String param2_;
 
@@ -11,7 +11,7 @@ abstract public class TestPageBase extends com.example.page.SuperPage
     protected Integer[] param4_;
 
 
-    public String getParam1()
+    public boolean isParam1()
     {
         return param1_;
     }

@@ -20,7 +20,7 @@ abstract public class ${shortName}Base
 <#list propertyDescs as propertyDesc>
 <#if propertyDesc.readable>
 
-    public ${propertyDesc.typeString} get${propertyDesc.name?cap_first}()
+    public ${propertyDesc.typeString} <#if propertyDesc.typeString == "boolean">is<#else>get</#if>${propertyDesc.name?cap_first}()
     {
         return ${propertyDesc.name}_;
     }
