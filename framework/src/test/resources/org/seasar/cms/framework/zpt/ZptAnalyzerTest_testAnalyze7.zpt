@@ -1,0 +1,9 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <a tal:attributes="href page:/action.html?id=${hoe}">LINK</a>
+  </body>
+</html>
+  

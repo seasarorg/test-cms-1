@@ -1,13 +1,9 @@
 package org.seasar.cms.framework.zpt;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.seasar.cms.framework.FormFile;
-import org.seasar.cms.framework.creator.MethodDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
 
 import net.skirnir.freyja.Attribute;
 import net.skirnir.freyja.Element;
@@ -19,6 +15,13 @@ import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.TalTagEvaluator;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
 
+import org.seasar.cms.framework.FormFile;
+import org.seasar.cms.framework.Path;
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.MethodDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.SourceCreator;
+
 public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 
     public String evaluate(TemplateContext context, String name,
@@ -27,30 +30,22 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         AnnotationResult result = findAnnotation(context, name, attrs);
         String annotation = result.getAnnotation();
         attrs = result.getTheOtherAttributes();
-
         AnalyzerContext analyzeContext = toAnalyzeContext(context);
-        if ("form".equals(name)) {
-            SourceCreator creator = analyzeContext.getSourceCreator();
-            Map attrMap = evaluate(analyzeContext, attrs);
-            String action = getAttributeValue(attrMap, "action", null);
-            String method = getAttributeValue(attrMap, "method", "GET")
-                .toUpperCase();
-            String className = creator.getClassName(creator.getComponentName(
-                action, method));
-            String actionName = creator.getActionName(action, method);
-            if (actionName != null) {
-                analyzeContext.getClassDesc(className).setMethodDesc(
-                    new MethodDesc(actionName));
-            }
+        Map attrMap = evaluate(analyzeContext, attrs);
 
-            analyzeContext.setFormActionPageClassName(className);
+        if ("form".equals(name)) {
+            ClassDesc classDesc = registerClassDesc(analyzeContext, attrMap,
+                "action", getAttributeValue(attrMap, "method", "GET")
+                    .toUpperCase());
+            analyzeContext
+                .setFormActionPageClassName((classDesc != null ? classDesc
+                    .getName() : null));
             try {
                 return super.evaluate(context, name, attrs, body);
             } finally {
                 analyzeContext.setFormActionPageClassName(null);
             }
         } else if ("input".equals(name)) {
-            Map attrMap = evaluate(analyzeContext, attrs);
             String type = getAttributeValue(attrMap, "type", null);
             if (!("button".equals(type) || "image".equals(type) || "submit"
                 .equals(type))) {
@@ -62,9 +57,48 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             }
         } else if ("select".equals(name) || "textarea".equals(name)) {
             processParameterTag(toAnalyzeContext(context), attrs, annotation);
+        } else {
+            registerClassDesc(analyzeContext, attrMap, "href", "GET");
+            registerClassDesc(analyzeContext, attrMap, "src", "GET");
         }
 
         return super.evaluate(context, name, attrs, body);
+    }
+
+    ClassDesc registerClassDesc(AnalyzerContext analyzerContext, Map attrMap,
+        String attrName, String method) {
+
+        SourceCreator creator = analyzerContext.getSourceCreator();
+        Path path = constructPath(getAttributeValue(attrMap, attrName, null));
+        if (path == null) {
+            return null;
+        }
+        String className = creator.getClassName(creator.getComponentName(path
+            .getTrunk(), method));
+        if (className == null) {
+            return null;
+        }
+        String actionName = creator.getActionName(path.getTrunk(), method);
+        if (actionName == null) {
+            return null;
+        }
+        ClassDesc classDesc = analyzerContext.getClassDesc(className);
+        classDesc.setMethodDesc(new MethodDesc(actionName));
+        for (Iterator itr = path.getParameterMap().keySet().iterator(); itr
+            .hasNext();) {
+            classDesc.addProperty((String) itr.next(), PropertyDesc.WRITE
+                | PropertyDesc.READ);
+        }
+        return classDesc;
+    }
+
+    Path constructPath(String pathWithParameters) {
+
+        if (pathWithParameters == null) {
+            return null;
+        } else {
+            return new Path(pathWithParameters);
+        }
     }
 
     AnnotationResult findAnnotation(TemplateContext context, String name,

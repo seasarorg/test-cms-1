@@ -1,0 +1,9 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <img tal:attributes="src page:/action.html?id=${hoe}" />
+  </body>
+</html>
+  

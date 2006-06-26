@@ -163,4 +163,28 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull("コンポーネント名が指定されている場合は対応するクラスのためのClassDescを生成すること", cd);
         assertNotNull(cd.getPropertyDesc("body"));
     }
+
+    public void testAnalyze7() throws Exception {
+
+        act("testAnalyze7");
+
+        ClassDesc actual = getClassDescriptor("com.example.web.ActionPage");
+        assertNotNull(actual);
+        MethodDesc md = actual.getMethodDesc("GET");
+        assertNotNull(md);
+        PropertyDesc pd = actual.getPropertyDesc("id");
+        assertNotNull(pd);
+    }
+
+    public void testAnalyze8() throws Exception {
+
+        act("testAnalyze8");
+
+        ClassDesc actual = getClassDescriptor("com.example.web.ActionPage");
+        assertNotNull(actual);
+        MethodDesc md = actual.getMethodDesc("GET");
+        assertNotNull(md);
+        PropertyDesc pd = actual.getPropertyDesc("id");
+        assertNotNull(pd);
+    }
 }

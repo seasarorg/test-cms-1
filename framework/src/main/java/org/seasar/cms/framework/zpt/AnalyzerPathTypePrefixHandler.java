@@ -37,7 +37,12 @@ public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
             return new DummyObject(analyzerContext.getDtoClassName(), true);
         }
 
-        return super.getProperty(context, varResolver, arg);
+        Object value = super.getProperty(context, varResolver, arg);
+        if (value == null) {
+            // 極力attributeを解釈させるためのダミー。
+            value = "0";
+        }
+        return value;
     }
 
     protected Object resolveSegment(TemplateContext context,

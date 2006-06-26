@@ -1,6 +1,7 @@
 package org.seasar.cms.framework;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -30,14 +31,79 @@ public class Path {
 
     public Path(String path, Map parameterMap, String parameterEncoding) {
 
-        trunk_ = path;
         parameterMap_ = parameterMap;
         parameterEncoding_ = parameterEncoding;
+        analyze(path);
     }
 
-    /*
-     * public scope methods
-     */
+    void analyze(String path) {
+        int question = path.indexOf('?');
+        if (question < 0) {
+            trunk_ = path;
+            return;
+        }
+        trunk_ = path.substring(0, question);
+        int pre = question + 1;
+        int idx;
+        while ((idx = path.indexOf('&', pre)) >= 0) {
+            addEncodedParameter(path.substring(pre, idx));
+            pre = idx + 1;
+        }
+        if (pre < path.length()) {
+            addEncodedParameter(path.substring(pre));
+        }
+    }
+
+    void addEncodedParameter(String encodedParam) {
+        int equal = encodedParam.indexOf('=');
+        if (equal >= 0) {
+            try {
+                addParameter(URLDecoder.decode(
+                    encodedParam.substring(0, equal), parameterEncoding_),
+                    URLDecoder.decode(encodedParam.substring(equal + 1),
+                        parameterEncoding_));
+            } catch (UnsupportedEncodingException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    public String toString() {
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(trunk_);
+        if (parameterMap_ != null) {
+            String delim = "?";
+            for (Iterator itr = parameterMap_.entrySet().iterator(); itr
+                .hasNext();) {
+                Map.Entry entry = (Map.Entry) itr.next();
+                String key = (String) entry.getKey();
+                String[] values = (String[]) entry.getValue();
+                if (key == null || values == null || values.length == 0) {
+                    continue;
+                }
+                sb.append(delim);
+                delim = "&";
+                String encodedKey;
+                try {
+                    encodedKey = URLEncoder.encode(key, parameterEncoding_);
+                } catch (UnsupportedEncodingException ex) {
+                    throw new RuntimeException(ex);
+                }
+                for (int i = 0; i < values.length; i++) {
+                    sb.append(encodedKey);
+                    sb.append("=");
+                    try {
+                        sb.append(URLEncoder.encode(values[i],
+                            parameterEncoding_));
+                    } catch (UnsupportedEncodingException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        }
+        return sb.toString();
+    }
 
     public String getTrunk() {
 
@@ -101,46 +167,5 @@ public class Path {
     public void setParameterEncoding(String parameterEncoding) {
 
         parameterEncoding_ = parameterEncoding;
-    }
-
-    /*
-     * Object
-     */
-
-    public String toString() {
-
-        StringBuffer sb = new StringBuffer();
-        sb.append(trunk_);
-        if (parameterMap_ != null) {
-            String delim = "?";
-            for (Iterator itr = parameterMap_.entrySet().iterator(); itr
-                .hasNext();) {
-                Map.Entry entry = (Map.Entry) itr.next();
-                String key = (String) entry.getKey();
-                String[] values = (String[]) entry.getValue();
-                if (key == null || values == null || values.length == 0) {
-                    continue;
-                }
-                sb.append(delim);
-                delim = "&";
-                String encodedKey;
-                try {
-                    encodedKey = URLEncoder.encode(key, parameterEncoding_);
-                } catch (UnsupportedEncodingException ex) {
-                    throw new RuntimeException(ex);
-                }
-                for (int i = 0; i < values.length; i++) {
-                    sb.append(encodedKey);
-                    sb.append("=");
-                    try {
-                        sb.append(URLEncoder.encode(values[i],
-                            parameterEncoding_));
-                    } catch (UnsupportedEncodingException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-        }
-        return sb.toString();
     }
 }

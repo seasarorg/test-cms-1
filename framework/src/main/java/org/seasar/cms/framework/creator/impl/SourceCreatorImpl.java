@@ -143,6 +143,9 @@ public class SourceCreatorImpl implements SourceCreator {
             return false;
         } else if (configuration_.getProperty(Configuration.KEY_PROJECTROOT) == null) {
             return false;
+        } else if (!new File(configuration_
+            .getProperty(Configuration.KEY_PROJECTROOT)).exists()) {
+            return false;
         } else if (configuration_
             .getProperty(Configuration.KEY_ROOTPACKAGENAME) == null) {
             return false;

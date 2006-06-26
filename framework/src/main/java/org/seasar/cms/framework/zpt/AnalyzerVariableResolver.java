@@ -17,7 +17,6 @@ public class AnalyzerVariableResolver implements VariableResolver {
     }
 
     public Object getVariable(TemplateContext context, String name) {
-        System.out.println("GET VARIABLE: " + name);
         if (DefaultRequestProcessor.ATTR_PAGE.equals(name)) {
             return new HashMap();
         }

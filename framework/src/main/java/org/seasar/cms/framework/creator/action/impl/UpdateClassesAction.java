@@ -341,6 +341,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             }
             propertyDesc.setMode(mode);
             Class propertyType = pds[i].getPropertyType();
+            if (propertyType == null) {
+                System.out.println("**** PropertyType is NULL: name=" + name);
+                continue;
+            }
             String type;
             if (propertyType.isArray()) {
                 type = propertyType.getComponentType().getName() + "[]";
