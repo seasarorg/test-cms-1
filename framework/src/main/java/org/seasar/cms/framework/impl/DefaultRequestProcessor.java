@@ -6,15 +6,19 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConvertUtilsBean;
+import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.seasar.cms.framework.Configuration;
+import org.seasar.cms.framework.FormFile;
 import org.seasar.cms.framework.MatchedPathMapping;
-import org.seasar.cms.framework.MultipartServletRequest;
 import org.seasar.cms.framework.PageNotFoundException;
 import org.seasar.cms.framework.PathMapping;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.beanutils.FormFileArrayConverter;
+import org.seasar.cms.framework.beanutils.FormFileConverter;
 import org.seasar.cms.framework.container.ThreadLocalS2ContainerUtils;
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.response.constructor.ResponseConstructor;
@@ -42,10 +46,23 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private Configuration configuration_;
 
+    private final BeanUtilsBean beanUtilsBean_;
+
     private final Logger logger_ = Logger.getLogger(getClass());
 
+    public DefaultRequestProcessor() {
+
+        ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
+        convertUtilsBean.register(new FormFileConverter(), FormFile.class);
+        convertUtilsBean.register(new FormFileArrayConverter(),
+            FormFile[].class);
+        beanUtilsBean_ = new BeanUtilsBean(convertUtilsBean,
+            new PropertyUtilsBean());
+    }
+
     public Response process(String contextPath, String path, String method,
-        String dispatcher, Map parameterMap) throws PageNotFoundException {
+        String dispatcher, Map parameterMap, Map fileParameterMap)
+        throws PageNotFoundException {
 
         if (isPathIgnored(path, method, dispatcher)) {
             throw new PageNotFoundException(path);
@@ -61,7 +78,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
         String componentName = mapping.getComponentName(resolver);
         String actionName = mapping.getActionName(resolver);
         Request request = new RequestImpl(contextPath, path, method,
-            dispatcher, parameterMap, mapping.getPathInfo(resolver));
+            dispatcher, parameterMap, fileParameterMap, mapping
+                .getPathInfo(resolver));
 
         if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
             && sourceCreator_ != null) {
@@ -137,20 +155,15 @@ public class DefaultRequestProcessor implements RequestProcessor {
             // 呼び出しもしない。そうでない場合のみ処理を行なう。
 
             try {
-                BeanUtils.populate(component, request.getParameterMap());
+                beanUtilsBean_.populate(component, request.getParameterMap());
             } catch (Throwable t) {
                 if (logger_.isDebugEnabled()) {
                     logger_.debug("Can't populate request parameters", t);
                 }
             }
             try {
-                Map formFileMap = (Map) httpRequest
-                    .getAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
-                if (formFileMap != null) {
-                    httpRequest
-                        .removeAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
-                    BeanUtils.populate(component, formFileMap);
-                }
+                beanUtilsBean_.copyProperties(component, request
+                    .getFileParameterMap());
             } catch (Throwable t) {
                 if (logger_.isDebugEnabled()) {
                     logger_.debug(

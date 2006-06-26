@@ -1,6 +1,7 @@
 package org.seasar.cms.framework;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -44,11 +45,21 @@ public class FrameworkFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) req;
         HttpServletResponse httpResponse = (HttpServletResponse) res;
 
+        Map fileParameterMap = (Map) httpRequest
+            .getAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
+        if (fileParameterMap != null) {
+            httpRequest
+                .removeAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
+        } else {
+            fileParameterMap = new HashMap();
+        }
+
         try {
             Response response = processRequest(ServletUtils
                 .getContextPath(httpRequest),
                 ServletUtils.getPath(httpRequest), httpRequest.getMethod()
-                    .toUpperCase(), dispatcher_, httpRequest.getParameterMap());
+                    .toUpperCase(), dispatcher_, httpRequest.getParameterMap(),
+                fileParameterMap);
 
             if (processResponse(httpRequest, httpResponse, response)) {
                 chain.doFilter(httpRequest, httpResponse);
@@ -59,11 +70,12 @@ public class FrameworkFilter implements Filter {
     }
 
     Response processRequest(String contextPath, String path, String method,
-        String dispatcher, Map parameterMap) throws PageNotFoundException {
+        String dispatcher, Map parameterMap, Map fileParameterMap)
+        throws PageNotFoundException {
 
         return ((RequestProcessor) getContainer().getComponent(
             RequestProcessor.class)).process(contextPath, path, method,
-            dispatcher, parameterMap);
+            dispatcher, parameterMap, fileParameterMap);
     }
 
     boolean processResponse(HttpServletRequest httpRequest,

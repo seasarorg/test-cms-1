@@ -106,16 +106,8 @@ public class MultipartServletRequest extends HttpServletRequestWrapper {
                     String.class));
             } else {
                 FormFile value = new FormFileImpl(fileItem);
-                // FormFile[]にはしない。そういうケースが少ないということと、
-                // BeanPageProcessorでのpopulate()がString以外のオブジェクト
-                // の配列を扱えないから。FormFile[]にしたければ、
-                // fileMap.putの行をコメントアウトして、
-                // 下のコメントをアンコメントして、
-                // BeanProcessorでBeanUtils.register()でFormFile[]
-                // のためのConverterを登録するなどすること。
-                fileMap.put(fieldName, value);
-                //              fileMap.put(fieldName,
-                //                  add(fileMap.get(fieldName), value, FormFile.class));
+                fileMap.put(fieldName, add(fileMap.get(fieldName), value,
+                    FormFile.class));
             }
         }
         request_.setAttribute(ATTR_FORMFILEMAP, Collections

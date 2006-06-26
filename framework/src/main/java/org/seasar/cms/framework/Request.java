@@ -67,6 +67,16 @@ public interface Request {
 
     void setParameterMap(Map parameterMap);
 
+    FormFile getFileParameter(String name);
+
+    FormFile[] getFileParameterValues(String name);
+
+    Iterator getFileParameterNames();
+
+    Map getFileParameterMap();
+
+    void setFileParameterMap(Map parameterMap);
+
     String getPathInfo();
 
     void setPathInfo(String pathInfo);
