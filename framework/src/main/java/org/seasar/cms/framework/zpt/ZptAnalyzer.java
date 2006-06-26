@@ -51,6 +51,11 @@ public class ZptAnalyzer implements TemplateAnalyzer {
                     new MockHttpServletRequestImpl(new MockServletContextImpl(
                         "/"), "/"));
             }
+
+            public String getResponseEncoding() {
+                return "UTF-8";
+            }
+
         }.addTypePrefix("path", new AnalyzerPathTypePrefixHandler('/')
             .addPathResolver(new BeanPathResolver()), true));
 
