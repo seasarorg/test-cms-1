@@ -21,6 +21,7 @@ import org.seasar.cms.framework.response.constructor.ResponseConstructor;
 import org.seasar.cms.framework.response.constructor.ResponseConstructorSelector;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.log.Logger;
 import org.seasar.kvasir.util.el.VariableResolver;
 
 public class DefaultRequestProcessor implements RequestProcessor {
@@ -40,6 +41,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
     private SourceCreator sourceCreator_;
 
     private Configuration configuration_;
+
+    private final Logger logger_ = Logger.getLogger(getClass());
 
     public Response process(String contextPath, String path, String method,
         String dispatcher, Map parameterMap) throws PageNotFoundException {
@@ -135,7 +138,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
             try {
                 BeanUtils.populate(component, request.getParameterMap());
-
+            } catch (Throwable t) {
+                if (logger_.isDebugEnabled()) {
+                    logger_.debug("Can't populate request parameters", t);
+                }
+            }
+            try {
                 Map formFileMap = (Map) httpRequest
                     .getAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
                 if (formFileMap != null) {
@@ -144,7 +152,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     BeanUtils.populate(component, formFileMap);
                 }
             } catch (Throwable t) {
-                ;
+                if (logger_.isDebugEnabled()) {
+                    logger_.debug(
+                        "Can't populate request parameters (FormFile)", t);
+                }
             }
 
             if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
