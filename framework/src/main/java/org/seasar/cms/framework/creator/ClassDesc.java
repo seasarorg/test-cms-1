@@ -4,20 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ClassDesc implements Cloneable {
-
-    public static final String KIND_PAGE = "Page";
-
-    public static final String KIND_DTO = "Dto";
-
-    public static final String KIND_DAO = "Dao";
-
-    public static final String KIND_DXO = "Dxo";
-
-    public static final String KIND_BEAN = "Bean";
-
-    private static final String[] AUTODETECTED_KINDS = new String[] {
-        KIND_PAGE, KIND_DTO, KIND_DAO };
+public class ClassDesc extends AbstractTypeDesc {
 
     private String name_;
 
@@ -27,27 +14,15 @@ public class ClassDesc implements Cloneable {
 
     private Map methodDescMap_ = new LinkedHashMap();
 
-    private String kind_ = KIND_BEAN;
-
     public ClassDesc(String name) {
 
         setName(name);
-        for (int i = 0; i < AUTODETECTED_KINDS.length; i++) {
-            if (name.endsWith(AUTODETECTED_KINDS[i])) {
-                setKind(AUTODETECTED_KINDS[i]);
-                break;
-            }
-        }
     }
 
     public Object clone() {
 
-        ClassDesc cloned;
-        try {
-            cloned = (ClassDesc) super.clone();
-        } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(ex);
-        }
+        ClassDesc cloned = (ClassDesc) super.clone();
+
         cloned.propertyDescMap_ = new LinkedHashMap();
         for (Iterator itr = propertyDescMap_.entrySet().iterator(); itr
             .hasNext();) {
@@ -64,46 +39,12 @@ public class ClassDesc implements Cloneable {
         return cloned;
     }
 
-    public String toString() {
-        return "name=" + name_;
-    }
-
     public String getName() {
         return name_;
     }
 
     public void setName(String name) {
         name_ = name;
-    }
-
-    public String getShortName() {
-
-        int dot = name_.lastIndexOf('.');
-        if (dot < 0) {
-            return name_;
-        } else {
-            return name_.substring(dot + 1);
-        }
-    }
-
-    public String getBaseName() {
-
-        String shortName = getShortName();
-        if (shortName.endsWith(kind_)) {
-            return shortName.substring(0, shortName.length() - kind_.length());
-        } else {
-            return shortName;
-        }
-    }
-
-    public String getPackageName() {
-
-        int dot = name_.lastIndexOf('.');
-        if (dot < 0) {
-            return "";
-        } else {
-            return name_.substring(0, dot);
-        }
     }
 
     public PropertyDesc addProperty(String name, int mode) {
@@ -131,14 +72,6 @@ public class ClassDesc implements Cloneable {
 
         return (PropertyDesc[]) propertyDescMap_.values().toArray(
             new PropertyDesc[0]);
-    }
-
-    public String getKind() {
-        return kind_;
-    }
-
-    public void setKind(String kind) {
-        kind_ = kind;
     }
 
     public MethodDesc getMethodDesc(MethodDesc methodDesc) {
@@ -213,22 +146,5 @@ public class ClassDesc implements Cloneable {
         }
 
         return this;
-    }
-
-    public boolean isValid() {
-
-        PropertyDesc[] pds = getPropertyDescs();
-        for (int i = 0; i < pds.length; i++) {
-            if (!pds[i].isValid()) {
-                return false;
-            }
-        }
-        MethodDesc[] mds = getMethodDescs();
-        for (int i = 0; i < mds.length; i++) {
-            if (!mds[i].isValid()) {
-                return false;
-            }
-        }
-        return true;
     }
 }

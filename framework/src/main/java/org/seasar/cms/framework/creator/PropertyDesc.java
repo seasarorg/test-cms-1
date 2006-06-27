@@ -68,9 +68,4 @@ public class PropertyDesc implements Cloneable {
 
         return ((mode_ & WRITE) != 0);
     }
-
-    public boolean isValid() {
-
-        return getTypeDesc().isValid();
-    }
 }

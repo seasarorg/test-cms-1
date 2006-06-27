@@ -154,7 +154,7 @@ public class ZptAnalyzerTest extends TestCase {
         assertNull(cd.getPropertyDesc("submit"));
         MethodDesc md = cd.getMethodDesc(new MethodDesc("POST"));
         assertNotNull(md);
-        assertEquals("void", md.getReturnTypeDesc().getTypeString());
+        assertEquals("void", md.getReturnTypeDesc().getName());
     }
 
     public void testAnalyze6() throws Exception {

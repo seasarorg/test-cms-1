@@ -24,7 +24,7 @@ public class MethodDescKey {
             return false;
         }
         for (int i = 0; i < optds.length; i++) {
-            if (!optds[i].getTypeString().equals(ptds[i].getTypeString())) {
+            if (!optds[i].getName().equals(ptds[i].getName())) {
                 return false;
             }
         }

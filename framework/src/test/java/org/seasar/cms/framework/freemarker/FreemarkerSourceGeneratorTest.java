@@ -34,7 +34,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
     public void testGenerateGapSource() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
-        classDesc.setKind(ClassDesc.KIND_DTO);
+        classDesc.setName("com.example.dto.TestDto");
 
         String actual = generator_.generateGapSource(classDesc);
 
@@ -45,7 +45,6 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
     public void testGenerateBaseSource_Page() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
-        classDesc.setKind(ClassDesc.KIND_PAGE);
         MethodDesc methodDesc = new MethodDesc("_get");
         methodDesc.getReturnTypeDesc().setDefaultType(String.class.getName());
         methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
@@ -60,7 +59,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
     public void testGenerateBaseSource_Dto() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
-        classDesc.setKind(ClassDesc.KIND_DTO);
+        classDesc.setName("com.example.dto.TestDto");
 
         String actual = generator_.generateBaseSource(classDesc);
 
@@ -71,7 +70,6 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
     public void testGenerateGapSource_Page() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
-        classDesc.setKind(ClassDesc.KIND_PAGE);
         MethodDesc methodDesc = new MethodDesc("_get");
         methodDesc.getReturnTypeDesc().setDefaultType(String.class.getName());
         methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");

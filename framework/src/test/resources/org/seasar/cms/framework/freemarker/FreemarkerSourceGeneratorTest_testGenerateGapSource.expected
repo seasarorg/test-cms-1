@@ -1,12 +1,12 @@
-package com.example.page;
+package com.example.dto;
 
-public class TestPage extends TestPageBase
+public class TestDto extends TestDtoBase
 {
-    public TestPage()
+    public TestDto()
     {
     }
 
-    public TestPage(boolean param1, String param2, String param3, Integer[] param4)
+    public TestDto(boolean param1, String param2, String param3, Integer[] param4)
     {
         super(param1, param2, param3, param4);
     }

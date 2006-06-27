@@ -4,7 +4,7 @@ public class ${shortName} extends ${shortName}Base
 {
 <#list methodDescs as methodDesc><#if methodDesc.body?exists>
 
-    public ${methodDesc.returnTypeDesc.typeString} ${methodDesc.name}()
+    public ${methodDesc.returnTypeDesc.name} ${methodDesc.name}()
     {
         ${methodDesc.body?default("")}
     }

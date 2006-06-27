@@ -129,7 +129,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         ClassDesc[] classDescs = target_.gatherClassDescs("/test.html",
             Request.METHOD_GET, "com.example.web.TestPage", getSourceCreator()
                 .getTemplateFile("/test.html"));
-        for (int i = 0; i < classDescs.length; i++) {
+        for (int i = classDescs.length - 1; i >= 0; i--) {
             target_.writeSourceFile(classDescs[i].merge(target_
                 .getClassDesc(classDescs[i].getName()), true));
         }

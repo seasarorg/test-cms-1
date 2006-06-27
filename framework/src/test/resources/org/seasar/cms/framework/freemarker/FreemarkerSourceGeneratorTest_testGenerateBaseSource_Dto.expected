@@ -1,6 +1,6 @@
-package com.example.page;
+package com.example.dto;
 
-abstract public class TestPageBase
+abstract public class TestDtoBase
 {
     protected boolean param1_;
 
@@ -11,11 +11,11 @@ abstract public class TestPageBase
     protected Integer[] param4_;
 
 
-    public TestPageBase()
+    public TestDtoBase()
     {
     }
 
-    public TestPageBase(boolean param1, String param2, String param3, Integer[] param4)
+    public TestDtoBase(boolean param1, String param2, String param3, Integer[] param4)
     {
         param1_ = param1;
         param2_ = param2;

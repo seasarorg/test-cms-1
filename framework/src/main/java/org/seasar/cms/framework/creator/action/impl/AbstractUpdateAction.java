@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.DescValidator;
 import org.seasar.cms.framework.creator.action.UpdateAction;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
@@ -61,7 +62,11 @@ abstract public class AbstractUpdateAction implements UpdateAction {
         return sb.toString();
     }
 
-    protected void writeSourceFile(ClassDesc classDesc) {
+    protected boolean writeSourceFile(ClassDesc classDesc) {
+
+        if (!DescValidator.isValid(classDesc, getSourceCreator())) {
+            return false;
+        }
 
         writeString(getSourceCreator().getSourceGenerator().generateBaseSource(
             classDesc), getSourceCreator().getSourceFile(
@@ -73,6 +78,8 @@ abstract public class AbstractUpdateAction implements UpdateAction {
             writeString(getSourceCreator().getSourceGenerator()
                 .generateGapSource(classDesc), sourceFile);
         }
+
+        return true;
     }
 
     protected void writeString(String string, File file) {

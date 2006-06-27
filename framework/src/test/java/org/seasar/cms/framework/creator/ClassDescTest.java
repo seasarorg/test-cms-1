@@ -64,11 +64,11 @@ public class ClassDescTest extends TestCase {
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
             .getPropertyDesc("param1").getMode());
         assertTrue(actual.getPropertyDesc("param4").getTypeDesc()
-            .getTypeString().endsWith("[]"));
+            .getName().endsWith("[]"));
         assertEquals("java.lang.Integer[]", actual.getPropertyDesc("param5")
             .getTypeDesc().getType());
         assertEquals("Integer", actual.getPropertyDesc("param6").getTypeDesc()
-            .getTypeString());
+            .getName());
         MethodDesc actualMd = actual.getMethodDesc(new MethodDesc("method"));
         assertNotNull(actualMd);
         assertEquals("body", actualMd.getBody());

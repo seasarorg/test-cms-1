@@ -66,17 +66,4 @@ public class MethodDesc implements Cloneable {
 
         body_ = body;
     }
-
-    public boolean isValid() {
-
-        if (!returnTypeDesc_.isValid()) {
-            return false;
-        }
-        for (int i = 0; i < parameterTypeDescs_.length; i++) {
-            if (!parameterTypeDescs_[i].isValid()) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
