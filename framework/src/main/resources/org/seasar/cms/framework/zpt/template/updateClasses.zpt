@@ -16,6 +16,7 @@
     <li tal:repeat="classDesc updatedClassDescs" tal:content="classDesc/name">CLASS</li>
   </ul>
   </p>
+  <p><input type="checkbox" name="__cms__replace" value="true" /> 以前のクラスが持つメソッドやプロパティのうち、新しいクラスに含まれないものを除去する</p>
   <div tal:condition="daoClassDescExists">
     <p>また、追加・更新されるDTOクラスに対応する以下のDaoクラスやBeanクラスのうち、追加・更新したいものにチェックを入れて下さい。</p>
     <p tal:condition="createdDaoClassDescs"><strong>追加したいクラス：</strong>

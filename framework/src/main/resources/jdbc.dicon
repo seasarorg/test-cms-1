@@ -3,6 +3,7 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components namespace="jdbc">
   <include path="common.dicon" />
+  <include path="jta.dicon" />
 
   <component
     class="org.seasar.extension.jdbc.impl.BasicResultSetFactory" />
@@ -28,8 +29,8 @@
     class="org.seasar.extension.dbcp.impl.ConnectionPoolImpl">
     <property name="timeout">600</property>
     <property name="maxPoolSize">10</property>
-    <!-- JTAトランザクションが開始されていない場合にコネクションを
-      取得できないようにするには次のプロパティをfalseにしてください．-->
+    <!-- If you don't allow to get connection where JTA transaction is not begun,
+      make the following property false. -->
     <property name="allowLocalTx">true</property>
     <destroyMethod name="close" />
   </component>

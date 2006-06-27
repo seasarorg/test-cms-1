@@ -129,7 +129,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
                 .getTemplateFile("/test.html"));
         for (int i = 0; i < classDescs.length; i++) {
             target_.writeSourceFile(classDescs[i].merge(target_
-                .getClassDesc(classDescs[i].getName())));
+                .getClassDesc(classDescs[i].getName()), true));
         }
 
         assertTrue(new File(sourceDir, "com/example/web/TestPage.java")

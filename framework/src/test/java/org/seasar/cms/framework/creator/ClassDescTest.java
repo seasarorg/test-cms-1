@@ -46,7 +46,7 @@ public class ClassDescTest extends TestCase {
         md.setBody("body");
         cd2.setMethodDesc(md);
 
-        ClassDesc actual = cd1.merge(cd2);
+        ClassDesc actual = cd1.merge(cd2, true);
 
         assertEquals("com.example.page.TestPageBase", actual
             .getSuperclassName());

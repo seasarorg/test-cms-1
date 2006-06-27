@@ -165,7 +165,7 @@ public class ClassDesc implements Cloneable {
         superclassName_ = superclassName;
     }
 
-    public ClassDesc merge(ClassDesc classDesc) {
+    public ClassDesc merge(ClassDesc classDesc, boolean mergeMethod) {
 
         if (classDesc == null) {
             return this;
@@ -177,12 +177,16 @@ public class ClassDesc implements Cloneable {
         for (int i = 0; i < pds.length; i++) {
             PropertyDesc pd = getPropertyDesc(pds[i].getName());
             if (pd == null) {
-                setPropertyDesc((PropertyDesc) pds[i].clone());
+                if (mergeMethod) {
+                    setPropertyDesc((PropertyDesc) pds[i].clone());
+                }
             } else {
                 if (pd.getType() == null) {
                     pd.setType(pds[i].getType());
                 }
-                pd.addMode(pds[i].getMode());
+                if (mergeMethod) {
+                    pd.addMode(pds[i].getMode());
+                }
             }
         }
 
@@ -190,12 +194,16 @@ public class ClassDesc implements Cloneable {
         for (int i = 0; i < mds.length; i++) {
             MethodDesc md = getMethodDesc(mds[i].getName());
             if (md == null) {
-                setMethodDesc((MethodDesc) mds[i].clone());
+                if (mergeMethod) {
+                    setMethodDesc((MethodDesc) mds[i].clone());
+                }
             } else {
                 if (md.getReturnType() == null) {
                     md.setReturnType(mds[i].getReturnType());
                 }
-                md.setBody(mds[i].getBody());
+                if (mergeMethod) {
+                    md.setBody(mds[i].getBody());
+                }
             }
         }
 

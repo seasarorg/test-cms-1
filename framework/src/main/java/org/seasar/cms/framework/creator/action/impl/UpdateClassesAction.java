@@ -31,6 +31,9 @@ public class UpdateClassesAction extends AbstractUpdateAction {
     private static final String PARAM_DAO = SourceCreatorImpl.PARAM_PREFIX
         + "dao";
 
+    private static final String PARAM_REPLACE = SourceCreatorImpl.PARAM_PREFIX
+        + "replace";
+
     public UpdateClassesAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
     }
@@ -150,6 +153,9 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             }
         }
 
+        boolean mergeMethod = !"true".equals(request
+            .getParameter(PARAM_REPLACE));
+
         Map classDescMap = classDescBag.getClassDescMap();
         for (int i = 0; i < classDescs.length; i++) {
             if (processedClassNameSet.contains(classDescs[i].getName())) {
@@ -157,7 +163,8 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             }
 
             // 既存のクラスがあればマージする。
-            classDescs[i].merge(getClassDesc(classDescs[i].getName()));
+            classDescs[i].merge(getClassDesc(classDescs[i].getName()),
+                mergeMethod);
 
             // Pageクラスの場合、Dtoに触るようなプロパティを持っているなら
             // Dtoに対応するBeanに対応するDaoのsetterを自動生成する。
