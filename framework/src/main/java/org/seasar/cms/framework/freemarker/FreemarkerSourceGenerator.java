@@ -17,11 +17,17 @@ public class FreemarkerSourceGenerator implements SourceGenerator {
 
     public String generateGapSource(ClassDesc classDesc) {
 
+        if (!classDesc.isValid()) {
+            return null;
+        }
         return generateSource(classDesc.getKind() + ".java", classDesc);
     }
 
     public String generateBaseSource(ClassDesc classDesc) {
 
+        if (!classDesc.isValid()) {
+            return null;
+        }
         return generateSource(classDesc.getKind() + "Base.java", classDesc);
     }
 

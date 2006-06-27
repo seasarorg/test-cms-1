@@ -70,6 +70,8 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private String daoPackageName_;
 
+    private String dxoPackageName_;
+
     private SourceGenerator sourceGenerator_;
 
     private ResponseCreator responseCreator_ = new ZptResponseCreator();
@@ -378,6 +380,16 @@ public class SourceCreatorImpl implements SourceCreator {
     public void setDaoPackageName(String daoPackageName) {
 
         daoPackageName_ = daoPackageName;
+    }
+
+    public String getDxoPackageName() {
+
+        return dxoPackageName_;
+    }
+
+    public void setDxoPackageName(String dxoPackageName) {
+
+        dxoPackageName_ = dxoPackageName;
     }
 
     public SourceGenerator getSourceGenerator() {

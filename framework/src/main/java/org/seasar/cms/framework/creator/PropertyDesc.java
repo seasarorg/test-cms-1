@@ -1,6 +1,6 @@
 package org.seasar.cms.framework.creator;
 
-public class PropertyDesc extends AbstractDesc {
+public class PropertyDesc implements Cloneable {
 
     public static final int NONE = 0;
 
@@ -10,9 +10,7 @@ public class PropertyDesc extends AbstractDesc {
 
     private String name_;
 
-    private String type_;
-
-    private String defaultType_;
+    private TypeDesc typeDesc_ = new TypeDesc(String.class.getName());
 
     private int mode_;
 
@@ -21,34 +19,29 @@ public class PropertyDesc extends AbstractDesc {
         name_ = name;
     }
 
+    public Object clone() {
+
+        PropertyDesc cloned;
+        try {
+            cloned = (PropertyDesc) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException(ex);
+        }
+        if (typeDesc_ != null) {
+            cloned.typeDesc_ = (TypeDesc) typeDesc_.clone();
+        }
+
+        return cloned;
+    }
+
     public String getName() {
 
         return name_;
     }
 
-    public String getType() {
+    public TypeDesc getTypeDesc() {
 
-        return type_;
-    }
-
-    public void setType(String type) {
-
-        type_ = type;
-    }
-
-    public String getDefaultType() {
-
-        return defaultType_;
-    }
-
-    public void setDefaultType(String defaultType) {
-
-        defaultType_ = defaultType;
-    }
-
-    public String getTypeString() {
-
-        return getTypeString(type_, defaultType_, "String");
+        return typeDesc_;
     }
 
     public int getMode() {
@@ -74,5 +67,10 @@ public class PropertyDesc extends AbstractDesc {
     public boolean isWritable() {
 
         return ((mode_ & WRITE) != 0);
+    }
+
+    public boolean isValid() {
+
+        return getTypeDesc().isValid();
     }
 }

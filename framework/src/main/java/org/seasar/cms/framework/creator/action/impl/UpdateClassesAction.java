@@ -23,6 +23,7 @@ import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.TypeDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
@@ -62,7 +63,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             return null;
         }
 
-        ClassDescBag classDescBag = classifyClassDescs(classDescs);
+        ClassDescBag classDescBag = classifyClassDescs(addRelativeClassDescs(classDescs));
 
         List createdClassDescList = new ArrayList();
         for (Iterator itr = classDescBag.getCreatedClassDescMap().values()
@@ -119,7 +120,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         ClassDesc[] classDescs = gatherClassDescs(request.getPath(), method,
             className, templateFile);
 
-        ClassDescBag classDescBag = classifyClassDescs(classDescs);
+        ClassDescBag classDescBag = classifyClassDescs(addRelativeClassDescs(classDescs));
 
         Set daoClassNameSet = new HashSet();
         String[] daoClassNames = request.getParameterValues(PARAM_DAO);
@@ -157,6 +158,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             .getParameter(PARAM_REPLACE));
 
         Map classDescMap = classDescBag.getClassDescMap();
+        classDescs = classDescBag.getClassDescs();
         for (int i = 0; i < classDescs.length; i++) {
             if (processedClassNameSet.contains(classDescs[i].getName())) {
                 continue;
@@ -172,7 +174,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 PropertyDesc[] pds = classDescs[i].getPropertyDescs();
                 for (int j = 0; j < pds.length; j++) {
                     ClassDesc dtoClassDesc = findClassDesc(classDescMap, pds[j]
-                        .getTypeString());
+                        .getTypeDesc().getTypeString());
                     if (dtoClassDesc != null
                         && ClassDesc.KIND_DTO.equals(dtoClassDesc.getKind())) {
                         String daoShortName = dtoClassDesc.getBaseName()
@@ -184,7 +186,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                             classDescs[i].addProperty(
                                 Character.toLowerCase(daoShortName.charAt(0))
                                     + daoShortName.substring(1),
-                                PropertyDesc.WRITE)
+                                PropertyDesc.WRITE).getTypeDesc()
                                 .setDefaultType(daoClassName);
                         }
                     }
@@ -232,6 +234,94 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         return classDesc;
     }
 
+    ClassDesc[] addRelativeClassDescs(ClassDesc[] classDescs) {
+
+        List list = new ArrayList(Arrays.asList(classDescs));
+        for (int i = 0; i < classDescs.length; i++) {
+            if (ClassDesc.KIND_DTO.equals(classDescs[i].getKind())) {
+
+                // Dao、Bean用のClassDescを生成しておく。
+
+                ClassDesc classDesc = new ClassDesc(getSourceCreator()
+                    .getDaoPackageName()
+                    + "." + classDescs[i].getBaseName() + "Dao");
+                classDesc.setKind(ClassDesc.KIND_DAO);
+                list.add(classDesc);
+
+                classDesc = (ClassDesc) classDescs[i].clone();
+                classDesc.setName(getSourceCreator().getDaoPackageName() + "."
+                    + classDescs[i].getBaseName());
+                classDesc.setKind(ClassDesc.KIND_BEAN);
+                list.add(classDesc);
+
+                // Dxo用のClassDescを生成しておく。
+
+                classDesc = new ClassDesc(getSourceCreator()
+                    .getDxoPackageName()
+                    + "." + classDescs[i].getBaseName() + "Dxo");
+                classDesc.setKind(ClassDesc.KIND_DXO);
+
+                String beanClassName = getSourceCreator().getDaoPackageName()
+                    + "." + classDescs[i].getBaseName();
+                String dtoClassName = classDescs[i].getName();
+                String beanArrayClassName = beanClassName + "[]";
+                String dtoArrayClassName = dtoClassName + "[]";
+
+                MethodDesc md = new MethodDesc("convert");
+                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
+                    beanClassName) });
+                md.getReturnTypeDesc().setType(dtoClassName);
+                classDesc.setMethodDesc(md);
+
+                md = new MethodDesc("convert");
+                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
+                    dtoClassName) });
+                md.getReturnTypeDesc().setType(beanClassName);
+                classDesc.setMethodDesc(md);
+
+                md = new MethodDesc("convert");
+                md.setParameterTypeDescs(new TypeDesc[] {
+                    new TypeDesc(dtoClassName, "src"),
+                    new TypeDesc(beanClassName, "dest") });
+                classDesc.setMethodDesc(md);
+
+                md = new MethodDesc("convert");
+                md.setParameterTypeDescs(new TypeDesc[] {
+                    new TypeDesc(beanClassName, "src"),
+                    new TypeDesc(dtoClassName, "dest") });
+                classDesc.setMethodDesc(md);
+
+                md = new MethodDesc("convert");
+                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
+                    beanArrayClassName) });
+                md.getReturnTypeDesc().setType(dtoArrayClassName);
+                classDesc.setMethodDesc(md);
+
+                md = new MethodDesc("convert");
+                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
+                    List.class.getName()) });
+                md.getReturnTypeDesc().setType(dtoArrayClassName);
+                classDesc.setMethodDesc(md);
+
+                md = new MethodDesc("convert");
+                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
+                    dtoArrayClassName) });
+                md.getReturnTypeDesc().setType(beanArrayClassName);
+                classDesc.setMethodDesc(md);
+
+                md = new MethodDesc("convert");
+                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
+                    List.class.getName()) });
+                md.getReturnTypeDesc().setType(beanArrayClassName);
+                classDesc.setMethodDesc(md);
+
+                list.add(classDesc);
+            }
+        }
+
+        return (ClassDesc[]) list.toArray(new ClassDesc[0]);
+    }
+
     ClassDescBag classifyClassDescs(ClassDesc[] classDescs) {
 
         ClassDescBag classDescBag = new ClassDescBag();
@@ -240,28 +330,6 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 classDescBag.addAsCreated(classDescs[i]);
             } else {
                 classDescBag.addAsUpdated(classDescs[i]);
-            }
-
-            if (ClassDesc.KIND_DTO.equals(classDescs[i].getKind())) {
-                ClassDesc classDesc = (ClassDesc) classDescs[i].clone();
-                classDesc.setName(getSourceCreator().getDaoPackageName() + "."
-                    + classDescs[i].getBaseName() + "Dao");
-                classDesc.setKind(ClassDesc.KIND_DAO);
-                if (getClassDesc(classDesc.getName()) == null) {
-                    classDescBag.addAsCreated(classDesc);
-                } else {
-                    classDescBag.addAsUpdated(classDesc);
-                }
-
-                classDesc = (ClassDesc) classDescs[i].clone();
-                classDesc.setName(getSourceCreator().getDaoPackageName() + "."
-                    + classDescs[i].getBaseName());
-                classDesc.setKind(ClassDesc.KIND_BEAN);
-                if (getClassDesc(classDesc.getName()) == null) {
-                    classDescBag.addAsCreated(classDesc);
-                } else {
-                    classDescBag.addAsUpdated(classDesc);
-                }
             }
         }
 
@@ -358,7 +426,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             } else {
                 type = propertyType.getName();
             }
-            propertyDesc.setType(type);
+            propertyDesc.getTypeDesc().setType(type);
             propertyDesc.setMode(mode);
             classDesc.setPropertyDesc(propertyDesc);
         }
@@ -377,7 +445,8 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 continue;
             }
             MethodDesc methodDesc = new MethodDesc(name);
-            methodDesc.setReturnType(methods[i].getReturnType().getName());
+            methodDesc.getReturnTypeDesc().setType(
+                methods[i].getReturnType().getName());
             classDesc.setMethodDesc(methodDesc);
         }
 

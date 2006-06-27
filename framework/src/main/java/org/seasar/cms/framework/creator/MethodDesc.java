@@ -1,12 +1,12 @@
 package org.seasar.cms.framework.creator;
 
-public class MethodDesc extends AbstractDesc {
+public class MethodDesc implements Cloneable {
 
     private String name_;
 
-    private String returnType_;
+    private TypeDesc[] parameterTypeDescs_ = new TypeDesc[0];
 
-    private String defaultReturnType_;
+    private TypeDesc returnTypeDesc_ = new TypeDesc(TypeDesc.TYPE_VOID);
 
     private String body_;
 
@@ -15,34 +15,46 @@ public class MethodDesc extends AbstractDesc {
         name_ = name;
     }
 
+    public Object clone() {
+
+        MethodDesc cloned;
+        try {
+            cloned = (MethodDesc) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException(ex);
+        }
+        if (parameterTypeDescs_ != null) {
+            cloned.parameterTypeDescs_ = new TypeDesc[parameterTypeDescs_.length];
+            for (int i = 0; i < parameterTypeDescs_.length; i++) {
+                cloned.parameterTypeDescs_[i] = (TypeDesc) parameterTypeDescs_[i]
+                    .clone();
+            }
+        }
+        if (returnTypeDesc_ != null) {
+            cloned.returnTypeDesc_ = (TypeDesc) returnTypeDesc_.clone();
+        }
+
+        return cloned;
+    }
+
     public String getName() {
 
         return name_;
     }
 
-    public String getReturnType() {
+    public TypeDesc getReturnTypeDesc() {
 
-        return returnType_;
+        return returnTypeDesc_;
     }
 
-    public void setReturnType(String returnType) {
+    public TypeDesc[] getParameterTypeDescs() {
 
-        returnType_ = returnType;
+        return parameterTypeDescs_;
     }
 
-    public String getDefaultReturnType() {
+    public void setParameterTypeDescs(TypeDesc[] parameterTypeDescs) {
 
-        return defaultReturnType_;
-    }
-
-    public void setDefaultReturnType(String defaultReturnType) {
-
-        defaultReturnType_ = defaultReturnType;
-    }
-
-    public String getReturnTypeString() {
-
-        return getTypeString(returnType_, defaultReturnType_, TYPE_VOID);
+        parameterTypeDescs_ = parameterTypeDescs;
     }
 
     public String getBody() {
@@ -53,5 +65,18 @@ public class MethodDesc extends AbstractDesc {
     public void setBody(String body) {
 
         body_ = body;
+    }
+
+    public boolean isValid() {
+
+        if (!returnTypeDesc_.isValid()) {
+            return false;
+        }
+        for (int i = 0; i < parameterTypeDescs_.length; i++) {
+            if (!parameterTypeDescs_[i].isValid()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

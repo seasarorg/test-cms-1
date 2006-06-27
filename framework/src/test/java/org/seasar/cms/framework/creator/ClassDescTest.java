@@ -14,13 +14,13 @@ public class ClassDescTest extends TestCase {
         pd.setMode(PropertyDesc.WRITE);
         cd1.setPropertyDesc(pd);
         pd = new PropertyDesc("param3");
-        pd.setType("java.lang.String");
+        pd.getTypeDesc().setType("java.lang.String");
         cd1.setPropertyDesc(pd);
         pd = new PropertyDesc("param4");
-        pd.setDefaultType("java.lang.String[]");
+        pd.getTypeDesc().setDefaultType("java.lang.String[]");
         cd1.setPropertyDesc(pd);
         pd = new PropertyDesc("param6");
-        pd.setDefaultType("java.lang.Integer");
+        pd.getTypeDesc().setDefaultType("java.lang.Integer");
         cd1.setPropertyDesc(pd);
         MethodDesc md = new MethodDesc("method");
         cd1.setMethodDesc(md);
@@ -28,21 +28,21 @@ public class ClassDescTest extends TestCase {
         ClassDesc cd2 = new ClassDesc("com.example.page.TestPage");
         cd2.setSuperclassName("com.example.page.TestPageBase");
         pd = new PropertyDesc("param1");
-        pd.setType("java.lang.Integer");
+        pd.getTypeDesc().setType("java.lang.Integer");
         pd.setMode(PropertyDesc.WRITE);
         cd2.setPropertyDesc(pd);
         pd = new PropertyDesc("param2");
-        pd.setType("java.lang.Integer");
+        pd.getTypeDesc().setType("java.lang.Integer");
         pd.setMode(PropertyDesc.READ);
         cd2.setPropertyDesc(pd);
         pd = new PropertyDesc("param3");
-        pd.setType("java.lang.Integer");
+        pd.getTypeDesc().setType("java.lang.Integer");
         cd2.setPropertyDesc(pd);
         pd = new PropertyDesc("param5");
-        pd.setType("java.lang.Integer[]");
+        pd.getTypeDesc().setType("java.lang.Integer[]");
         cd2.setPropertyDesc(pd);
         md = new MethodDesc("method");
-        md.setReturnType("java.lang.Integer");
+        md.getReturnTypeDesc().setType("java.lang.Integer");
         md.setBody("body");
         cd2.setMethodDesc(md);
 
@@ -54,25 +54,25 @@ public class ClassDescTest extends TestCase {
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
             .getPropertyDesc("param1").getMode());
         assertEquals("java.lang.Integer", actual.getPropertyDesc("param1")
-            .getType());
+            .getTypeDesc().getType());
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
             .getPropertyDesc("param2").getMode());
         assertEquals("java.lang.Integer", actual.getPropertyDesc("param2")
-            .getType());
+            .getTypeDesc().getType());
         assertEquals("java.lang.String", actual.getPropertyDesc("param3")
-            .getType());
+            .getTypeDesc().getType());
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
             .getPropertyDesc("param1").getMode());
-        assertTrue(actual.getPropertyDesc("param4").getTypeString().endsWith(
-            "[]"));
+        assertTrue(actual.getPropertyDesc("param4").getTypeDesc()
+            .getTypeString().endsWith("[]"));
         assertEquals("java.lang.Integer[]", actual.getPropertyDesc("param5")
-            .getType());
-        assertEquals("Integer", actual.getPropertyDesc("param6")
+            .getTypeDesc().getType());
+        assertEquals("Integer", actual.getPropertyDesc("param6").getTypeDesc()
             .getTypeString());
-        MethodDesc actualMd = actual.getMethodDesc("method");
+        MethodDesc actualMd = actual.getMethodDesc(new MethodDesc("method"));
         assertNotNull(actualMd);
         assertEquals("body", actualMd.getBody());
-        assertEquals("java.lang.Integer", actual.getMethodDesc("method")
-            .getReturnType());
+        assertEquals("java.lang.Integer", actual.getMethodDesc(
+            new MethodDesc("method")).getReturnTypeDesc().getType());
     }
 }

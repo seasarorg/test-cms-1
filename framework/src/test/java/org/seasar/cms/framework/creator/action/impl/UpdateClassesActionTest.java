@@ -9,6 +9,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.TypeDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImplTestBase;
 import org.seasar.framework.util.ResourceUtil;
 import org.seasar.kvasir.util.io.IOUtils;
@@ -38,17 +39,17 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         assertEquals(2, actual.getPropertyDescs().length);
         PropertyDesc pd = actual.getPropertyDesc("param1");
         assertNotNull(pd);
-        assertEquals("java.lang.String", pd.getType());
+        assertEquals("java.lang.String", pd.getTypeDesc().getType());
         assertTrue(pd.isReadable());
         assertFalse(pd.isWritable());
         pd = actual.getPropertyDesc("param2");
         assertNotNull(pd);
-        assertEquals("java.lang.Integer[]", pd.getType());
+        assertEquals("java.lang.Integer[]", pd.getTypeDesc().getType());
         assertFalse(pd.isReadable());
         assertTrue(pd.isWritable());
-        MethodDesc md = actual.getMethodDesc("_render");
+        MethodDesc md = actual.getMethodDesc(new MethodDesc("_render"));
         assertNotNull(md);
-        assertEquals("void", md.getReturnType());
+        assertEquals("void", md.getReturnTypeDesc().getType());
     }
 
     public void testWriteSourceFile1() throws Exception {
@@ -108,10 +109,11 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         assertEquals(2, actual.length);
         assertEquals("com.example.web.TestPage", actual[0].getName());
         assertEquals("com.example.dto.EntityDto", actual[1].getName());
-        MethodDesc md = actual[0].getMethodDesc("_get");
+        MethodDesc md = actual[0].getMethodDesc(new MethodDesc("_get"));
         assertNotNull(md);
-        assertNull(md.getDefaultReturnType());
-        assertNotNull(actual[0].getMethodDesc("_render"));
+        assertEquals(TypeDesc.TYPE_VOID, md.getReturnTypeDesc()
+            .getDefaultType());
+        assertNotNull(actual[0].getMethodDesc(new MethodDesc("_render")));
     }
 
     public void testShouldUpdate() throws Exception {

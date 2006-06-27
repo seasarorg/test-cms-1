@@ -55,7 +55,7 @@ public class AnalyzerContext extends ZptTemplateContext {
                 + "Dto";
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
-            pd.setDefaultType(dtoClassName_ + "[]");
+            pd.getTypeDesc().setDefaultType(dtoClassName_ + "[]");
         }
 
         return super.pushRepeatInfo(name, objs);
@@ -66,7 +66,7 @@ public class AnalyzerContext extends ZptTemplateContext {
         if (getClassDesc(dtoClassName_, false) == null) {
             PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
                 dtoCollectionName_);
-            pd.setDefaultType("java.lang.String[]");
+            pd.getTypeDesc().setDefaultType("java.lang.String[]");
         }
 
         dtoName_ = null;

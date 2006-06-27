@@ -6,6 +6,7 @@
   <include path="common.dicon" />
   <include path="j2ee.dicon" />
   <include path="dao.dicon" />
+  <include path="s2dxo.dicon" />
   <component
     class="org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer">
     <property name="rootPackageName">
@@ -34,6 +35,21 @@
                     <initMethod name="add"><arg>dao.interceptor</arg></initMethod>
                   </component>
                 </property>
+              </component>
+            </arg>
+          </initMethod>
+        </component>
+      </arg>
+    </initMethod>
+    <initMethod name="addCreator">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.creator.DxoCreator">
+           <initMethod name="addCustomizer">
+            <arg>
+              <component
+                class="org.seasar.framework.container.autoregister.AspectCustomizer" autoBinding="none">
+                <property name="interceptor">s2dxo.s2DxoIntereceptor</property>
               </component>
             </arg>
           </initMethod>

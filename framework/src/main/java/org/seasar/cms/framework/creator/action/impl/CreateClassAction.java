@@ -58,7 +58,7 @@ public class CreateClassAction extends AbstractUpdateAction {
         ClassDesc classDesc = new ClassDesc(className);
         MethodDesc methodDesc = new MethodDesc(getSourceCreator()
             .getActionName(request.getPath(), method));
-        methodDesc.setReturnType(String.class.getName());
+        methodDesc.getReturnTypeDesc().setType(String.class.getName());
         if (transition != null && transition.trim().length() > 0) {
             methodDesc.setBody("return " + quote(transition.trim()) + ";");
         }

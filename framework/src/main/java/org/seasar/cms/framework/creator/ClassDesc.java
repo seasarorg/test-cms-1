@@ -12,6 +12,8 @@ public class ClassDesc implements Cloneable {
 
     public static final String KIND_DAO = "Dao";
 
+    public static final String KIND_DXO = "Dxo";
+
     public static final String KIND_BEAN = "Bean";
 
     private static final String[] AUTODETECTED_KINDS = new String[] {
@@ -139,14 +141,14 @@ public class ClassDesc implements Cloneable {
         kind_ = kind;
     }
 
-    public MethodDesc getMethodDesc(String name) {
+    public MethodDesc getMethodDesc(MethodDesc methodDesc) {
 
-        return (MethodDesc) methodDescMap_.get(name);
+        return (MethodDesc) methodDescMap_.get(new MethodDescKey(methodDesc));
     }
 
     public void setMethodDesc(MethodDesc methodDesc) {
 
-        methodDescMap_.put(methodDesc.getName(), methodDesc);
+        methodDescMap_.put(new MethodDescKey(methodDesc), methodDesc);
     }
 
     public MethodDesc[] getMethodDescs() {
@@ -181,8 +183,9 @@ public class ClassDesc implements Cloneable {
                     setPropertyDesc((PropertyDesc) pds[i].clone());
                 }
             } else {
-                if (pd.getType() == null) {
-                    pd.setType(pds[i].getType());
+                TypeDesc typeDesc = pd.getTypeDesc();
+                if (typeDesc.getType() == null) {
+                    typeDesc.setType(pds[i].getTypeDesc().getType());
                 }
                 if (mergeMethod) {
                     pd.addMode(pds[i].getMode());
@@ -192,14 +195,16 @@ public class ClassDesc implements Cloneable {
 
         MethodDesc[] mds = classDesc.getMethodDescs();
         for (int i = 0; i < mds.length; i++) {
-            MethodDesc md = getMethodDesc(mds[i].getName());
+            MethodDesc md = getMethodDesc(mds[i]);
             if (md == null) {
                 if (mergeMethod) {
                     setMethodDesc((MethodDesc) mds[i].clone());
                 }
             } else {
-                if (md.getReturnType() == null) {
-                    md.setReturnType(mds[i].getReturnType());
+                TypeDesc returnTypeDesc = md.getReturnTypeDesc();
+                if (returnTypeDesc.getType() == null) {
+                    returnTypeDesc
+                        .setType(mds[i].getReturnTypeDesc().getType());
                 }
                 if (mergeMethod) {
                     md.setBody(mds[i].getBody());
@@ -208,5 +213,22 @@ public class ClassDesc implements Cloneable {
         }
 
         return this;
+    }
+
+    public boolean isValid() {
+
+        PropertyDesc[] pds = getPropertyDescs();
+        for (int i = 0; i < pds.length; i++) {
+            if (!pds[i].isValid()) {
+                return false;
+            }
+        }
+        MethodDesc[] mds = getMethodDescs();
+        for (int i = 0; i < mds.length; i++) {
+            if (!mds[i].isValid()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

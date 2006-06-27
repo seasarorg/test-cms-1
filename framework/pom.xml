@@ -98,6 +98,11 @@
       <version>1.0.35</version>
     </dependency>
     <dependency>
+      <groupId>org.seasar.dxo</groupId>
+      <artifactId>s2dxo</artifactId>
+      <version>1.0.0-RC1</version>
+    </dependency>
+    <dependency>
       <groupId>org.seasar.kvasir</groupId>
       <artifactId>kvasir-util</artifactId>
       <version>3.0.0-EA2</version>

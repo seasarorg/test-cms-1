@@ -52,7 +52,8 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
                 PropertyDesc propertyDesc = processParameterTag(
                     toAnalyzeContext(context), attrs, annotation);
                 if ("file".equals(type) && propertyDesc != null) {
-                    propertyDesc.setDefaultType(FormFile.class.getName());
+                    propertyDesc.getTypeDesc().setDefaultType(
+                        FormFile.class.getName());
                 }
             }
         } else if ("select".equals(name) || "textarea".equals(name)) {

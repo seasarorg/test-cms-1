@@ -14,7 +14,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         ClassDesc classDesc = new ClassDesc("com.example.page.TestPage");
         classDesc.setSuperclassName("com.example.page.SuperPage");
         PropertyDesc propertyDesc = new PropertyDesc("param1");
-        propertyDesc.setDefaultType("boolean");
+        propertyDesc.getTypeDesc().setDefaultType("boolean");
         propertyDesc.setMode(PropertyDesc.READ);
         classDesc.setPropertyDesc(propertyDesc);
         propertyDesc = new PropertyDesc("param2");
@@ -25,7 +25,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         classDesc.setPropertyDesc(propertyDesc);
         propertyDesc = new PropertyDesc("param4");
         propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
-        propertyDesc.setType("java.lang.Integer[]");
+        propertyDesc.getTypeDesc().setType("java.lang.Integer[]");
         classDesc.setPropertyDesc(propertyDesc);
 
         return classDesc;
@@ -47,7 +47,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         ClassDesc classDesc = prepareClassDesc();
         classDesc.setKind(ClassDesc.KIND_PAGE);
         MethodDesc methodDesc = new MethodDesc("_get");
-        methodDesc.setDefaultReturnType(String.class.getName());
+        methodDesc.getReturnTypeDesc().setDefaultType(String.class.getName());
         methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
         classDesc.setMethodDesc(methodDesc);
 
@@ -73,7 +73,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         ClassDesc classDesc = prepareClassDesc();
         classDesc.setKind(ClassDesc.KIND_PAGE);
         MethodDesc methodDesc = new MethodDesc("_get");
-        methodDesc.setDefaultReturnType(String.class.getName());
+        methodDesc.getReturnTypeDesc().setDefaultType(String.class.getName());
         methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
         classDesc.setMethodDesc(methodDesc);
 

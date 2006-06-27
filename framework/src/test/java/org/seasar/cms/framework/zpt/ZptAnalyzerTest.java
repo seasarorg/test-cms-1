@@ -75,7 +75,7 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(cd);
         assertNotNull(cd.getPropertyDesc("body"));
         assertNull("TemplateAnalyzerではリクエストメソッドのためのメソッド定義を生成しないこと", cd
-            .getMethodDesc("GET"));
+            .getMethodDesc(new MethodDesc("GET")));
     }
 
     public void testAnalyze2() throws Exception {
@@ -103,8 +103,9 @@ public class ZptAnalyzerTest extends TestCase {
         PropertyDesc pd = cd.getPropertyDesc("entities");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
-        assertNull(pd.getType());
-        assertEquals("com.example.dto.EntityDto[]", pd.getDefaultType());
+        assertNull(pd.getTypeDesc().getType());
+        assertEquals("com.example.dto.EntityDto[]", pd.getTypeDesc()
+            .getDefaultType());
         ClassDesc cd2 = getClassDescriptor("com.example.dto.EntityDto");
         assertNotNull(cd2);
         PropertyDesc pd2 = cd2.getPropertyDesc("content");
@@ -122,8 +123,8 @@ public class ZptAnalyzerTest extends TestCase {
         PropertyDesc pd = cd.getPropertyDesc("entities");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
-        assertNull(pd.getType());
-        assertEquals("java.lang.String[]", pd.getDefaultType());
+        assertNull(pd.getTypeDesc().getType());
+        assertEquals("java.lang.String[]", pd.getTypeDesc().getDefaultType());
     }
 
     public void testAnalyze5() throws Exception {
@@ -146,13 +147,14 @@ public class ZptAnalyzerTest extends TestCase {
         assertTrue(pd.isWritable());
         pd = cd.getPropertyDesc("file");
         assertNotNull(pd);
-        assertEquals(FormFile.class.getName(), pd.getDefaultType());
+        assertEquals(FormFile.class.getName(), pd.getTypeDesc()
+            .getDefaultType());
         assertNull(cd.getPropertyDesc("button"));
         assertNull(cd.getPropertyDesc("image"));
         assertNull(cd.getPropertyDesc("submit"));
-        MethodDesc md = cd.getMethodDesc("POST");
+        MethodDesc md = cd.getMethodDesc(new MethodDesc("POST"));
         assertNotNull(md);
-        assertEquals("void", md.getReturnTypeString());
+        assertEquals("void", md.getReturnTypeDesc().getTypeString());
     }
 
     public void testAnalyze6() throws Exception {
@@ -170,7 +172,7 @@ public class ZptAnalyzerTest extends TestCase {
 
         ClassDesc actual = getClassDescriptor("com.example.web.ActionPage");
         assertNotNull(actual);
-        MethodDesc md = actual.getMethodDesc("GET");
+        MethodDesc md = actual.getMethodDesc(new MethodDesc("GET"));
         assertNotNull(md);
         PropertyDesc pd = actual.getPropertyDesc("id");
         assertNotNull(pd);
@@ -182,7 +184,7 @@ public class ZptAnalyzerTest extends TestCase {
 
         ClassDesc actual = getClassDescriptor("com.example.web.ActionPage");
         assertNotNull(actual);
-        MethodDesc md = actual.getMethodDesc("GET");
+        MethodDesc md = actual.getMethodDesc(new MethodDesc("GET"));
         assertNotNull(md);
         PropertyDesc pd = actual.getPropertyDesc("id");
         assertNotNull(pd);

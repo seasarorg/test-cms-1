@@ -38,7 +38,7 @@ abstract public class SourceCreatorImplTestBase extends FrameworkTestCase {
     protected ClassDesc constructClassDesc() {
         ClassDesc classDesc = new ClassDesc("com.example.web.TestPage");
         PropertyDesc pd = new PropertyDesc("param1");
-        pd.setType("java.lang.String");
+        pd.getTypeDesc().setType(String.class.getName());
         pd.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
         classDesc.setPropertyDesc(pd);
         return classDesc;
