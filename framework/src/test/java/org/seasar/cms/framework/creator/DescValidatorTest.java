@@ -46,6 +46,14 @@ public class DescValidatorTest extends TestCase {
             public Response update(String path, String method, Request request) {
                 return null;
             }
+
+            public String getDaoPackageName() {
+                return null;
+            }
+
+            public String getDxoPackageName() {
+                return null;
+            }
         };
     }
 

@@ -3,9 +3,13 @@ package org.seasar.cms.framework.freemarker;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.EntityMetaData;
+import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.creator.SourceGenerator;
 
 import freemarker.cache.ClassTemplateLoader;
@@ -15,14 +19,26 @@ import freemarker.template.TemplateException;
 
 public class FreemarkerSourceGenerator implements SourceGenerator {
 
+    private SourceCreator sourceCreator_;
+
     public String generateGapSource(ClassDesc classDesc) {
 
-        return generateSource(classDesc.getKind() + ".java", classDesc);
+        return generateClassSource(classDesc.getKind() + ".java", classDesc);
     }
 
     public String generateBaseSource(ClassDesc classDesc) {
 
-        return generateSource(classDesc.getKind() + "Base.java", classDesc);
+        return generateClassSource(classDesc.getKind() + "Base.java", classDesc);
+    }
+
+    String generateClassSource(String templateName, ClassDesc classDesc) {
+
+        Map root = new HashMap();
+        root.put("classDesc", classDesc);
+        root.put("entityMetaData", new EntityMetaData(sourceCreator_, classDesc
+            .getName()));
+
+        return generateSource(templateName, root);
     }
 
     public String generateTemplateSource(String suffix, Object root) {
@@ -48,5 +64,10 @@ public class FreemarkerSourceGenerator implements SourceGenerator {
             throw new RuntimeException(ex);
         }
         return sw.toString();
+    }
+
+    public void setSourceCreator(SourceCreator sourceCreator) {
+
+        sourceCreator_ = sourceCreator;
     }
 }

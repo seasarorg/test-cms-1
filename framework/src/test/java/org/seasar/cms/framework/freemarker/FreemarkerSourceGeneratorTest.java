@@ -1,13 +1,66 @@
 package org.seasar.cms.framework.freemarker;
 
+import java.io.File;
+
 import org.seasar.cms.framework.FrameworkTestCase;
+import org.seasar.cms.framework.Request;
+import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.SourceCreator;
 
 public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
-    private FreemarkerSourceGenerator generator_ = new FreemarkerSourceGenerator();
+    private FreemarkerSourceGenerator target_;
+
+    protected void setUp() throws Exception {
+
+        super.setUp();
+        target_ = new FreemarkerSourceGenerator();
+        target_.setSourceCreator(new SourceCreator() {
+
+            public String getPagePackageName() {
+                return "com.example.web";
+            }
+
+            public String getDtoPackageName() {
+                return "com.example.dto";
+            }
+
+            public String getDaoPackageName() {
+                return "com.example.dao";
+            }
+
+            public String getDxoPackageName() {
+                return "com.example.dxo";
+            }
+
+            public String getComponentName(String path, String method) {
+                return null;
+            }
+
+            public String getActionName(String path, String method) {
+                return null;
+            }
+
+            public String getClassName(String componentName) {
+                return null;
+            }
+
+            public File getSourceFile(String className) {
+                return null;
+            }
+
+            public File getTemplateFile(String className) {
+                return null;
+            }
+
+            public Response update(String path, String method, Request request) {
+                return null;
+            }
+        });
+    }
 
     private ClassDesc prepareClassDesc() {
 
@@ -36,7 +89,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         ClassDesc classDesc = prepareClassDesc();
         classDesc.setName("com.example.dto.TestDto");
 
-        String actual = generator_.generateGapSource(classDesc);
+        String actual = target_.generateGapSource(classDesc);
 
         assertEquals(
             readResource(getClass(), "testGenerateGapSource.expected"), actual);
@@ -50,7 +103,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
         classDesc.setMethodDesc(methodDesc);
 
-        String actual = generator_.generateBaseSource(classDesc);
+        String actual = target_.generateBaseSource(classDesc);
 
         assertEquals(readResource(getClass(),
             "testGenerateBaseSource_Page.expected"), actual);
@@ -61,7 +114,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         ClassDesc classDesc = prepareClassDesc();
         classDesc.setName("com.example.dto.TestDto");
 
-        String actual = generator_.generateBaseSource(classDesc);
+        String actual = target_.generateBaseSource(classDesc);
 
         assertEquals(readResource(getClass(),
             "testGenerateBaseSource_Dto.expected"), actual);
@@ -75,7 +128,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
         classDesc.setMethodDesc(methodDesc);
 
-        String actual = generator_.generateGapSource(classDesc);
+        String actual = target_.generateGapSource(classDesc);
 
         assertEquals(readResource(getClass(),
             "testGenerateGapSource_Page.expected"), actual);

@@ -1,8 +1,8 @@
-<#if packageName != "">package ${packageName};</#if>
+<#if classDesc.packageName != "">package ${classDesc.packageName};</#if>
 
-public class ${shortName} extends ${shortName}Base
+public class ${classDesc.shortName} extends ${classDesc.shortName}Base
 {
-<#list methodDescs as methodDesc><#if methodDesc.body?exists>
+<#list classDesc.methodDescs as methodDesc><#if methodDesc.body?exists>
 
     public ${methodDesc.returnTypeDesc.name} ${methodDesc.name}()
     {

@@ -1,5 +1,8 @@
 package org.seasar.cms.framework.creator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 abstract public class AbstractTypeDesc implements Cloneable {
 
     protected static final String ARRAY_SUFFIX = "[]";
@@ -21,7 +24,24 @@ abstract public class AbstractTypeDesc implements Cloneable {
     private static final String[] AUTODETECTED_KINDS = new String[] {
         KIND_PAGE, KIND_DTO, KIND_DAO, KIND_DXO };
 
+    private static final Map defaultValueMap_;
+
+    private static final String NULL_VALUE = "null";
+
     abstract public String getName();
+
+    static {
+
+        defaultValueMap_ = new HashMap();
+        defaultValueMap_.put("byte", "0");
+        defaultValueMap_.put("short", "0");
+        defaultValueMap_.put("int", "0");
+        defaultValueMap_.put("long", "0");
+        defaultValueMap_.put("float", "0");
+        defaultValueMap_.put("double", "0");
+        defaultValueMap_.put("char", "0");
+        defaultValueMap_.put("boolean", "false");
+    }
 
     public Object clone() {
 
@@ -140,6 +160,21 @@ abstract public class AbstractTypeDesc implements Cloneable {
         } else {
             return Character.toLowerCase(string.charAt(0))
                 + string.substring(1);
+        }
+    }
+
+    public String getDefaultValue() {
+
+        return getDefaultValue(getName());
+    }
+
+    String getDefaultValue(String name) {
+
+        String value = (String) defaultValueMap_.get(name);
+        if (value != null) {
+            return value;
+        } else {
+            return NULL_VALUE;
         }
     }
 }

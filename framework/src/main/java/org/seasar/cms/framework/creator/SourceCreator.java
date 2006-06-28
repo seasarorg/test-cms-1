@@ -11,6 +11,10 @@ public interface SourceCreator {
 
     String getDtoPackageName();
 
+    String getDaoPackageName();
+
+    String getDxoPackageName();
+
     String getComponentName(String path, String method);
 
     String getActionName(String path, String method);

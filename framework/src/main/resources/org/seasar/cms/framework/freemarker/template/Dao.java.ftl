@@ -1,16 +1,16 @@
-<#if packageName != "">package ${packageName};</#if>
+<#if classDesc.packageName != "">package ${classDesc.packageName};</#if>
 
 import java.util.List;
 
-public interface ${shortName}
+public interface ${classDesc.shortName}
 {
-    Class BEAN = ${baseName}.class;
+    Class BEAN = ${entityMetaData.beanClassDesc.shortName}.class;
 
-    List get();
+    List select();
 
-    int insert(${baseName} ${baseName?uncap_first});
+    int insert(${entityMetaData.beanClassDesc.shortName} ${entityMetaData.beanClassDesc.instanceName});
 
-    int update(${baseName} ${baseName?uncap_first});
+    int update(${entityMetaData.beanClassDesc.shortName} ${entityMetaData.beanClassDesc.instanceName});
 
-    int delete(${baseName} ${baseName?uncap_first});
+    int delete(${entityMetaData.beanClassDesc.shortName} ${entityMetaData.beanClassDesc.instanceName});
 }

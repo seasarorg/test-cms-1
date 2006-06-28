@@ -1,12 +1,12 @@
-<#if packageName != "">package ${packageName};</#if>
+<#if classDesc.packageName != "">package ${classDesc.packageName};</#if>
 
-abstract public class ${shortName}Base<#if superclassName?exists> extends ${superclassName}</#if>
+abstract public class ${classDesc.shortName}Base<#if classDesc.superclassName?exists> extends ${classDesc.superclassName}</#if>
 {
-<#list propertyDescs as propertyDesc>
+<#list classDesc.propertyDescs as propertyDesc>
     protected ${propertyDesc.typeDesc.name} ${propertyDesc.name}_;
 
 </#list>
-<#list propertyDescs as propertyDesc>
+<#list classDesc.propertyDescs as propertyDesc>
 <#if propertyDesc.readable>
 
     public ${propertyDesc.typeDesc.name} <#if propertyDesc.typeDesc.name == "boolean">is<#else>get</#if>${propertyDesc.name?cap_first}()
@@ -22,11 +22,11 @@ abstract public class ${shortName}Base<#if superclassName?exists> extends ${supe
     }
 </#if>
 </#list>
-<#list methodDescs as methodDesc>
+<#list classDesc.methodDescs as methodDesc>
 
-    public ${methodDesc.returnTypeDesc.name} ${methodDesc.name}()
+    public ${methodDesc.returnTypeDesc.name} ${methodDesc.name}(<#list methodDesc.parameterTypeDescs as parameterTypeDesc>${parameterTypeDesc.name} ${parameterTypeDesc.argumentName}<#if parameterTypeDesc_has_next>, </#if></#list>)
     {
-        <#if methodDesc.returnTypeDesc.name != "void">return null;</#if>
+        <#if methodDesc.returnTypeDesc.name != "void">return ${methodDesc.returnTypeDesc.defaultValue};</#if>
     }
 </#list>
 }

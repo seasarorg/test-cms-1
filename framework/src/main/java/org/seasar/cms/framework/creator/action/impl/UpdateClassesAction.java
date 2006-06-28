@@ -22,6 +22,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.DescValidator;
+import org.seasar.cms.framework.creator.EntityMetaData;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.TypeDesc;
@@ -171,12 +172,12 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                     continue;
                 }
 
-                addPropertyIfValid(pageClassDescs[i], getSourceCreator()
-                    .getDaoPackageName()
-                    + "." + td.getBaseName() + "Dao", PropertyDesc.WRITE);
-                addPropertyIfValid(pageClassDescs[i], getSourceCreator()
-                    .getDxoPackageName()
-                    + "." + td.getBaseName() + "Dxo", PropertyDesc.WRITE);
+                EntityMetaData metaData = new EntityMetaData(
+                    getSourceCreator(), td.getName());
+                addPropertyIfValid(pageClassDescs[i], metaData.getDaoTypeDesc()
+                    .getName(), PropertyDesc.WRITE);
+                addPropertyIfValid(pageClassDescs[i], metaData.getDxoTypeDesc()
+                    .getName(), PropertyDesc.WRITE);
             }
         }
         writeSourceFiles(classDescBag, ClassDesc.KIND_PAGE, mergeMethod);
@@ -227,90 +228,28 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         }
     }
 
-    ClassDesc findClassDesc(Map classDescMap, String type) {
-
-        if (type.endsWith("[]")) {
-            type = type.substring(0, type.length() - "[]".length());
-        }
-        ClassDesc classDesc = (ClassDesc) classDescMap.get(type);
-        if (classDesc == null) {
-            classDesc = getClassDesc(type);
-        }
-        return classDesc;
-    }
-
     ClassDesc[] addRelativeClassDescs(ClassDesc[] classDescs) {
 
         List list = new ArrayList(Arrays.asList(classDescs));
         for (int i = 0; i < classDescs.length; i++) {
             if (ClassDesc.KIND_DTO.equals(classDescs[i].getKind())) {
 
+                EntityMetaData metaData = new EntityMetaData(
+                    getSourceCreator(), classDescs[i].getName());
+
                 // Dao、Bean用のClassDescを生成しておく。
 
-                ClassDesc classDesc = new ClassDesc(getSourceCreator()
-                    .getDaoPackageName()
-                    + "." + classDescs[i].getBaseName() + "Dao");
+                ClassDesc classDesc = new ClassDesc(metaData.getDaoTypeDesc()
+                    .getName());
                 list.add(classDesc);
 
                 classDesc = (ClassDesc) classDescs[i].clone();
-                classDesc.setName(getSourceCreator().getDaoPackageName() + "."
-                    + classDescs[i].getBaseName());
+                classDesc.setName(metaData.getBeanTypeDesc().getName());
                 list.add(classDesc);
 
                 // Dxo用のClassDescを生成しておく。
 
-                classDesc = new ClassDesc(getSourceCreator()
-                    .getDxoPackageName()
-                    + "." + classDescs[i].getBaseName() + "Dxo");
-
-                String beanClassName = getSourceCreator().getDaoPackageName()
-                    + "." + classDescs[i].getBaseName();
-                String dtoClassName = classDescs[i].getName();
-                String beanArrayClassName = beanClassName + "[]";
-                String dtoArrayClassName = dtoClassName + "[]";
-
-                MethodDesc md = new MethodDesc("convert");
-                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
-                    beanClassName) });
-                md.getReturnTypeDesc().setType(dtoClassName);
-                classDesc.setMethodDesc(md);
-
-                md = new MethodDesc("convert");
-                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
-                    dtoClassName) });
-                md.getReturnTypeDesc().setType(beanClassName);
-                classDesc.setMethodDesc(md);
-
-                md = new MethodDesc("convert");
-                md.setParameterTypeDescs(new TypeDesc[] {
-                    new TypeDesc(dtoClassName, "src"),
-                    new TypeDesc(beanClassName, "dest") });
-                classDesc.setMethodDesc(md);
-
-                md = new MethodDesc("convert");
-                md.setParameterTypeDescs(new TypeDesc[] {
-                    new TypeDesc(beanClassName, "src"),
-                    new TypeDesc(dtoClassName, "dest") });
-                classDesc.setMethodDesc(md);
-
-                md = new MethodDesc("convert");
-                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
-                    beanArrayClassName) });
-                md.getReturnTypeDesc().setType(dtoArrayClassName);
-                classDesc.setMethodDesc(md);
-
-                md = new MethodDesc("convert");
-                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
-                    List.class.getName()) });
-                md.getReturnTypeDesc().setType(dtoArrayClassName);
-                classDesc.setMethodDesc(md);
-
-                md = new MethodDesc("convert");
-                md.setParameterTypeDescs(new TypeDesc[] { new TypeDesc(
-                    dtoArrayClassName) });
-                md.getReturnTypeDesc().setType(beanArrayClassName);
-                classDesc.setMethodDesc(md);
-
+                classDesc = new ClassDesc(metaData.getDxoTypeDesc().getName());
                 list.add(classDesc);
             }
         }

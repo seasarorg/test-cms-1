@@ -90,7 +90,9 @@ abstract public class SourceCreatorImplTestBase extends FrameworkTestCase {
             .getCanonicalPath());
         target_.setWebappDirectoryPath(new File(ResourceUtil
             .getBuildDir(getClass()), "webapp").getCanonicalPath());
-        target_.setSourceGenerator(new FreemarkerSourceGenerator());
+        FreemarkerSourceGenerator sourceGenerator = new FreemarkerSourceGenerator();
+        sourceGenerator.setSourceCreator(target_);
+        target_.setSourceGenerator(sourceGenerator);
     }
 
     protected void tearDown() throws Exception {
