@@ -21,8 +21,6 @@ abstract public class AbstractTypeDesc implements Cloneable {
     private static final String[] AUTODETECTED_KINDS = new String[] {
         KIND_PAGE, KIND_DTO, KIND_DAO, KIND_DXO };
 
-    private String name_;
-
     abstract public String getName();
 
     public Object clone() {
