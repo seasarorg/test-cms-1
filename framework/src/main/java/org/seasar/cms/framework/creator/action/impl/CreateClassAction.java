@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.creator.BodyDesc;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
@@ -60,7 +61,8 @@ public class CreateClassAction extends AbstractUpdateAction {
             .getActionName(request.getPath(), method));
         methodDesc.getReturnTypeDesc().setType(String.class.getName());
         if (transition != null && transition.trim().length() > 0) {
-            methodDesc.setBody("return " + quote(transition.trim()) + ";");
+            methodDesc.setBodyDesc(new BodyDesc("return "
+                + quote(transition.trim()) + ";"));
         }
         classDesc.setMethodDesc(methodDesc);
 

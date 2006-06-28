@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.creator.BodyDesc;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
@@ -84,7 +85,8 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
         MethodDesc methodDesc = new MethodDesc(getSourceCreator()
             .getActionName(request.getPath(), method));
         methodDesc.getReturnTypeDesc().setType(String.class.getName());
-        methodDesc.setBody("return " + quote("redirect:" + redirectPath) + ";");
+        methodDesc.setBodyDesc(new BodyDesc("return "
+            + quote("redirect:" + redirectPath) + ";"));
         classDesc.setMethodDesc(methodDesc);
         classDesc.setMethodDesc(new MethodDesc(
             DefaultRequestProcessor.ACTION_RENDER));

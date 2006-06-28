@@ -8,7 +8,9 @@ public class MethodDesc implements Cloneable {
 
     private TypeDesc returnTypeDesc_ = new TypeDesc(TypeDesc.TYPE_VOID);
 
-    private String body_;
+    private BodyDesc bodyDesc_;
+
+    private String evaluatedBody_;
 
     public MethodDesc(String name) {
 
@@ -32,6 +34,9 @@ public class MethodDesc implements Cloneable {
         }
         if (returnTypeDesc_ != null) {
             cloned.returnTypeDesc_ = (TypeDesc) returnTypeDesc_.clone();
+        }
+        if (bodyDesc_ != null) {
+            cloned.bodyDesc_ = (BodyDesc) bodyDesc_.clone();
         }
 
         return cloned;
@@ -57,13 +62,23 @@ public class MethodDesc implements Cloneable {
         parameterTypeDescs_ = parameterTypeDescs;
     }
 
-    public String getBody() {
+    public BodyDesc getBodyDesc() {
 
-        return body_;
+        return bodyDesc_;
     }
 
-    public void setBody(String body) {
+    public void setBodyDesc(BodyDesc bodyDesc) {
 
-        body_ = body;
+        bodyDesc_ = bodyDesc;
+    }
+
+    public String getEvaluatedBody() {
+
+        return evaluatedBody_;
+    }
+
+    public void setEvaluatedBody(String evaluatedBody) {
+
+        evaluatedBody_ = evaluatedBody;
     }
 }

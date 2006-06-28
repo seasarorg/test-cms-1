@@ -5,6 +5,7 @@ import java.io.File;
 import org.seasar.cms.framework.FrameworkTestCase;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.creator.BodyDesc;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
@@ -100,7 +101,8 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         ClassDesc classDesc = prepareClassDesc();
         MethodDesc methodDesc = new MethodDesc("_get");
         methodDesc.getReturnTypeDesc().setDefaultType(String.class.getName());
-        methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
+        methodDesc.setBodyDesc(new BodyDesc(
+            "return \"redirect:/path/to/redirect.html\";"));
         classDesc.setMethodDesc(methodDesc);
 
         String actual = target_.generateBaseSource(classDesc);
@@ -125,12 +127,20 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         ClassDesc classDesc = prepareClassDesc();
         MethodDesc methodDesc = new MethodDesc("_get");
         methodDesc.getReturnTypeDesc().setDefaultType(String.class.getName());
-        methodDesc.setBody("return \"redirect:/path/to/redirect.html\";");
+        methodDesc.setBodyDesc(new BodyDesc(
+            "return \"redirect:/path/to/redirect.html\";"));
         classDesc.setMethodDesc(methodDesc);
 
         String actual = target_.generateGapSource(classDesc);
 
         assertEquals(readResource(getClass(),
             "testGenerateGapSource_Page.expected"), actual);
+    }
+
+    public void testGenerateSource_BodyDesc() throws Exception {
+
+        String actual = target_.generateSource(new BodyDesc("test"));
+
+        assertEquals("test", actual);
     }
 }

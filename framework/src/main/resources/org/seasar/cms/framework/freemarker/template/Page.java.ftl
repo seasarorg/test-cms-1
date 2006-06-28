@@ -2,11 +2,11 @@
 
 public class ${classDesc.shortName} extends ${classDesc.shortName}Base
 {
-<#list classDesc.methodDescs as methodDesc><#if methodDesc.body?exists>
+<#list classDesc.methodDescs as methodDesc><#if methodDesc.evaluatedBody?exists>
 
     public ${methodDesc.returnTypeDesc.name} ${methodDesc.name}()
     {
-        ${methodDesc.body?default("")}
+        ${methodDesc.evaluatedBody}
     }
 </#if></#list>
 }

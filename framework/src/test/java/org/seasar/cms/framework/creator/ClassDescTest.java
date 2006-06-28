@@ -43,7 +43,7 @@ public class ClassDescTest extends TestCase {
         cd2.setPropertyDesc(pd);
         md = new MethodDesc("method");
         md.getReturnTypeDesc().setType("java.lang.Integer");
-        md.setBody("body");
+        md.setBodyDesc(new BodyDesc("body"));
         cd2.setMethodDesc(md);
 
         ClassDesc actual = cd1.merge(cd2, true);
@@ -63,15 +63,15 @@ public class ClassDescTest extends TestCase {
             .getTypeDesc().getType());
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
             .getPropertyDesc("param1").getMode());
-        assertTrue(actual.getPropertyDesc("param4").getTypeDesc()
-            .getName().endsWith("[]"));
+        assertTrue(actual.getPropertyDesc("param4").getTypeDesc().getName()
+            .endsWith("[]"));
         assertEquals("java.lang.Integer[]", actual.getPropertyDesc("param5")
             .getTypeDesc().getType());
         assertEquals("Integer", actual.getPropertyDesc("param6").getTypeDesc()
             .getName());
         MethodDesc actualMd = actual.getMethodDesc(new MethodDesc("method"));
         assertNotNull(actualMd);
-        assertEquals("body", actualMd.getBody());
+        assertEquals("body", actualMd.getBodyDesc());
         assertEquals("java.lang.Integer", actual.getMethodDesc(
             new MethodDesc("method")).getReturnTypeDesc().getType());
     }

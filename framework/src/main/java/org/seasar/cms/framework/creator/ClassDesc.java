@@ -138,9 +138,9 @@ public class ClassDesc extends AbstractTypeDesc {
                 if (returnTypeDesc.getType() == null) {
                     returnTypeDesc
                         .setType(mds[i].getReturnTypeDesc().getType());
-                }
-                if (mergeMethod) {
-                    md.setBody(mds[i].getBody());
+                    if (mergeMethod) {
+                        md.setBodyDesc(mds[i].getBodyDesc());
+                    }
                 }
             }
         }

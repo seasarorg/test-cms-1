@@ -164,6 +164,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             // Dtoに触るようなプロパティを持っているなら
             // Dtoに対応するBeanに対応するDaoのsetterを自動生成する。
             // Dxoも自動生成する。
+            // _render()のボディも自動生成する。
             PropertyDesc[] pds = pageClassDescs[i].getPropertyDescs();
             for (int j = 0; j < pds.length; j++) {
                 TypeDesc td = pds[j].getTypeDesc();
@@ -178,6 +179,12 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                     .getName(), PropertyDesc.WRITE);
                 addPropertyIfValid(pageClassDescs[i], metaData.getDxoTypeDesc()
                     .getName(), PropertyDesc.WRITE);
+
+                MethodDesc md = pageClassDescs[i].getMethodDesc(new MethodDesc(
+                    DefaultRequestProcessor.ACTION_RENDER));
+                if (md != null) {
+                    addSelectStatementIfNecessary(md, td);
+                }
             }
         }
         writeSourceFiles(classDescBag, ClassDesc.KIND_PAGE, mergeMethod);
@@ -205,6 +212,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             .getCreatedClassDescs(ClassDesc.KIND_BEAN));
         return getSourceCreator().getResponseCreator().createResponse(
             "updateClasses_update", variableMap);
+    }
+
+    private void addSelectStatementIfNecessary(MethodDesc md, TypeDesc td) {
+        // TODO Auto-generated method stub
     }
 
     void addPropertyIfValid(ClassDesc classDesc, String className, int mode) {
@@ -302,8 +313,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         if (classDesc != null) {
             classDesc.setMethodDesc(new MethodDesc(getSourceCreator()
                 .getActionName(path, method)));
-            classDesc.setMethodDesc(new MethodDesc(
-                DefaultRequestProcessor.ACTION_RENDER));
+            MethodDesc methodDesc = new MethodDesc(
+                DefaultRequestProcessor.ACTION_RENDER);
+            // TODO RENDERのBODYを埋めよう。
+            classDesc.setMethodDesc(methodDesc);
         }
 
         return (ClassDesc[]) classDescriptorMap.values().toArray(

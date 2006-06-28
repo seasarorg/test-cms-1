@@ -7,4 +7,6 @@ public interface SourceGenerator {
     String generateBaseSource(ClassDesc classDesc);
 
     String generateTemplateSource(String suffix, Object root);
+
+    String generateSource(BodyDesc bodyDesc);
 }

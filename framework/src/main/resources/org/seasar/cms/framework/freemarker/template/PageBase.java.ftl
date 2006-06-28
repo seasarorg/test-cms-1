@@ -26,7 +26,7 @@ abstract public class ${classDesc.shortName}Base<#if classDesc.superclassName?ex
 
     public ${methodDesc.returnTypeDesc.name} ${methodDesc.name}(<#list methodDesc.parameterTypeDescs as parameterTypeDesc>${parameterTypeDesc.name} ${parameterTypeDesc.argumentName}<#if parameterTypeDesc_has_next>, </#if></#list>)
     {
-        <#if methodDesc.returnTypeDesc.name != "void">return ${methodDesc.returnTypeDesc.defaultValue};</#if>
+        <#if methodDesc.evaluatedBody?exists>${methodDesc.evaluatedBody}<#elseif methodDesc.returnTypeDesc.name != "void">return ${methodDesc.returnTypeDesc.defaultValue};</#if>
     }
 </#list>
 }
