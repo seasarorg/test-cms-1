@@ -1,5 +1,7 @@
 package org.seasar.cms.framework.creator;
 
+import java.util.Map;
+
 import junit.framework.TestCase;
 
 public class ClassDescTest extends TestCase {
@@ -71,7 +73,8 @@ public class ClassDescTest extends TestCase {
             .getName());
         MethodDesc actualMd = actual.getMethodDesc(new MethodDesc("method"));
         assertNotNull(actualMd);
-        assertEquals("body", actualMd.getBodyDesc());
+        assertEquals("body", ((Map) actualMd.getBodyDesc().getRoot())
+            .get("body"));
         assertEquals("java.lang.Integer", actual.getMethodDesc(
             new MethodDesc("method")).getReturnTypeDesc().getType());
     }

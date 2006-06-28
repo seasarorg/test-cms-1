@@ -43,6 +43,6 @@ abstract public class TestPageBase extends com.example.page.SuperPage
 
     public String _get()
     {
-        return null;
+        return "redirect:/path/to/redirect.html";
     }
 }

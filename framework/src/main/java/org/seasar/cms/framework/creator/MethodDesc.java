@@ -42,6 +42,19 @@ public class MethodDesc implements Cloneable {
         return cloned;
     }
 
+    public String toString() {
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(returnTypeDesc_).append(" ").append(name_).append("(");
+        String delim = "";
+        for (int i = 0; i < parameterTypeDescs_.length; i++) {
+            sb.append(delim).append(parameterTypeDescs_[i]);
+            delim = ", ";
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
     public String getName() {
 
         return name_;

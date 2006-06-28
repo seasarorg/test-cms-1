@@ -86,7 +86,7 @@ abstract public class AbstractTypeDesc implements Cloneable {
 
     public String toString() {
 
-        return "name=" + getName();
+        return getName();
     }
 
     public String getShortName() {

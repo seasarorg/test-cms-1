@@ -75,4 +75,9 @@ public class TypeDesc extends AbstractTypeDesc {
 
         argumentName_ = argumentName;
     }
+
+    public boolean isArray() {
+
+        return getName().endsWith(ARRAY_SUFFIX);
+    }
 }

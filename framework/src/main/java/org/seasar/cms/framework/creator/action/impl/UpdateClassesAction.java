@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.creator.BodyDesc;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.DescValidator;
 import org.seasar.cms.framework.creator.EntityMetaData;
@@ -175,15 +176,16 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
                 EntityMetaData metaData = new EntityMetaData(
                     getSourceCreator(), td.getName());
-                addPropertyIfValid(pageClassDescs[i], metaData.getDaoTypeDesc()
-                    .getName(), PropertyDesc.WRITE);
-                addPropertyIfValid(pageClassDescs[i], metaData.getDxoTypeDesc()
-                    .getName(), PropertyDesc.WRITE);
+                boolean daoExists = addPropertyIfValid(pageClassDescs[i],
+                    metaData.getDaoTypeDesc().getName(), PropertyDesc.WRITE);
+                boolean dxoExists = addPropertyIfValid(pageClassDescs[i],
+                    metaData.getDxoTypeDesc().getName(), PropertyDesc.WRITE);
 
                 MethodDesc md = pageClassDescs[i].getMethodDesc(new MethodDesc(
                     DefaultRequestProcessor.ACTION_RENDER));
-                if (md != null) {
-                    addSelectStatementIfNecessary(md, td);
+                if (md != null && td.isArray() && pds[j].isReadable()
+                    && daoExists && dxoExists) {
+                    addSelectStatement(md, pds[j], metaData);
                 }
             }
         }
@@ -214,16 +216,36 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             "updateClasses_update", variableMap);
     }
 
-    private void addSelectStatementIfNecessary(MethodDesc md, TypeDesc td) {
-        // TODO Auto-generated method stub
+    void addSelectStatement(MethodDesc methodDesc, PropertyDesc propertyDesc,
+        EntityMetaData metaData) {
+
+        BodyDesc bodyDesc = methodDesc.getBodyDesc();
+        Map root;
+        if (bodyDesc == null) {
+            root = new HashMap();
+            root.put("entityMetaData", metaData);
+            bodyDesc = new BodyDesc(DefaultRequestProcessor.ACTION_RENDER, root);
+        } else {
+            root = (Map) bodyDesc.getRoot();
+        }
+        List propertyDescList = (List) root.get("propertyDescs");
+        if (propertyDescList == null) {
+            propertyDescList = new ArrayList();
+            root.put("propertyDescs", propertyDescList);
+        }
+        propertyDescList.add(propertyDesc);
+        methodDesc.setBodyDesc(bodyDesc);
     }
 
-    void addPropertyIfValid(ClassDesc classDesc, String className, int mode) {
+    boolean addPropertyIfValid(ClassDesc classDesc, String className, int mode) {
 
         ClassDesc cd = new ClassDesc(className);
         if (DescValidator.isValid(new TypeDesc(className), getSourceCreator())) {
             classDesc.addProperty(cd.getInstanceName(), mode).getTypeDesc()
                 .setDefaultType(cd.getName());
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -315,7 +337,6 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 .getActionName(path, method)));
             MethodDesc methodDesc = new MethodDesc(
                 DefaultRequestProcessor.ACTION_RENDER);
-            // TODO RENDERのBODYを埋めよう。
             classDesc.setMethodDesc(methodDesc);
         }
 

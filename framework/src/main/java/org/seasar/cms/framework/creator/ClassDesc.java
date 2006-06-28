@@ -135,7 +135,9 @@ public class ClassDesc extends AbstractTypeDesc {
                 }
             } else {
                 TypeDesc returnTypeDesc = md.getReturnTypeDesc();
-                if (returnTypeDesc.getType() == null) {
+                if (!returnTypeDesc.getName().equals(
+                    mds[i].getReturnTypeDesc().getName())
+                    && returnTypeDesc.getType() == null) {
                     returnTypeDesc
                         .setType(mds[i].getReturnTypeDesc().getType());
                     if (mergeMethod) {
