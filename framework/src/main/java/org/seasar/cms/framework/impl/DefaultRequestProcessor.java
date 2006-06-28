@@ -70,7 +70,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         MatchedPathMapping matched = findMatchedPathMapping(path, method);
         if (matched == null) {
-            return new VoidResponse();
+            return PassthroughResponse.INSTANCE;
         }
         PathMapping mapping = matched.getPathMapping();
         VariableResolver resolver = matched.getVariableResolver();
