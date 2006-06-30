@@ -6,7 +6,7 @@ public interface ${classDesc.shortName}
 {
     Class BEAN = ${entityMetaData.beanTypeDesc.shortName}.class;
 
-    List select();
+    ${entityMetaData.beanTypeDesc.shortName}[] selectAll();
 
     int insert(${entityMetaData.beanTypeDesc.shortName} ${entityMetaData.beanTypeDesc.instanceName});
 
