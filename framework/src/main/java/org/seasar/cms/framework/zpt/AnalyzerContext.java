@@ -1,13 +1,14 @@
 package org.seasar.cms.framework.zpt;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
 
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
+
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.PropertyHolder;
+import org.seasar.cms.framework.creator.SourceCreator;
 
 public class AnalyzerContext extends ZptTemplateContext {
 
@@ -23,11 +24,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private String formActionPageClassName_;
 
-    private String dtoName_;
-
-    private String dtoCollectionName_;
-
-    private String dtoClassName_;
+    private Map propertyHolderMap_ = new HashMap();
 
     public AnalyzerContext() {
 
@@ -47,33 +44,29 @@ public class AnalyzerContext extends ZptTemplateContext {
     public RepeatInfo pushRepeatInfo(String name, Object[] objs) {
 
         if (objs != null && objs.length == 1
-            && objs[0] instanceof DummyRepeatObject) {
-            dtoName_ = name;
-            dtoCollectionName_ = ((DummyRepeatObject) objs[0]).getName();
-            dtoClassName_ = sourceCreator_.getDtoPackageName() + "."
-                + Character.toUpperCase(name.charAt(0)) + name.substring(1)
-                + "Dto";
-            PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
-                dtoCollectionName_);
-            pd.getTypeDesc().setDefaultType(dtoClassName_ + "[]");
+            && objs instanceof PropertyHolder.Property[]) {
+            PropertyHolder.Property property = (PropertyHolder.Property) objs[0];
+            PropertyHolder propertyHolder = getPropertyHolder(name);
+            property.setType(propertyHolder);
+            property.setArray(true);
         }
 
         return super.pushRepeatInfo(name, objs);
     }
 
-    public void popRepeatInfo(String name) {
+    public PropertyHolder getPropertyHolder(String name) {
+        return getPropertyHolder(name, true);
+    }
 
-        if (getClassDesc(dtoClassName_, false) == null) {
-            PropertyDesc pd = getPageClassDescriptor().getPropertyDesc(
-                dtoCollectionName_);
-            pd.getTypeDesc().setDefaultType("java.lang.String[]");
+    public PropertyHolder getPropertyHolder(String name, boolean create) {
+
+        PropertyHolder propertyHolder = (PropertyHolder) propertyHolderMap_
+            .get(name);
+        if (propertyHolder == null && create) {
+            propertyHolder = new PropertyHolder(name);
+            propertyHolderMap_.put(name, propertyHolder);
         }
-
-        dtoName_ = null;
-        dtoCollectionName_ = null;
-        dtoClassName_ = null;
-
-        super.popRepeatInfo(name);
+        return propertyHolder;
     }
 
     public String getMethod() {
@@ -144,15 +137,5 @@ public class AnalyzerContext extends ZptTemplateContext {
             classDescMap_.put(className, descriptor);
         }
         return descriptor;
-    }
-
-    public String getDtoName() {
-
-        return dtoName_;
-    }
-
-    public String getDtoClassName() {
-
-        return dtoClassName_;
     }
 }

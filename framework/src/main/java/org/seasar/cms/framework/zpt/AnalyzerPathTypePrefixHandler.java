@@ -1,13 +1,12 @@
 package org.seasar.cms.framework.zpt;
 
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
-import org.seasar.cms.framework.impl.DefaultRequestProcessor;
-
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.tales.PathTypePrefixHandler;
+
+import org.seasar.cms.framework.creator.PropertyHolder;
+import org.seasar.cms.framework.creator.SourceCreator;
+import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
 public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
 
@@ -23,18 +22,21 @@ public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
         SourceCreator sourceCreator = analyzerContext.getSourceCreator();
 
         if (DefaultRequestProcessor.ATTR_PAGE.equals(arg)) {
-            return new DummyObject(analyzerContext.getPageClassName(), false);
+            // 現在のPageオブジェクト。
+            return analyzerContext.getPropertyHolder(arg);
         }
 
         String className = sourceCreator.getClassName(arg);
         if (className != null
             && className.startsWith(sourceCreator.getPagePackageName() + ".")) {
-            return new DummyObject(className, false);
+            // 他のPageオブジェクト。
+            return analyzerContext.getPropertyHolder(arg);
         }
 
-        String dtoName = analyzerContext.getDtoName();
-        if (arg.equals(dtoName)) {
-            return new DummyObject(analyzerContext.getDtoClassName(), true);
+        PropertyHolder propertyHolder = analyzerContext.getPropertyHolder(arg,
+            false);
+        if (propertyHolder != null) {
+            return propertyHolder;
         }
 
         Object value = super.getProperty(context, varResolver, arg);
@@ -48,14 +50,24 @@ public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
     protected Object resolveSegment(TemplateContext context,
         VariableResolver varResolver, Object obj, String segment) {
 
-        if (obj instanceof DummyObject) {
-            DummyObject dummyObject = (DummyObject) obj;
-            int mode = (dummyObject.isDto() ? (PropertyDesc.READ | PropertyDesc.WRITE)
-                : PropertyDesc.READ);
-            ClassDesc classDesc = toAnalyzerContext(context).getClassDesc(
-                dummyObject.getClassName());
-            classDesc.addProperty(segment, mode);
-            return new Object[] { new DummyRepeatObject(segment) };
+        AnalyzerContext analyzerContext = toAnalyzerContext(context);
+
+        if (obj instanceof PropertyHolder) {
+            PropertyHolder propertyHolder = (PropertyHolder) obj;
+            PropertyHolder.Property property = new PropertyHolder.Property(
+                segment);
+            propertyHolder.addProperty(property);
+            return new PropertyHolder.Property[] { property };
+        } else if (obj instanceof PropertyHolder.Property[]) {
+            PropertyHolder.Property prevProperty = ((PropertyHolder.Property[]) obj)[0];
+            PropertyHolder propertyHolder = analyzerContext
+                .getPropertyHolder(prevProperty.getName());
+            prevProperty.setType(propertyHolder);
+
+            PropertyHolder.Property property = new PropertyHolder.Property(
+                segment);
+            propertyHolder.addProperty(property);
+            return new PropertyHolder.Property[] { property };
         } else {
             return super.resolveSegment(context, varResolver, obj, segment);
         }

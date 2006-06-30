@@ -20,6 +20,7 @@ import org.seasar.cms.framework.Path;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.PropertyHolder;
 import org.seasar.cms.framework.creator.SourceCreator;
 
 public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
@@ -138,13 +139,27 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         Map attrMap = evaluate(context, attrs);
         Attribute attr = (Attribute) attrMap.get("name");
         if (attr != null) {
-            // 最低限必要なのはWRITEだけだが、利便性を考えてREADも生成する
-            // ようにしている。
-            return context.getClassDesc(className).addProperty(
-                TagEvaluatorUtils.defilter(attr.getValue()),
-                PropertyDesc.WRITE | PropertyDesc.READ);
+            PropertyHolder propertyHolder = context.getPropertyHolder()
+            return addProperty(context, context.getSourceCreator().ClassDesc(className),
+                TagEvaluatorUtils.defilter(attr.getValue()));
         }
         return null;
+    }
+
+    PropertyDesc addProperty(AnalyzerContext context, ClassDesc classDesc,
+        String name) {
+
+        int dot = name.indexOf('.');
+        if (dot < 0) {
+            classDesc.get
+            // 最低限必要なのはWRITEだけだが、利便性を考えてREADも生成する
+            // ようにしている。
+            return classDesc.addProperty(name, PropertyDesc.READ
+                | PropertyDesc.WRITE);
+        } else {
+            classDesc.addProperty(name.substring(0, dot), PropertyDesc.READ);
+            return addProperty(context, classDesc, name.substring(dot + 1));
+        }
     }
 
     Map evaluate(ZptTemplateContext context, Attribute[] attrs) {
