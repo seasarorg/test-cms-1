@@ -24,6 +24,8 @@ public interface ClassDesc extends Cloneable {
 
     String getKind();
 
+    boolean isKindOf(String kind);
+
     String getBaseName();
 
     MethodDesc getMethodDesc(MethodDesc methodDesc);

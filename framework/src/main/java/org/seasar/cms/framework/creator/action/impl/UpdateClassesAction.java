@@ -25,14 +25,17 @@ import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.DescValidator;
 import org.seasar.cms.framework.creator.EntityMetaData;
 import org.seasar.cms.framework.creator.MethodDesc;
+import org.seasar.cms.framework.creator.ParameterDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.TypeDesc;
 import org.seasar.cms.framework.creator.impl.BodyDescImpl;
 import org.seasar.cms.framework.creator.impl.ClassDescImpl;
 import org.seasar.cms.framework.creator.impl.MethodDescImpl;
+import org.seasar.cms.framework.creator.impl.ParameterDescImpl;
 import org.seasar.cms.framework.creator.impl.PropertyDescImpl;
 import org.seasar.cms.framework.creator.impl.SimpleClassDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.framework.creator.impl.TypeDescImpl;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
 public class UpdateClassesAction extends AbstractUpdateAction {
@@ -182,9 +185,11 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 EntityMetaData metaData = new EntityMetaData(
                     getSourceCreator(), td.getName());
                 boolean daoExists = addPropertyIfValid(pageClassDescs[i],
-                    metaData.getDaoClassDesc().getName(), PropertyDesc.WRITE);
+                    new TypeDescImpl(metaData.getDaoClassDesc()),
+                    PropertyDesc.WRITE);
                 boolean dxoExists = addPropertyIfValid(pageClassDescs[i],
-                    metaData.getDxoClassDesc().getName(), PropertyDesc.WRITE);
+                    new TypeDescImpl(metaData.getDxoClassDesc()),
+                    PropertyDesc.WRITE);
 
                 MethodDesc md = pageClassDescs[i]
                     .getMethodDesc(new MethodDescImpl(
@@ -244,12 +249,11 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         methodDesc.setBodyDesc(bodyDesc);
     }
 
-    boolean addPropertyIfValid(ClassDesc classDesc, String className, int mode) {
+    boolean addPropertyIfValid(ClassDesc classDesc, TypeDesc typeDesc, int mode) {
 
-        if (DescValidator.isValidClassName(className, getSourceCreator())) {
-            ClassDesc cd = new SimpleClassDesc(className);
-            classDesc.addProperty(cd.getInstanceName(), mode).getTypeDesc()
-                .setClassDesc(cd);
+        if (DescValidator.isValid(typeDesc, getSourceCreator())) {
+            classDesc.addProperty(typeDesc.getInstanceName(), mode)
+                .setTypeDesc(typeDesc);
             return true;
         } else {
             return false;
@@ -270,15 +274,34 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
     ClassDesc[] addRelativeClassDescs(ClassDesc[] classDescs) {
 
-        List list = new ArrayList(Arrays.asList(classDescs));
+        Map pageByDtoMap = new HashMap();
         for (int i = 0; i < classDescs.length; i++) {
-            if (ClassDesc.KIND_DTO.equals(classDescs[i].getKind())) {
+            if (!classDescs[i].isKindOf(ClassDesc.KIND_PAGE)) {
+                continue;
+            }
+            PropertyDesc[] pds = classDescs[i].getPropertyDescs();
+            for (int j = 0; j < pds.length; j++) {
+                ClassDesc cd = pds[j].getTypeDesc().getClassDesc();
+                if (!cd.isKindOf(ClassDesc.KIND_DTO)) {
+                    continue;
+                }
+                List list = (List) pageByDtoMap.get(cd.getName());
+                if (list == null) {
+                    list = new ArrayList();
+                    pageByDtoMap.put(cd.getName(), list);
+                }
+                list.add(classDescs[i]);
+            }
+        }
 
+        List classDescList = new ArrayList(Arrays.asList(classDescs));
+        for (int i = 0; i < classDescs.length; i++) {
+            if (classDescs[i].isKindOf(ClassDesc.KIND_DTO)) {
                 EntityMetaData metaData = new EntityMetaData(
                     getSourceCreator(), classDescs[i].getName());
 
                 // Dao用のClassDescを生成しておく。
-                list.add(metaData.getDaoClassDesc());
+                classDescList.add(metaData.getDaoClassDesc());
 
                 // Bean用のClassDescを生成しておく。
                 ClassDesc classDesc = metaData.getBeanClassDesc();
@@ -286,14 +309,27 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 for (int j = 0; j < pds.length; j++) {
                     classDesc.setPropertyDesc((PropertyDesc) pds[i].clone());
                 }
-                list.add(classDesc);
+                classDescList.add(classDesc);
 
                 // Dxo用のClassDescを生成しておく。
-                list.add(metaData.getDxoClassDesc());
+                classDesc = metaData.getDxoClassDesc();
+                List list = (List) pageByDtoMap.get(classDescs[i].getName());
+                if (list != null) {
+                    for (Iterator itr = list.iterator(); itr.hasNext();) {
+                        MethodDescImpl md = new MethodDescImpl("convert");
+                        ParameterDesc[] pmds = new ParameterDesc[] { new ParameterDescImpl(
+                            new TypeDescImpl(((ClassDesc) itr.next()))) };
+                        md.setParameterDescs(pmds);
+                        md.setReturnTypeDesc(metaData.getBeanClassDesc()
+                            .getName());
+                        classDesc.setMethodDesc(md);
+                    }
+                }
+                classDescList.add(classDesc);
             }
         }
 
-        return (ClassDesc[]) list.toArray(new ClassDesc[0]);
+        return (ClassDesc[]) classDescList.toArray(new ClassDesc[0]);
     }
 
     ClassDescBag classifyClassDescs(ClassDesc[] classDescs) {

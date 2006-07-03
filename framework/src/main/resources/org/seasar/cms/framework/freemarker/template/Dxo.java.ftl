@@ -19,4 +19,8 @@ public interface ${classDesc.shortName}
     ${entityMetaData.dtoClassDesc.shortName}[] convert(List list);
 
     ${entityMetaData.beanClassDesc.shortName}[] convert(${entityMetaData.dtoClassDesc.shortName}[] ${entityMetaData.dtoClassDesc.instanceName}s);
+<#list classDesc.methodDescs as methodDesc>
+
+    ${methodDesc.returnTypeDesc.name} ${methodDesc.name}(<#list methodDesc.parameterDescs as parameterTypeDesc>${parameterTypeDesc.name} ${parameterTypeDesc.argumentName}<#if parameterDesc_has_next>, </#if></#list>);
+</#list>
 }

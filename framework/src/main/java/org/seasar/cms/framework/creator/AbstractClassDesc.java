@@ -31,6 +31,11 @@ abstract public class AbstractClassDesc implements ClassDesc {
         return KIND_BEAN;
     }
 
+    public boolean isKindOf(String kind) {
+
+        return kind.equals(getKind());
+    }
+
     public String toString() {
 
         return getName();

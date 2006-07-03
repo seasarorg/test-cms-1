@@ -4,16 +4,15 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.skirnir.freyja.VariableResolver;
-import net.skirnir.freyja.zpt.ZptTemplateContext;
-
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.creator.TypeDesc;
 import org.seasar.cms.framework.creator.impl.ClassDescImpl;
-import org.seasar.cms.framework.creator.impl.SimpleClassDesc;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
+
+import net.skirnir.freyja.VariableResolver;
+import net.skirnir.freyja.zpt.ZptTemplateContext;
 
 public class AnalyzerContext extends ZptTemplateContext {
 
@@ -152,13 +151,13 @@ public class AnalyzerContext extends ZptTemplateContext {
                 continue;
             } else {
                 // 中身のないDTOを型にもつプロパティについては、
-                // 型をStringに差し替える。（DTOかもしれないと考えて
+                // 型をデフォルトクラスに差し替える。（DTOかもしれないと考えて
                 // 解析を進めたが結局DTOであることが確定しなかったので。）
                 PropertyDesc[] pds = classDesc.getPropertyDescs();
                 for (int i = 0; i < pds.length; i++) {
                     if (isEmptyDto(pds[i].getTypeDesc().getClassDesc())) {
                         pds[i].getTypeDesc().setClassDesc(
-                            new SimpleClassDesc(String.class.getName()));
+                            TypeDesc.DEFAULT_CLASSDESC);
                     }
                 }
             }
