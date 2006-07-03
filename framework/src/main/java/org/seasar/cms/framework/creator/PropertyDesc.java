@@ -16,6 +16,10 @@ public interface PropertyDesc extends Cloneable {
 
     void setTypeDesc(TypeDesc typeDesc);
 
+    void setTypeDesc(String typeName);
+
+    void setTypeDesc(String typeName, boolean explicit);
+
     int getMode();
 
     void setMode(int mode);

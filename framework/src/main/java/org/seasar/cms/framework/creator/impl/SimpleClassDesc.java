@@ -1,6 +1,9 @@
 package org.seasar.cms.framework.creator.impl;
 
 import org.seasar.cms.framework.creator.AbstractClassDesc;
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.MethodDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
 
 public class SimpleClassDesc extends AbstractClassDesc {
 
@@ -8,12 +11,12 @@ public class SimpleClassDesc extends AbstractClassDesc {
 
     public SimpleClassDesc(String name) {
 
-        setName(name);
+        name_ = name;
     }
 
     public Object clone() {
 
-        return super.clone();
+        return this;
     }
 
     public String getName() {
@@ -23,6 +26,61 @@ public class SimpleClassDesc extends AbstractClassDesc {
 
     public void setName(String name) {
 
-        name_ = name;
+        throw new UnsupportedOperationException();
+    }
+
+    public MethodDesc[] getMethodDescs() {
+
+        return new MethodDesc[0];
+    }
+
+    public PropertyDesc[] getPropertyDescs() {
+
+        return new PropertyDesc[0];
+    }
+
+    public MethodDesc getMethodDesc(MethodDesc methodDesc) {
+
+        return null;
+    }
+
+    public void setPropertyDesc(PropertyDesc propertyDesc) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public PropertyDesc addProperty(String name, int mode) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public void merge(ClassDesc classDesc, boolean mergeMethod) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public void setMethodDesc(MethodDesc methodDesc) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public void setSuperclassName(String superclassName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public String getSuperclassName() {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isEmpty() {
+
+        return true;
+    }
+
+    public PropertyDesc getPropertyDesc(String name) {
+
+        return null;
     }
 }

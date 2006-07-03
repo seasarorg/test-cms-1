@@ -8,6 +8,12 @@ public interface MethodDesc extends Cloneable {
 
     TypeDesc getReturnTypeDesc();
 
+    void setReturnTypeDesc(TypeDesc typeDesc);
+
+    void setReturnTypeDesc(String typeName);
+
+    void setReturnTypeDesc(String typeName, boolean explicit);
+
     ParameterDesc[] getParameterDescs();
 
     void setParameterDescs(ParameterDesc[] parameterDescs);

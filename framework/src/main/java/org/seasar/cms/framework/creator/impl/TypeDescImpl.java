@@ -35,9 +35,20 @@ public class TypeDescImpl implements TypeDesc {
         defaultValueMap_.put("boolean", "false");
     }
 
-    public TypeDescImpl(String name) {
+    public TypeDescImpl() {
 
-        this(new SimpleClassDesc(getComponentName(name)), isArray(name));
+        this(DEFAULT_CLASSDESC);
+    }
+
+    public TypeDescImpl(String typeName) {
+
+        this(typeName, false);
+    }
+
+    public TypeDescImpl(String typeName, boolean explicit) {
+
+        this(new SimpleClassDesc(getComponentName(typeName)),
+            isArray(typeName), explicit);
     }
 
     public TypeDescImpl(ClassDesc classDesc) {
@@ -155,6 +166,9 @@ public class TypeDescImpl implements TypeDesc {
         } else {
             sb.append(name);
         }
+        if (array_) {
+            sb.append(ARRAY_SUFFIX);
+        }
         return sb.toString();
     }
 
@@ -170,6 +184,15 @@ public class TypeDescImpl implements TypeDesc {
             } else {
                 return NULL_VALUE;
             }
+        }
+    }
+
+    public String getInstanceName() {
+
+        if (array_) {
+            return classDesc_.getInstanceName() + "s";
+        } else {
+            return classDesc_.getInstanceName();
         }
     }
 }

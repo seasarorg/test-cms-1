@@ -1,6 +1,5 @@
 package org.seasar.cms.framework.creator;
 
-import org.seasar.cms.framework.creator.impl.ClassDescImpl;
 
 public class DescValidator {
 
@@ -9,24 +8,19 @@ public class DescValidator {
 
     public static boolean isValid(ClassDesc classDesc, SourceCreator creator) {
 
-        if (classDesc instanceof ClassDescImpl) {
-            ClassDescImpl impl = (ClassDescImpl) classDesc;
-            PropertyDesc[] pds = impl.getPropertyDescs();
-            for (int i = 0; i < pds.length; i++) {
-                if (!isValid(pds[i], creator)) {
-                    return false;
-                }
+        PropertyDesc[] pds = classDesc.getPropertyDescs();
+        for (int i = 0; i < pds.length; i++) {
+            if (!isValid(pds[i], creator)) {
+                return false;
             }
-            MethodDesc[] mds = impl.getMethodDescs();
-            for (int i = 0; i < mds.length; i++) {
-                if (!isValid(mds[i], creator)) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return true;
         }
+        MethodDesc[] mds = classDesc.getMethodDescs();
+        for (int i = 0; i < mds.length; i++) {
+            if (!isValid(mds[i], creator)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static boolean isValid(PropertyDesc propertyDesc,
@@ -57,7 +51,12 @@ public class DescValidator {
 
     public static boolean isValid(TypeDesc typeDesc, SourceCreator creator) {
 
-        String className = typeDesc.getClassDesc().getName();
+        return isValidClassName(typeDesc.getClassDesc().getName(), creator);
+    }
+
+    public static boolean isValidClassName(String className,
+        SourceCreator creator) {
+
         if (TypeDesc.TYPE_VOID.equals(className)) {
             return true;
         } else if (isPrimitive(className)) {

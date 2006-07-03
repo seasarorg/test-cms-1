@@ -1,6 +1,5 @@
 package org.seasar.cms.framework.creator;
 
-
 abstract public class AbstractClassDesc implements ClassDesc {
 
     private static final String[] AUTODETECTED_KINDS = new String[] {
@@ -81,6 +80,26 @@ abstract public class AbstractClassDesc implements ClassDesc {
             return "";
         } else {
             return name.substring(0, dot);
+        }
+    }
+
+    public String getInstanceName() {
+
+        return getInstanceName(getName());
+    }
+
+    String getInstanceName(String name) {
+
+        return uncapFirst(getShortName(name));
+    }
+
+    String uncapFirst(String string) {
+
+        if (string == null || string.length() == 0) {
+            return string;
+        } else {
+            return Character.toLowerCase(string.charAt(0))
+                + string.substring(1);
         }
     }
 }

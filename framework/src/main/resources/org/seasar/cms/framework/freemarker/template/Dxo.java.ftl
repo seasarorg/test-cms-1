@@ -1,22 +1,22 @@
 <#if classDesc.packageName != "">package ${classDesc.packageName};</#if>
 
 import java.util.List;
-import ${entityMetaData.beanTypeDesc.name};
-import ${entityMetaData.dtoTypeDesc.name};
+import ${entityMetaData.beanClassDesc.name};
+import ${entityMetaData.dtoClassDesc.name};
 
 public interface ${classDesc.shortName}
 {
-    ${entityMetaData.dtoTypeDesc.shortName} convert(${entityMetaData.beanTypeDesc.shortName} ${entityMetaData.beanTypeDesc.instanceName});
+    ${entityMetaData.dtoClassDesc.shortName} convert(${entityMetaData.beanClassDesc.shortName} ${entityMetaData.beanClassDesc.instanceName});
 
-    ${entityMetaData.beanTypeDesc.shortName} convert(${entityMetaData.dtoTypeDesc.shortName} ${entityMetaData.dtoTypeDesc.instanceName});
+    ${entityMetaData.beanClassDesc.shortName} convert(${entityMetaData.dtoClassDesc.shortName} ${entityMetaData.dtoClassDesc.instanceName});
 
-    void convert(${entityMetaData.dtoTypeDesc.shortName} src, ${entityMetaData.beanTypeDesc.shortName} dest);
+    void convert(${entityMetaData.dtoClassDesc.shortName} src, ${entityMetaData.beanClassDesc.shortName} dest);
 
-    void convert(${entityMetaData.beanTypeDesc.shortName} src, ${entityMetaData.dtoTypeDesc.shortName} dest);
+    void convert(${entityMetaData.beanClassDesc.shortName} src, ${entityMetaData.dtoClassDesc.shortName} dest);
 
-    ${entityMetaData.dtoTypeDesc.shortName}[] convert(${entityMetaData.beanTypeDesc.shortName}[] ${entityMetaData.beanTypeDesc.instanceName}s);
+    ${entityMetaData.dtoClassDesc.shortName}[] convert(${entityMetaData.beanClassDesc.shortName}[] ${entityMetaData.beanClassDesc.instanceName}s);
 
-    ${entityMetaData.dtoTypeDesc.shortName}[] convert(List list);
+    ${entityMetaData.dtoClassDesc.shortName}[] convert(List list);
 
-    ${entityMetaData.beanTypeDesc.shortName}[] convert(${entityMetaData.dtoTypeDesc.shortName}[] ${entityMetaData.dtoTypeDesc.instanceName}s);
+    ${entityMetaData.beanClassDesc.shortName}[] convert(${entityMetaData.dtoClassDesc.shortName}[] ${entityMetaData.dtoClassDesc.instanceName}s);
 }

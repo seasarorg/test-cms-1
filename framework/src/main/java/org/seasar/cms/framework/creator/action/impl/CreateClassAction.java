@@ -6,9 +6,12 @@ import java.util.Map;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.creator.BodyDesc;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
+import org.seasar.cms.framework.creator.impl.BodyDescImpl;
+import org.seasar.cms.framework.creator.impl.ClassDescImpl;
+import org.seasar.cms.framework.creator.impl.MethodDescImpl;
+import org.seasar.cms.framework.creator.impl.SimpleClassDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 public class CreateClassAction extends AbstractUpdateAction {
@@ -56,12 +59,13 @@ public class CreateClassAction extends AbstractUpdateAction {
 
         String transition = request.getParameter(PARAM_TRANSITION);
 
-        ClassDesc classDesc = new ClassDesc(className);
-        MethodDesc methodDesc = new MethodDesc(getSourceCreator()
+        ClassDesc classDesc = new ClassDescImpl(className);
+        MethodDesc methodDesc = new MethodDescImpl(getSourceCreator()
             .getActionName(request.getPath(), method));
-        methodDesc.getReturnTypeDesc().setType(String.class.getName());
+        methodDesc.getReturnTypeDesc().setClassDesc(
+            new SimpleClassDesc(String.class.getName()));
         if (transition != null && transition.trim().length() > 0) {
-            methodDesc.setBodyDesc(new BodyDesc("return "
+            methodDesc.setBodyDesc(new BodyDescImpl("return "
                 + quote(transition.trim()) + ";"));
         }
         classDesc.setMethodDesc(methodDesc);

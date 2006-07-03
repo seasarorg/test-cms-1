@@ -52,6 +52,16 @@ public class PropertyDescImpl implements PropertyDesc, Cloneable {
         typeDesc_ = typeDesc;
     }
 
+    public void setTypeDesc(String typeName) {
+
+        setTypeDesc(typeName, false);
+    }
+
+    public void setTypeDesc(String typeName, boolean explicit) {
+
+        setTypeDesc(new TypeDescImpl(typeName, explicit));
+    }
+
     public int getMode() {
 
         return mode_;

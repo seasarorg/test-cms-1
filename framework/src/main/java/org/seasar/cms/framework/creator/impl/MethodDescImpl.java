@@ -11,8 +11,7 @@ public class MethodDescImpl implements MethodDesc {
 
     private ParameterDesc[] parameterDescs_ = new ParameterDesc[0];
 
-    private TypeDesc returnTypeDesc_ = new TypeDescImpl(new SimpleClassDesc(
-        TypeDesc.TYPE_VOID));
+    private TypeDesc returnTypeDesc_ = new TypeDescImpl(TypeDesc.TYPE_VOID);
 
     private BodyDesc bodyDesc_;
 
@@ -69,6 +68,21 @@ public class MethodDescImpl implements MethodDesc {
     public TypeDesc getReturnTypeDesc() {
 
         return returnTypeDesc_;
+    }
+
+    public void setReturnTypeDesc(TypeDesc returnTypeDesc) {
+
+        returnTypeDesc_ = returnTypeDesc;
+    }
+
+    public void setReturnTypeDesc(String typeName) {
+
+        setReturnTypeDesc(typeName, false);
+    }
+
+    public void setReturnTypeDesc(String typeName, boolean explicit) {
+
+        setReturnTypeDesc(new TypeDescImpl(typeName, explicit));
     }
 
     public ParameterDesc[] getParameterDescs() {

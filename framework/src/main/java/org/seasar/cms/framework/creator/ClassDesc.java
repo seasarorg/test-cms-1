@@ -20,7 +20,33 @@ public interface ClassDesc extends Cloneable {
 
     String getShortName();
 
+    String getInstanceName();
+
     String getKind();
 
     String getBaseName();
+
+    MethodDesc getMethodDesc(MethodDesc methodDesc);
+
+    MethodDesc[] getMethodDescs();
+
+    PropertyDesc getPropertyDesc(String name);
+
+    PropertyDesc[] getPropertyDescs();
+
+    void setPropertyDesc(PropertyDesc propertyDesc);
+
+    PropertyDesc addProperty(String name, int mode);
+
+    void merge(ClassDesc classDesc, boolean mergeMethod);
+
+    void setName(String name);
+
+    void setMethodDesc(MethodDesc methodDesc);
+
+    void setSuperclassName(String superclassName);
+
+    String getSuperclassName();
+
+    boolean isEmpty();
 }

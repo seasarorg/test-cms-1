@@ -5,11 +5,14 @@ import java.io.File;
 import org.seasar.cms.framework.FrameworkTestCase;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.creator.BodyDesc;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
+import org.seasar.cms.framework.creator.impl.BodyDescImpl;
+import org.seasar.cms.framework.creator.impl.ClassDescImpl;
+import org.seasar.cms.framework.creator.impl.MethodDescImpl;
+import org.seasar.cms.framework.creator.impl.PropertyDescImpl;
 
 public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
@@ -65,21 +68,21 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
     private ClassDesc prepareClassDesc() {
 
-        ClassDesc classDesc = new ClassDesc("com.example.page.TestPage");
+        ClassDesc classDesc = new ClassDescImpl("com.example.page.TestPage");
         classDesc.setSuperclassName("com.example.page.SuperPage");
-        PropertyDesc propertyDesc = new PropertyDesc("param1");
-        propertyDesc.getTypeDesc().setDefaultName("boolean");
+        PropertyDesc propertyDesc = new PropertyDescImpl("param1");
+        propertyDesc.setTypeDesc("boolean");
         propertyDesc.setMode(PropertyDesc.READ);
         classDesc.setPropertyDesc(propertyDesc);
-        propertyDesc = new PropertyDesc("param2");
+        propertyDesc = new PropertyDescImpl("param2");
         propertyDesc.setMode(PropertyDesc.WRITE);
         classDesc.setPropertyDesc(propertyDesc);
-        propertyDesc = new PropertyDesc("param3");
+        propertyDesc = new PropertyDescImpl("param3");
         propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
         classDesc.setPropertyDesc(propertyDesc);
-        propertyDesc = new PropertyDesc("param4");
+        propertyDesc = new PropertyDescImpl("param4");
         propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
-        propertyDesc.getTypeDesc().setType("java.lang.Integer[]");
+        propertyDesc.setTypeDesc("java.lang.Integer[]", true);
         classDesc.setPropertyDesc(propertyDesc);
 
         return classDesc;
@@ -99,9 +102,9 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
     public void testGenerateBaseSource_Page() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
-        MethodDesc methodDesc = new MethodDesc("_get");
-        methodDesc.getReturnTypeDesc().setDefaultName(String.class.getName());
-        methodDesc.setBodyDesc(new BodyDesc(
+        MethodDesc methodDesc = new MethodDescImpl("_get");
+        methodDesc.setReturnTypeDesc(String.class.getName());
+        methodDesc.setBodyDesc(new BodyDescImpl(
             "return \"redirect:/path/to/redirect.html\";"));
         classDesc.setMethodDesc(methodDesc);
 
@@ -125,9 +128,9 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
     public void testGenerateGapSource_Page() throws Exception {
 
         ClassDesc classDesc = prepareClassDesc();
-        MethodDesc methodDesc = new MethodDesc("_get");
-        methodDesc.getReturnTypeDesc().setDefaultName(String.class.getName());
-        methodDesc.setBodyDesc(new BodyDesc(
+        MethodDesc methodDesc = new MethodDescImpl("_get");
+        methodDesc.setReturnTypeDesc(String.class.getName());
+        methodDesc.setBodyDesc(new BodyDescImpl(
             "return \"redirect:/path/to/redirect.html\";"));
         classDesc.setMethodDesc(methodDesc);
 
@@ -139,7 +142,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
     public void testGenerateSource_BodyDesc() throws Exception {
 
-        String actual = target_.generateSource(new BodyDesc("test"));
+        String actual = target_.generateSource(new BodyDescImpl("test"));
 
         assertEquals("test", actual);
     }

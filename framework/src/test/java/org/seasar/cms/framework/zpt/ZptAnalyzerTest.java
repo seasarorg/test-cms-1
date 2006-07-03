@@ -10,6 +10,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.impl.MethodDescImpl;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 public class ZptAnalyzerTest extends TestCase {
@@ -62,7 +63,7 @@ public class ZptAnalyzerTest extends TestCase {
             "UTF-8", CLASSNAME);
     }
 
-    private ClassDesc getClassDescriptor(String name) {
+    private ClassDesc getClassDesc(String name) {
 
         return (ClassDesc) classDescriptorMap_.get(name);
     }
@@ -71,23 +72,23 @@ public class ZptAnalyzerTest extends TestCase {
 
         act("testAnalyze1");
 
-        ClassDesc cd = getClassDescriptor(CLASSNAME);
+        ClassDesc cd = getClassDesc(CLASSNAME);
         assertNotNull(cd);
         assertNotNull(cd.getPropertyDesc("body"));
         assertNull("TemplateAnalyzerではリクエストメソッドのためのメソッド定義を生成しないこと", cd
-            .getMethodDesc(new MethodDesc("GET")));
+            .getMethodDesc(new MethodDescImpl("GET")));
     }
 
     public void testAnalyze2() throws Exception {
 
         act("testAnalyze2");
 
-        ClassDesc cd = getClassDescriptor(CLASSNAME);
+        ClassDesc cd = getClassDesc(CLASSNAME);
         assertNotNull(cd);
         PropertyDesc pd = cd.getPropertyDesc("text");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
-        ClassDesc cd2 = getClassDescriptor("com.example.web.ActionPage");
+        ClassDesc cd2 = getClassDesc("com.example.web.ActionPage");
         assertNotNull(cd2);
         PropertyDesc pd2 = cd2.getPropertyDesc("text");
         assertNotNull(pd2);
@@ -98,15 +99,14 @@ public class ZptAnalyzerTest extends TestCase {
 
         act("testAnalyze3");
 
-        ClassDesc cd = getClassDescriptor(CLASSNAME);
+        ClassDesc cd = getClassDesc(CLASSNAME);
         assertNotNull(cd);
         PropertyDesc pd = cd.getPropertyDesc("entities");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
-        assertNull(pd.getTypeDesc().getType());
-        assertEquals("com.example.dto.EntityDto[]", pd.getTypeDesc()
-            .getDefaultName());
-        ClassDesc cd2 = getClassDescriptor("com.example.dto.EntityDto");
+        assertFalse(pd.getTypeDesc().isExplicit());
+        assertEquals("com.example.dto.EntityDto[]", pd.getTypeDesc().getName());
+        ClassDesc cd2 = getClassDesc("com.example.dto.EntityDto");
         assertNotNull(cd2);
         PropertyDesc pd2 = cd2.getPropertyDesc("content");
         assertNotNull(pd2);
@@ -118,20 +118,20 @@ public class ZptAnalyzerTest extends TestCase {
 
         act("testAnalyze4");
 
-        ClassDesc cd = getClassDescriptor(CLASSNAME);
+        ClassDesc cd = getClassDesc(CLASSNAME);
         assertNotNull(cd);
         PropertyDesc pd = cd.getPropertyDesc("entities");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
-        assertNull(pd.getTypeDesc().getType());
-        assertEquals("java.lang.String[]", pd.getTypeDesc().getDefaultName());
+        assertFalse(pd.getTypeDesc().isExplicit());
+        assertEquals("String[]", pd.getTypeDesc().getName());
     }
 
     public void testAnalyze5() throws Exception {
 
         act("testAnalyze5");
 
-        ClassDesc cd = getClassDescriptor("com.example.web.UpdatePage");
+        ClassDesc cd = getClassDesc("com.example.web.UpdatePage");
         assertNotNull(cd);
         PropertyDesc pd = cd.getPropertyDesc("text");
         assertNotNull(pd);
@@ -147,12 +147,11 @@ public class ZptAnalyzerTest extends TestCase {
         assertTrue(pd.isWritable());
         pd = cd.getPropertyDesc("file");
         assertNotNull(pd);
-        assertEquals(FormFile.class.getName(), pd.getTypeDesc()
-            .getDefaultName());
+        assertEquals(FormFile.class.getName(), pd.getTypeDesc().getName());
         assertNull(cd.getPropertyDesc("button"));
         assertNull(cd.getPropertyDesc("image"));
         assertNull(cd.getPropertyDesc("submit"));
-        MethodDesc md = cd.getMethodDesc(new MethodDesc("POST"));
+        MethodDesc md = cd.getMethodDesc(new MethodDescImpl("POST"));
         assertNotNull(md);
         assertEquals("void", md.getReturnTypeDesc().getName());
     }
@@ -161,7 +160,7 @@ public class ZptAnalyzerTest extends TestCase {
 
         act("testAnalyze6");
 
-        ClassDesc cd = getClassDescriptor("com.example.web.TestPage");
+        ClassDesc cd = getClassDesc("com.example.web.TestPage");
         assertNotNull("コンポーネント名が指定されている場合は対応するクラスのためのClassDescを生成すること", cd);
         assertNotNull(cd.getPropertyDesc("body"));
     }
@@ -170,9 +169,9 @@ public class ZptAnalyzerTest extends TestCase {
 
         act("testAnalyze7");
 
-        ClassDesc actual = getClassDescriptor("com.example.web.ActionPage");
+        ClassDesc actual = getClassDesc("com.example.web.ActionPage");
         assertNotNull(actual);
-        MethodDesc md = actual.getMethodDesc(new MethodDesc("GET"));
+        MethodDesc md = actual.getMethodDesc(new MethodDescImpl("GET"));
         assertNotNull(md);
         PropertyDesc pd = actual.getPropertyDesc("id");
         assertNotNull(pd);
@@ -182,9 +181,9 @@ public class ZptAnalyzerTest extends TestCase {
 
         act("testAnalyze8");
 
-        ClassDesc actual = getClassDescriptor("com.example.web.ActionPage");
+        ClassDesc actual = getClassDesc("com.example.web.ActionPage");
         assertNotNull(actual);
-        MethodDesc md = actual.getMethodDesc(new MethodDesc("GET"));
+        MethodDesc md = actual.getMethodDesc(new MethodDescImpl("GET"));
         assertNotNull(md);
         PropertyDesc pd = actual.getPropertyDesc("id");
         assertNotNull(pd);

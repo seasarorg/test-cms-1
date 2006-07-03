@@ -48,32 +48,12 @@ public class ParameterDescImpl implements ParameterDesc {
         if (name_ != null) {
             return name_;
         } else {
-            return getInstanceName();
+            return getTypeDesc().getInstanceName();
         }
     }
 
     public void setName(String name) {
 
         name_ = name;
-    }
-
-    String getInstanceName() {
-
-        String shortName = typeDesc_.getClassDesc().getShortName();
-        if (typeDesc_.isArray()) {
-            return uncapFirst(shortName) + "s";
-        } else {
-            return uncapFirst(shortName);
-        }
-    }
-
-    String uncapFirst(String string) {
-
-        if (string == null || string.length() == 0) {
-            return string;
-        } else {
-            return Character.toLowerCase(string.charAt(0))
-                + string.substring(1);
-        }
     }
 }

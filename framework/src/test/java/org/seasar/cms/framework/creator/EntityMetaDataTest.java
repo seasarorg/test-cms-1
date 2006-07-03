@@ -50,7 +50,7 @@ public class EntityMetaDataTest extends TestCase {
         public Response update(String path, String method, Request request) {
             return null;
         }
-    }, "com.example.dto.TestDto");;
+    }, "com.example.dto.TestDto");
 
     public void testGetEntityName() throws Exception {
 
@@ -64,45 +64,45 @@ public class EntityMetaDataTest extends TestCase {
 
     }
 
-    public void testGetDtoTypeDesc() throws Exception {
+    public void testGetDtoClassDesc() throws Exception {
 
         // ## Arrange ##
 
         // ## Act ##
-        TypeDesc actual = target_.getDtoTypeDesc();
+        ClassDesc actual = target_.getDtoClassDesc();
 
         // ## Assert ##
         assertEquals("com.example.dto.TestDto", actual.getName());
     }
 
-    public void testGetBeanTypeDesc() throws Exception {
+    public void testGetBeanClassDesc() throws Exception {
 
         // ## Arrange ##
 
         // ## Act ##
-        TypeDesc actual = target_.getBeanTypeDesc();
+        ClassDesc actual = target_.getBeanClassDesc();
 
         // ## Assert ##
         assertEquals("com.example.dao.Test", actual.getName());
     }
 
-    public void testGetDaoTypeDesc() throws Exception {
+    public void testGetDaoClassDesc() throws Exception {
 
         // ## Arrange ##
 
         // ## Act ##
-        TypeDesc actual = target_.getDaoTypeDesc();
+        ClassDesc actual = target_.getDaoClassDesc();
 
         // ## Assert ##
         assertEquals("com.example.dao.TestDao", actual.getName());
     }
 
-    public void testGetDxoTypeDesc() throws Exception {
+    public void testGetDxoClassDesc() throws Exception {
 
         // ## Arrange ##
 
         // ## Act ##
-        TypeDesc actual = target_.getDxoTypeDesc();
+        ClassDesc actual = target_.getDxoClassDesc();
 
         // ## Assert ##
         assertEquals("com.example.dxo.TestDxo", actual.getName());

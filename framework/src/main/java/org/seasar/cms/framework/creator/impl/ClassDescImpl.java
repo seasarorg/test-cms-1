@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.seasar.cms.framework.creator.AbstractClassDesc;
+import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.MethodDescKey;
 import org.seasar.cms.framework.creator.PropertyDesc;
@@ -106,10 +107,10 @@ public class ClassDescImpl extends AbstractClassDesc {
         superclassName_ = superclassName;
     }
 
-    public ClassDescImpl merge(ClassDescImpl classDesc, boolean mergeMethod) {
+    public void merge(ClassDesc classDesc, boolean mergeMethod) {
 
         if (classDesc == null) {
-            return this;
+            return;
         }
 
         setSuperclassName(classDesc.getSuperclassName());
@@ -151,8 +152,6 @@ public class ClassDescImpl extends AbstractClassDesc {
                 }
             }
         }
-
-        return this;
     }
 
     public boolean isEmpty() {

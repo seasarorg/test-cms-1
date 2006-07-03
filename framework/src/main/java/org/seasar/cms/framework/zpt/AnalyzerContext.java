@@ -48,14 +48,12 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public RepeatInfo pushRepeatInfo(String name, Object[] objs) {
 
-        //TODO 書こう。
-        //        if (objs != null && objs.length == 1
-        //            && objs instanceof PropertyHolder.Property[]) {
-        //            PropertyHolder.Property property = (PropertyHolder.Property) objs[0];
-        //            PropertyHolder propertyHolder = getPropertyHolder(name);
-        //            property.setType(propertyHolder);
-        //            property.setArray(true);
-        //        }
+        if (objs != null && objs.length == 1 && objs[0] instanceof PropertyDesc) {
+            PropertyDesc propertyDesc = (PropertyDesc) objs[0];
+            TypeDesc typeDesc = propertyDesc.getTypeDesc();
+            typeDesc.setArray(true);
+            typeDesc.setClassDesc(getTemporaryClassDesc(name));
+        }
 
         return super.pushRepeatInfo(name, objs);
     }
@@ -80,14 +78,13 @@ public class AnalyzerContext extends ZptTemplateContext {
         classDescMap_ = classDescriptorMap;
     }
 
-    public ClassDescImpl getTemporaryClassDesc(String className) {
+    public ClassDesc getTemporaryClassDesc(String className) {
 
         int dot = className.lastIndexOf('.');
         if (dot < 0) {
             className = toClassName(className);
         }
-        ClassDescImpl classDesc = (ClassDescImpl) temporaryClassDescMap_
-            .get(className);
+        ClassDesc classDesc = (ClassDesc) temporaryClassDescMap_.get(className);
         if (classDesc == null) {
             classDesc = new ClassDescImpl(className);
             temporaryClassDescMap_.put(className, classDesc);
@@ -128,7 +125,7 @@ public class AnalyzerContext extends ZptTemplateContext {
         sourceCreator_ = sourceCreator;
     }
 
-    public ClassDescImpl getPageClassDescriptor() {
+    public ClassDesc getPageClassDescriptor() {
 
         return getTemporaryClassDesc(pageClassName_);
     }
@@ -149,7 +146,7 @@ public class AnalyzerContext extends ZptTemplateContext {
             .hasNext();) {
             Map.Entry entry = (Map.Entry) itr.next();
             String name = (String) entry.getKey();
-            ClassDescImpl classDesc = (ClassDescImpl) entry.getValue();
+            ClassDesc classDesc = (ClassDesc) entry.getValue();
             if (isEmptyDto(classDesc)) {
                 // 中身のないDTOは無視する。
                 continue;
@@ -165,33 +162,34 @@ public class AnalyzerContext extends ZptTemplateContext {
                     }
                 }
             }
-            classDesc.merge((ClassDescImpl) classDescMap_.get(name), true);
+            classDesc.merge((ClassDesc) classDescMap_.get(name), true);
             classDescMap_.put(name, classDesc);
         }
     }
 
     boolean isEmptyDto(ClassDesc classDesc) {
 
-        if (!(classDesc instanceof ClassDescImpl)) {
-            return true;
-        }
-        ClassDescImpl impl = (ClassDescImpl) classDesc;
-        if (!ClassDesc.KIND_DTO.equals(impl.getKind())) {
-            return true;
-        }
-        if (!impl.isEmpty()) {
-            return true;
-        }
-        return false;
+        return (ClassDesc.KIND_DTO.equals(classDesc.getKind()) && classDesc
+            .isEmpty());
     }
 
     public String getDtoClassName(String baseName) {
 
-        return sourceCreator_.getDtoPackageName() + "." + baseName
+        return sourceCreator_.getDtoPackageName() + "." + capFirst(baseName)
             + ClassDesc.KIND_DTO;
     }
 
-    public PropertyDesc getPropertyDesc(ClassDescImpl classDesc, String name,
+    String capFirst(String string) {
+
+        if (string == null || string.length() == 0) {
+            return string;
+        } else {
+            return Character.toUpperCase(string.charAt(0))
+                + string.substring(1);
+        }
+    }
+
+    public PropertyDesc getPropertyDesc(ClassDesc classDesc, String name,
         char delimChar, int mode) {
 
         int delim = name.indexOf(delimChar);
@@ -199,18 +197,9 @@ public class AnalyzerContext extends ZptTemplateContext {
             return classDesc.addProperty(name, mode);
         } else {
             String baseName = name.substring(0, delim);
-            String dtoClassName = getDtoClassName(baseName);
             PropertyDesc propertyDesc = classDesc.addProperty(baseName,
                 PropertyDesc.READ);
-            TypeDesc typeDesc = propertyDesc.getTypeDesc();
-            String typeClassName = typeDesc.getClassDesc().getName();
-            ClassDescImpl typeClassDesc = null;
-            if (typeClassName.equals(String.class.getName())) {
-                typeClassDesc = getTemporaryClassDesc(dtoClassName);
-                typeDesc.setClassDesc(typeClassDesc);
-            } else if (typeClassName.equals(dtoClassName)) {
-                typeClassDesc = (ClassDescImpl) typeDesc.getClassDesc();
-            }
+            ClassDesc typeClassDesc = prepareTypeClassDesc(propertyDesc);
             if (typeClassDesc != null) {
                 return getPropertyDesc(typeClassDesc,
                     name.substring(delim + 1), delimChar, mode);
@@ -218,5 +207,18 @@ public class AnalyzerContext extends ZptTemplateContext {
                 return propertyDesc;
             }
         }
+    }
+
+    public ClassDesc prepareTypeClassDesc(PropertyDesc propertyDesc) {
+
+        ClassDesc cd = propertyDesc.getTypeDesc().getClassDesc();
+        ClassDesc returned = null;
+        if (cd == TypeDesc.DEFAULT_CLASSDESC) {
+            returned = getTemporaryClassDesc(cd.getName());
+            propertyDesc.getTypeDesc().setClassDesc(returned);
+        } else if (cd instanceof ClassDescImpl) {
+            returned = cd;
+        }
+        return returned;
     }
 }

@@ -27,6 +27,11 @@ import org.seasar.cms.framework.creator.EntityMetaData;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.TypeDesc;
+import org.seasar.cms.framework.creator.impl.BodyDescImpl;
+import org.seasar.cms.framework.creator.impl.ClassDescImpl;
+import org.seasar.cms.framework.creator.impl.MethodDescImpl;
+import org.seasar.cms.framework.creator.impl.PropertyDescImpl;
+import org.seasar.cms.framework.creator.impl.SimpleClassDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
@@ -170,19 +175,20 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             for (int j = 0; j < pds.length; j++) {
                 TypeDesc td = pds[j].getTypeDesc();
                 if (!DescValidator.isValid(td, getSourceCreator())
-                    || !ClassDesc.KIND_DTO.equals(td.getKind())) {
+                    || !ClassDesc.KIND_DTO.equals(td.getClassDesc().getKind())) {
                     continue;
                 }
 
                 EntityMetaData metaData = new EntityMetaData(
                     getSourceCreator(), td.getName());
                 boolean daoExists = addPropertyIfValid(pageClassDescs[i],
-                    metaData.getDaoTypeDesc().getName(), PropertyDesc.WRITE);
+                    metaData.getDaoClassDesc().getName(), PropertyDesc.WRITE);
                 boolean dxoExists = addPropertyIfValid(pageClassDescs[i],
-                    metaData.getDxoTypeDesc().getName(), PropertyDesc.WRITE);
+                    metaData.getDxoClassDesc().getName(), PropertyDesc.WRITE);
 
-                MethodDesc md = pageClassDescs[i].getMethodDesc(new MethodDesc(
-                    DefaultRequestProcessor.ACTION_RENDER));
+                MethodDesc md = pageClassDescs[i]
+                    .getMethodDesc(new MethodDescImpl(
+                        DefaultRequestProcessor.ACTION_RENDER));
                 if (md != null && td.isArray() && pds[j].isReadable()
                     && daoExists && dxoExists) {
                     addSelectStatement(md, pds[j], metaData);
@@ -224,7 +230,8 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         if (bodyDesc == null) {
             root = new HashMap();
             root.put("entityMetaData", metaData);
-            bodyDesc = new BodyDesc(DefaultRequestProcessor.ACTION_RENDER, root);
+            bodyDesc = new BodyDescImpl(DefaultRequestProcessor.ACTION_RENDER,
+                root);
         } else {
             root = (Map) bodyDesc.getRoot();
         }
@@ -239,10 +246,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
     boolean addPropertyIfValid(ClassDesc classDesc, String className, int mode) {
 
-        ClassDesc cd = new ClassDesc(className);
-        if (DescValidator.isValid(new TypeDesc(className), getSourceCreator())) {
+        if (DescValidator.isValidClassName(className, getSourceCreator())) {
+            ClassDesc cd = new SimpleClassDesc(className);
             classDesc.addProperty(cd.getInstanceName(), mode).getTypeDesc()
-                .setDefaultName(cd.getName());
+                .setClassDesc(cd);
             return true;
         } else {
             return false;
@@ -270,20 +277,19 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 EntityMetaData metaData = new EntityMetaData(
                     getSourceCreator(), classDescs[i].getName());
 
-                // Dao、Bean用のClassDescを生成しておく。
+                // Dao用のClassDescを生成しておく。
+                list.add(metaData.getDaoClassDesc());
 
-                ClassDesc classDesc = new ClassDesc(metaData.getDaoTypeDesc()
-                    .getName());
-                list.add(classDesc);
-
-                classDesc = (ClassDesc) classDescs[i].clone();
-                classDesc.setName(metaData.getBeanTypeDesc().getName());
+                // Bean用のClassDescを生成しておく。
+                ClassDesc classDesc = metaData.getBeanClassDesc();
+                PropertyDesc[] pds = classDescs[i].getPropertyDescs();
+                for (int j = 0; j < pds.length; j++) {
+                    classDesc.setPropertyDesc((PropertyDesc) pds[i].clone());
+                }
                 list.add(classDesc);
 
                 // Dxo用のClassDescを生成しておく。
-
-                classDesc = new ClassDesc(metaData.getDxoTypeDesc().getName());
-                list.add(classDesc);
+                list.add(metaData.getDxoClassDesc());
             }
         }
 
@@ -329,13 +335,13 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         if (classDesc == null && method.equalsIgnoreCase(Request.METHOD_POST)) {
             // テンプレートを解析した結果対応するPageクラスを作る必要があると
             // 見なされなかった場合でも、methodがPOSTならPageクラスを作る。
-            classDesc = new ClassDesc(className);
+            classDesc = new ClassDescImpl(className);
             classDescriptorMap.put(className, classDesc);
         }
         if (classDesc != null) {
-            classDesc.setMethodDesc(new MethodDesc(getSourceCreator()
+            classDesc.setMethodDesc(new MethodDescImpl(getSourceCreator()
                 .getActionName(path, method)));
-            MethodDesc methodDesc = new MethodDesc(
+            MethodDesc methodDesc = new MethodDescImpl(
                 DefaultRequestProcessor.ACTION_RENDER);
             classDesc.setMethodDesc(methodDesc);
         }
@@ -358,7 +364,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             throw new RuntimeException(ex);
         }
 
-        ClassDesc classDesc = new ClassDesc(className);
+        ClassDesc classDesc = new ClassDescImpl(className);
 
         Class superclass = clazz.getSuperclass();
         // Generation-GapのBaseクラスを飛ばすため。
@@ -375,7 +381,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             if ("class".equals(name)) {
                 continue;
             }
-            PropertyDesc propertyDesc = new PropertyDesc(name);
+            PropertyDesc propertyDesc = new PropertyDescImpl(name);
             int mode = PropertyDesc.NONE;
             if (pds[i].getReadMethod() != null) {
                 mode |= PropertyDesc.READ;
@@ -389,13 +395,16 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 System.out.println("**** PropertyType is NULL: name=" + name);
                 continue;
             }
-            String type;
+
+            TypeDesc propertyTypeDesc = propertyDesc.getTypeDesc();
+            String componentType;
             if (propertyType.isArray()) {
-                type = propertyType.getComponentType().getName() + "[]";
+                componentType = propertyType.getComponentType().getName();
+                propertyTypeDesc.setArray(true);
             } else {
-                type = propertyType.getName();
+                componentType = propertyType.getName();
             }
-            propertyDesc.getTypeDesc().setType(type);
+            propertyTypeDesc.setClassDesc(new SimpleClassDesc(componentType));
             propertyDesc.setMode(mode);
             classDesc.setPropertyDesc(propertyDesc);
         }
@@ -413,9 +422,9 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             if (methods[i].getDeclaringClass() == Object.class) {
                 continue;
             }
-            MethodDesc methodDesc = new MethodDesc(name);
-            methodDesc.getReturnTypeDesc().setType(
-                methods[i].getReturnType().getName());
+            MethodDesc methodDesc = new MethodDescImpl(name);
+            methodDesc.getReturnTypeDesc().setClassDesc(
+                new SimpleClassDesc(methods[i].getReturnType().getName()));
             classDesc.setMethodDesc(methodDesc);
         }
 

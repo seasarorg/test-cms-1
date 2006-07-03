@@ -10,6 +10,7 @@ import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.TypeDesc;
+import org.seasar.cms.framework.creator.impl.MethodDescImpl;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImplTestBase;
 import org.seasar.framework.util.ResourceUtil;
 import org.seasar.kvasir.util.io.IOUtils;
@@ -39,17 +40,17 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         assertEquals(2, actual.getPropertyDescs().length);
         PropertyDesc pd = actual.getPropertyDesc("param1");
         assertNotNull(pd);
-        assertEquals("java.lang.String", pd.getTypeDesc().getType());
+        assertEquals("String", pd.getTypeDesc().getName());
         assertTrue(pd.isReadable());
         assertFalse(pd.isWritable());
         pd = actual.getPropertyDesc("param2");
         assertNotNull(pd);
-        assertEquals("java.lang.Integer[]", pd.getTypeDesc().getType());
+        assertEquals("Integer[]", pd.getTypeDesc().getName());
         assertFalse(pd.isReadable());
         assertTrue(pd.isWritable());
-        MethodDesc md = actual.getMethodDesc(new MethodDesc("_render"));
+        MethodDesc md = actual.getMethodDesc(new MethodDescImpl("_render"));
         assertNotNull(md);
-        assertEquals("void", md.getReturnTypeDesc().getType());
+        assertEquals("void", md.getReturnTypeDesc().getName());
     }
 
     public void testWriteSourceFile1() throws Exception {
@@ -109,11 +110,10 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         assertEquals(2, actual.length);
         assertEquals("com.example.web.TestPage", actual[0].getName());
         assertEquals("com.example.dto.EntityDto", actual[1].getName());
-        MethodDesc md = actual[0].getMethodDesc(new MethodDesc("_get"));
+        MethodDesc md = actual[0].getMethodDesc(new MethodDescImpl("_get"));
         assertNotNull(md);
-        assertEquals(TypeDesc.TYPE_VOID, md.getReturnTypeDesc()
-            .getDefaultName());
-        assertNotNull(actual[0].getMethodDesc(new MethodDesc("_render")));
+        assertEquals(TypeDesc.TYPE_VOID, md.getReturnTypeDesc().getName());
+        assertNotNull(actual[0].getMethodDesc(new MethodDescImpl("_render")));
     }
 
     public void testShouldUpdate() throws Exception {
@@ -130,8 +130,9 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
             Request.METHOD_GET, "com.example.web.TestPage", getSourceCreator()
                 .getTemplateFile("/test.html"));
         for (int i = classDescs.length - 1; i >= 0; i--) {
-            target_.writeSourceFile(classDescs[i].merge(target_
-                .getClassDesc(classDescs[i].getName()), true));
+            classDescs[i].merge(target_.getClassDesc(classDescs[i].getName()),
+                true);
+            target_.writeSourceFile(classDescs[i]);
         }
 
         assertTrue(new File(sourceDir, "com/example/web/TestPage.java")

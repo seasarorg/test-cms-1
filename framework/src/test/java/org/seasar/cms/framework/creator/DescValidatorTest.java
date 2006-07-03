@@ -2,10 +2,11 @@ package org.seasar.cms.framework.creator;
 
 import java.io.File;
 
+import junit.framework.TestCase;
+
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
-
-import junit.framework.TestCase;
+import org.seasar.cms.framework.creator.impl.TypeDescImpl;
 
 public class DescValidatorTest extends TestCase {
 
@@ -60,7 +61,7 @@ public class DescValidatorTest extends TestCase {
     public void testIsValid1() throws Exception {
 
         // ## Arrange ##
-        TypeDesc target = new TypeDesc(TypeDesc.TYPE_VOID);
+        TypeDesc target = new TypeDescImpl(TypeDesc.TYPE_VOID);
 
         // ## Act ##
         boolean actual = DescValidator.isValid(target, sourceCreator_);
@@ -72,7 +73,7 @@ public class DescValidatorTest extends TestCase {
     public void testIsValid2() throws Exception {
 
         // ## Arrange ##
-        TypeDesc target = new TypeDesc("int");
+        TypeDesc target = new TypeDescImpl("int");
 
         // ## Act ##
         boolean actual = DescValidator.isValid(target, sourceCreator_);
@@ -84,19 +85,19 @@ public class DescValidatorTest extends TestCase {
     public void testIsValid3() throws Exception {
 
         // ## Arrange ##
-        TypeDesc target = new TypeDesc("String");
+        TypeDesc target = new TypeDescImpl("String");
 
         // ## Act ##
         boolean actual = DescValidator.isValid(target, sourceCreator_);
 
         // ## Assert ##
-        assertTrue(actual);
+        assertFalse(actual);
     }
 
     public void testIsValid4() throws Exception {
 
         // ## Arrange ##
-        TypeDesc target = new TypeDesc("java.lang.String");
+        TypeDesc target = new TypeDescImpl("java.lang.String");
 
         // ## Act ##
         boolean actual = DescValidator.isValid(target, sourceCreator_);
@@ -108,7 +109,7 @@ public class DescValidatorTest extends TestCase {
     public void testIsValid5() throws Exception {
 
         // ## Arrange ##
-        TypeDesc target = new TypeDesc("java.lang.String[]");
+        TypeDesc target = new TypeDescImpl("java.lang.String[]");
 
         // ## Act ##
         boolean actual = DescValidator.isValid(target, sourceCreator_);
@@ -120,7 +121,7 @@ public class DescValidatorTest extends TestCase {
     public void testIsValid6() throws Exception {
 
         // ## Arrange ##
-        TypeDesc target = new TypeDesc("java.lang.Hoehoe");
+        TypeDesc target = new TypeDescImpl("java.lang.Hoehoe");
 
         // ## Act ##
         boolean actual = DescValidator.isValid(target, sourceCreator_);
