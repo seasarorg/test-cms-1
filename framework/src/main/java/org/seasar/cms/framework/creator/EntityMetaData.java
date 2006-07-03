@@ -1,18 +1,20 @@
 package org.seasar.cms.framework.creator;
 
+import org.seasar.cms.framework.creator.impl.SimpleClassDesc;
+
 public class EntityMetaData {
 
     private SourceCreator creator_;
 
     private String entityName_;
 
-    private TypeDesc dtoTypeDesc_;
+    private ClassDesc dtoClassDesc_;
 
-    private TypeDesc beanTypeDesc_;
+    private ClassDesc beanClassDesc_;
 
-    private TypeDesc daoTypeDesc_;
+    private ClassDesc daoClassDesc_;
 
-    private TypeDesc dxoTypeDesc_;
+    private ClassDesc dxoClassDesc_;
 
     public EntityMetaData(SourceCreator creator, String className) {
 
@@ -22,15 +24,15 @@ public class EntityMetaData {
 
     void analyze(String className) {
 
-        TypeDesc typeDesc = new TypeDesc(className);
-        entityName_ = typeDesc.getBaseName();
-        dtoTypeDesc_ = new TypeDesc(creator_.getDtoPackageName() + "."
+        ClassDesc classDesc = new SimpleClassDesc(className);
+        entityName_ = classDesc.getBaseName();
+        dtoClassDesc_ = new SimpleClassDesc(creator_.getDtoPackageName() + "."
             + entityName_ + ClassDesc.KIND_DTO);
-        beanTypeDesc_ = new TypeDesc(creator_.getDaoPackageName() + "."
+        beanClassDesc_ = new SimpleClassDesc(creator_.getDaoPackageName() + "."
             + entityName_);
-        daoTypeDesc_ = new TypeDesc(creator_.getDaoPackageName() + "."
+        daoClassDesc_ = new SimpleClassDesc(creator_.getDaoPackageName() + "."
             + entityName_ + ClassDesc.KIND_DAO);
-        dxoTypeDesc_ = new TypeDesc(creator_.getDxoPackageName() + "."
+        dxoClassDesc_ = new SimpleClassDesc(creator_.getDxoPackageName() + "."
             + entityName_ + ClassDesc.KIND_DXO);
     }
 
@@ -39,23 +41,23 @@ public class EntityMetaData {
         return entityName_;
     }
 
-    public TypeDesc getDtoTypeDesc() {
+    public ClassDesc getDtoClassDesc() {
 
-        return dtoTypeDesc_;
+        return dtoClassDesc_;
     }
 
-    public TypeDesc getBeanTypeDesc() {
+    public ClassDesc getBeanClassDesc() {
 
-        return beanTypeDesc_;
+        return beanClassDesc_;
     }
 
-    public TypeDesc getDaoTypeDesc() {
+    public ClassDesc getDaoClassDesc() {
 
-        return daoTypeDesc_;
+        return daoClassDesc_;
     }
 
-    public TypeDesc getDxoTypeDesc() {
+    public ClassDesc getDxoClassDesc() {
 
-        return dxoTypeDesc_;
+        return dxoClassDesc_;
     }
 }

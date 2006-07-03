@@ -1,27 +1,32 @@
 package org.seasar.cms.framework.creator;
 
-public class DescValidator {
+import org.seasar.cms.framework.creator.impl.ClassDescImpl;
 
-    private static final String PACKAGE_JAVA_LANG = "java.lang.";
+public class DescValidator {
 
     private DescValidator() {
     }
 
     public static boolean isValid(ClassDesc classDesc, SourceCreator creator) {
 
-        PropertyDesc[] pds = classDesc.getPropertyDescs();
-        for (int i = 0; i < pds.length; i++) {
-            if (!isValid(pds[i], creator)) {
-                return false;
+        if (classDesc instanceof ClassDescImpl) {
+            ClassDescImpl impl = (ClassDescImpl) classDesc;
+            PropertyDesc[] pds = impl.getPropertyDescs();
+            for (int i = 0; i < pds.length; i++) {
+                if (!isValid(pds[i], creator)) {
+                    return false;
+                }
             }
-        }
-        MethodDesc[] mds = classDesc.getMethodDescs();
-        for (int i = 0; i < mds.length; i++) {
-            if (!isValid(mds[i], creator)) {
-                return false;
+            MethodDesc[] mds = impl.getMethodDescs();
+            for (int i = 0; i < mds.length; i++) {
+                if (!isValid(mds[i], creator)) {
+                    return false;
+                }
             }
+            return true;
+        } else {
+            return true;
         }
-        return true;
     }
 
     public static boolean isValid(PropertyDesc propertyDesc,
@@ -35,26 +40,29 @@ public class DescValidator {
         if (!isValid(methodDesc.getReturnTypeDesc(), creator)) {
             return false;
         }
-        TypeDesc[] parameterTypeDescs = methodDesc.getParameterTypeDescs();
-        for (int i = 0; i < parameterTypeDescs.length; i++) {
-            if (!isValid(parameterTypeDescs[i], creator)) {
+        ParameterDesc[] parameterDescs = methodDesc.getParameterDescs();
+        for (int i = 0; i < parameterDescs.length; i++) {
+            if (!isValid(parameterDescs[i], creator)) {
                 return false;
             }
         }
         return true;
     }
 
+    public static boolean isValid(ParameterDesc parameterDesc,
+        SourceCreator creator) {
+
+        return isValid(parameterDesc.getTypeDesc(), creator);
+    }
+
     public static boolean isValid(TypeDesc typeDesc, SourceCreator creator) {
 
-        String className = typeDesc.getComponentName();
+        String className = typeDesc.getClassDesc().getName();
         if (TypeDesc.TYPE_VOID.equals(className)) {
             return true;
         } else if (isPrimitive(className)) {
             return true;
         } else {
-            if (className.indexOf('.') < 0) {
-                className = PACKAGE_JAVA_LANG + className;
-            }
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if (cl == null) {
                 cl = DescValidator.class.getClassLoader();

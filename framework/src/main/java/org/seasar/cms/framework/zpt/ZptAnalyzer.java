@@ -72,6 +72,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         try {
             evaluator_.evaluate(context, new InputStreamReader(inputStream,
                 encoding));
+            context.close();
         } catch (RuntimeException ex) {
             if (ex.getCause() instanceof IllegalSyntaxException) {
                 // TODO 文法エラーがあったのでスキップする旨

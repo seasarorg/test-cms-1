@@ -1,97 +1,22 @@
 package org.seasar.cms.framework.creator;
 
-public class MethodDesc implements Cloneable {
+public interface MethodDesc extends Cloneable {
 
-    private String name_;
+    Object clone();
 
-    private TypeDesc[] parameterTypeDescs_ = new TypeDesc[0];
+    String getName();
 
-    private TypeDesc returnTypeDesc_ = new TypeDesc(TypeDesc.TYPE_VOID);
+    TypeDesc getReturnTypeDesc();
 
-    private BodyDesc bodyDesc_;
+    ParameterDesc[] getParameterDescs();
 
-    private String evaluatedBody_;
+    void setParameterDescs(ParameterDesc[] parameterDescs);
 
-    public MethodDesc(String name) {
+    BodyDesc getBodyDesc();
 
-        name_ = name;
-    }
+    void setBodyDesc(BodyDesc bodyDesc);
 
-    public Object clone() {
+    String getEvaluatedBody();
 
-        MethodDesc cloned;
-        try {
-            cloned = (MethodDesc) super.clone();
-        } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(ex);
-        }
-        if (parameterTypeDescs_ != null) {
-            cloned.parameterTypeDescs_ = new TypeDesc[parameterTypeDescs_.length];
-            for (int i = 0; i < parameterTypeDescs_.length; i++) {
-                cloned.parameterTypeDescs_[i] = (TypeDesc) parameterTypeDescs_[i]
-                    .clone();
-            }
-        }
-        if (returnTypeDesc_ != null) {
-            cloned.returnTypeDesc_ = (TypeDesc) returnTypeDesc_.clone();
-        }
-        if (bodyDesc_ != null) {
-            cloned.bodyDesc_ = (BodyDesc) bodyDesc_.clone();
-        }
-
-        return cloned;
-    }
-
-    public String toString() {
-
-        StringBuffer sb = new StringBuffer();
-        sb.append(returnTypeDesc_).append(" ").append(name_).append("(");
-        String delim = "";
-        for (int i = 0; i < parameterTypeDescs_.length; i++) {
-            sb.append(delim).append(parameterTypeDescs_[i]);
-            delim = ", ";
-        }
-        sb.append(")");
-        return sb.toString();
-    }
-
-    public String getName() {
-
-        return name_;
-    }
-
-    public TypeDesc getReturnTypeDesc() {
-
-        return returnTypeDesc_;
-    }
-
-    public TypeDesc[] getParameterTypeDescs() {
-
-        return parameterTypeDescs_;
-    }
-
-    public void setParameterTypeDescs(TypeDesc[] parameterTypeDescs) {
-
-        parameterTypeDescs_ = parameterTypeDescs;
-    }
-
-    public BodyDesc getBodyDesc() {
-
-        return bodyDesc_;
-    }
-
-    public void setBodyDesc(BodyDesc bodyDesc) {
-
-        bodyDesc_ = bodyDesc;
-    }
-
-    public String getEvaluatedBody() {
-
-        return evaluatedBody_;
-    }
-
-    public void setEvaluatedBody(String evaluatedBody) {
-
-        evaluatedBody_ = evaluatedBody;
-    }
+    void setEvaluatedBody(String evaluatedBody);
 }

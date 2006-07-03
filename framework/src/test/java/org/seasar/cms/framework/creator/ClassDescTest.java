@@ -19,10 +19,10 @@ public class ClassDescTest extends TestCase {
         pd.getTypeDesc().setType("java.lang.String");
         cd1.setPropertyDesc(pd);
         pd = new PropertyDesc("param4");
-        pd.getTypeDesc().setDefaultType("java.lang.String[]");
+        pd.getTypeDesc().setDefaultName("java.lang.String[]");
         cd1.setPropertyDesc(pd);
         pd = new PropertyDesc("param6");
-        pd.getTypeDesc().setDefaultType("java.lang.Integer");
+        pd.getTypeDesc().setDefaultName("java.lang.Integer");
         cd1.setPropertyDesc(pd);
         MethodDesc md = new MethodDesc("method");
         cd1.setMethodDesc(md);

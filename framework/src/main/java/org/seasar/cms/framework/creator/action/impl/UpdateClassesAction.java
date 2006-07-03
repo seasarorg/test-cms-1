@@ -242,7 +242,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         ClassDesc cd = new ClassDesc(className);
         if (DescValidator.isValid(new TypeDesc(className), getSourceCreator())) {
             classDesc.addProperty(cd.getInstanceName(), mode).getTypeDesc()
-                .setDefaultType(cd.getName());
+                .setDefaultName(cd.getName());
             return true;
         } else {
             return false;

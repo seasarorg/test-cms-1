@@ -1,152 +1,26 @@
 package org.seasar.cms.framework.creator;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+public interface ClassDesc extends Cloneable {
 
-public class ClassDesc extends AbstractTypeDesc {
+    String KIND_PAGE = "Page";
 
-    private String name_;
+    String KIND_DTO = "Dto";
 
-    private String superclassName_;
+    String KIND_DAO = "Dao";
 
-    private Map propertyDescMap_ = new LinkedHashMap();
+    String KIND_DXO = "Dxo";
 
-    private Map methodDescMap_ = new LinkedHashMap();
+    String KIND_BEAN = "Bean";
 
-    public ClassDesc(String name) {
+    Object clone();
 
-        setName(name);
-    }
+    String getName();
 
-    public Object clone() {
+    String getPackageName();
 
-        ClassDesc cloned = (ClassDesc) super.clone();
+    String getShortName();
 
-        cloned.propertyDescMap_ = new LinkedHashMap();
-        for (Iterator itr = propertyDescMap_.entrySet().iterator(); itr
-            .hasNext();) {
-            Map.Entry entry = (Map.Entry) itr.next();
-            cloned.propertyDescMap_.put(entry.getKey(), ((PropertyDesc) entry
-                .getValue()).clone());
-        }
-        cloned.methodDescMap_ = new LinkedHashMap();
-        for (Iterator itr = methodDescMap_.entrySet().iterator(); itr.hasNext();) {
-            Map.Entry entry = (Map.Entry) itr.next();
-            cloned.methodDescMap_.put(entry.getKey(), ((MethodDesc) entry
-                .getValue()).clone());
-        }
-        return cloned;
-    }
+    String getKind();
 
-    public String getName() {
-        return name_;
-    }
-
-    public void setName(String name) {
-        name_ = name;
-    }
-
-    public PropertyDesc addProperty(String name, int mode) {
-
-        PropertyDesc propertyDesc = getPropertyDesc(name);
-        if (propertyDesc == null) {
-            propertyDesc = new PropertyDesc(name);
-            propertyDescMap_.put(name, propertyDesc);
-        }
-        propertyDesc.addMode(mode);
-        return propertyDesc;
-    }
-
-    public PropertyDesc getPropertyDesc(String name) {
-
-        return (PropertyDesc) propertyDescMap_.get(name);
-    }
-
-    public void setPropertyDesc(PropertyDesc propertyDesc) {
-
-        propertyDescMap_.put(propertyDesc.getName(), propertyDesc);
-    }
-
-    public PropertyDesc[] getPropertyDescs() {
-
-        return (PropertyDesc[]) propertyDescMap_.values().toArray(
-            new PropertyDesc[0]);
-    }
-
-    public MethodDesc getMethodDesc(MethodDesc methodDesc) {
-
-        return (MethodDesc) methodDescMap_.get(new MethodDescKey(methodDesc));
-    }
-
-    public void setMethodDesc(MethodDesc methodDesc) {
-
-        methodDescMap_.put(new MethodDescKey(methodDesc), methodDesc);
-    }
-
-    public MethodDesc[] getMethodDescs() {
-
-        return (MethodDesc[]) methodDescMap_.values()
-            .toArray(new MethodDesc[0]);
-    }
-
-    public String getSuperclassName() {
-
-        return superclassName_;
-    }
-
-    public void setSuperclassName(String superclassName) {
-
-        superclassName_ = superclassName;
-    }
-
-    public ClassDesc merge(ClassDesc classDesc, boolean mergeMethod) {
-
-        if (classDesc == null) {
-            return this;
-        }
-
-        setSuperclassName(classDesc.getSuperclassName());
-
-        PropertyDesc[] pds = classDesc.getPropertyDescs();
-        for (int i = 0; i < pds.length; i++) {
-            PropertyDesc pd = getPropertyDesc(pds[i].getName());
-            if (pd == null) {
-                if (mergeMethod) {
-                    setPropertyDesc((PropertyDesc) pds[i].clone());
-                }
-            } else {
-                TypeDesc typeDesc = pd.getTypeDesc();
-                if (typeDesc.getType() == null) {
-                    typeDesc.setType(pds[i].getTypeDesc().getType());
-                }
-                if (mergeMethod) {
-                    pd.addMode(pds[i].getMode());
-                }
-            }
-        }
-
-        MethodDesc[] mds = classDesc.getMethodDescs();
-        for (int i = 0; i < mds.length; i++) {
-            MethodDesc md = getMethodDesc(mds[i]);
-            if (md == null) {
-                if (mergeMethod) {
-                    setMethodDesc((MethodDesc) mds[i].clone());
-                }
-            } else {
-                TypeDesc returnTypeDesc = md.getReturnTypeDesc();
-                if (!returnTypeDesc.getName().equals(
-                    mds[i].getReturnTypeDesc().getName())
-                    && returnTypeDesc.getType() == null) {
-                    returnTypeDesc
-                        .setType(mds[i].getReturnTypeDesc().getType());
-                    if (mergeMethod) {
-                        md.setBodyDesc(mds[i].getBodyDesc());
-                    }
-                }
-            }
-        }
-
-        return this;
-    }
+    String getBaseName();
 }

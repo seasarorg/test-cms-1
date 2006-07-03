@@ -105,7 +105,7 @@ public class ZptAnalyzerTest extends TestCase {
         assertTrue(pd.isReadable());
         assertNull(pd.getTypeDesc().getType());
         assertEquals("com.example.dto.EntityDto[]", pd.getTypeDesc()
-            .getDefaultType());
+            .getDefaultName());
         ClassDesc cd2 = getClassDescriptor("com.example.dto.EntityDto");
         assertNotNull(cd2);
         PropertyDesc pd2 = cd2.getPropertyDesc("content");
@@ -124,7 +124,7 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(pd);
         assertTrue(pd.isReadable());
         assertNull(pd.getTypeDesc().getType());
-        assertEquals("java.lang.String[]", pd.getTypeDesc().getDefaultType());
+        assertEquals("java.lang.String[]", pd.getTypeDesc().getDefaultName());
     }
 
     public void testAnalyze5() throws Exception {
@@ -148,7 +148,7 @@ public class ZptAnalyzerTest extends TestCase {
         pd = cd.getPropertyDesc("file");
         assertNotNull(pd);
         assertEquals(FormFile.class.getName(), pd.getTypeDesc()
-            .getDefaultType());
+            .getDefaultName());
         assertNull(cd.getPropertyDesc("button"));
         assertNull(cd.getPropertyDesc("image"));
         assertNull(cd.getPropertyDesc("submit"));

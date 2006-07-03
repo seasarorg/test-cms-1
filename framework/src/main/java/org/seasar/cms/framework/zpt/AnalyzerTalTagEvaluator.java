@@ -18,10 +18,11 @@ import net.skirnir.freyja.zpt.ZptTemplateContext;
 import org.seasar.cms.framework.FormFile;
 import org.seasar.cms.framework.Path;
 import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.PropertyHolder;
 import org.seasar.cms.framework.creator.SourceCreator;
+import org.seasar.cms.framework.creator.impl.ClassDescImpl;
+import org.seasar.cms.framework.creator.impl.MethodDescImpl;
+import org.seasar.cms.framework.creator.impl.TypeDescImpl;
 
 public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 
@@ -53,8 +54,8 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
                 PropertyDesc propertyDesc = processParameterTag(
                     toAnalyzeContext(context), attrs, annotation);
                 if ("file".equals(type) && propertyDesc != null) {
-                    propertyDesc.getTypeDesc().setDefaultType(
-                        FormFile.class.getName());
+                    propertyDesc.setTypeDesc(new TypeDescImpl(FormFile.class
+                        .getName()));
                 }
             }
         } else if ("select".equals(name) || "textarea".equals(name)) {
@@ -84,8 +85,9 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         if (actionName == null) {
             return null;
         }
-        ClassDesc classDesc = analyzerContext.getClassDesc(className);
-        classDesc.setMethodDesc(new MethodDesc(actionName));
+        ClassDescImpl classDesc = analyzerContext
+            .getTemporaryClassDesc(className);
+        classDesc.setMethodDesc(new MethodDescImpl(actionName));
         for (Iterator itr = path.getParameterMap().keySet().iterator(); itr
             .hasNext();) {
             classDesc.addProperty((String) itr.next(), PropertyDesc.WRITE
@@ -139,27 +141,12 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         Map attrMap = evaluate(context, attrs);
         Attribute attr = (Attribute) attrMap.get("name");
         if (attr != null) {
-            PropertyHolder propertyHolder = context.getPropertyHolder()
-            return addProperty(context, context.getSourceCreator().ClassDesc(className),
-                TagEvaluatorUtils.defilter(attr.getValue()));
+            return context.getPropertyDesc(context
+                .getTemporaryClassDesc(className), TagEvaluatorUtils
+                .defilter(attr.getValue()), '.', PropertyDesc.READ
+                | PropertyDesc.WRITE);
         }
         return null;
-    }
-
-    PropertyDesc addProperty(AnalyzerContext context, ClassDesc classDesc,
-        String name) {
-
-        int dot = name.indexOf('.');
-        if (dot < 0) {
-            classDesc.get
-            // 最低限必要なのはWRITEだけだが、利便性を考えてREADも生成する
-            // ようにしている。
-            return classDesc.addProperty(name, PropertyDesc.READ
-                | PropertyDesc.WRITE);
-        } else {
-            classDesc.addProperty(name.substring(0, dot), PropertyDesc.READ);
-            return addProperty(context, classDesc, name.substring(dot + 1));
-        }
     }
 
     Map evaluate(ZptTemplateContext context, Attribute[] attrs) {

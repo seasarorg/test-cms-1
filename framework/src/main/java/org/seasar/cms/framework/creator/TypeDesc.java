@@ -1,83 +1,26 @@
 package org.seasar.cms.framework.creator;
 
-public class TypeDesc extends AbstractTypeDesc {
+public interface TypeDesc extends Cloneable {
 
-    private String type_;
+    String TYPE_VOID = "void";
 
-    private String defaultType_;
+    Object clone();
 
-    private String argumentName_;
+    ClassDesc getClassDesc();
 
-    public TypeDesc(String defaultType) {
+    void setClassDesc(ClassDesc classDesc);
 
-        this(defaultType, null);
-    }
+    boolean isArray();
 
-    public TypeDesc(String defaultType, String argumentName) {
+    void setArray(boolean array);
 
-        setDefaultType(defaultType);
-        setArgumentName(argumentName);
-    }
+    boolean isExplicit();
 
-    public Object clone() {
+    void setExplicit(boolean explicit);
 
-        return super.clone();
-    }
+    void transcript(TypeDesc typeDesc);
 
-    public String getName() {
+    String getName();
 
-        String type;
-        if (type_ != null) {
-            type = type_;
-        } else {
-            type = defaultType_;
-        }
-
-        StringBuffer sb = new StringBuffer();
-        if (type.startsWith(PACKAGE_JAVA_LANG)) {
-            sb.append(type.substring(PACKAGE_JAVA_LANG.length()));
-        } else {
-            sb.append(type);
-        }
-        return sb.toString();
-    }
-
-    public String getType() {
-
-        return type_;
-    }
-
-    public void setType(String type) {
-
-        type_ = type;
-    }
-
-    public String getDefaultType() {
-
-        return defaultType_;
-    }
-
-    public void setDefaultType(String defaultType) {
-
-        defaultType_ = defaultType;
-    }
-
-    public String getArgumentName() {
-
-        if (argumentName_ != null) {
-            return argumentName_;
-        } else {
-            return getInstanceName();
-        }
-    }
-
-    public void setArgumentName(String argumentName) {
-
-        argumentName_ = argumentName;
-    }
-
-    public boolean isArray() {
-
-        return getName().endsWith(ARRAY_SUFFIX);
-    }
+    String getDefaultValue();
 }

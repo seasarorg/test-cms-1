@@ -112,7 +112,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         MethodDesc md = actual[0].getMethodDesc(new MethodDesc("_get"));
         assertNotNull(md);
         assertEquals(TypeDesc.TYPE_VOID, md.getReturnTypeDesc()
-            .getDefaultType());
+            .getDefaultName());
         assertNotNull(actual[0].getMethodDesc(new MethodDesc("_render")));
     }
 

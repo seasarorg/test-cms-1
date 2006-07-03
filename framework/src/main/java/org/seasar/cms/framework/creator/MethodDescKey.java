@@ -18,13 +18,14 @@ public class MethodDescKey {
         if (!o.methodDesc_.getName().equals(methodDesc_.getName())) {
             return false;
         }
-        TypeDesc[] optds = o.methodDesc_.getParameterTypeDescs();
-        TypeDesc[] ptds = methodDesc_.getParameterTypeDescs();
-        if (optds.length != ptds.length) {
+        ParameterDesc[] opds = o.methodDesc_.getParameterDescs();
+        ParameterDesc[] pds = methodDesc_.getParameterDescs();
+        if (opds.length != pds.length) {
             return false;
         }
-        for (int i = 0; i < optds.length; i++) {
-            if (!optds[i].getName().equals(ptds[i].getName())) {
+        for (int i = 0; i < opds.length; i++) {
+            if (!opds[i].getTypeDesc().getName().equals(
+                pds[i].getTypeDesc().getName())) {
                 return false;
             }
         }

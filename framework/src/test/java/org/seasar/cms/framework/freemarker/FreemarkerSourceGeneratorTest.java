@@ -68,7 +68,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
         ClassDesc classDesc = new ClassDesc("com.example.page.TestPage");
         classDesc.setSuperclassName("com.example.page.SuperPage");
         PropertyDesc propertyDesc = new PropertyDesc("param1");
-        propertyDesc.getTypeDesc().setDefaultType("boolean");
+        propertyDesc.getTypeDesc().setDefaultName("boolean");
         propertyDesc.setMode(PropertyDesc.READ);
         classDesc.setPropertyDesc(propertyDesc);
         propertyDesc = new PropertyDesc("param2");
@@ -100,7 +100,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
         ClassDesc classDesc = prepareClassDesc();
         MethodDesc methodDesc = new MethodDesc("_get");
-        methodDesc.getReturnTypeDesc().setDefaultType(String.class.getName());
+        methodDesc.getReturnTypeDesc().setDefaultName(String.class.getName());
         methodDesc.setBodyDesc(new BodyDesc(
             "return \"redirect:/path/to/redirect.html\";"));
         classDesc.setMethodDesc(methodDesc);
@@ -126,7 +126,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
         ClassDesc classDesc = prepareClassDesc();
         MethodDesc methodDesc = new MethodDesc("_get");
-        methodDesc.getReturnTypeDesc().setDefaultType(String.class.getName());
+        methodDesc.getReturnTypeDesc().setDefaultName(String.class.getName());
         methodDesc.setBodyDesc(new BodyDesc(
             "return \"redirect:/path/to/redirect.html\";"));
         classDesc.setMethodDesc(methodDesc);
