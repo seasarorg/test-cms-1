@@ -120,11 +120,19 @@ public class ZptAnalyzerTest extends TestCase {
 
         ClassDesc cd = getClassDesc(CLASSNAME);
         assertNotNull(cd);
-        PropertyDesc pd = cd.getPropertyDesc("entities");
+        PropertyDesc pd = cd.getPropertyDesc("strings");
         assertNotNull(pd);
         assertTrue(pd.isReadable());
         assertFalse(pd.getTypeDesc().isExplicit());
-        assertEquals("String[]", pd.getTypeDesc().getName());
+        assertEquals("プロパティを持たないリピート対象変数はStringの配列になること", "String[]", pd
+            .getTypeDesc().getName());
+
+        pd = cd.getPropertyDesc("entities");
+        assertEquals("プロパティを持つリピート対象変数はDtoの配列になること",
+            "com.example.dto.EntityDto[]", pd.getTypeDesc().getName());
+        cd = getClassDesc("com.example.dto.EntityDto");
+        assertNotNull("プロパティを持つリピート対象変数の型が生成されていること", cd);
+        assertNotNull("Dto型がプロパティを持つこと", cd.getPropertyDesc("content"));
     }
 
     public void testAnalyze5() throws Exception {

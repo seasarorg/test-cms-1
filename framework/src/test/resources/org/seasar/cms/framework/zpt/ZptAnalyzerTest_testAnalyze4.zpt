@@ -4,7 +4,8 @@
   </head>
   <body>
   <ul>
-    <li tal:repeat="entity PAGE/entities" tal:content="entity">CONTENT</li>
+    <li tal:repeat="string PAGE/strings" tal:content="string">CONTENT</li>
+    <li tal:repeat="entity PAGE/entities" tal:content="entity/content">CONTENT</li>
   </ul>
   </body>
 </html>
