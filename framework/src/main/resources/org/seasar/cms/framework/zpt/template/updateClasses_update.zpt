@@ -14,6 +14,11 @@
   <li tal:repeat="classDesc updatedClassDescs" tal:content="classDesc/name">CLASS</li>
 </ul>
 </p>
+<p tal:condition="failedClassDescs">必要な情報を取得できなかったため、以下のクラスは追加・更新できませんでした：
+<ul>
+  <li tal:repeat="classDesc failedClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
 <p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
 <form tal:attributes="method method; action request/absolutePath">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />

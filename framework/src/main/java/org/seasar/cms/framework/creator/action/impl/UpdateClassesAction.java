@@ -41,8 +41,8 @@ import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
 public class UpdateClassesAction extends AbstractUpdateAction {
 
-    private static final String PARAM_DAO = SourceCreatorImpl.PARAM_PREFIX
-        + "dao";
+    private static final String PARAM_APPLY = SourceCreatorImpl.PARAM_PREFIX
+        + "apply";
 
     private static final String PARAM_REPLACE = SourceCreatorImpl.PARAM_PREFIX
         + "replace";
@@ -88,6 +88,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             }
             createdClassDescList.add(classDesc);
         }
+
         List updatedClassDescList = new ArrayList();
         for (Iterator itr = classDescBag.getUpdatedClassDescMap().values()
             .iterator(); itr.hasNext();) {
@@ -131,41 +132,26 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         ClassDesc[] classDescs = addRelativeClassDescs(gatherClassDescs(request
             .getPath(), method, className, templateFile));
-
         ClassDescBag classDescBag = classifyClassDescs(classDescs);
         ClassDescSet classDescSet = classDescBag.getClassDescSet();
 
-        Set daoClassNameSet = new HashSet();
-        String[] daoClassNames = request.getParameterValues(PARAM_DAO);
-        if (daoClassNames != null) {
-            daoClassNameSet.addAll(Arrays.asList(daoClassNames));
+        String[] appliedClassNames = request.getParameterValues(PARAM_APPLY);
+        Set appliedClassNameSet = new HashSet();
+        if (appliedClassNames != null) {
+            appliedClassNameSet.addAll(Arrays.asList(appliedClassNames));
         }
-
-        ClassDesc[] beanClassDescs = classDescBag
-            .getClassDescs(ClassDesc.KIND_BEAN);
-        for (int i = 0; i < beanClassDescs.length; i++) {
-            String beanClassName = beanClassDescs[i].getName();
-            if (daoClassNameSet.contains(beanClassName)) {
-                writeSourceFile(beanClassDescs[i], classDescSet);
-            } else {
-                classDescBag.remove(beanClassName);
-            }
-        }
-
-        ClassDesc[] daoClassDescs = classDescBag
-            .getClassDescs(ClassDesc.KIND_DAO);
-        for (int i = 0; i < daoClassDescs.length; i++) {
-            String daoClassName = daoClassDescs[i].getName();
-            if (daoClassNameSet.contains(daoClassName)) {
-                writeSourceFile(daoClassDescs[i], classDescSet);
-            } else {
-                classDescBag.remove(daoClassName);
+        for (int i = 0; i < classDescs.length; i++) {
+            String name = classDescs[i].getName();
+            if (!appliedClassNameSet.contains(name)) {
+                classDescBag.remove(name);
             }
         }
 
         boolean mergeMethod = !"true".equals(request
             .getParameter(PARAM_REPLACE));
 
+        writeSourceFiles(classDescBag, ClassDesc.KIND_BEAN, false);
+        writeSourceFiles(classDescBag, ClassDesc.KIND_DAO, false);
         writeSourceFiles(classDescBag, ClassDesc.KIND_DTO, mergeMethod);
         writeSourceFiles(classDescBag, ClassDesc.KIND_DXO, mergeMethod);
 
@@ -213,6 +199,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             .getCreatedClassDescs());
         variableMap.put("updatedClassDescs", classDescBag
             .getUpdatedClassDescs());
+        variableMap.put("failedClassDescs", classDescBag.getFailedClassDescs());
         variableMap.put("actionName", getSourceCreator().getActionName(
             request.getPath(), method));
         variableMap.put("suggestionExists", Boolean
@@ -271,7 +258,12 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             // 既存のクラスがあればマージする。
             classDescs[i].merge(getClassDesc(classDescs[i].getName()),
                 mergeMethod);
-            writeSourceFile(classDescs[i], classDescBag.getClassDescSet());
+            if (!writeSourceFile(classDescs[i], classDescBag.getClassDescSet())) {
+                // ソースファイルの生成に失敗した。
+                classDescBag.remove(classDescs[i].getName());
+                classDescBag.addAsFailed(classDescs[i]);
+
+            }
         }
     }
 
@@ -477,6 +469,8 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         private Map updatedMap_ = new HashMap();
 
+        private Map failedMap_ = new LinkedHashMap();
+
         private ClassDescSet set_ = new ClassDescSet();
 
         public Map getClassDescMap() {
@@ -539,7 +533,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         Map getClassDescMap(Map map, String kind) {
             Map got = (Map) map.get(kind);
             if (got == null) {
-                got = new HashMap();
+                got = new LinkedHashMap();
                 map.put(kind, got);
             }
             return got;
@@ -548,6 +542,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         ClassDesc[] getClassDescs(Map map, String kind) {
             return (ClassDesc[]) getClassDescMap(map, kind).values().toArray(
                 new ClassDesc[0]);
+        }
+
+        public ClassDesc[] getFailedClassDescs() {
+            return (ClassDesc[]) failedMap_.values().toArray(new ClassDesc[0]);
         }
 
         public ClassDescSet getClassDescSet() {
@@ -572,6 +570,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             getUpdatedClassDescMap(classDesc.getKind()).put(
                 classDesc.getName(), classDesc);
             set_.add(classDesc);
+        }
+
+        public void addAsFailed(ClassDesc classDesc) {
+            failedMap_.put(classDesc.getName(), classDesc);
         }
 
         public void remove(String className) {
