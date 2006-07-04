@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.ClassDescSet;
 import org.seasar.cms.framework.creator.DescValidator;
 import org.seasar.cms.framework.creator.action.UpdateAction;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
@@ -62,9 +63,10 @@ abstract public class AbstractUpdateAction implements UpdateAction {
         return sb.toString();
     }
 
-    protected boolean writeSourceFile(ClassDesc classDesc) {
+    protected boolean writeSourceFile(ClassDesc classDesc,
+        ClassDescSet classDescSet) {
 
-        if (!DescValidator.isValid(classDesc, getSourceCreator())) {
+        if (!DescValidator.isValid(classDesc, classDescSet)) {
             return false;
         }
 

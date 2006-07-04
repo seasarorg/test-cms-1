@@ -7,6 +7,7 @@ import java.io.OutputStream;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.ClassDescSet;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.TypeDesc;
@@ -63,7 +64,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
 
         testPage.delete();
 
-        target_.writeSourceFile(classDesc);
+        target_.writeSourceFile(classDesc, null);
 
         assertTrue(testPage.exists());
         assertTrue(testPageBase.exists());
@@ -86,7 +87,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         os.write(32);
         os.close();
 
-        target_.writeSourceFile(classDesc);
+        target_.writeSourceFile(classDesc, null);
 
         String actual = IOUtils.readString(new FileInputStream(testPage),
             "UTF-8", false);
@@ -129,10 +130,11 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         ClassDesc[] classDescs = target_.gatherClassDescs("/test.html",
             Request.METHOD_GET, "com.example.web.TestPage", getSourceCreator()
                 .getTemplateFile("/test.html"));
+        ClassDescSet classDescSet = new ClassDescSet(classDescs);
         for (int i = classDescs.length - 1; i >= 0; i--) {
             classDescs[i].merge(target_.getClassDesc(classDescs[i].getName()),
                 true);
-            target_.writeSourceFile(classDescs[i]);
+            target_.writeSourceFile(classDescs[i], classDescSet);
         }
 
         assertTrue(new File(sourceDir, "com/example/web/TestPage.java")

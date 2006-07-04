@@ -1,62 +1,12 @@
 package org.seasar.cms.framework.creator;
 
-import java.io.File;
-
 import junit.framework.TestCase;
 
-import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.impl.TypeDescImpl;
 
 public class DescValidatorTest extends TestCase {
 
-    private SourceCreator sourceCreator_;
-
-    protected void setUp() throws Exception {
-
-        sourceCreator_ = new SourceCreator() {
-
-            public String getPagePackageName() {
-                return null;
-            }
-
-            public String getDtoPackageName() {
-                return null;
-            }
-
-            public String getComponentName(String path, String method) {
-                return null;
-            }
-
-            public String getActionName(String path, String method) {
-                return null;
-            }
-
-            public String getClassName(String componentName) {
-                return null;
-            }
-
-            public File getSourceFile(String className) {
-                return new File("ZETTAIARIENAIFILEPATH");
-            }
-
-            public File getTemplateFile(String className) {
-                return null;
-            }
-
-            public Response update(String path, String method, Request request) {
-                return null;
-            }
-
-            public String getDaoPackageName() {
-                return null;
-            }
-
-            public String getDxoPackageName() {
-                return null;
-            }
-        };
-    }
+    private ClassDescSet classDescSet_ = new ClassDescSet();
 
     public void testIsValid1() throws Exception {
 
@@ -64,7 +14,7 @@ public class DescValidatorTest extends TestCase {
         TypeDesc target = new TypeDescImpl(TypeDesc.TYPE_VOID);
 
         // ## Act ##
-        boolean actual = DescValidator.isValid(target, sourceCreator_);
+        boolean actual = DescValidator.isValid(target, classDescSet_);
 
         // ## Assert ##
         assertTrue(actual);
@@ -76,7 +26,7 @@ public class DescValidatorTest extends TestCase {
         TypeDesc target = new TypeDescImpl("int");
 
         // ## Act ##
-        boolean actual = DescValidator.isValid(target, sourceCreator_);
+        boolean actual = DescValidator.isValid(target, classDescSet_);
 
         // ## Assert ##
         assertTrue(actual);
@@ -88,7 +38,7 @@ public class DescValidatorTest extends TestCase {
         TypeDesc target = new TypeDescImpl("String");
 
         // ## Act ##
-        boolean actual = DescValidator.isValid(target, sourceCreator_);
+        boolean actual = DescValidator.isValid(target, classDescSet_);
 
         // ## Assert ##
         assertFalse(actual);
@@ -100,7 +50,7 @@ public class DescValidatorTest extends TestCase {
         TypeDesc target = new TypeDescImpl("java.lang.String");
 
         // ## Act ##
-        boolean actual = DescValidator.isValid(target, sourceCreator_);
+        boolean actual = DescValidator.isValid(target, classDescSet_);
 
         // ## Assert ##
         assertTrue(actual);
@@ -112,7 +62,7 @@ public class DescValidatorTest extends TestCase {
         TypeDesc target = new TypeDescImpl("java.lang.String[]");
 
         // ## Act ##
-        boolean actual = DescValidator.isValid(target, sourceCreator_);
+        boolean actual = DescValidator.isValid(target, classDescSet_);
 
         // ## Assert ##
         assertTrue(actual);
@@ -124,7 +74,7 @@ public class DescValidatorTest extends TestCase {
         TypeDesc target = new TypeDescImpl("java.lang.Hoehoe");
 
         // ## Act ##
-        boolean actual = DescValidator.isValid(target, sourceCreator_);
+        boolean actual = DescValidator.isValid(target, classDescSet_);
 
         // ## Assert ##
         assertFalse(actual);

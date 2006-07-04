@@ -1,22 +1,21 @@
 package org.seasar.cms.framework.creator;
 
-
 public class DescValidator {
 
     private DescValidator() {
     }
 
-    public static boolean isValid(ClassDesc classDesc, SourceCreator creator) {
+    public static boolean isValid(ClassDesc classDesc, ClassDescSet classDescSet) {
 
         PropertyDesc[] pds = classDesc.getPropertyDescs();
         for (int i = 0; i < pds.length; i++) {
-            if (!isValid(pds[i], creator)) {
+            if (!isValid(pds[i], classDescSet)) {
                 return false;
             }
         }
         MethodDesc[] mds = classDesc.getMethodDescs();
         for (int i = 0; i < mds.length; i++) {
-            if (!isValid(mds[i], creator)) {
+            if (!isValid(mds[i], classDescSet)) {
                 return false;
             }
         }
@@ -24,19 +23,20 @@ public class DescValidator {
     }
 
     public static boolean isValid(PropertyDesc propertyDesc,
-        SourceCreator creator) {
+        ClassDescSet classDescSet) {
 
-        return isValid(propertyDesc.getTypeDesc(), creator);
+        return isValid(propertyDesc.getTypeDesc(), classDescSet);
     }
 
-    public static boolean isValid(MethodDesc methodDesc, SourceCreator creator) {
+    public static boolean isValid(MethodDesc methodDesc,
+        ClassDescSet classDescSet) {
 
-        if (!isValid(methodDesc.getReturnTypeDesc(), creator)) {
+        if (!isValid(methodDesc.getReturnTypeDesc(), classDescSet)) {
             return false;
         }
         ParameterDesc[] parameterDescs = methodDesc.getParameterDescs();
         for (int i = 0; i < parameterDescs.length; i++) {
-            if (!isValid(parameterDescs[i], creator)) {
+            if (!isValid(parameterDescs[i], classDescSet)) {
                 return false;
             }
         }
@@ -44,22 +44,24 @@ public class DescValidator {
     }
 
     public static boolean isValid(ParameterDesc parameterDesc,
-        SourceCreator creator) {
+        ClassDescSet classDescSet) {
 
-        return isValid(parameterDesc.getTypeDesc(), creator);
+        return isValid(parameterDesc.getTypeDesc(), classDescSet);
     }
 
-    public static boolean isValid(TypeDesc typeDesc, SourceCreator creator) {
+    public static boolean isValid(TypeDesc typeDesc, ClassDescSet classDescSet) {
 
-        return isValidClassName(typeDesc.getClassDesc().getName(), creator);
+        return isValidClassName(typeDesc.getClassDesc().getName(), classDescSet);
     }
 
     public static boolean isValidClassName(String className,
-        SourceCreator creator) {
+        ClassDescSet classDescSet) {
 
         if (TypeDesc.TYPE_VOID.equals(className)) {
             return true;
         } else if (isPrimitive(className)) {
+            return true;
+        } else if (classDescSet != null && classDescSet.contains(className)) {
             return true;
         } else {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -70,7 +72,7 @@ public class DescValidator {
                 Class.forName(className, false, cl);
                 return true;
             } catch (ClassNotFoundException ex) {
-                return creator.getSourceFile(className).exists();
+                return false;
             }
         }
     }

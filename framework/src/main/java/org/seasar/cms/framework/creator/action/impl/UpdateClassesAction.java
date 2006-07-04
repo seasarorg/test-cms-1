@@ -22,6 +22,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.BodyDesc;
 import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.ClassDescSet;
 import org.seasar.cms.framework.creator.DescValidator;
 import org.seasar.cms.framework.creator.EntityMetaData;
 import org.seasar.cms.framework.creator.MethodDesc;
@@ -132,6 +133,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             .getPath(), method, className, templateFile));
 
         ClassDescBag classDescBag = classifyClassDescs(classDescs);
+        ClassDescSet classDescSet = classDescBag.getClassDescSet();
 
         Set daoClassNameSet = new HashSet();
         String[] daoClassNames = request.getParameterValues(PARAM_DAO);
@@ -144,7 +146,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         for (int i = 0; i < beanClassDescs.length; i++) {
             String beanClassName = beanClassDescs[i].getName();
             if (daoClassNameSet.contains(beanClassName)) {
-                writeSourceFile(beanClassDescs[i]);
+                writeSourceFile(beanClassDescs[i], classDescSet);
             } else {
                 classDescBag.remove(beanClassName);
             }
@@ -155,7 +157,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         for (int i = 0; i < daoClassDescs.length; i++) {
             String daoClassName = daoClassDescs[i].getName();
             if (daoClassNameSet.contains(daoClassName)) {
-                writeSourceFile(daoClassDescs[i]);
+                writeSourceFile(daoClassDescs[i], classDescSet);
             } else {
                 classDescBag.remove(daoClassName);
             }
@@ -172,24 +174,24 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         for (int i = 0; i < pageClassDescs.length; i++) {
             // Dtoに触るようなプロパティを持っているなら
             // Dtoに対応するBeanに対応するDaoのsetterを自動生成する。
-            // Dxoも自動生成する。
+            // Dxoのsetterも自動生成する。
             // _render()のボディも自動生成する。
             PropertyDesc[] pds = pageClassDescs[i].getPropertyDescs();
             for (int j = 0; j < pds.length; j++) {
                 TypeDesc td = pds[j].getTypeDesc();
-                if (!DescValidator.isValid(td, getSourceCreator())
+                if (!DescValidator.isValid(td, classDescSet)
                     || !ClassDesc.KIND_DTO.equals(td.getClassDesc().getKind())) {
                     continue;
                 }
 
                 EntityMetaData metaData = new EntityMetaData(
-                    getSourceCreator(), td.getName());
+                    getSourceCreator(), td.getClassDesc().getName());
                 boolean daoExists = addPropertyIfValid(pageClassDescs[i],
                     new TypeDescImpl(metaData.getDaoClassDesc()),
-                    PropertyDesc.WRITE);
+                    PropertyDesc.WRITE, classDescSet);
                 boolean dxoExists = addPropertyIfValid(pageClassDescs[i],
                     new TypeDescImpl(metaData.getDxoClassDesc()),
-                    PropertyDesc.WRITE);
+                    PropertyDesc.WRITE, classDescSet);
 
                 MethodDesc md = pageClassDescs[i]
                     .getMethodDesc(new MethodDescImpl(
@@ -249,9 +251,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         methodDesc.setBodyDesc(bodyDesc);
     }
 
-    boolean addPropertyIfValid(ClassDesc classDesc, TypeDesc typeDesc, int mode) {
+    boolean addPropertyIfValid(ClassDesc classDesc, TypeDesc typeDesc,
+        int mode, ClassDescSet classDescSet) {
 
-        if (DescValidator.isValid(typeDesc, getSourceCreator())) {
+        if (DescValidator.isValid(typeDesc, classDescSet)) {
             classDesc.addProperty(typeDesc.getInstanceName(), mode)
                 .setTypeDesc(typeDesc);
             return true;
@@ -268,7 +271,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             // 既存のクラスがあればマージする。
             classDescs[i].merge(getClassDesc(classDescs[i].getName()),
                 mergeMethod);
-            writeSourceFile(classDescs[i]);
+            writeSourceFile(classDescs[i], classDescBag.getClassDescSet());
         }
     }
 
@@ -474,6 +477,8 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         private Map updatedMap_ = new HashMap();
 
+        private ClassDescSet set_ = new ClassDescSet();
+
         public Map getClassDescMap() {
             return getClassDescMap(map_, null);
         }
@@ -545,6 +550,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 new ClassDesc[0]);
         }
 
+        public ClassDescSet getClassDescSet() {
+            return set_;
+        }
+
         public void addAsCreated(ClassDesc classDesc) {
             getClassDescMap().put(classDesc.getName(), classDesc);
             getClassDescMap(classDesc.getKind()).put(classDesc.getName(),
@@ -552,6 +561,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             getCreatedClassDescMap().put(classDesc.getName(), classDesc);
             getCreatedClassDescMap(classDesc.getKind()).put(
                 classDesc.getName(), classDesc);
+            set_.add(classDesc);
         }
 
         public void addAsUpdated(ClassDesc classDesc) {
@@ -561,12 +571,14 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             getUpdatedClassDescMap().put(classDesc.getName(), classDesc);
             getUpdatedClassDescMap(classDesc.getKind()).put(
                 classDesc.getName(), classDesc);
+            set_.add(classDesc);
         }
 
         public void remove(String className) {
             remove(map_, className);
             remove(createdMap_, className);
             remove(updatedMap_, className);
+            set_.remove(className);
         }
 
         void remove(Map map, String className) {

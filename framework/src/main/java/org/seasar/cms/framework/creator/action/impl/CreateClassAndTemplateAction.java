@@ -11,7 +11,6 @@ import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.impl.BodyDescImpl;
 import org.seasar.cms.framework.creator.impl.ClassDescImpl;
 import org.seasar.cms.framework.creator.impl.MethodDescImpl;
-import org.seasar.cms.framework.creator.impl.SimpleClassDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
@@ -94,7 +93,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
         classDesc.setMethodDesc(new MethodDescImpl(
             DefaultRequestProcessor.ACTION_RENDER));
 
-        writeSourceFile(classDesc);
+        writeSourceFile(classDesc, null);
 
         Map variableMap = new HashMap();
         variableMap.put("request", request);

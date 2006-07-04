@@ -11,7 +11,6 @@ import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.impl.BodyDescImpl;
 import org.seasar.cms.framework.creator.impl.ClassDescImpl;
 import org.seasar.cms.framework.creator.impl.MethodDescImpl;
-import org.seasar.cms.framework.creator.impl.SimpleClassDesc;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 public class CreateClassAction extends AbstractUpdateAction {
@@ -69,7 +68,7 @@ public class CreateClassAction extends AbstractUpdateAction {
         }
         classDesc.setMethodDesc(methodDesc);
 
-        writeSourceFile(classDesc);
+        writeSourceFile(classDesc, null);
 
         Map variableMap = new HashMap();
         variableMap.put("request", request);
