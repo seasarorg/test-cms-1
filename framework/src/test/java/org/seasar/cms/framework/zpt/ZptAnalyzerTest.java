@@ -196,4 +196,20 @@ public class ZptAnalyzerTest extends TestCase {
         PropertyDesc pd = actual.getPropertyDesc("id");
         assertNotNull(pd);
     }
+
+    public void testAnalyze9() throws Exception {
+
+        act("testAnalyze9");
+
+        ClassDesc cd = getClassDesc("com.example.web.ActionPage");
+        PropertyDesc pd = cd.getPropertyDesc("test");
+        assertNotNull("formのパラメータに対応するプロパティが生成されること", pd);
+        assertEquals("com.example.dto.TestDto", pd.getTypeDesc().getName());
+        assertTrue(pd.isReadable());
+
+        cd = getClassDesc("com.example.dto.TestDto");
+        assertNotNull("formのパラメータを保持するためのDtoクラスが生成されること", cd);
+        assertNotNull(cd.getPropertyDesc("name"));
+        assertNotNull(cd.getPropertyDesc("body"));
+    }
 }

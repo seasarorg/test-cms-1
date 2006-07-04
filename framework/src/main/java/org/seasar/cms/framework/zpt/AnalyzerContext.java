@@ -213,7 +213,7 @@ public class AnalyzerContext extends ZptTemplateContext {
         ClassDesc cd = propertyDesc.getTypeDesc().getClassDesc();
         ClassDesc returned = null;
         if (cd == TypeDesc.DEFAULT_CLASSDESC) {
-            returned = getTemporaryClassDesc(cd.getName());
+            returned = getTemporaryClassDesc(propertyDesc.getName());
             propertyDesc.getTypeDesc().setClassDesc(returned);
         } else if (cd instanceof ClassDescImpl) {
             returned = cd;

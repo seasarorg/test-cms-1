@@ -13,7 +13,7 @@ public class PropertyDescImpl implements PropertyDesc, Cloneable {
 
     private String name_;
 
-    private TypeDesc typeDesc_ = new TypeDescImpl(String.class.getName());
+    private TypeDesc typeDesc_ = new TypeDescImpl();
 
     private int mode_;
 
