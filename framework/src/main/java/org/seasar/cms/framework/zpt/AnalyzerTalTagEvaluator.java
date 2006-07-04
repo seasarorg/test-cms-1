@@ -5,14 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.cms.framework.FormFile;
-import org.seasar.cms.framework.Path;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
-import org.seasar.cms.framework.creator.impl.MethodDescImpl;
-import org.seasar.cms.framework.creator.impl.TypeDescImpl;
-
 import net.skirnir.freyja.Attribute;
 import net.skirnir.freyja.Element;
 import net.skirnir.freyja.EvaluationException;
@@ -22,6 +14,13 @@ import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.TalTagEvaluator;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
+
+import org.seasar.cms.framework.FormFile;
+import org.seasar.cms.framework.Path;
+import org.seasar.cms.framework.creator.ClassDesc;
+import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.framework.creator.SourceCreator;
+import org.seasar.cms.framework.creator.impl.MethodDescImpl;
 
 public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 
@@ -53,8 +52,8 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
                 PropertyDesc propertyDesc = processParameterTag(
                     toAnalyzeContext(context), attrs, annotation);
                 if ("file".equals(type) && propertyDesc != null) {
-                    propertyDesc.setTypeDesc(new TypeDescImpl(FormFile.class
-                        .getName()));
+                    propertyDesc.getTypeDesc().setClassDesc(
+                        FormFile.class.getName());
                 }
             }
         } else if ("select".equals(name) || "textarea".equals(name)) {
@@ -141,7 +140,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         if (attr != null) {
             return context.getPropertyDesc(context
                 .getTemporaryClassDesc(className), TagEvaluatorUtils
-                .defilter(attr.getValue()), '.', PropertyDesc.READ
+                .defilter(attr.getValue()), PropertyDesc.READ
                 | PropertyDesc.WRITE);
         }
         return null;

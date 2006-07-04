@@ -131,6 +131,11 @@ public class TypeDescImpl implements TypeDesc {
         classDesc_ = classDesc;
     }
 
+    public void setClassDesc(String className) {
+
+        setClassDesc(new SimpleClassDesc(className));
+    }
+
     public boolean isArray() {
 
         return array_;

@@ -14,6 +14,8 @@ public interface TypeDesc extends Cloneable {
 
     void setClassDesc(ClassDesc classDesc);
 
+    void setClassDesc(String className);
+
     boolean isArray();
 
     void setArray(boolean array);

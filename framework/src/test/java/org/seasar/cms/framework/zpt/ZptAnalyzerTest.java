@@ -212,4 +212,35 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(cd.getPropertyDesc("name"));
         assertNotNull(cd.getPropertyDesc("body"));
     }
+
+    public void testAnalyze10() throws Exception {
+
+        act("testAnalyze10");
+
+        ClassDesc cd = getClassDesc("com.example.dto.TestDto");
+        PropertyDesc pd = cd.getPropertyDesc("file");
+        assertEquals("ファイルパラメータについてはプロパティの型がFormFileになること", FormFile.class
+            .getName(), pd.getTypeDesc().getName());
+    }
+
+    public void testAnalyze11() throws Exception {
+
+        act("testAnalyze11");
+
+        ClassDesc cd = getClassDesc("com.example.web.ActionPage");
+        PropertyDesc pd = cd.getPropertyDesc("tests");
+        assertTrue("フォームパラメータ名に添字指定がある場合は配列になること", pd.getTypeDesc().isArray());
+        assertEquals("tests配列プロパティのDto型名は単数形になること", "com.example.dto.TestDto",
+            pd.getTypeDesc().getClassDesc().getName());
+    }
+
+    public void testAnalyze12() throws Exception {
+
+        act("testAnalyze12");
+
+        ClassDesc cd = getClassDesc("com.example.dto.TestDto");
+        PropertyDesc pd = cd.getPropertyDesc("files");
+        assertEquals("添字指定があるファイルパラメータについてはプロパティの型がFormFileの配列になること",
+            FormFile.class.getName() + "[]", pd.getTypeDesc().getName());
+    }
 }

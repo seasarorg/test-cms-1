@@ -16,6 +16,12 @@ import net.skirnir.freyja.zpt.ZptTemplateContext;
 
 public class AnalyzerContext extends ZptTemplateContext {
 
+    private static final String MULTIPLE_SUFFIX = "s";
+
+    private static final char STR_ARRAY_LPAREN = '[';
+
+    private static final char CHAR_ARRAY_RPAREN = ']';
+
     private VariableResolver variableResolver_;
 
     private SourceCreator sourceCreator_;
@@ -189,23 +195,42 @@ public class AnalyzerContext extends ZptTemplateContext {
     }
 
     public PropertyDesc getPropertyDesc(ClassDesc classDesc, String name,
-        char delimChar, int mode) {
+        int mode) {
 
-        int delim = name.indexOf(delimChar);
-        if (delim < 0) {
-            return classDesc.addProperty(name, mode);
+        int dot = name.indexOf('.');
+        if (dot < 0) {
+            return getSinglePropertyDesc(classDesc, name, mode);
         } else {
-            String baseName = name.substring(0, delim);
-            PropertyDesc propertyDesc = classDesc.addProperty(baseName,
-                PropertyDesc.READ);
+            String baseName = name.substring(0, dot);
+            PropertyDesc propertyDesc = getSinglePropertyDesc(classDesc,
+                baseName, PropertyDesc.READ);
             ClassDesc typeClassDesc = prepareTypeClassDesc(propertyDesc);
             if (typeClassDesc != null) {
-                return getPropertyDesc(typeClassDesc,
-                    name.substring(delim + 1), delimChar, mode);
+                return getPropertyDesc(typeClassDesc, name.substring(dot + 1),
+                    mode);
             } else {
                 return propertyDesc;
             }
         }
+    }
+
+    PropertyDesc getSinglePropertyDesc(ClassDesc classDesc, String name,
+        int mode) {
+
+        boolean array = false;
+        int lparen = name.indexOf(STR_ARRAY_LPAREN);
+        int rparen = name.indexOf(CHAR_ARRAY_RPAREN);
+        if (lparen >= 0 && rparen > lparen) {
+            array = true;
+            name = name.substring(0, lparen);
+        }
+        PropertyDesc propertyDesc = classDesc.addProperty(name, mode);
+        if (array) {
+            // なるべく元の状態を壊さないようにこうしている。
+            // （添字があるならば配列である、は真であるが、裏は真ではない。）
+            propertyDesc.getTypeDesc().setArray(array);
+        }
+        return propertyDesc;
     }
 
     public ClassDesc prepareTypeClassDesc(PropertyDesc propertyDesc) {
@@ -213,7 +238,14 @@ public class AnalyzerContext extends ZptTemplateContext {
         ClassDesc cd = propertyDesc.getTypeDesc().getClassDesc();
         ClassDesc returned = null;
         if (cd == TypeDesc.DEFAULT_CLASSDESC) {
-            returned = getTemporaryClassDesc(propertyDesc.getName());
+            String name = propertyDesc.getName();
+            if (propertyDesc.getTypeDesc().isArray()
+                && name.endsWith(MULTIPLE_SUFFIX)) {
+                // 名前を単数形にする。
+                name = name.substring(0, name.length()
+                    - MULTIPLE_SUFFIX.length());
+            }
+            returned = getTemporaryClassDesc(name);
             propertyDesc.getTypeDesc().setClassDesc(returned);
         } else if (cd instanceof ClassDescImpl) {
             returned = cd;
