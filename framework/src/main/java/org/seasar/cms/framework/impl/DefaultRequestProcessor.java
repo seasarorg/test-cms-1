@@ -1,5 +1,6 @@
 package org.seasar.cms.framework.impl;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -34,9 +35,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     public static final String ATTR_PAGE = "PAGE";
 
-    private PathMapping[] mappings_;
-
-    private PathMapping[] ignoreMappings_;
+    private PathMapping[] pathMappings_;
 
     private ResponseConstructorSelector responseConstructorSelector_;
 
@@ -64,17 +63,16 @@ public class DefaultRequestProcessor implements RequestProcessor {
         String dispatcher, Map parameterMap, Map fileParameterMap)
         throws PageNotFoundException {
 
-        if (isPathIgnored(path, method, dispatcher)) {
-            throw new PageNotFoundException(path);
-        }
-
         MatchedPathMapping matched = findMatchedPathMapping(path, method);
         if (matched == null) {
             return PassthroughResponse.INSTANCE;
         }
         PathMapping mapping = matched.getPathMapping();
-        VariableResolver resolver = matched.getVariableResolver();
+        if (mapping.isDenied() && Request.DISPATCHER_REQUEST.equals(dispatcher)) {
+            throw new PageNotFoundException(path);
+        }
 
+        VariableResolver resolver = matched.getVariableResolver();
         String componentName = mapping.getComponentName(resolver);
         String actionName = mapping.getActionName(resolver);
         Request request = new RequestImpl(contextPath, path, method,
@@ -90,7 +88,24 @@ public class DefaultRequestProcessor implements RequestProcessor {
             }
         }
 
-        return processRequest(request, componentName, actionName);
+        Response response = processRequest(request, componentName, actionName);
+
+        // デフォルトパスが指定されており、かつpassthroughの場合でパスに
+        // 対応するリソースが存在しない場合はデフォルトパスにフォワードする。
+        if (response.getType() == Response.TYPE_PASSTHROUGH) {
+            String defaultPath = mapping.getDefaultPath(resolver);
+            if (defaultPath != null && !isResourceExists(path)) {
+                response = new ForwardResponse(defaultPath);
+            }
+        }
+
+        return response;
+    }
+
+    boolean isResourceExists(String path) {
+
+        return new File(configuration_
+            .getProperty(Configuration.KEY_WEBAPPROOT), path).exists();
     }
 
     String getProjectStatus() {
@@ -105,29 +120,15 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public MatchedPathMapping findMatchedPathMapping(String path, String method) {
 
         VariableResolver resolver = null;
-        if (mappings_ != null) {
-            for (int i = 0; i < mappings_.length; i++) {
-                resolver = mappings_[i].match(path, method);
+        if (pathMappings_ != null) {
+            for (int i = 0; i < pathMappings_.length; i++) {
+                resolver = pathMappings_[i].match(path, method);
                 if (resolver != null) {
-                    return new MatchedPathMapping(mappings_[i], resolver);
+                    return new MatchedPathMapping(pathMappings_[i], resolver);
                 }
             }
         }
         return null;
-    }
-
-    boolean isPathIgnored(String path, String method, String dispatcher)
-        throws PageNotFoundException {
-
-        if (Request.DISPATCHER_REQUEST.equals(dispatcher)
-            && ignoreMappings_ != null) {
-            for (int i = 0; i < ignoreMappings_.length; i++) {
-                if (ignoreMappings_[i].match(path, method) != null) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     Response processRequest(Request request, String componentName,
@@ -249,30 +250,32 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
-    public PathMapping[] getPathMappings() {
+    // FIXME アンコメントするとpathMappingsをプロパティとしてみてくれなくなる。
+    // →framework.diconでエラーになる。
+    // Seasarで配列型へのインジェクションが実現したらどうにかしよう。
+    //    public PathMapping[] getPathMappings() {
+    //
+    //        return pathMappings_;
+    //    }
+    //
+    public void setPathMappings(Object[] pathMappings) {
 
-        return mappings_;
+        pathMappings_ = new PathMapping[pathMappings.length];
+        for (int i = 0; i < pathMappings_.length; i++) {
+            pathMappings_[i] = (PathMapping) pathMappings[i];
+        }
     }
 
-    public void addMapping(String patternString, String componentNameTemplate,
-        String actionNameTemplate, String pathInfoTemplate) {
+    public void addPathMapping(String patternString,
+        String componentNameTemplate, String actionNameTemplate,
+        String pathInfoTemplate, String defaultPathTemplate) {
 
-        mappings_ = addMapping(mappings_, new PathMapping(patternString,
-            componentNameTemplate, actionNameTemplate, pathInfoTemplate));
+        pathMappings_ = addPathMapping(pathMappings_, new PathMappingImpl(
+            patternString, componentNameTemplate, actionNameTemplate,
+            pathInfoTemplate, defaultPathTemplate));
     }
 
-    public PathMapping[] getIgnorePathMappings() {
-
-        return ignoreMappings_;
-    }
-
-    public void addIgnoreMapping(String patternString) {
-
-        ignoreMappings_ = addMapping(ignoreMappings_, new PathMapping(
-            patternString, null, null, null));
-    }
-
-    PathMapping[] addMapping(PathMapping[] patterns, PathMapping pattern) {
+    PathMapping[] addPathMapping(PathMapping[] patterns, PathMapping pattern) {
 
         PathMapping[] newPatterns;
         if (patterns == null) {

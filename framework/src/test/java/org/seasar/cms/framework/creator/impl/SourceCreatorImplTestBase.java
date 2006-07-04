@@ -72,7 +72,8 @@ abstract public class SourceCreatorImplTestBase extends FrameworkTestCase {
 
         DefaultRequestProcessor processor = (DefaultRequestProcessor) container_
             .getComponent(RequestProcessor.class);
-        processor.addMapping("^/([^/]+)\\.(.+)$", "${1}Page", "_${method}", "");
+        processor.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page", "_${method}",
+            "", null);
         LocalOndemandCreatorContainer creatorContainer = (LocalOndemandCreatorContainer) container_
             .getComponent(OndemandCreatorContainer.class);
         creatorContainer.setRootPackageName("com.example");

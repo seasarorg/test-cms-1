@@ -3,6 +3,7 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
   <include path="convention.dicon" />
+  <include path="mapping.dicon" />
   <component
     class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
     <initMethod name="addReferenceClass">
@@ -30,24 +31,9 @@
   </component>
   <component
     class="org.seasar.cms.framework.impl.DefaultRequestProcessor">
-    <initMethod name="addMapping">
-      <arg>"^$"</arg>
-      <arg>"DefaultPage"</arg>
-      <arg>"_${method}"</arg>
-      <arg>""</arg>
-    </initMethod>
-    <initMethod name="addMapping">
-      <arg>"^/([^/]+)\\.(.+)$"</arg>
-      <arg>"${1}Page"</arg>
-      <arg>"_${method}"</arg>
-      <arg>""</arg>
-    </initMethod>
-    <initMethod name="addMapping">
-      <arg>"^/([^/]+)/([^/]+)\\.(.+)$"</arg>
-      <arg>"${1}Page"</arg>
-      <arg>"_${method}${2u}"</arg>
-      <arg>""</arg>
-    </initMethod>
+    <property name="pathMappings">
+      container.findComponents(@org.seasar.cms.framework.PathMapping@class)
+    </property>
   </component>
   <component
     class="org.seasar.cms.framework.impl.DefaultResponseProcessor" />

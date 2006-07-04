@@ -1,17 +1,18 @@
-package org.seasar.cms.framework;
+package org.seasar.cms.framework.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.seasar.cms.framework.PathMapping;
 import org.seasar.kvasir.util.el.EvaluationException;
 import org.seasar.kvasir.util.el.TextTemplateEvaluator;
 import org.seasar.kvasir.util.el.VariableResolver;
 import org.seasar.kvasir.util.el.impl.MapVariableResolver;
 import org.seasar.kvasir.util.el.impl.SimpleTextTemplateEvaluator;
 
-public class PathMapping {
+public class PathMappingImpl implements PathMapping {
 
     private TextTemplateEvaluator evaluator_ = new SimpleTextTemplateEvaluator();
 
@@ -23,16 +24,30 @@ public class PathMapping {
 
     private String pathInfoTemplate_;
 
-    public PathMapping() {
+    private String defaultPathTemplate_;
+
+    private boolean denied_;
+
+    public PathMappingImpl() {
     }
 
-    public PathMapping(String patternString, String componentTemplate,
-        String actionNameTemplate, String pathInfoTemplate) {
+    public PathMappingImpl(String patternString, String componentTemplate,
+        String actionNameTemplate, String pathInfoTemplate,
+        String defaultPathTemplate) {
+
+        this(false, patternString, componentTemplate, actionNameTemplate,
+            pathInfoTemplate, defaultPathTemplate);
+    }
+
+    public PathMappingImpl(boolean denied, String patternString,
+        String componentTemplate, String actionNameTemplate,
+        String pathInfoTemplate, String defaultPathTemplate) {
 
         pattern_ = Pattern.compile(patternString);
         componentNameTemplate_ = componentTemplate;
         actionNameTemplate_ = actionNameTemplate;
         pathInfoTemplate_ = pathInfoTemplate;
+        defaultPathTemplate_ = defaultPathTemplate;
     }
 
     public String getActionNameTemplate() {
@@ -62,6 +77,16 @@ public class PathMapping {
     public void setPathInfoTemplate(String pathInfoTemplate) {
 
         pathInfoTemplate_ = pathInfoTemplate;
+    }
+
+    public String getDefaultPathTemplate() {
+
+        return defaultPathTemplate_;
+    }
+
+    public void setDefaultPathTemplate(String defaultPathTemplate) {
+
+        defaultPathTemplate_ = defaultPathTemplate;
     }
 
     public Pattern getPattern() {
@@ -122,46 +147,40 @@ public class PathMapping {
 
     public String getComponentName(VariableResolver resolver) {
 
-        if (resolver == null) {
-            return null;
-        } else {
-            try {
-                return evaluator_.evaluateAsString(componentNameTemplate_,
-                    resolver);
-            } catch (EvaluationException ex) {
-                throw new RuntimeException("Can't evaluate webapp: "
-                    + componentNameTemplate_ + ", resolver=" + resolver, ex);
-            }
-        }
+        return evaluate(componentNameTemplate_, resolver);
     }
 
     public String getActionName(VariableResolver resolver) {
 
-        if (resolver == null) {
-            return null;
-        } else {
-            try {
-                return evaluator_.evaluateAsString(actionNameTemplate_,
-                    resolver);
-            } catch (EvaluationException ex) {
-                throw new RuntimeException("Can't evaluate webapp: "
-                    + actionNameTemplate_ + ", resolver=" + resolver, ex);
-            }
-        }
+        return evaluate(actionNameTemplate_, resolver);
     }
 
     public String getPathInfo(VariableResolver resolver) {
 
-        if (resolver == null) {
+        return evaluate(pathInfoTemplate_, resolver);
+    }
+
+    public String getDefaultPath(VariableResolver resolver) {
+
+        return evaluate(defaultPathTemplate_, resolver);
+    }
+
+    String evaluate(String template, VariableResolver resolver) {
+
+        if (resolver == null || template == null) {
             return null;
         } else {
             try {
-                return evaluator_.evaluateAsString(pathInfoTemplate_, resolver);
+                return evaluator_.evaluateAsString(template, resolver);
             } catch (EvaluationException ex) {
-                throw new RuntimeException("Can't evaluate webapp: "
-                    + pathInfoTemplate_ + ", resolver=" + resolver, ex);
+                throw new RuntimeException("Can't evaluate template: "
+                    + template + ", resolver=" + resolver, ex);
             }
-
         }
+    }
+
+    public boolean isDenied() {
+
+        return denied_;
     }
 }
