@@ -20,6 +20,8 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
     private static final String PARAMPREFIX_KEY = SourceCreatorImpl.PARAM_PREFIX
         + "key_";
 
+    private static final String POM_XML = "pom.xml";
+
     public CreateConfigurationAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
     }
@@ -38,12 +40,36 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
     Response actDefault(Request request, String className, File sourceFile,
         File templateFile) {
 
+        Configuration configuration = getConfiguration();
+        String webappRoot = configuration
+            .getProperty(Configuration.KEY_WEBAPPROOT);
+        if (webappRoot != null) {
+            String projectRoot = findProjectRootDirectory(webappRoot);
+            if (projectRoot != null) {
+                configuration.setProperty(Configuration.KEY_PROJECTROOT,
+                    projectRoot);
+            }
+        }
+
         Map variableMap = new HashMap();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("configuration", getConfiguration());
+        variableMap.put("configuration", configuration);
         return getSourceCreator().getResponseCreator().createResponse(
             "createConfiguration", variableMap);
+    }
+
+    String findProjectRootDirectory(String webappRoot) {
+
+        File dir = new File(webappRoot);
+        while (dir != null && !new File(dir, POM_XML).exists()) {
+            dir = dir.getParentFile();
+        }
+        if (dir != null) {
+            return dir.getAbsolutePath();
+        } else {
+            return null;
+        }
     }
 
     Response actCreate(Request request, String className, File sourceFile,
@@ -96,6 +122,7 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
     }
 
     Configuration getConfiguration() {
+
         Configuration configuration = getSourceCreator().getConfiguration();
         if (configuration == null) {
             configuration = new ConfigurationImpl();

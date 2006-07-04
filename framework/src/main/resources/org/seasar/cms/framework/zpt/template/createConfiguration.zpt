@@ -16,12 +16,12 @@
     <li>
       <strong>projectRoot</strong><br />
       このWebアプリケーションのためのEclipseプロジェクトのパスを入力して下さい。<br />
-      <input type="text" name="__cms__key_projectRoot" size="64" />
+      <input type="text" name="__cms__key_projectRoot" size="64" tal:attributes="value configuration/property(projectRoot)" />
     </li>
     <li>
       <strong>rootPackageName</strong><br />
       このWebアプリケーションのJavaソースコードのルートパッケージ名を入力して下さい。<br />
-      <input type="text" name="__cms__key_rootPackageName" size="64" />
+      <input type="text" name="__cms__key_rootPackageName" size="64" tal:attributes="value configuration/property(rootPackageName)" />
     </li>
   </ul>
   <p><input type="submit" value=" OK " />
