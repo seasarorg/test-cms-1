@@ -17,36 +17,20 @@ public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
     protected Object getProperty(TemplateContext context,
         VariableResolver varResolver, String arg) {
 
-        AnalyzerContext analyzerContext = toAnalyzerContext(context);
-
-        ClassDesc classDesc = analyzerContext.getTemporaryClassDesc(arg);
-        //        if (!analyzerContext.isEmptyDto(classDesc)) {
-        return classDesc;
-        //        } else {
-        //            Object value = super.getProperty(context, varResolver, arg);
-        //            if (value == null) {
-        //                // 極力attributeを解釈させるためのダミー。
-        //                value = "0";
-        //            }
-        //            return value;
-        //        }
+        return new DescWrapper(toAnalyzerContext(context)
+            .getTemporaryClassDesc(arg));
     }
 
     protected Object resolveSegment(TemplateContext context,
         VariableResolver varResolver, Object obj, String segment) {
 
-        AnalyzerContext analyzerContext = toAnalyzerContext(context);
-        ClassDesc classDesc = null;
-        if (obj instanceof ClassDesc) {
-            classDesc = (ClassDesc) obj;
-        } else if (obj instanceof PropertyDesc) {
-            classDesc = analyzerContext
-                .prepareTypeClassDesc((PropertyDesc) obj);
-        }
-        if (classDesc != null) {
-            int mode = (ClassDesc.KIND_DTO.equals(classDesc.getKind()) ? (PropertyDesc.READ | PropertyDesc.WRITE)
+        if (obj instanceof DescWrapper) {
+            DescWrapper wrapper = (DescWrapper) obj;
+            ClassDesc classDesc = wrapper.getClassDesc();
+            int mode = (classDesc.isKindOf(ClassDesc.KIND_DTO) ? (PropertyDesc.READ | PropertyDesc.WRITE)
                 : PropertyDesc.READ);
-            return classDesc.addProperty(segment, mode);
+            return new DescWrapper(toAnalyzerContext(context), classDesc
+                .addProperty(segment, mode));
         } else {
             return super.resolveSegment(context, varResolver, obj, segment);
         }

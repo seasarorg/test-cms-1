@@ -243,4 +243,12 @@ public class ZptAnalyzerTest extends TestCase {
         assertEquals("添字指定があるファイルパラメータについてはプロパティの型がFormFileの配列になること",
             FormFile.class.getName() + "[]", pd.getTypeDesc().getName());
     }
+
+    public void testAnalyze13() throws Exception {
+
+        act("testAnalyze13");
+
+        ClassDesc cd = getClassDesc("com.example.web.Test0Page");
+        assertNotNull("page:指定のパラメータ置換が正しく行われ、その結果Pageクラスが生成されること", cd);
+    }
 }

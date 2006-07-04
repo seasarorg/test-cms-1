@@ -53,8 +53,9 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public RepeatInfo pushRepeatInfo(String name, Object[] objs) {
 
-        if (objs != null && objs.length == 1 && objs[0] instanceof PropertyDesc) {
-            PropertyDesc propertyDesc = (PropertyDesc) objs[0];
+        if (objs != null && objs.length == 1 && objs[0] instanceof DescWrapper) {
+            DescWrapper wrapper = (DescWrapper) objs[0];
+            PropertyDesc propertyDesc = wrapper.getPropertyDesc();
             TypeDesc typeDesc = propertyDesc.getTypeDesc();
             typeDesc.setArray(true);
             typeDesc.setClassDesc(getTemporaryClassDesc(name));
