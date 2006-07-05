@@ -302,7 +302,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 ClassDesc classDesc = metaData.getBeanClassDesc();
                 PropertyDesc[] pds = classDescs[i].getPropertyDescs();
                 for (int j = 0; j < pds.length; j++) {
-                    classDesc.setPropertyDesc((PropertyDesc) pds[i].clone());
+                    classDesc.setPropertyDesc((PropertyDesc) pds[j].clone());
                 }
                 classDescList.add(classDesc);
 
