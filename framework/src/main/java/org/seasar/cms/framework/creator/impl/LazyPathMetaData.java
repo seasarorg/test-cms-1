@@ -13,6 +13,10 @@ public class LazyPathMetaData implements PathMetaData {
 
     private String method_;
 
+    private boolean deniedLoaded_;
+
+    private boolean denied_;
+
     private String componentName_;
 
     private boolean componentNameLoaded_;
@@ -53,6 +57,14 @@ public class LazyPathMetaData implements PathMetaData {
     public String getPath() {
 
         return path_;
+    }
+
+    public boolean isDenied() {
+
+        if (!deniedLoaded_) {
+            denied_ = sourceCreator_.isDenied(path_, method_);
+        }
+        return denied_;
     }
 
     public String getComponentName() {

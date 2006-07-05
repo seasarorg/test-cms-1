@@ -26,6 +26,10 @@ public class MockSourceCreator implements SourceCreator {
         return null;
     }
 
+    public boolean isDenied(String path, String method) {
+        return false;
+    }
+
     public String getComponentName(String path, String method) {
         return null;
     }

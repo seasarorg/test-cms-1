@@ -121,7 +121,7 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
 
         Map classDescMap = new LinkedHashMap();
         target_.gatherClassDescs(classDescMap, new PathMetaDataImpl(
-            "/test.html", Request.METHOD_GET, "testPage",
+            "/test.html", Request.METHOD_GET, false, "testPage",
             "com.example.web.TestPage", null, null, null, getSourceCreator()
                 .getTemplateFile("/test.html")));
         ClassDesc[] actual = (ClassDesc[]) classDescMap.values().toArray(

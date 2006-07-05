@@ -559,6 +559,20 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
+    public boolean isDenied(String path, String method) {
+
+        if (path == null) {
+            return true;
+        }
+        MatchedPathMapping matched = defaultRequestProcessor_
+            .findMatchedPathMapping(path, method);
+        if (matched == null) {
+            return true;
+        } else {
+            return matched.getPathMapping().isDenied();
+        }
+    }
+
     public String getComponentName(String path, String method) {
 
         if (path == null) {

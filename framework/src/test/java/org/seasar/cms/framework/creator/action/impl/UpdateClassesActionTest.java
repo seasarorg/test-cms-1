@@ -27,16 +27,16 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
             .getParentFile(), "src"));
         getSourceCreator().setSourceDirectoryPath(sourceDir.getCanonicalPath());
 
-        assertTrue(target_.shouldUpdate(new PathMetaDataImpl(null, null, null,
-            null, null, null, getSourceCreator().getSourceFile(
+        assertTrue(target_.shouldUpdate(new PathMetaDataImpl(null, null, false,
+            null, null, null, null, getSourceCreator().getSourceFile(
                 "com.example.web.TestPage"), getSourceCreator()
                 .getTemplateFile("/test.html"))));
 
         Map classDescMap = new LinkedHashMap();
         getSourceCreator().gatherClassDescs(
             classDescMap,
-            new PathMetaDataImpl("/test.html", Request.METHOD_GET, "testPage",
-                "com.example.web.TestPage", null, null, null,
+            new PathMetaDataImpl("/test.html", Request.METHOD_GET, false,
+                "testPage", "com.example.web.TestPage", null, null, null,
                 getSourceCreator().getTemplateFile("/test.html")));
         ClassDesc[] classDescs = (ClassDesc[]) classDescMap.values().toArray(
             new ClassDesc[0]);
@@ -56,8 +56,8 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         assertTrue(new File(sourceDir, "com/example/dto/EntityDtoBase.java")
             .exists());
 
-        assertFalse(target_.shouldUpdate(new PathMetaDataImpl(null, null, null,
-            null, null, null, getSourceCreator().getSourceFile(
+        assertFalse(target_.shouldUpdate(new PathMetaDataImpl(null, null,
+            false, null, null, null, null, getSourceCreator().getSourceFile(
                 "com.example.web.TestPage"), getSourceCreator()
                 .getTemplateFile("/test.html"))));
     }

@@ -17,6 +17,8 @@ public interface SourceCreator {
 
     File getWebappDirectory();
 
+    boolean isDenied(String path, String method);
+
     String getComponentName(String path, String method);
 
     String getActionName(String path, String method);

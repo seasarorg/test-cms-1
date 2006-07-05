@@ -53,7 +53,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         variableMap.put("method", request.getMethod());
         variableMap.put("classDescBag", classDescBag);
         return getSourceCreator().getResponseCreator().createResponse(
-            "systemConsole", variableMap);
+            "systemConsole_confirmUpdateAllClasses", variableMap);
     }
 
     Response actUpdateAllClasses(Request request, PathMetaData pathMetaData) {
@@ -71,6 +71,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("method", method);
+        variableMap.put("classDescBag", classDescBag);
         return getSourceCreator().getResponseCreator().createResponse(
             "systemConsole_updateAllClasses", variableMap);
     }
@@ -95,7 +96,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         for (int i = 0; i < childFiles.length; i++) {
             String childName = childFiles[i].getName();
             String childPath = path + "/" + childName;
-            if (shouldIgnore(childName)) {
+            if (shouldIgnore(childPath, childName)) {
                 continue;
             }
             if (childFiles[i].isDirectory()) {
@@ -113,14 +114,22 @@ public class SystemConsoleAction extends AbstractUpdateAction {
 
         PathMetaData pathMetaData = new LazyPathMetaData(getSourceCreator(),
             path, method);
-        if (pathMetaData.getComponentName() != null) {
+        if (pathMetaData.getComponentName() != null && !pathMetaData.isDenied()) {
             pathList.add(pathMetaData);
         }
     }
 
-    boolean shouldIgnore(String name) {
+    boolean shouldIgnore(String path, String name) {
 
-        return ("CVS".equals(name) || ".svn".equals(name) || "_svn"
-            .equals(name));
+        if (path.equals("/WEB-INF/classes") || path.equals("/WEB-INF/lib")
+            || path.equals("/WEB-INF/web.xml") || path.equals("/META-INF")) {
+            return true;
+        }
+
+        if ("CVS".equals(name) || ".svn".equals(name) || "_svn".equals(name)) {
+            return true;
+        }
+
+        return false;
     }
 }

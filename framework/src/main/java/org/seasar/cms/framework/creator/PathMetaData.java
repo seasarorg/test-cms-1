@@ -8,6 +8,8 @@ public interface PathMetaData {
 
     String getPath();
 
+    boolean isDenied();
+
     String getComponentName();
 
     String getClassName();

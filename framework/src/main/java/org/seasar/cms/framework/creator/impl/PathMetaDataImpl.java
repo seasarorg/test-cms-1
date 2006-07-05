@@ -10,6 +10,8 @@ public class PathMetaDataImpl implements PathMetaData {
 
     private String method_;
 
+    private boolean denied_;
+
     private String componentName_;
 
     private String className_;
@@ -22,12 +24,13 @@ public class PathMetaDataImpl implements PathMetaData {
 
     private File templateFile_;
 
-    public PathMetaDataImpl(String path, String method, String componentName,
-        String className, String actionName, String defaultPath,
-        File sourceFile, File templateFile) {
+    public PathMetaDataImpl(String path, String method, boolean denied,
+        String componentName, String className, String actionName,
+        String defaultPath, File sourceFile, File templateFile) {
 
         path_ = path;
         method_ = method;
+        denied_ = denied;
         componentName_ = componentName;
         className_ = className;
         actionName_ = actionName;
@@ -44,6 +47,11 @@ public class PathMetaDataImpl implements PathMetaData {
     public String getPath() {
 
         return path_;
+    }
+
+    public boolean isDenied() {
+
+        return denied_;
     }
 
     public String getComponentName() {
