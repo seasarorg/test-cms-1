@@ -1,14 +1,10 @@
 package org.seasar.cms.framework.freemarker;
 
-import java.io.File;
-
 import org.seasar.cms.framework.FrameworkTestCase;
-import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
+import org.seasar.cms.framework.creator.MockSourceCreator;
 import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.creator.impl.BodyDescImpl;
 import org.seasar.cms.framework.creator.impl.ClassDescImpl;
 import org.seasar.cms.framework.creator.impl.MethodDescImpl;
@@ -22,7 +18,7 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
         super.setUp();
         target_ = new FreemarkerSourceGenerator();
-        target_.setSourceCreator(new SourceCreator() {
+        target_.setSourceCreator(new MockSourceCreator() {
 
             public String getPagePackageName() {
                 return "com.example.web";
@@ -38,30 +34,6 @@ public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 
             public String getDxoPackageName() {
                 return "com.example.dxo";
-            }
-
-            public String getComponentName(String path, String method) {
-                return null;
-            }
-
-            public String getActionName(String path, String method) {
-                return null;
-            }
-
-            public String getClassName(String componentName) {
-                return null;
-            }
-
-            public File getSourceFile(String className) {
-                return null;
-            }
-
-            public File getTemplateFile(String className) {
-                return null;
-            }
-
-            public Response update(String path, String method, Request request) {
-                return null;
             }
         });
     }

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.ClassDescSet;
+import org.seasar.cms.framework.creator.impl.PathMetaDataImpl;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImplTestBase;
 import org.seasar.framework.util.ResourceUtil;
 
@@ -26,14 +27,17 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
             .getParentFile(), "src"));
         getSourceCreator().setSourceDirectoryPath(sourceDir.getCanonicalPath());
 
-        assertTrue(target_.shouldUpdate(getSourceCreator().getSourceFile(
-            "com.example.web.TestPage"), getSourceCreator().getTemplateFile(
-            "/test.html")));
+        assertTrue(target_.shouldUpdate(new PathMetaDataImpl(null, null, null,
+            null, null, null, getSourceCreator().getSourceFile(
+                "com.example.web.TestPage"), getSourceCreator()
+                .getTemplateFile("/test.html"))));
 
         Map classDescMap = new LinkedHashMap();
-        getSourceCreator().gatherClassDescs(classDescMap, "/test.html",
-            Request.METHOD_GET, "com.example.web.TestPage",
-            getSourceCreator().getTemplateFile("/test.html"));
+        getSourceCreator().gatherClassDescs(
+            classDescMap,
+            new PathMetaDataImpl("/test.html", Request.METHOD_GET, "testPage",
+                "com.example.web.TestPage", null, null, null,
+                getSourceCreator().getTemplateFile("/test.html")));
         ClassDesc[] classDescs = (ClassDesc[]) classDescMap.values().toArray(
             new ClassDesc[0]);
         ClassDescSet classDescSet = new ClassDescSet(classDescs);
@@ -52,8 +56,9 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         assertTrue(new File(sourceDir, "com/example/dto/EntityDtoBase.java")
             .exists());
 
-        assertFalse(target_.shouldUpdate(getSourceCreator().getSourceFile(
-            "com.example.web.TestPage"), getSourceCreator().getTemplateFile(
-            "/test.html")));
+        assertFalse(target_.shouldUpdate(new PathMetaDataImpl(null, null, null,
+            null, null, null, getSourceCreator().getSourceFile(
+                "com.example.web.TestPage"), getSourceCreator()
+                .getTemplateFile("/test.html"))));
     }
 }

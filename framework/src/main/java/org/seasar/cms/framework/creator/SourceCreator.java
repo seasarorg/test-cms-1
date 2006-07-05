@@ -15,9 +15,13 @@ public interface SourceCreator {
 
     String getDxoPackageName();
 
+    File getWebappDirectory();
+
     String getComponentName(String path, String method);
 
     String getActionName(String path, String method);
+
+    String getDefaultPath(String path, String method);
 
     String getClassName(String componentName);
 

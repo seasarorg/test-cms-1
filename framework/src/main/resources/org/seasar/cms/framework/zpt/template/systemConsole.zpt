@@ -7,9 +7,9 @@
 <form tal:attributes="action request/absolutePath" method="post">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
   <input type="hidden" name="__cms__task" value="systemConsole" />
-  <input type="hidden" name="__cms__subTask" value="updateAllClasses" />
+  <input type="hidden" name="__cms__subTask" value="confirmUpdateAllClasses" />
   <input type="hidden" name="__cms__method" tal:attributes="value method" />
-  <p><input type="submit" value="全てのクラスを更新する" /></p>
+  <p><input type="submit" value="クラスを一括更新する" /></p>
 </form>
 <form tal:attributes="method method; action request/absolutePath">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />

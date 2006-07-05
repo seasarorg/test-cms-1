@@ -4,7 +4,7 @@
   </head>
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
-<p>テンプレート<span tal:replace="templateFile/name">TEMPLTATE</span>を作成します。</p>
+<p>テンプレート<span tal:replace="pathMetaData/templateFile/name">TEMPLTATE</span>を作成します。</p>
 <form tal:attributes="action request/absolutePath" method="post">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
   <input type="hidden" name="__cms__task" value="createTemplate" />

@@ -10,6 +10,7 @@ import java.util.Map;
 import org.seasar.cms.framework.Configuration;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.creator.PathMetaData;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.framework.impl.ConfigurationImpl;
 
@@ -26,19 +27,17 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
         super(sourceCreator);
     }
 
-    public Response act(Request request, String className, File sourceFile,
-        File templateFile) {
+    public Response act(Request request, PathMetaData pathMetaData) {
 
         String subTask = request.getParameter(PARAM_SUBTASK);
         if ("create".equals(subTask)) {
-            return actCreate(request, className, sourceFile, templateFile);
+            return actCreate(request, pathMetaData);
         } else {
-            return actDefault(request, className, sourceFile, templateFile);
+            return actDefault(request, pathMetaData);
         }
     }
 
-    Response actDefault(Request request, String className, File sourceFile,
-        File templateFile) {
+    Response actDefault(Request request, PathMetaData pathMetaData) {
 
         Configuration configuration = getConfiguration();
         String webappRoot = configuration
@@ -72,8 +71,7 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
         }
     }
 
-    Response actCreate(Request request, String className, File sourceFile,
-        File templateFile) {
+    Response actCreate(Request request, PathMetaData pathMetaDataf) {
 
         String method = request.getParameter(PARAM_METHOD);
         if (method == null) {

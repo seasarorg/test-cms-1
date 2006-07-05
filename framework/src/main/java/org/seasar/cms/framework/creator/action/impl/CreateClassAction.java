@@ -1,6 +1,5 @@
 package org.seasar.cms.framework.creator.action.impl;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +7,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.MethodDesc;
+import org.seasar.cms.framework.creator.PathMetaData;
 import org.seasar.cms.framework.creator.impl.BodyDescImpl;
 import org.seasar.cms.framework.creator.impl.ClassDescImpl;
 import org.seasar.cms.framework.creator.impl.MethodDescImpl;
@@ -22,19 +22,17 @@ public class CreateClassAction extends AbstractUpdateAction {
         super(sourceCreator);
     }
 
-    public Response act(Request request, String className, File sourceFile,
-        File templateFile) {
+    public Response act(Request request, PathMetaData pathMetaData) {
 
         String subTask = request.getParameter(PARAM_SUBTASK);
         if ("create".equals(subTask)) {
-            return actCreate(request, className, sourceFile, templateFile);
+            return actCreate(request, pathMetaData);
         } else {
-            return actDefault(request, className, sourceFile, templateFile);
+            return actDefault(request, pathMetaData);
         }
     }
 
-    Response actDefault(Request request, String className, File sourceFile,
-        File templateFile) {
+    Response actDefault(Request request, PathMetaData pathMetaData) {
 
         String actionName = getSourceCreator().getActionName(request.getPath(),
             request.getMethod());
@@ -42,14 +40,13 @@ public class CreateClassAction extends AbstractUpdateAction {
         Map variableMap = new HashMap();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("className", className);
+        variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("actionName", actionName);
         return getSourceCreator().getResponseCreator().createResponse(
             "createClass", variableMap);
     }
 
-    Response actCreate(Request request, String className, File sourceFile,
-        File templateFile) {
+    Response actCreate(Request request, PathMetaData pathMetaData) {
 
         String method = request.getParameter(PARAM_METHOD);
         if (method == null) {
@@ -58,7 +55,7 @@ public class CreateClassAction extends AbstractUpdateAction {
 
         String transition = request.getParameter(PARAM_TRANSITION);
 
-        ClassDesc classDesc = new ClassDescImpl(className);
+        ClassDesc classDesc = new ClassDescImpl(pathMetaData.getClassName());
         MethodDesc methodDesc = new MethodDescImpl(getSourceCreator()
             .getActionName(request.getPath(), method));
         methodDesc.setReturnTypeDesc(String.class.getName());
@@ -74,7 +71,7 @@ public class CreateClassAction extends AbstractUpdateAction {
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("className", className);
+        variableMap.put("pathMetaData", pathMetaData);
         return getSourceCreator().getResponseCreator().createResponse(
             "createClass_create", variableMap);
     }

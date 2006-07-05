@@ -38,6 +38,7 @@ import org.seasar.cms.framework.creator.DescValidator;
 import org.seasar.cms.framework.creator.EntityMetaData;
 import org.seasar.cms.framework.creator.MethodDesc;
 import org.seasar.cms.framework.creator.ParameterDesc;
+import org.seasar.cms.framework.creator.PathMetaData;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.creator.SourceGenerator;
@@ -85,8 +86,6 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private File classesDirectory_;
 
-    private File webappDirectory_;
-
     private TemplateAnalyzer analyzer_;
 
     private String encoding_ = "UTF-8";
@@ -133,13 +132,10 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public Response update(String path, String method, Request request) {
 
-        String className = getClassName(getComponentName(path, method));
-        File sourceFile = getSourceFile(className + "Base");
-        File templateFile = getTemplateFile(path);
-        String defaultPath = getDefaultPath(path, method);
-        if (defaultPath != null && !templateFile.exists()) {
-            templateFile = getTemplateFile(defaultPath);
-        }
+        PathMetaData pathMetaData = new LazyPathMetaData(this, path, method);
+        String className = pathMetaData.getClassName();
+        File sourceFile = pathMetaData.getSourceFile();
+        File templateFile = pathMetaData.getTemplateFile();
 
         Object condition;
 
@@ -165,7 +161,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
         UpdateAction action = actionSelector_.getAction(condition);
         if (action != null) {
-            return action.act(request, className, sourceFile, templateFile);
+            return action.act(request, pathMetaData);
         } else {
             return null;
         }
@@ -226,13 +222,11 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    public ClassDescBag gatherClassDescs(String[] paths, String method,
-        String className, File templateFile) {
+    public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas) {
 
         Map classDescMap = new LinkedHashMap();
-        for (int i = 0; i < paths.length; i++) {
-            gatherClassDescs(classDescMap, paths[i], method, className,
-                templateFile);
+        for (int i = 0; i < pathMetaDatas.length; i++) {
+            gatherClassDescs(classDescMap, pathMetaDatas[i]);
         }
         ClassDesc[] classDescs = addRelativeClassDescs((ClassDesc[]) classDescMap
             .values().toArray(new ClassDesc[0]));
@@ -285,12 +279,13 @@ public class SourceCreatorImpl implements SourceCreator {
         writeSourceFiles(classDescBag, ClassDesc.KIND_PAGE, mergeMethod);
     }
 
-    public void gatherClassDescs(Map classDescMap, String path, String method,
-        String className, File templateFile) {
+    public void gatherClassDescs(Map classDescMap, PathMetaData pathMetaData) {
 
+        String method = pathMetaData.getMethod();
+        String className = pathMetaData.getClassName();
         try {
             analyzer_.analyze(method, classDescMap, new FileInputStream(
-                templateFile), encoding_, className);
+                pathMetaData.getTemplateFile()), encoding_, className);
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
@@ -303,8 +298,8 @@ public class SourceCreatorImpl implements SourceCreator {
             classDescMap.put(className, classDesc);
         }
         if (classDesc != null) {
-            classDesc.setMethodDesc(new MethodDescImpl(getActionName(path,
-                method)));
+            classDesc.setMethodDesc(new MethodDescImpl(getActionName(
+                pathMetaData.getPath(), method)));
             MethodDesc methodDesc = new MethodDescImpl(
                 DefaultRequestProcessor.ACTION_RENDER);
             classDesc.setMethodDesc(methodDesc);
@@ -517,7 +512,8 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    public boolean writeSourceFile(ClassDesc classDesc, ClassDescSet classDescSet) {
+    public boolean writeSourceFile(ClassDesc classDesc,
+        ClassDescSet classDescSet) {
 
         if (!DescValidator.isValid(classDesc, classDescSet)) {
             return false;
@@ -652,7 +648,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public File getTemplateFile(String path) {
 
-        return new File(webappDirectory_, path);
+        return new File(getWebappDirectory(), path);
     }
 
     public File getSourceFile(String className) {
@@ -708,12 +704,8 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public File getWebappDirectory() {
 
-        return webappDirectory_;
-    }
-
-    public void setWebappDirectoryPath(String webappDirectoryPath) {
-
-        webappDirectory_ = new File(webappDirectoryPath);
+        return new File(configuration_
+            .getProperty(Configuration.KEY_WEBAPPROOT));
     }
 
     public TemplateAnalyzer getTemplateAnalyzer() {

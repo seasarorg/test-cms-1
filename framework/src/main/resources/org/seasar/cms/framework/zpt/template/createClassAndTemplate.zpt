@@ -4,7 +4,7 @@
   </head>
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
-<p>リクエストされたパス<span tal:replace="request/path">PATH</span>に対応するクラス<span tal:replace="className">CLASSNAME</span>が見つかりませんでしたので、クラスを作成します。</p>
+<p>リクエストされたパス<span tal:replace="request/path">PATH</span>に対応するクラス<span tal:replace="pathMetaData/className">CLASSNAME</span>が見つかりませんでしたので、クラスを作成します。</p>
 <p>処理を行なった後の遷移先：</p>
 <form tal:attributes="action request/absolutePath" method="post">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />

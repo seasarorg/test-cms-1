@@ -1,56 +1,28 @@
 package org.seasar.cms.framework.creator;
 
-import java.io.File;
-
-import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.Response;
-
 import junit.framework.TestCase;
 
 public class EntityMetaDataTest extends TestCase {
 
-    private EntityMetaData target_ = new EntityMetaData(new SourceCreator() {
+    private EntityMetaData target_ = new EntityMetaData(
+        new MockSourceCreator() {
 
-        public String getPagePackageName() {
-            return "com.example.web";
-        }
+            public String getPagePackageName() {
+                return "com.example.web";
+            }
 
-        public String getDtoPackageName() {
-            return "com.example.dto";
-        }
+            public String getDtoPackageName() {
+                return "com.example.dto";
+            }
 
-        public String getDaoPackageName() {
-            return "com.example.dao";
-        }
+            public String getDaoPackageName() {
+                return "com.example.dao";
+            }
 
-        public String getDxoPackageName() {
-            return "com.example.dxo";
-        }
-
-        public String getComponentName(String path, String method) {
-            return null;
-        }
-
-        public String getActionName(String path, String method) {
-            return null;
-        }
-
-        public String getClassName(String componentName) {
-            return null;
-        }
-
-        public File getSourceFile(String className) {
-            return null;
-        }
-
-        public File getTemplateFile(String className) {
-            return null;
-        }
-
-        public Response update(String path, String method, Request request) {
-            return null;
-        }
-    }, "com.example.dto.TestDto");
+            public String getDxoPackageName() {
+                return "com.example.dxo";
+            }
+        }, "com.example.dto.TestDto");
 
     public void testGetEntityName() throws Exception {
 

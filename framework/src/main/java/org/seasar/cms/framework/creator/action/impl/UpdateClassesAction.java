@@ -14,6 +14,7 @@ import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
 import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.ClassDescBag;
+import org.seasar.cms.framework.creator.PathMetaData;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 
@@ -29,27 +30,24 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         super(sourceCreator);
     }
 
-    public Response act(Request request, String className, File sourceFile,
-        File templateFile) {
+    public Response act(Request request, PathMetaData pathMetaData) {
 
         String subTask = request.getParameter(PARAM_SUBTASK);
         if ("update".equals(subTask)) {
-            return actUpdate(request, className, sourceFile, templateFile);
+            return actUpdate(request, pathMetaData);
         } else {
-            return actDefault(request, className, sourceFile, templateFile);
+            return actDefault(request, pathMetaData);
         }
     }
 
-    Response actDefault(Request request, String className, File sourceFile,
-        File templateFile) {
+    Response actDefault(Request request, PathMetaData pathMetaData) {
 
-        if (!shouldUpdate(sourceFile, templateFile)) {
+        if (!shouldUpdate(pathMetaData)) {
             return null;
         }
 
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
-            new String[] { request.getPath() }, className, className,
-            templateFile);
+            new PathMetaData[] { pathMetaData });
         if (classDescBag.isEmpty()) {
             return null;
         }
@@ -80,8 +78,9 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         Map variableMap = new HashMap();
         variableMap.put("request", request);
-        variableMap.put("templateFile", templateFile);
+        variableMap.put("templateFile", pathMetaData.getTemplateFile());
         variableMap.put("parameters", getParameters(request));
+        variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("createdClassDescs", createdClassDescList);
         variableMap.put("updatedClassDescs", updatedClassDescList);
         variableMap.put("daoClassDescExists", Boolean.valueOf(classDescBag
@@ -99,8 +98,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             "updateClasses", variableMap);
     }
 
-    Response actUpdate(Request request, String className, File sourceFile,
-        File templateFile) {
+    Response actUpdate(Request request, PathMetaData pathMetaData) {
 
         String method = request.getParameter(PARAM_METHOD);
         if (method == null) {
@@ -108,8 +106,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         }
 
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
-            new String[] { request.getPath() }, className, className,
-            templateFile);
+            new PathMetaData[] { pathMetaData });
         if (classDescBag.isEmpty()) {
             return null;
         }
@@ -136,7 +133,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("templateFile", templateFile);
+        variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("createdClassDescs", classDescBag
             .getCreatedClassDescs());
         variableMap.put("updatedClassDescs", classDescBag
@@ -158,11 +155,13 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             "updateClasses_update", variableMap);
     }
 
-    boolean shouldUpdate(File sourceFile, File templateFile) {
+    boolean shouldUpdate(PathMetaData pathMetaData) {
 
+        File templateFile = pathMetaData.getTemplateFile();
         if (!templateFile.exists()) {
             return false;
         }
+        File sourceFile = pathMetaData.getSourceFile();
         return (!sourceFile.exists() || templateFile.lastModified() > sourceFile
             .lastModified());
     }

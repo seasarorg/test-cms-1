@@ -4,7 +4,7 @@
   </head>
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
-<p>Pageクラス<span tal:replace="className">CLASSNAME</span>を生成しました。</p>
+<p>Pageクラス<span tal:replace="pathMetaData/className">CLASSNAME</span>を生成しました。</p>
 <p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
 <form tal:attributes="method method; action request/absolutePath">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />

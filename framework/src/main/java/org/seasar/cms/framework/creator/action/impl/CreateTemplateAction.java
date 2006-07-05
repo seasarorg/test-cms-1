@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.creator.PathMetaData;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 public class CreateTemplateAction extends AbstractUpdateAction {
@@ -18,29 +19,25 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         super(sourceCreator);
     }
 
-    public Response act(Request request, String className, File sourceFile,
-        File templateFile) {
+    public Response act(Request request, PathMetaData pathMetaData) {
 
         String subTask = request.getParameter(PARAM_SUBTASK);
         if ("create".equals(subTask)) {
-            return actCreate(request, className, sourceFile, templateFile);
+            return actCreate(request, pathMetaData);
         } else {
-            return actDefault(request, className, sourceFile, templateFile);
+            return actDefault(request, pathMetaData);
         }
     }
 
-    Response actDefault(Request request, String className, File sourceFile,
-        File templateFile) {
+    Response actDefault(Request request, PathMetaData pathMetaData) {
 
-        if (!isOwnTemplateUsed(request.getPath(), request.getMethod())) {
+        if (!isOwnTemplateUsed(pathMetaData)) {
             return null;
         }
 
-        String actionName = getSourceCreator().getActionName(request.getPath(),
-            request.getMethod());
-
         String template = getSourceCreator().getSourceGenerator()
-            .generateTemplateSource(getSuffix(templateFile.getName()),
+            .generateTemplateSource(
+                getSuffix(pathMetaData.getTemplateFile().getName()),
                 new HashMap());
         if (template == null) {
             template = "";
@@ -49,41 +46,36 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         Map variableMap = new HashMap();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("className", className);
-        variableMap.put("sourceFile", sourceFile);
-        variableMap.put("templateFile", templateFile);
-        variableMap.put("actionName", actionName);
+        variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("template", template);
         return getSourceCreator().getResponseCreator().createResponse(
             "createTemplate", variableMap);
     }
 
-    boolean isOwnTemplateUsed(String path, String method) {
+    boolean isOwnTemplateUsed(PathMetaData pathMetaData) {
 
         Class pageClass = getSourceCreator().getClass(
-            getSourceCreator().getClassName(
-                getSourceCreator().getComponentName(path, method)));
+            pathMetaData.getClassName());
         if (pageClass == null) {
             return true;
         }
         Method actionMethod;
         try {
-            actionMethod = pageClass.getMethod(getSourceCreator()
-                .getActionName(path, method), new Class[0]);
+            actionMethod = pageClass.getMethod(pathMetaData.getActionName(),
+                new Class[0]);
         } catch (SecurityException ex) {
             return true;
         } catch (NoSuchMethodException ex) {
             return true;
         }
         if (actionMethod.getReturnType() == Void.TYPE) {
-            return true;
+            return (pathMetaData.getDefaultPath() == null);
         } else {
             return false;
         }
     }
 
-    Response actCreate(Request request, String className, File sourceFile,
-        File templateFile) {
+    Response actCreate(Request request, PathMetaData pathMetaData) {
 
         String method = request.getParameter(PARAM_METHOD);
         if (method == null) {
@@ -95,6 +87,7 @@ public class CreateTemplateAction extends AbstractUpdateAction {
             return null;
         }
 
+        File templateFile = pathMetaData.getTemplateFile();
         templateFile.getParentFile().mkdirs();
         getSourceCreator().writeString(template, templateFile);
 
@@ -102,7 +95,7 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("templateFile", templateFile);
+        variableMap.put("pathMetaData", pathMetaData);
         return getSourceCreator().getResponseCreator().createResponse(
             "createTemplate_create", variableMap);
     }

@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
+import org.seasar.cms.framework.Configuration;
 import org.seasar.cms.framework.FrameworkTestCase;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.container.hotdeploy.DistributedOndemandBehavoir;
@@ -13,6 +14,7 @@ import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.PropertyDesc;
 import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator;
+import org.seasar.cms.framework.impl.ConfigurationImpl;
 import org.seasar.cms.framework.impl.DefaultRequestProcessor;
 import org.seasar.cms.framework.zpt.ZptAnalyzer;
 import org.seasar.framework.container.S2Container;
@@ -69,11 +71,18 @@ abstract public class SourceCreatorImplTestBase extends FrameworkTestCase {
         container_.register(DefaultRequestProcessor.class);
         container_.register(LocalOndemandCreatorContainer.class);
         container_.register(ZptAnalyzer.class);
+        container_.register(ConfigurationImpl.class);
+
+        Configuration configuration = (Configuration) container_
+            .getComponent(Configuration.class);
+        configuration.setProperty(Configuration.KEY_WEBAPPROOT, new File(
+            ResourceUtil.getBuildDir(getClass()), "webapp").getCanonicalPath());
 
         DefaultRequestProcessor processor = (DefaultRequestProcessor) container_
             .getComponent(RequestProcessor.class);
         processor.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page", "_${method}",
             "", null);
+
         LocalOndemandCreatorContainer creatorContainer = (LocalOndemandCreatorContainer) container_
             .getComponent(OndemandCreatorContainer.class);
         creatorContainer.setRootPackageName("com.example");
@@ -88,8 +97,6 @@ abstract public class SourceCreatorImplTestBase extends FrameworkTestCase {
             .getCanonicalPath());
         target_.setClassesDirectoryPath(ResourceUtil.getBuildDir(getClass())
             .getCanonicalPath());
-        target_.setWebappDirectoryPath(new File(ResourceUtil
-            .getBuildDir(getClass()), "webapp").getCanonicalPath());
         FreemarkerSourceGenerator sourceGenerator = new FreemarkerSourceGenerator();
         sourceGenerator.setSourceCreator(target_);
         target_.setSourceGenerator(sourceGenerator);

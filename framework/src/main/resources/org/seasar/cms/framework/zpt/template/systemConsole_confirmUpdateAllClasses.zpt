@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>SYSTEM CONSOLE</title>
+  </head>
+  <body>
+<h1>SYSTEM CONSOLE</h1>
+<p>クラスを一括更新します。</p>
+<p tal:condition="classDescBag/createdClassDescs">以下のクラスが追加されます：
+<ul>
+  <li tal:repeat="classDesc classDescBag/createdClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
+<p tal:condition="classDescBag/updatedClassDescs">以下のクラスが更新されます：
+<ul>
+  <li tal:repeat="classDesc classDescBag/updatedClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
+<p>よろしいですか？</p>
+<form tal:attributes="method method; action request/absolutePath">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="hidden" name="__cms__task" value="systemConsole" />
+  <input type="hidden" name="__cms__subTask" value="updateAllClasses" />
+  <input type="hidden" name="__cms__method" tal:attributes="value method" />
+  <p><input type="submit" value="はい" />
+  <input type="button" value="戻る" onclick="history.back()" /></p>
+</form>
+  </body>
+</html>
