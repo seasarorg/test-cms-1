@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>SYSTEM CONSOLE</title>
+  </head>
+  <body>
+<h1>SYSTEM CONSOLE</h1>
+<form tal:attributes="action request/absolutePath" method="post">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="hidden" name="__cms__task" value="systemConsole" />
+  <input type="hidden" name="__cms__subTask" value="updateAllClasses" />
+  <input type="hidden" name="__cms__method" tal:attributes="value method" />
+  <p><input type="submit" value="全てのクラスを更新する" /></p>
+</form>
+<form tal:attributes="method method; action request/absolutePath">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <p><input type="submit" value="進む" /></p>
+</form>
+<p><input type="button" value="戻る" onclick="history.back()" /></p>
+  </body>
+</html>

@@ -68,7 +68,7 @@ public class CreateClassAction extends AbstractUpdateAction {
         }
         classDesc.setMethodDesc(methodDesc);
 
-        writeSourceFile(classDesc, null);
+        getSourceCreator().writeSourceFile(classDesc, null);
 
         Map variableMap = new HashMap();
         variableMap.put("request", request);

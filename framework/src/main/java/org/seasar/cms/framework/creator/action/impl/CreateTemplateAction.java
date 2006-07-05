@@ -96,7 +96,7 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         }
 
         templateFile.getParentFile().mkdirs();
-        writeString(template, templateFile);
+        getSourceCreator().writeString(template, templateFile);
 
         Map variableMap = new HashMap();
         variableMap.put("request", request);

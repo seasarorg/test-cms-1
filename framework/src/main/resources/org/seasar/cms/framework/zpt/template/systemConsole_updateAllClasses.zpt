@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title>SYSTEM CONSOLE</title>
+  </head>
+  <body>
+<h1>SYSTEM CONSOLE</h1>
+<p>全てのクラスを更新しました。</p>
+<p tal:condition="createdClassDescs">以下のクラスが追加されました：
+<ul>
+  <li tal:repeat="classDesc createdClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
+<p tal:condition="updatedClassDescs">以下のクラスが更新されました：
+<ul>
+  <li tal:repeat="classDesc updatedClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
+<p tal:condition="failedClassDescs">必要な情報を取得できなかったため、以下のクラスは追加・更新できませんでした：
+<ul>
+  <li tal:repeat="classDesc failedClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
+<p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
+<form tal:attributes="method method; action request/absolutePath">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="hidden" name="__cms__task" value="systemConsole" />
+  <input type="submit" value=" OK " />
+</form>
+  </body>
+</html>

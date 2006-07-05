@@ -1,20 +1,11 @@
 package org.seasar.cms.framework.creator.action.impl;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.ClassDescSet;
-import org.seasar.cms.framework.creator.DescValidator;
 import org.seasar.cms.framework.creator.action.UpdateAction;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
@@ -61,54 +52,6 @@ abstract public class AbstractUpdateAction implements UpdateAction {
         }
         sb.append('"');
         return sb.toString();
-    }
-
-    protected boolean writeSourceFile(ClassDesc classDesc,
-        ClassDescSet classDescSet) {
-
-        if (!DescValidator.isValid(classDesc, classDescSet)) {
-            return false;
-        }
-
-        writeString(getSourceCreator().getSourceGenerator().generateBaseSource(
-            classDesc), getSourceCreator().getSourceFile(
-            classDesc.getName() + "Base"));
-
-        // gap側のクラスは存在しない場合のみ生成する。
-        File sourceFile = getSourceCreator().getSourceFile(classDesc.getName());
-        if (!sourceFile.exists()) {
-            writeString(getSourceCreator().getSourceGenerator()
-                .generateGapSource(classDesc), sourceFile);
-        }
-
-        return true;
-    }
-
-    protected void writeString(String string, File file) {
-
-        if (string == null) {
-            return;
-        }
-
-        file.getParentFile().mkdirs();
-
-        OutputStream os = null;
-        try {
-            os = new FileOutputStream(file);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                os, getSourceCreator().getEncoding()));
-            writer.write(string);
-            writer.flush();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException ignore) {
-                }
-            }
-        }
     }
 
     protected Parameter[] getParameters(Request request) {

@@ -93,7 +93,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
         classDesc.setMethodDesc(new MethodDescImpl(
             DefaultRequestProcessor.ACTION_RENDER));
 
-        writeSourceFile(classDesc, null);
+        getSourceCreator().writeSourceFile(classDesc, null);
 
         Map variableMap = new HashMap();
         variableMap.put("request", request);
