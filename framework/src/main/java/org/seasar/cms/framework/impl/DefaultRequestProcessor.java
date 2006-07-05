@@ -91,11 +91,11 @@ public class DefaultRequestProcessor implements RequestProcessor {
         Response response = processRequest(request, componentName, actionName);
 
         // デフォルトパスが指定されており、かつpassthroughの場合でパスに
-        // 対応するリソースが存在しない場合はデフォルトパスにフォワードする。
+        // 対応するリソースが存在しない場合はデフォルトパスにリダイレクトする。
         if (response.getType() == Response.TYPE_PASSTHROUGH) {
             String defaultPath = mapping.getDefaultPath(resolver);
             if (defaultPath != null && !isResourceExists(path)) {
-                response = new ForwardResponse(defaultPath);
+                response = new RedirectResponse(defaultPath);
             }
         }
 

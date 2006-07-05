@@ -108,6 +108,10 @@ public class SourceCreatorImpl implements SourceCreator {
         String className = getClassName(getComponentName(path, method));
         File sourceFile = getSourceFile(className + "Base");
         File templateFile = getTemplateFile(path);
+        String defaultPath = getDefaultPath(path, method);
+        if (defaultPath != null && !templateFile.exists()) {
+            templateFile = getTemplateFile(defaultPath);
+        }
 
         Object condition;
 
@@ -220,6 +224,21 @@ public class SourceCreatorImpl implements SourceCreator {
             return null;
         } else {
             return matched.getPathMapping().getActionName(
+                matched.getVariableResolver());
+        }
+    }
+
+    public String getDefaultPath(String path, String method) {
+
+        if (path == null) {
+            return null;
+        }
+        MatchedPathMapping matched = defaultRequestProcessor_
+            .findMatchedPathMapping(path, method);
+        if (matched == null) {
+            return null;
+        } else {
+            return matched.getPathMapping().getDefaultPath(
                 matched.getVariableResolver());
         }
     }
