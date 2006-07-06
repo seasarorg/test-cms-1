@@ -28,6 +28,7 @@ public class ZptResponseCreator implements ResponseCreator {
     public Response createResponse(String path, Map variableMap) {
 
         TemplateContext context = evaluator_.newContext();
+        context.setProperty(TemplateContext.PROP_CONTENT_TYPE, "text/html");
         if (variableMap != null) {
             VariableResolver resolver = new VariableResolverImpl();
             for (Iterator itr = variableMap.entrySet().iterator(); itr

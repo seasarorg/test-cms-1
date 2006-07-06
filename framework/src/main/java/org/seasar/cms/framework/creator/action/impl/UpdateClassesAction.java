@@ -1,12 +1,9 @@
 package org.seasar.cms.framework.creator.action.impl;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,48 +49,12 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             return null;
         }
 
-        List createdClassDescList = new ArrayList();
-        for (Iterator itr = classDescBag.getCreatedClassDescMap().values()
-            .iterator(); itr.hasNext();) {
-            ClassDesc classDesc = (ClassDesc) itr.next();
-            String kind = classDesc.getKind();
-            if (ClassDesc.KIND_DAO.equals(kind)
-                || ClassDesc.KIND_BEAN.equals(kind)) {
-                continue;
-            }
-            createdClassDescList.add(classDesc);
-        }
-
-        List updatedClassDescList = new ArrayList();
-        for (Iterator itr = classDescBag.getUpdatedClassDescMap().values()
-            .iterator(); itr.hasNext();) {
-            ClassDesc classDesc = (ClassDesc) itr.next();
-            String kind = classDesc.getKind();
-            if (ClassDesc.KIND_DAO.equals(kind)
-                || ClassDesc.KIND_BEAN.equals(kind)) {
-                continue;
-            }
-            updatedClassDescList.add(classDesc);
-        }
-
         Map variableMap = new HashMap();
         variableMap.put("request", request);
         variableMap.put("templateFile", pathMetaData.getTemplateFile());
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
-        variableMap.put("createdClassDescs", createdClassDescList);
-        variableMap.put("updatedClassDescs", updatedClassDescList);
-        variableMap.put("daoClassDescExists", Boolean.valueOf(classDescBag
-            .getClassDescMap(ClassDesc.KIND_DAO).size()
-            + classDescBag.getClassDescMap(ClassDesc.KIND_BEAN).size() > 0));
-        variableMap.put("createdDaoClassDescs", classDescBag
-            .getCreatedClassDescs(ClassDesc.KIND_DAO));
-        variableMap.put("updatedDaoClassDescs", classDescBag
-            .getUpdatedClassDescs(ClassDesc.KIND_DAO));
-        variableMap.put("createdBeanClassDescs", classDescBag
-            .getCreatedClassDescs(ClassDesc.KIND_BEAN));
-        variableMap.put("updatedBeanClassDescs", classDescBag
-            .getUpdatedClassDescs(ClassDesc.KIND_BEAN));
+        variableMap.put("classDescBag", classDescBag);
         return getSourceCreator().getResponseCreator().createResponse(
             "updateClasses", variableMap);
     }
@@ -107,9 +68,6 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
             new PathMetaData[] { pathMetaData });
-        if (classDescBag.isEmpty()) {
-            return null;
-        }
 
         String[] appliedClassNames = request.getParameterValues(PARAM_APPLY);
         Set appliedClassNameSet = new HashSet();
@@ -134,11 +92,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
-        variableMap.put("createdClassDescs", classDescBag
-            .getCreatedClassDescs());
-        variableMap.put("updatedClassDescs", classDescBag
-            .getUpdatedClassDescs());
-        variableMap.put("failedClassDescs", classDescBag.getFailedClassDescs());
+        variableMap.put("classDescBag", classDescBag);
         variableMap.put("actionName", getSourceCreator().getActionName(
             request.getPath(), method));
         variableMap.put("suggestionExists", Boolean

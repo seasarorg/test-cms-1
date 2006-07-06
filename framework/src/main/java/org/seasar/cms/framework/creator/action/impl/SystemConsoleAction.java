@@ -2,18 +2,25 @@ package org.seasar.cms.framework.creator.action.impl;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.creator.ClassDesc;
 import org.seasar.cms.framework.creator.ClassDescBag;
 import org.seasar.cms.framework.creator.PathMetaData;
 import org.seasar.cms.framework.creator.impl.LazyPathMetaData;
 import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
 
 public class SystemConsoleAction extends AbstractUpdateAction {
+
+    private static final String PARAM_APPLY = SourceCreatorImpl.PARAM_PREFIX
+        + "apply";
 
     public SystemConsoleAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
@@ -44,13 +51,18 @@ public class SystemConsoleAction extends AbstractUpdateAction {
     Response actConfirmUpdateAllClasses(Request request,
         PathMetaData pathMetaData) {
 
+        String method = request.getParameter(PARAM_METHOD);
+        if (method == null) {
+            return null;
+        }
+
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
             gatherPaths());
 
         Map variableMap = new HashMap();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("method", request.getMethod());
+        variableMap.put("method", method);
         variableMap.put("classDescBag", classDescBag);
         return getSourceCreator().getResponseCreator().createResponse(
             "systemConsole_confirmUpdateAllClasses", variableMap);
@@ -65,6 +77,20 @@ public class SystemConsoleAction extends AbstractUpdateAction {
 
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
             gatherPaths());
+
+        String[] appliedClassNames = request.getParameterValues(PARAM_APPLY);
+        Set appliedClassNameSet = new HashSet();
+        if (appliedClassNames != null) {
+            appliedClassNameSet.addAll(Arrays.asList(appliedClassNames));
+        }
+        ClassDesc[] classDescs = classDescBag.getClassDescs();
+        for (int i = 0; i < classDescs.length; i++) {
+            String name = classDescs[i].getName();
+            if (!appliedClassNameSet.contains(name)) {
+                classDescBag.remove(name);
+            }
+        }
+
         getSourceCreator().updateClasses(classDescBag, false);
 
         Map variableMap = new HashMap();
