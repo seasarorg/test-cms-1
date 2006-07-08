@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <include path="j2ee.dicon" />
+  <component
+    class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
+    <initMethod name="addReferenceClass">
+      <arg>
+        @org.seasar.cms.beantable.identity.Identity@class
+      </arg>
+    </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.beantable.identity.impl"</arg>
+      <arg>".*Identity"</arg>
+    </initMethod>
+    <initMethod name="addIgnoreClassPattern">
+      <arg>"org.seasar.cms.beantable.identity.impl"</arg>
+      <arg>"Abstract.*"</arg>
+    </initMethod>
+    <initMethod name="registerAll" />
+  </component>
+  <component name="identitySelector" class="org.seasar.cms.beantable.identity.impl.IdentitySelectorImpl">
+    <property name="identities">
+      container.findComponents(@org.seasar.cms.beantable.identity.Identity@class)
+    </property>
+    <initMethod name="start" />
+  </component>
+  <component class="org.seasar.cms.beantable.impl.BeanTableImpl" instance="prototype">
+    <property name="identity">identitySelector.getIdentity()</property>
+  </component>
+</components>
