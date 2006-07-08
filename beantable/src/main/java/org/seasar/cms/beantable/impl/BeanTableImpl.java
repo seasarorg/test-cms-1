@@ -275,7 +275,7 @@ public class BeanTableImpl implements BeanTable {
         ColumnDetail column = getColumnAnnotation(method);
         if (column != null) {
             String columnName = column.name();
-            if (columnName != null && columnName.length() > 0) {
+            if (columnName != null) {
                 columnMetaData.setName(columnName);
             }
 
@@ -289,7 +289,7 @@ public class BeanTableImpl implements BeanTable {
             }
 
             String defaultValue = column.defaultValue();
-            if (defaultValue.length() != 0) {
+            if (defaultValue != null) {
                 columnMetaData.setDefault(defaultValue);
             }
 
@@ -361,7 +361,7 @@ public class BeanTableImpl implements BeanTable {
                     }
 
                     public String defaultValue() {
-                        return "";
+                        return null;
                     }
 
                     public Constraint[] constraint() {
@@ -377,7 +377,7 @@ public class BeanTableImpl implements BeanTable {
                     }
                 };
             }
-        } else if (column.name().length() == 0) {
+        } else if (column.name() == null) {
             final org.seasar.dao.annotation.tiger.Column s2DaoColumn = method
                 .getAnnotation(org.seasar.dao.annotation.tiger.Column.class);
             if (s2DaoColumn != null) {

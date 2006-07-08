@@ -13,13 +13,13 @@ import org.seasar.cms.beantable.JDBCType;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ColumnDetail {
-    String name() default "";
+    String name();
 
-    JDBCType type() default null;
+    JDBCType type();
 
-    String defaultValue() default "";
+    String defaultValue();
 
     Constraint[] constraint() default {};
 
-    boolean index() default false;
+    boolean index();
 }
