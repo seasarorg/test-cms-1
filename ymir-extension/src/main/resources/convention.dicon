@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <include path="app.dicon" />
+  <include path="common.dicon" />
+  <include path="j2ee.dicon" />
+  <include path="dao.dicon" />
+  <include path="s2dxo.dicon" />
+  <component
+    class="org.seasar.cms.ymir.container.hotdeploy.LocalOndemandCreatorContainer">
+    <property name="rootPackageName">
+      config.getProperty("rootPackageName", "skeleton")
+    </property>
+    <initMethod name="addCreator">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.creator.PageCreator">
+           <property name="autoBindingDef">@org.seasar.framework.container.assembler.AutoBindingDefFactory@AUTO</property>
+           <property name="externalBinding">false</property>
+        </component>
+      </arg>
+    </initMethod>
+    <initMethod name="addCreator">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.creator.DaoCreator">
+           <initMethod name="addCustomizer">
+            <arg>
+              <component
+                class="org.seasar.framework.container.autoregister.AspectCustomizer" autoBinding="none">
+                <property name="interceptor">
+                  <component class="org.seasar.framework.aop.interceptors.InterceptorChain" instance="prototype">
+                    <initMethod name="add"><arg>j2ee.requiredTx</arg></initMethod>
+                    <initMethod name="add"><arg>dao.interceptor</arg></initMethod>
+                  </component>
+                </property>
+              </component>
+            </arg>
+          </initMethod>
+        </component>
+      </arg>
+    </initMethod>
+    <initMethod name="addCreator">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.creator.DxoCreator">
+           <initMethod name="addCustomizer">
+            <arg>
+              <component
+                class="org.seasar.framework.container.autoregister.AspectCustomizer" autoBinding="none">
+                <property name="interceptor">s2dxo.s2DxoIntereceptor</property>
+              </component>
+            </arg>
+          </initMethod>
+        </component>
+      </arg>
+    </initMethod>
+  </component>
+</components>

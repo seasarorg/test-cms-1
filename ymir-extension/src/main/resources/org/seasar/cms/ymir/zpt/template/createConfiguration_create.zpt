@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>SYSTEM NOTIFICATION</title>
+  </head>
+  <body>
+<h1>SYSTEM NOTIFICATION</h1>
+<p>プロジェクトの設定を完了しました。</p>
+<p>プロジェクトの設定を有効にするには、Webアプリケーションをリロードする必要があります。
+EclipseでプロジェクトルートをRefreshし、
+サーブレットコンテナでこのWebアプリケーションをリロードしてから、以下の「OK」ボタンを押して下さい。</p>
+<form tal:attributes="method method; action request/absolutePath">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="submit" value=" OK " />
+</form>
+  </body>
+</html>

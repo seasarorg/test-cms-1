@@ -1,0 +1,10 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <form tal:attributes="action page:/action.html">
+      <input type="file" name="test.file" />
+    </form>
+  </body>
+</html>

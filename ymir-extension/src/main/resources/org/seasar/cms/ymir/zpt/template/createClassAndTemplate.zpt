@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>SYSTEM NOTIFICATION</title>
+  </head>
+  <body>
+<h1>SYSTEM NOTIFICATION</h1>
+<p>リクエストされたパス<span tal:replace="request/path">PATH</span>に対応するクラス<span tal:replace="pathMetaData/className">CLASSNAME</span>が見つかりませんでしたので、クラスを作成します。</p>
+<p>処理を行なった後の遷移先：</p>
+<form tal:attributes="action request/absolutePath" method="post">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="hidden" name="__cms__task" value="createClassAndTemplate" />
+  <input type="hidden" name="__cms__method" tal:attributes="value request/method" />
+  <p><input type="radio" name="__cms__subTask" value="template" /> このページ用のテンプレートにフォワード</p>
+  <p><input type="radio" name="__cms__subTask" value="redirect" /> 次のページにリダイレクト：<input type="text" name="__cms__redirectPath" value="" /></p>
+  <p><input type="submit" value=" OK " />
+  <input type="button" value="戻る" onclick="history.back()" /></p>
+</form>
+  </body>
+</html>

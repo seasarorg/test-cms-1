@@ -1,0 +1,10 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <form tal:attributes="action page:/action.html" action="">
+      <input type="text" name="text" tal:attributes="value PAGE/text" value="" />
+    </form>
+  </body>
+</html>

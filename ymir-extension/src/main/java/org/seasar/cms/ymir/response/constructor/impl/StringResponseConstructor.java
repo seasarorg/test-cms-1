@@ -1,0 +1,39 @@
+package org.seasar.cms.ymir.response.constructor.impl;
+
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.impl.VoidResponse;
+import org.seasar.cms.ymir.response.scheme.Strategy;
+import org.seasar.cms.ymir.response.scheme.impl.PageStrategy;
+
+public class StringResponseConstructor extends AbstractResponseConstructor {
+
+    public Class getTargetClass() {
+
+        return String.class;
+    }
+
+    public Response constructResponse(Object component, Object returnValue) {
+
+        String string = (String) returnValue;
+        if (string == null) {
+            return VoidResponse.INSTANCE;
+        }
+
+        String scheme;
+        String path;
+        int colon = string.indexOf(':');
+        if (colon < 0) {
+            scheme = PageStrategy.SCHEME;
+            path = string;
+        } else {
+            scheme = string.substring(0, colon);
+            path = string.substring(colon + 1);
+        }
+        Strategy strategy = strategySelector_.getStrategy(scheme);
+        if (strategy == null) {
+            throw new RuntimeException("Unknown scheme '" + scheme
+                + "' is specified: " + string);
+        }
+        return strategy.constructResponse(path, component);
+    }
+}

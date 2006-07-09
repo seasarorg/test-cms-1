@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>SYSTEM NOTIFICATION</title>
+  </head>
+  <body>
+<h1>SYSTEM NOTIFICATION</h1>
+<p tal:condition="classDescBag/createdClassDescs">以下のクラスが追加されました：
+<ul>
+  <li tal:repeat="classDesc classDescBag/createdClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
+<p tal:condition="classDescBag/updatedClassDescs">以下のクラスが更新されました：
+<ul>
+  <li tal:repeat="classDesc classDescBag/updatedClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
+<p tal:condition="classDescBag/failedClassDescs">必要な情報を取得できなかったため、以下のクラスは追加・更新できませんでした：
+<ul>
+  <li tal:repeat="classDesc classDescBag/failedClassDescs" tal:content="classDesc/name">CLASS</li>
+</ul>
+</p>
+<p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
+<form tal:attributes="method method; action request/absolutePath">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="submit" value=" OK " />
+</form>
+<p tal:condition="suggestionExists"><strong>次にあなたがすべき事の例：</strong>
+<ul>
+  <li tal:condition="pageClassDescs">
+<span tal:repeat="classDesc pageClassDescs"><span tal:condition="not:repeat/classDesc/start">、</span><span tal:replace="string:${classDesc/shortName}クラス">SHORTNAMEクラス</span></span>のBaseクラスにリクエストを処理するための<span tal:replace="actionName">ACTIONNAME</span>のようなメソッドが生成されています。
+これをGapクラスでオーバライドして処理を実装して下さい。
+（この時必要に応じてBaseクラスのメソッドの返り値の方を変更しても構いません。
+メソッドの返り値の型はBaseクラスが更新されても保持されます。）
+  </li>
+  <li tal:condition="pageClassDescs">
+<span tal:repeat="classDesc pageClassDescs"><span tal:condition="not:repeat/classDesc/start">、</span><span tal:replace="string:${classDesc/shortName}クラス">SHORTNAMEクラス</span></span>のBaseクラスに<span tal:replace="renderActionName">RENDERACTIONNAME</span>メソッドが生成されている場合、
+これをGapクラスでオーバライドして処理を実装して下さい。
+<span tal:replace="renderActionName">RENDERACTIONNAME</span>メソッドはテンプレートがレンダリングされる前に呼び出されるメソッドです。
+このメソッドの中でテンプレートを表示するために必要な各種プロパティの準備を行なうようにして下さい。
+  </li>
+  <li tal:condition="createdBeanClassDescs">
+<span tal:repeat="classDesc createdBeanClassDescs"><span tal:condition="not:repeat/classDesc/start">、</span><span tal:replace="string:${classDesc/shortName}クラス">SHORTNAMEクラス</span></span>をデータベースのテーブル構造と一致するようメソッドを追加して下さい。
+また、必要に応じてBaseクラスにあるプロパティの型を修正して下さい。
+（プロパティの型はBaseクラスが更新されても保持されます。）
+  </li>
+</ul>
+</p>
+  </body>
+</html>
