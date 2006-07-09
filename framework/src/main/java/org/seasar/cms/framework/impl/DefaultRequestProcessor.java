@@ -18,10 +18,10 @@ import org.seasar.cms.framework.PathMapping;
 import org.seasar.cms.framework.Request;
 import org.seasar.cms.framework.RequestProcessor;
 import org.seasar.cms.framework.Response;
+import org.seasar.cms.framework.Updater;
 import org.seasar.cms.framework.beanutils.FormFileArrayConverter;
 import org.seasar.cms.framework.beanutils.FormFileConverter;
 import org.seasar.cms.framework.container.ThreadLocalS2ContainerUtils;
-import org.seasar.cms.framework.creator.SourceCreator;
 import org.seasar.cms.framework.response.constructor.ResponseConstructor;
 import org.seasar.cms.framework.response.constructor.ResponseConstructorSelector;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
@@ -41,7 +41,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private S2Container container_;
 
-    private SourceCreator sourceCreator_;
+    private Updater[] updaters_ = new Updater[0];
 
     private Configuration configuration_;
 
@@ -79,12 +79,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
             dispatcher, parameterMap, fileParameterMap, mapping
                 .getPathInfo(resolver));
 
-        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
-            && sourceCreator_ != null) {
-            Response response = sourceCreator_.update(path,
-                request.getMethod(), request);
-            if (response != null) {
-                return response;
+        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())) {
+            for (int i = 0; i < updaters_.length; i++) {
+                Response response = updaters_[i].update(path, request
+                    .getMethod(), request);
+                if (response != null) {
+                    return response;
+                }
             }
         }
 
@@ -294,9 +295,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
         responseConstructorSelector_ = responseConstructorSelector;
     }
 
-    public void setSourceCreator(SourceCreator sourceCreator) {
+    public void setUpdaters(Object[] updaters) {
 
-        sourceCreator_ = sourceCreator;
+        updaters_ = new Updater[updaters.length];
+        for (int i = 0; i < updaters.length; i++) {
+            updaters_[i] = (Updater) updaters[i];
+        }
     }
 
     public void setConfiguration(Configuration configuration) {
