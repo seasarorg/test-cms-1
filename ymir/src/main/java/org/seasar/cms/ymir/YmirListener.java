@@ -10,13 +10,13 @@ import org.seasar.framework.log.Logger;
 
 public class YmirListener extends S2ContainerListener {
 
-    private static Logger logger = Logger.getLogger(YmirListener.class);
+    private Logger logger_ = Logger.getLogger(getClass());
 
     public void contextInitialized(ServletContextEvent sce) {
 
         super.contextInitialized(sce);
 
-        logger.debug("Ymir initialize start");
+        logger_.debug("Ymir initialize start");
 
         Configuration config = getConfiguration();
         if (config.getProperty(Configuration.KEY_WEBAPPROOT) == null) {
@@ -26,7 +26,7 @@ public class YmirListener extends S2ContainerListener {
 
         String projectStatus = config
             .getProperty(Configuration.KEY_PROJECTSTATUS);
-        logger.info("Project status is: "
+        logger_.info("Project status is: "
             + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
 
         // developモード以外の時はhotdeployを無効にするために
@@ -35,12 +35,12 @@ public class YmirListener extends S2ContainerListener {
             OndemandUtils.start(getContainer(), true);
         }
 
-        logger.debug("Ymir initialize end");
+        logger_.debug("Ymir initialize end");
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
 
-        logger.debug("Ymir destroy start");
+        logger_.debug("Ymir destroy start");
 
         if (!Configuration.PROJECTSTATUS_DEVELOP.equals(getConfiguration()
             .getProperty(Configuration.KEY_PROJECTSTATUS))) {
@@ -50,7 +50,7 @@ public class YmirListener extends S2ContainerListener {
 
         super.contextDestroyed(sce);
 
-        logger.debug("Ymir destroy end");
+        logger_.debug("Ymir destroy end");
     }
 
     S2Container getContainer() {
