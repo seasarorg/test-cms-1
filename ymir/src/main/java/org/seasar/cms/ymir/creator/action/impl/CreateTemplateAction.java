@@ -1,14 +1,14 @@
-package org.seasar.cms.framework.creator.action.impl;
+package org.seasar.cms.ymir.creator.action.impl;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.creator.PathMetaData;
-import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.creator.PathMetaData;
+import org.seasar.cms.ymir.creator.impl.SourceCreatorImpl;
 
 public class CreateTemplateAction extends AbstractUpdateAction {
 

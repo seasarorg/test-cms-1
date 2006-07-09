@@ -1,13 +1,13 @@
-package org.seasar.cms.framework.creator.action.impl;
+package org.seasar.cms.ymir.creator.action.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.creator.action.UpdateAction;
-import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.creator.action.UpdateAction;
+import org.seasar.cms.ymir.creator.impl.SourceCreatorImpl;
 
 abstract public class AbstractUpdateAction implements UpdateAction {
 

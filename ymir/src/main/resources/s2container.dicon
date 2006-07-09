@@ -4,5 +4,5 @@
 <components>
   <include path="common.dicon" />
   <component
-    class="org.seasar.cms.framework.container.hotdeploy.DistributedOndemandBehavoir" />
+    class="org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir" />
 </components>

@@ -1,14 +1,14 @@
-package org.seasar.cms.framework.freemarker;
+package org.seasar.cms.ymir.freemarker;
 
-import org.seasar.cms.framework.FrameworkTestCase;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.MethodDesc;
-import org.seasar.cms.framework.creator.MockSourceCreator;
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.impl.BodyDescImpl;
-import org.seasar.cms.framework.creator.impl.ClassDescImpl;
-import org.seasar.cms.framework.creator.impl.MethodDescImpl;
-import org.seasar.cms.framework.creator.impl.PropertyDescImpl;
+import org.seasar.cms.ymir.FrameworkTestCase;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.MethodDesc;
+import org.seasar.cms.ymir.creator.MockSourceCreator;
+import org.seasar.cms.ymir.creator.PropertyDesc;
+import org.seasar.cms.ymir.creator.impl.BodyDescImpl;
+import org.seasar.cms.ymir.creator.impl.ClassDescImpl;
+import org.seasar.cms.ymir.creator.impl.MethodDescImpl;
+import org.seasar.cms.ymir.creator.impl.PropertyDescImpl;
 
 public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
 

@@ -6,7 +6,7 @@
   <display-name>Application Skeleton</display-name>
   <context-param>
     <param-name>org.seasar.framework.container.configPath</param-name>
-    <param-value>framework.dicon</param-value>
+    <param-value>ymir.dicon</param-value>
   </context-param>
   <filter>
     <filter-name>encodingfilter</filter-name>
@@ -21,7 +21,7 @@
   <filter>
     <filter-name>multipartrequestfilter</filter-name>
     <filter-class>
-      org.seasar.cms.framework.MultipartRequestFilter
+      org.seasar.cms.ymir.MultipartRequestFilter
     </filter-class>
   </filter>
   <filter>
@@ -33,13 +33,13 @@
   <filter>
     <filter-name>hotdeployfilter</filter-name>
     <filter-class>
-      org.seasar.cms.framework.container.hotdeploy.OndemandFilter
+      org.seasar.cms.ymir.container.hotdeploy.OndemandFilter
     </filter-class>
   </filter>
   <filter>
-    <filter-name>framework.request</filter-name>
+    <filter-name>ymir.request</filter-name>
     <filter-class>
-      org.seasar.cms.framework.FrameworkFilter
+      org.seasar.cms.ymir.YmirFilter
     </filter-class>
     <init-param>
       <param-name>dispatcher</param-name>
@@ -47,9 +47,9 @@
     </init-param>
   </filter>
   <filter>
-    <filter-name>framework.forward</filter-name>
+    <filter-name>ymir.forward</filter-name>
     <filter-class>
-      org.seasar.cms.framework.FrameworkFilter
+      org.seasar.cms.ymir.YmirFilter
     </filter-class>
     <init-param>
       <param-name>dispatcher</param-name>
@@ -57,9 +57,9 @@
     </init-param>
   </filter>
   <filter>
-    <filter-name>framework.include</filter-name>
+    <filter-name>ymir.include</filter-name>
     <filter-class>
-      org.seasar.cms.framework.FrameworkFilter
+      org.seasar.cms.ymir.YmirFilter
     </filter-class>
     <init-param>
       <param-name>dispatcher</param-name>
@@ -83,23 +83,23 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>framework.request</filter-name>
+    <filter-name>ymir.request</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>framework.forward</filter-name>
+    <filter-name>ymir.forward</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>framework.include</filter-name>
+    <filter-name>ymir.include</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>INCLUDE</dispatcher>
   </filter-mapping>
   <listener>
     <listener-class>
-      org.seasar.cms.framework.FrameworkListener
+      org.seasar.cms.ymir.YmirListener
     </listener-class>
   </listener>
   <servlet>

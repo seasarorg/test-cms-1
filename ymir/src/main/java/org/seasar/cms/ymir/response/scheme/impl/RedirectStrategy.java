@@ -1,14 +1,14 @@
-package org.seasar.cms.framework.response.scheme.impl;
+package org.seasar.cms.ymir.response.scheme.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.seasar.cms.framework.Path;
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.impl.RedirectResponse;
-import org.seasar.cms.framework.response.scheme.Strategy;
+import org.seasar.cms.ymir.Path;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.impl.RedirectResponse;
+import org.seasar.cms.ymir.response.scheme.Strategy;
 import org.seasar.kvasir.util.el.EvaluationException;
 import org.seasar.kvasir.util.el.TextTemplateEvaluator;
 import org.seasar.kvasir.util.el.VariableResolver;

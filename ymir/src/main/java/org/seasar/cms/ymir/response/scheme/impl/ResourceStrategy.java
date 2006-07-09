@@ -1,10 +1,10 @@
-package org.seasar.cms.framework.response.scheme.impl;
+package org.seasar.cms.ymir.response.scheme.impl;
 
 import java.io.InputStream;
 
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.impl.SelfContainedResponse;
-import org.seasar.cms.framework.response.scheme.Strategy;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.impl.SelfContainedResponse;
+import org.seasar.cms.ymir.response.scheme.Strategy;
 
 public class ResourceStrategy implements Strategy {
 

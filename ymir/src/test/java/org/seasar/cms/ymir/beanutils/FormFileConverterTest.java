@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.beanutils;
+package org.seasar.cms.ymir.beanutils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,8 +8,8 @@ import junit.framework.TestCase;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.seasar.cms.framework.FormFile;
-import org.seasar.cms.framework.impl.FormFileImpl;
+import org.seasar.cms.ymir.FormFile;
+import org.seasar.cms.ymir.impl.FormFileImpl;
 
 public class FormFileConverterTest extends TestCase {
 

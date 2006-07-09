@@ -1,6 +1,6 @@
-package org.seasar.cms.framework.response.constructor;
+package org.seasar.cms.ymir.response.constructor;
 
-import org.seasar.cms.framework.Response;
+import org.seasar.cms.ymir.Response;
 
 public interface ResponseConstructor {
 

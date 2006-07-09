@@ -1,9 +1,9 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.ymir.creator.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.seasar.cms.framework.creator.BodyDesc;
+import org.seasar.cms.ymir.creator.BodyDesc;
 
 public class BodyDescImpl implements BodyDesc {
 

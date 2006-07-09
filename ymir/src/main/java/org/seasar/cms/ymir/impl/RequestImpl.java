@@ -1,10 +1,10 @@
-package org.seasar.cms.framework.impl;
+package org.seasar.cms.ymir.impl;
 
 import java.util.Iterator;
 import java.util.Map;
 
-import org.seasar.cms.framework.FormFile;
-import org.seasar.cms.framework.Request;
+import org.seasar.cms.ymir.FormFile;
+import org.seasar.cms.ymir.Request;
 
 public class RequestImpl implements Request {
 

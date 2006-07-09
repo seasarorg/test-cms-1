@@ -1,10 +1,10 @@
-package org.seasar.cms.framework.response.scheme.impl;
+package org.seasar.cms.ymir.response.scheme.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.seasar.cms.framework.response.scheme.Strategy;
-import org.seasar.cms.framework.response.scheme.StrategySelector;
+import org.seasar.cms.ymir.response.scheme.Strategy;
+import org.seasar.cms.ymir.response.scheme.StrategySelector;
 
 public class StrategySelectorImpl implements StrategySelector {
 

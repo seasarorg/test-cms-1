@@ -1,10 +1,10 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.ymir.creator.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.TypeDesc;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.TypeDesc;
 
 public class TypeDescImpl implements TypeDesc {
 

@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.container.hotdeploy;
+package org.seasar.cms.ymir.container.hotdeploy;
 
 import java.io.IOException;
 

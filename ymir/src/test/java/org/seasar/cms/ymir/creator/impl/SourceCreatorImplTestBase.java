@@ -1,22 +1,22 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.ymir.creator.impl;
 
 import java.io.File;
 
 import javax.servlet.ServletContext;
 
-import org.seasar.cms.framework.Configuration;
-import org.seasar.cms.framework.FrameworkTestCase;
-import org.seasar.cms.framework.RequestProcessor;
-import org.seasar.cms.framework.container.hotdeploy.DistributedOndemandBehavoir;
-import org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer;
-import org.seasar.cms.framework.container.hotdeploy.OndemandUtils;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
-import org.seasar.cms.framework.freemarker.FreemarkerSourceGenerator;
-import org.seasar.cms.framework.impl.ConfigurationImpl;
-import org.seasar.cms.framework.impl.DefaultRequestProcessor;
-import org.seasar.cms.framework.zpt.ZptAnalyzer;
+import org.seasar.cms.ymir.Configuration;
+import org.seasar.cms.ymir.FrameworkTestCase;
+import org.seasar.cms.ymir.RequestProcessor;
+import org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir;
+import org.seasar.cms.ymir.container.hotdeploy.LocalOndemandCreatorContainer;
+import org.seasar.cms.ymir.container.hotdeploy.OndemandUtils;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.PropertyDesc;
+import org.seasar.cms.ymir.creator.SourceCreator;
+import org.seasar.cms.ymir.freemarker.FreemarkerSourceGenerator;
+import org.seasar.cms.ymir.impl.ConfigurationImpl;
+import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
+import org.seasar.cms.ymir.zpt.ZptAnalyzer;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.deployer.ComponentDeployerFactory;
 import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;

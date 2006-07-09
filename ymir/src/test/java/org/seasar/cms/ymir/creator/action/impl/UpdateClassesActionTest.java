@@ -1,14 +1,14 @@
-package org.seasar.cms.framework.creator.action.impl;
+package org.seasar.cms.ymir.creator.action.impl;
 
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.ClassDescSet;
-import org.seasar.cms.framework.creator.impl.PathMetaDataImpl;
-import org.seasar.cms.framework.creator.impl.SourceCreatorImplTestBase;
+import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.ClassDescSet;
+import org.seasar.cms.ymir.creator.impl.PathMetaDataImpl;
+import org.seasar.cms.ymir.creator.impl.SourceCreatorImplTestBase;
 import org.seasar.framework.util.ResourceUtil;
 
 public class UpdateClassesActionTest extends SourceCreatorImplTestBase {

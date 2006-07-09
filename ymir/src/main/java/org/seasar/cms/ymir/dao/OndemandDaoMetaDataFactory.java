@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.dao;
+package org.seasar.cms.ymir.dao;
 
 import java.util.HashMap;
 import java.util.Map;

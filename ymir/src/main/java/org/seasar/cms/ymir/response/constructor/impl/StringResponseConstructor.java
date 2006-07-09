@@ -1,9 +1,9 @@
-package org.seasar.cms.framework.response.constructor.impl;
+package org.seasar.cms.ymir.response.constructor.impl;
 
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.impl.VoidResponse;
-import org.seasar.cms.framework.response.scheme.Strategy;
-import org.seasar.cms.framework.response.scheme.impl.PageStrategy;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.impl.VoidResponse;
+import org.seasar.cms.ymir.response.scheme.Strategy;
+import org.seasar.cms.ymir.response.scheme.impl.PageStrategy;
 
 public class StringResponseConstructor extends AbstractResponseConstructor {
 

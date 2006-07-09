@@ -1,9 +1,16 @@
-package org.seasar.cms.framework.zpt;
+package org.seasar.cms.ymir.zpt;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.seasar.cms.ymir.FormFile;
+import org.seasar.cms.ymir.Path;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.PropertyDesc;
+import org.seasar.cms.ymir.creator.SourceCreator;
+import org.seasar.cms.ymir.creator.impl.MethodDescImpl;
 
 import net.skirnir.freyja.Attribute;
 import net.skirnir.freyja.Element;
@@ -14,13 +21,6 @@ import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.TalTagEvaluator;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
-
-import org.seasar.cms.framework.FormFile;
-import org.seasar.cms.framework.Path;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
-import org.seasar.cms.framework.creator.impl.MethodDescImpl;
 
 public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 

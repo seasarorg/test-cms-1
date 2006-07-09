@@ -1,4 +1,4 @@
-package org.seasar.cms.framework;
+package org.seasar.cms.ymir;
 
 import org.seasar.kvasir.util.el.VariableResolver;
 

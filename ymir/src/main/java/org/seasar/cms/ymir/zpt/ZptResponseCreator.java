@@ -1,13 +1,13 @@
-package org.seasar.cms.framework.zpt;
+package org.seasar.cms.ymir.zpt;
 
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.ResponseCreator;
-import org.seasar.cms.framework.impl.SelfContainedResponse;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.ResponseCreator;
+import org.seasar.cms.ymir.impl.SelfContainedResponse;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.TemplateEvaluator;

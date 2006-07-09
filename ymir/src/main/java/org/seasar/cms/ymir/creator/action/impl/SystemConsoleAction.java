@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.creator.action.impl;
+package org.seasar.cms.ymir.creator.action.impl;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.ClassDescBag;
-import org.seasar.cms.framework.creator.PathMetaData;
-import org.seasar.cms.framework.creator.impl.LazyPathMetaData;
-import org.seasar.cms.framework.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.ClassDescBag;
+import org.seasar.cms.ymir.creator.PathMetaData;
+import org.seasar.cms.ymir.creator.impl.LazyPathMetaData;
+import org.seasar.cms.ymir.creator.impl.SourceCreatorImpl;
 
 public class SystemConsoleAction extends AbstractUpdateAction {
 

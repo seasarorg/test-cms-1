@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.impl;
+package org.seasar.cms.ymir.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -11,9 +11,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.ResponseProcessor;
-import org.seasar.cms.framework.util.ServletUtils;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.ResponseProcessor;
+import org.seasar.cms.ymir.util.ServletUtils;
 
 public class DefaultResponseProcessor implements ResponseProcessor {
 

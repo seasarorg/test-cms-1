@@ -1,9 +1,9 @@
-package org.seasar.cms.framework.creator;
+package org.seasar.cms.ymir.creator;
 
 import java.io.File;
 
-import org.seasar.cms.framework.Request;
-import org.seasar.cms.framework.Response;
+import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.Response;
 
 public class MockSourceCreator implements SourceCreator {
 

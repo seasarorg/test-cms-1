@@ -1,4 +1,4 @@
-package org.seasar.cms.framework;
+package org.seasar.cms.ymir;
 
 public class PageNotFoundException extends Exception {
 

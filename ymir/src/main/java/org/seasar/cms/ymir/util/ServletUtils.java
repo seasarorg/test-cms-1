@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.util;
+package org.seasar.cms.ymir.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

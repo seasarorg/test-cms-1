@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.ymir.creator.impl;
 
 
 public class WebApp

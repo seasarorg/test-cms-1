@@ -1,15 +1,15 @@
-package org.seasar.cms.framework.zpt;
+package org.seasar.cms.ymir.zpt;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
-import org.seasar.cms.framework.creator.TypeDesc;
-import org.seasar.cms.framework.creator.impl.ClassDescImpl;
-import org.seasar.cms.framework.impl.DefaultRequestProcessor;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.PropertyDesc;
+import org.seasar.cms.ymir.creator.SourceCreator;
+import org.seasar.cms.ymir.creator.TypeDesc;
+import org.seasar.cms.ymir.creator.impl.ClassDescImpl;
+import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.ZptTemplateContext;

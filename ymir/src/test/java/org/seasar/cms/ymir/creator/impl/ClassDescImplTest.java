@@ -1,12 +1,12 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.ymir.creator.impl;
 
 import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.MethodDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.MethodDesc;
+import org.seasar.cms.ymir.creator.PropertyDesc;
 
 public class ClassDescImplTest extends TestCase {
 

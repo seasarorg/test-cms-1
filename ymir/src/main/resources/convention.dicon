@@ -8,7 +8,7 @@
   <include path="dao.dicon" />
   <include path="s2dxo.dicon" />
   <component
-    class="org.seasar.cms.framework.container.hotdeploy.LocalOndemandCreatorContainer">
+    class="org.seasar.cms.ymir.container.hotdeploy.LocalOndemandCreatorContainer">
     <property name="rootPackageName">
       config.getProperty("rootPackageName", "skeleton")
     </property>

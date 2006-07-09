@@ -1,9 +1,9 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.ymir.creator.impl;
 
-import org.seasar.cms.framework.creator.AbstractClassDesc;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.MethodDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.ymir.creator.AbstractClassDesc;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.MethodDesc;
+import org.seasar.cms.ymir.creator.PropertyDesc;
 
 public class SimpleClassDesc extends AbstractClassDesc {
 

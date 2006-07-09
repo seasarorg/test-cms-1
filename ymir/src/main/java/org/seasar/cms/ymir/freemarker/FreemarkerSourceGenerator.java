@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.freemarker;
+package org.seasar.cms.ymir.freemarker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.seasar.cms.framework.creator.BodyDesc;
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.EntityMetaData;
-import org.seasar.cms.framework.creator.MethodDesc;
-import org.seasar.cms.framework.creator.SourceCreator;
-import org.seasar.cms.framework.creator.SourceGenerator;
+import org.seasar.cms.ymir.creator.BodyDesc;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.EntityMetaData;
+import org.seasar.cms.ymir.creator.MethodDesc;
+import org.seasar.cms.ymir.creator.SourceCreator;
+import org.seasar.cms.ymir.creator.SourceGenerator;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;

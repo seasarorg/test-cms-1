@@ -1,11 +1,11 @@
-package org.seasar.cms.framework.impl;
+package org.seasar.cms.ymir.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.seasar.cms.framework.PathMapping;
+import org.seasar.cms.ymir.PathMapping;
 import org.seasar.kvasir.util.el.EvaluationException;
 import org.seasar.kvasir.util.el.TextTemplateEvaluator;
 import org.seasar.kvasir.util.el.VariableResolver;

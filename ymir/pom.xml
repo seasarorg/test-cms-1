@@ -4,12 +4,11 @@
          http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms</groupId>
-  <artifactId>framework</artifactId>
-  <name>CMS Framework</name>
+  <artifactId>ymir</artifactId>
+  <name>Ymir</name>
   <version>0.0.1</version>
   <description>
-    CMS Framework is a framework for developing light-weight web
-    application.
+    Ymir is a framework for developing light-weight web application.
   </description>
   <build>
     <defaultGoal>install</defaultGoal>

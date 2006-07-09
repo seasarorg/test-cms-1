@@ -1,9 +1,9 @@
-package org.seasar.cms.framework.response.constructor.impl;
+package org.seasar.cms.ymir.response.constructor.impl;
 
-import org.seasar.cms.framework.Path;
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.impl.RedirectResponse;
-import org.seasar.cms.framework.impl.VoidResponse;
+import org.seasar.cms.ymir.Path;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.impl.RedirectResponse;
+import org.seasar.cms.ymir.impl.VoidResponse;
 
 public class PathResponseConstructor extends AbstractResponseConstructor {
 

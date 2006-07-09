@@ -48,7 +48,7 @@
   <dependencies>
     <dependency>
       <groupId>org.seasar.cms</groupId>
-      <artifactId>framework</artifactId>
+      <artifactId>ymir</artifactId>
       <version>0.0.1</version>
     </dependency>
     <dependency>

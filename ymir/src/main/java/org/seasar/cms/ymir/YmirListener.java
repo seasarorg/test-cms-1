@@ -1,22 +1,22 @@
-package org.seasar.cms.framework;
+package org.seasar.cms.ymir;
 
 import javax.servlet.ServletContextEvent;
 
-import org.seasar.cms.framework.container.hotdeploy.OndemandUtils;
+import org.seasar.cms.ymir.container.hotdeploy.OndemandUtils;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.container.servlet.S2ContainerListener;
 import org.seasar.framework.log.Logger;
 
-public class FrameworkListener extends S2ContainerListener {
+public class YmirListener extends S2ContainerListener {
 
-    private static Logger logger = Logger.getLogger(FrameworkListener.class);
+    private static Logger logger = Logger.getLogger(YmirListener.class);
 
     public void contextInitialized(ServletContextEvent sce) {
 
         super.contextInitialized(sce);
 
-        logger.debug("Framework initialize start");
+        logger.debug("Ymir initialize start");
 
         Configuration config = getConfiguration();
         if (config.getProperty(Configuration.KEY_WEBAPPROOT) == null) {
@@ -35,12 +35,12 @@ public class FrameworkListener extends S2ContainerListener {
             OndemandUtils.start(getContainer(), true);
         }
 
-        logger.debug("Framework initialize end");
+        logger.debug("Ymir initialize end");
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
 
-        logger.debug("Framework destroy start");
+        logger.debug("Ymir destroy start");
 
         if (!Configuration.PROJECTSTATUS_DEVELOP.equals(getConfiguration()
             .getProperty(Configuration.KEY_PROJECTSTATUS))) {
@@ -50,7 +50,7 @@ public class FrameworkListener extends S2ContainerListener {
 
         super.contextDestroyed(sce);
 
-        logger.debug("Framework destroy end");
+        logger.debug("Ymir destroy end");
     }
 
     S2Container getContainer() {

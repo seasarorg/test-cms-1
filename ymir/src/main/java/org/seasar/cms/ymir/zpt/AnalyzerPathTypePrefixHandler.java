@@ -1,7 +1,7 @@
-package org.seasar.cms.framework.zpt;
+package org.seasar.cms.ymir.zpt;
 
-import org.seasar.cms.framework.creator.ClassDesc;
-import org.seasar.cms.framework.creator.PropertyDesc;
+import org.seasar.cms.ymir.creator.ClassDesc;
+import org.seasar.cms.ymir.creator.PropertyDesc;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;

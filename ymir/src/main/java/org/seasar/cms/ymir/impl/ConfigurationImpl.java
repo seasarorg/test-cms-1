@@ -1,11 +1,11 @@
-package org.seasar.cms.framework.impl;
+package org.seasar.cms.ymir.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import org.seasar.cms.framework.Configuration;
+import org.seasar.cms.ymir.Configuration;
 import org.seasar.framework.log.Logger;
 
 public class ConfigurationImpl implements Configuration {

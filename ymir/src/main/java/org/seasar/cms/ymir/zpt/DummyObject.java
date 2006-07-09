@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.zpt;
+package org.seasar.cms.ymir.zpt;
 
 public class DummyObject {
 

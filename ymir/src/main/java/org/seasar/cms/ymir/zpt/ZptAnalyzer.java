@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.zpt;
+package org.seasar.cms.ymir.zpt;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +9,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.framework.creator.SourceCreator;
-import org.seasar.cms.framework.creator.TemplateAnalyzer;
+import org.seasar.cms.ymir.creator.SourceCreator;
+import org.seasar.cms.ymir.creator.TemplateAnalyzer;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;

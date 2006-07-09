@@ -1,8 +1,8 @@
-package org.seasar.cms.framework.zpt;
+package org.seasar.cms.ymir.zpt;
 
 import java.util.HashMap;
 
-import org.seasar.cms.framework.impl.DefaultRequestProcessor;
+import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;

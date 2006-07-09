@@ -1,4 +1,4 @@
-package org.seasar.cms.framework;
+package org.seasar.cms.ymir;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,11 +14,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.framework.util.ServletUtils;
+import org.seasar.cms.ymir.util.ServletUtils;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
-public class FrameworkFilter implements Filter {
+public class YmirFilter implements Filter {
 
     private String dispatcher_;
 

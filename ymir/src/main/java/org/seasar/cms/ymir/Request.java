@@ -1,4 +1,4 @@
-package org.seasar.cms.framework;
+package org.seasar.cms.ymir;
 
 import java.util.Iterator;
 import java.util.Map;

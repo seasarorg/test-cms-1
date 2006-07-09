@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.container.hotdeploy;
+package org.seasar.cms.ymir.container.hotdeploy;
 
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;

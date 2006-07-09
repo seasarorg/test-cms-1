@@ -1,7 +1,7 @@
-package org.seasar.cms.framework.creator.impl;
+package org.seasar.cms.ymir.creator.impl;
 
-import org.seasar.cms.framework.creator.PropertyDesc;
-import org.seasar.cms.framework.creator.TypeDesc;
+import org.seasar.cms.ymir.creator.PropertyDesc;
+import org.seasar.cms.ymir.creator.TypeDesc;
 
 public class PropertyDescImpl implements PropertyDesc, Cloneable {
 

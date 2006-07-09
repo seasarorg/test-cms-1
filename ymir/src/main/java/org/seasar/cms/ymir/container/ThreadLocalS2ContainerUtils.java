@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.container;
+package org.seasar.cms.ymir.container;
 
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;

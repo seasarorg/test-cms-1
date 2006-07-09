@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.creator;
+package org.seasar.cms.ymir.creator;
 
 
 public interface SourceGenerator {

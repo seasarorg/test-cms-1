@@ -1,4 +1,4 @@
-package org.seasar.cms.framework.impl;
+package org.seasar.cms.ymir.impl;
 
 
 abstract public class TransitionResponse extends ResponseBase {

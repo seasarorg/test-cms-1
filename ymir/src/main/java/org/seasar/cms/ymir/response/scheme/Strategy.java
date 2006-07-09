@@ -1,9 +1,9 @@
 /**
  * 
  */
-package org.seasar.cms.framework.response.scheme;
+package org.seasar.cms.ymir.response.scheme;
 
-import org.seasar.cms.framework.Response;
+import org.seasar.cms.ymir.Response;
 
 public interface Strategy {
 

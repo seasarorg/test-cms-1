@@ -1,8 +1,8 @@
-package org.seasar.cms.framework.response.scheme.impl;
+package org.seasar.cms.ymir.response.scheme.impl;
 
-import org.seasar.cms.framework.Response;
-import org.seasar.cms.framework.impl.SelfContainedResponse;
-import org.seasar.cms.framework.response.scheme.Strategy;
+import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.impl.SelfContainedResponse;
+import org.seasar.cms.ymir.response.scheme.Strategy;
 
 public class StringStrategy implements Strategy {
 
