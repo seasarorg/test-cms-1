@@ -1,6 +1,6 @@
 package org.seasar.cms.ymir.freemarker;
 
-import org.seasar.cms.ymir.FrameworkTestCase;
+import org.seasar.cms.ymir.YmirTestCase;
 import org.seasar.cms.ymir.creator.ClassDesc;
 import org.seasar.cms.ymir.creator.MethodDesc;
 import org.seasar.cms.ymir.creator.MockSourceCreator;
@@ -10,7 +10,7 @@ import org.seasar.cms.ymir.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.creator.impl.PropertyDescImpl;
 
-public class FreemarkerSourceGeneratorTest extends FrameworkTestCase {
+public class FreemarkerSourceGeneratorTest extends YmirTestCase {
 
     private FreemarkerSourceGenerator target_;
 

@@ -5,7 +5,7 @@ import java.io.File;
 import javax.servlet.ServletContext;
 
 import org.seasar.cms.ymir.Configuration;
-import org.seasar.cms.ymir.FrameworkTestCase;
+import org.seasar.cms.ymir.YmirTestCase;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir;
 import org.seasar.cms.ymir.container.hotdeploy.LocalOndemandCreatorContainer;
@@ -31,7 +31,7 @@ import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
 import org.seasar.framework.util.ResourceUtil;
 
-abstract public class SourceCreatorImplTestBase extends FrameworkTestCase {
+abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
     protected S2Container container_;
 

@@ -4,11 +4,12 @@
          http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms</groupId>
-  <artifactId>ymir</artifactId>
-  <name>Ymir</name>
+  <artifactId>ymir-extension</artifactId>
+  <name>Ymir Extension</name>
   <version>0.0.1</version>
   <description>
-    Ymir is a framework for developing light-weight web application.
+    Ymir Extension is an extension for Ymir. It includes source code generator,
+    bean-table mechanism, etc.
   </description>
   <build>
     <defaultGoal>install</defaultGoal>
@@ -66,55 +67,27 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
+      <groupId>org.seasar.cms.ymir</groupId>
+      <artifactId>ymir</artifactId>
+      <classifier>tests</classifier>
+      <version>0.0.1</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-      <version>1.7.0</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>log4j</artifactId>
-          <groupId>log4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>logkit</artifactId>
-          <groupId>logkit</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.seasar.container</groupId>
-      <artifactId>s2-extension</artifactId>
-      <version>2.4.0-beta-3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seasar.dao</groupId>
-      <artifactId>s2-dao</artifactId>
-      <version>1.0.35</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seasar.dxo</groupId>
-      <artifactId>s2dxo</artifactId>
-      <version>1.0.0-RC1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seasar.kvasir</groupId>
-      <artifactId>kvasir-util</artifactId>
-      <version>3.0.0-EA2</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-      <version>1.1</version>
+      <groupId>org.seasar.cms.ymir</groupId>
+      <artifactId>ymir</artifactId>
+      <version>0.0.1</version>
     </dependency>
     <dependency>
       <groupId>net.skirnir.freyja</groupId>
       <artifactId>freyja</artifactId>
       <version>1.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>net.skirnir.xom</groupId>

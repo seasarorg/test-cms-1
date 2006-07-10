@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <component class="org.seasar.cms.ymir.creator.impl.SourceCreatorImpl">
+    <property name="sourceDirectoryPath">config.getProperty("sourceDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/java")</property>
+    <property name="classesDirectoryPath">config.getProperty("classesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/webapp"))</property>
+    <property name="pagePackageName">config.getProperty("rootPackageName", "skeleton") + ".web"</property>
+    <property name="dtoPackageName">config.getProperty("rootPackageName", "skeleton") + ".dto"</property>
+    <property name="daoPackageName">config.getProperty("rootPackageName", "skeleton") + ".dao"</property>
+    <property name="dxoPackageName">config.getProperty("rootPackageName", "skeleton") + ".dxo"</property>
+  </component>
+  <component class="org.seasar.cms.ymir.freemarker.FreemarkerSourceGenerator" />
+  <component class="org.seasar.cms.ymir.zpt.ZptAnalyzer" />
+</components>

@@ -4,7 +4,7 @@
   </head>
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
-<p>CMS Frameworkへようこそ！</p>
+<p>Ymirへようこそ！</p>
 <p>Webアプリケーションを構築する前に、プロジェクトの設定を行ないます。
 以下の項目を埋めて「OK」ボタンを押して下さい。</p>
 <form tal:attributes="action request/absolutePath" method="post">

@@ -10,7 +10,7 @@
   <name>Application Skeleton</name>
   <version>0.0.1</version>
   <description>
-    A web application skeleton of CMS framework.
+    A web application skeleton of Ymir with extension.
   </description>
   <build>
     <defaultGoal>package</defaultGoal>
@@ -20,6 +20,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
             <encoding>UTF-8</encoding>
+            <source>1.5</source>
+            <target>1.5</target>
           </configuration>
         </plugin>
         <plugin>
@@ -47,8 +49,8 @@
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>org.seasar.cms</groupId>
-      <artifactId>ymir</artifactId>
+      <groupId>org.seasar.cms.ymir</groupId>
+      <artifactId>ymir-extension</artifactId>
       <version>0.0.1</version>
     </dependency>
     <dependency>
