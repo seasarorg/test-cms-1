@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
 
-public class FrameworkUtils {
+public class YmirUtils {
 
-    private FrameworkUtils() {
+    private YmirUtils() {
     }
 
     public static Object copyProperties(Class destClass, Object src) {
