@@ -11,8 +11,7 @@ public class YmirS2ContainerListener implements ServletContextListener {
 
     public static final String CONFIG_PATH_KEY = "org.seasar.framework.container.configPath";
 
-    private static Logger logger = Logger
-        .getLogger(YmirS2ContainerListener.class);
+    protected Logger logger_ = Logger.getLogger(getClass());
 
     private void initializeContainer(ServletContext servletContext) {
         String configPath = servletContext.getInitParameter(CONFIG_PATH_KEY);
@@ -23,15 +22,15 @@ public class YmirS2ContainerListener implements ServletContextListener {
     }
 
     public void contextInitialized(ServletContextEvent event) {
-        logger.debug("S2Container initialize start");
+        logger_.debug("S2Container initialize start");
         ServletContext servletContext = event.getServletContext();
         try {
             initializeContainer(servletContext);
         } catch (RuntimeException e) {
-            logger.log(e);
+            logger_.log(e);
             throw e;
         }
-        logger.debug("S2Container initialize end");
+        logger_.debug("S2Container initialize end");
     }
 
     public void contextDestroyed(ServletContextEvent event) {

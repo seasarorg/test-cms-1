@@ -1,5 +1,11 @@
 package org.seasar.cms.ymir.container;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.deployer.ComponentDeployerFactory;
 import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;
@@ -7,6 +13,7 @@ import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.container.impl.servlet.HttpServletExternalContext;
 import org.seasar.framework.container.impl.servlet.HttpServletExternalContextComponentDefRegister;
+import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.StringUtil;
 
@@ -53,58 +60,66 @@ class YmirSingletonS2ContainerInitializer {
     }
 
     void integrate(S2Container container) {
-        S2Container[] containers = getContainersInJars();
-        for (int i = 0; i < containers.length; i++) {
-            mergeContainer(container, containers[i]);
+        includeContainer(container, gatherContainers());
+    }
+
+    public S2Container[] gatherContainers() {
+
+        URL[] urls = getResourceURLs(COMPONENTS_DICON);
+        List containerList = new ArrayList();
+        for (int i = 0; i < urls.length; i++) {
+            try {
+                containerList.add(createContainer(urls[i]));
+            } catch (RuntimeException ignored) {
+                if (logger_.isInfoEnabled()) {
+                    logger_.info("Can't read configuration: " + urls[i]);
+                }
+            }
         }
+        return (S2Container[]) containerList.toArray(new S2Container[0]);
     }
 
-    void mergeContainer(S2Container parent, S2Container child) {
-        // TODO
+    URL[] getResourceURLs(String path) {
+
+        Enumeration enm;
+        try {
+            enm = getClassLoader().getResources(path);
+        } catch (IOException ex) {
+            throw new IORuntimeException(ex);
+        }
+        List list = new ArrayList();
+        for (; enm.hasMoreElements();) {
+            list.add(enm.nextElement());
+        }
+        return (URL[]) list.toArray(new URL[0]);
     }
 
-    S2Container[] getContainersInJars() {
-//        Enumeration enm;
-//        try {
-//            enm = getClassLoader().getResources(COMPONENTS_DICON);
-//        } catch (IOException ex) {
-//            if (logger_.isInfoEnabled()) {
-//                logger_.info("Can't gather reosurce: " + COMPONENTS_DICON, ex);
-//            }
-//            return new S2Container[0];
-//
-//        }
-        // TODO
-//
-//        PathResolver pathResolver = S2ContainerFactory.
-//        for (; enm.hasMoreElements();) {
-//            URL url = (URL) enm.nextElement();
-//            S2ContainerFactory.create
-//            InputStream is = null;
-//            try {
-//                is = url.openStream();
-//            } catch (IOException ex) {
-//                if (logger_.isInfoEnabled()) {
-//                    logger_.info("Can't read reosurce: " + url, ex);
-//                }
-//            } finally {
-//                if (is != null) {
-//                    try {
-//                        is.close();
-//                    } catch (IOException ignore) {
-//                    }
-//                }
-//            }
-//        }
-        return null;
+    S2Container createContainer(URL url) {
+
+        return S2ContainerFactory.create(url.toExternalForm());
     }
 
     ClassLoader getClassLoader() {
+
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (cl == null) {
             cl = getClass().getClassLoader();
         }
         return cl;
+    }
+
+    void includeContainer(S2Container parent, S2Container[] children) {
+
+        int size = parent.getChildSize();
+        if (size == 0) {
+            for (int i = 0; i < children.length; i++) {
+                parent.include(children[i]);
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                includeContainer(parent.getChild(i), children);
+            }
+        }
     }
 
     private boolean isAlreadyInitialized() {
@@ -118,5 +133,4 @@ class YmirSingletonS2ContainerInitializer {
     public void setConfigPath(String configPath) {
         this.configPath = configPath;
     }
-
 }

@@ -2,15 +2,12 @@ package org.seasar.cms.ymir;
 
 import javax.servlet.ServletContextEvent;
 
+import org.seasar.cms.ymir.container.YmirS2ContainerListener;
 import org.seasar.cms.ymir.container.hotdeploy.OndemandUtils;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
-import org.seasar.framework.container.servlet.S2ContainerListener;
-import org.seasar.framework.log.Logger;
 
-public class YmirListener extends S2ContainerListener {
-
-    private Logger logger_ = Logger.getLogger(getClass());
+public class YmirListener extends YmirS2ContainerListener {
 
     public void contextInitialized(ServletContextEvent sce) {
 
