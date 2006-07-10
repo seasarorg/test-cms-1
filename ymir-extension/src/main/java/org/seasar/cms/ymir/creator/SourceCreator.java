@@ -4,8 +4,9 @@ import java.io.File;
 
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.Updater;
 
-public interface SourceCreator {
+public interface SourceCreator extends Updater {
 
     String getPagePackageName();
 
