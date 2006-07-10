@@ -47,7 +47,7 @@
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>org.seasar.cms</groupId>
+      <groupId>org.seasar.cms.ymir</groupId>
       <artifactId>ymir</artifactId>
       <version>0.0.1</version>
     </dependency>

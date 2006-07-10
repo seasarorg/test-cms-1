@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 
 import org.seasar.kvasir.util.io.IOUtils;
 
-public abstract class FrameworkTestCase extends TestCase {
+public abstract class YmirTestCase extends TestCase {
 
     protected String readResource(Class testClass, String name) {
 
