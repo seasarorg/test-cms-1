@@ -37,7 +37,7 @@ public class CreateClassAction extends AbstractUpdateAction {
         String actionName = getSourceCreator().getActionName(request.getPath(),
             request.getMethod());
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
@@ -67,7 +67,7 @@ public class CreateClassAction extends AbstractUpdateAction {
 
         getSourceCreator().writeSourceFile(classDesc, null);
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));

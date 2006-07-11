@@ -5,20 +5,19 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 public class ClassDescBag {
 
-    private Map map_ = new HashMap();
+    private Map<String, Map<String, ClassDesc>> map_ = new HashMap<String, Map<String, ClassDesc>>();
 
-    private Map createdMap_ = new HashMap();
+    private Map<String, Map<String, ClassDesc>> createdMap_ = new HashMap<String, Map<String, ClassDesc>>();
 
-    private Map updatedMap_ = new HashMap();
+    private Map<String, Map<String, ClassDesc>> updatedMap_ = new HashMap<String, Map<String, ClassDesc>>();
 
-    private Map failedMap_ = new LinkedHashMap();
+    private Map<String, Map<String, ClassDesc>> failedMap_ = new HashMap<String, Map<String, ClassDesc>>();
 
     private ClassDescSet set_ = new ClassDescSet();
 
-    public Map getClassDescMap() {
+    public Map<String, ClassDesc> getClassDescMap() {
         return getClassDescMap(map_, null);
     }
 
@@ -26,71 +25,79 @@ public class ClassDescBag {
         return getClassDescs(map_, null);
     }
 
-    public Map getClassDescMap(String kind) {
+    public Map<String, ClassDesc> getClassDescMap(String kind) {
         return getClassDescMap(map_, kind);
     }
 
     public ClassDesc[] getClassDescs(String kind) {
-        return (ClassDesc[]) getClassDescMap(kind).values().toArray(
-            new ClassDesc[0]);
+        return getClassDescMap(kind).values().toArray(new ClassDesc[0]);
     }
 
     public Iterator getClassDescKindIterator() {
         return map_.keySet().iterator();
     }
 
-    public Map getCreatedClassDescMap() {
+    public Map<String, ClassDesc> getCreatedClassDescMap() {
         return getClassDescMap(createdMap_, null);
     }
 
     public ClassDesc[] getCreatedClassDescs() {
-        return (ClassDesc[]) getCreatedClassDescMap().values().toArray(
-            new ClassDesc[0]);
+        return getCreatedClassDescMap().values().toArray(new ClassDesc[0]);
     }
 
-    public Map getCreatedClassDescMap(String kind) {
+    public Map<String, ClassDesc> getCreatedClassDescMap(String kind) {
         return getClassDescMap(createdMap_, kind);
     }
 
     public ClassDesc[] getCreatedClassDescs(String kind) {
-        return (ClassDesc[]) getCreatedClassDescMap(kind).values().toArray(
-            new ClassDesc[0]);
+        return getCreatedClassDescMap(kind).values().toArray(new ClassDesc[0]);
     }
 
-    public Map getUpdatedClassDescMap() {
+    public Map<String, ClassDesc> getUpdatedClassDescMap() {
         return getClassDescMap(updatedMap_, null);
     }
 
     public ClassDesc[] getUpdatedClassDescs() {
-        return (ClassDesc[]) getUpdatedClassDescMap().values().toArray(
-            new ClassDesc[0]);
+        return getUpdatedClassDescMap().values().toArray(new ClassDesc[0]);
     }
 
-    public Map getUpdatedClassDescMap(String kind) {
+    public Map<String, ClassDesc> getUpdatedClassDescMap(String kind) {
         return getClassDescMap(updatedMap_, kind);
     }
 
     public ClassDesc[] getUpdatedClassDescs(String kind) {
-        return (ClassDesc[]) getUpdatedClassDescMap(kind).values().toArray(
-            new ClassDesc[0]);
+        return getUpdatedClassDescMap(kind).values().toArray(new ClassDesc[0]);
     }
 
-    Map getClassDescMap(Map map, String kind) {
-        Map got = (Map) map.get(kind);
+    public Map<String, ClassDesc> getFailedClassDescMap() {
+        return getClassDescMap(failedMap_, null);
+    }
+
+    public ClassDesc[] getFailedClassDescs() {
+        return getFailedClassDescMap().values().toArray(new ClassDesc[0]);
+    }
+
+    public Map<String, ClassDesc> getFailedClassDescMap(String kind) {
+        return getClassDescMap(failedMap_, kind);
+    }
+
+    public ClassDesc[] getFailedClassDescs(String kind) {
+        return getFailedClassDescMap(kind).values().toArray(new ClassDesc[0]);
+    }
+
+    Map<String, ClassDesc> getClassDescMap(
+        Map<String, Map<String, ClassDesc>> map, String kind) {
+        Map<String, ClassDesc> got = map.get(kind);
         if (got == null) {
-            got = new LinkedHashMap();
+            got = new LinkedHashMap<String, ClassDesc>();
             map.put(kind, got);
         }
         return got;
     }
 
-    ClassDesc[] getClassDescs(Map map, String kind) {
-        return (ClassDesc[]) getClassDescMap(map, kind).values().toArray(
-            new ClassDesc[0]);
-    }
-
-    public ClassDesc[] getFailedClassDescs() {
-        return (ClassDesc[]) failedMap_.values().toArray(new ClassDesc[0]);
+    ClassDesc[] getClassDescs(Map<String, Map<String, ClassDesc>> map,
+        String kind) {
+        return getClassDescMap(map, kind).values().toArray(new ClassDesc[0]);
     }
 
     public ClassDescSet getClassDescSet() {
@@ -118,7 +125,12 @@ public class ClassDescBag {
     }
 
     public void addAsFailed(ClassDesc classDesc) {
-        failedMap_.put(classDesc.getName(), classDesc);
+        getClassDescMap().put(classDesc.getName(), classDesc);
+        getClassDescMap(classDesc.getKind())
+            .put(classDesc.getName(), classDesc);
+        getFailedClassDescMap().put(classDesc.getName(), classDesc);
+        getFailedClassDescMap(classDesc.getKind()).put(classDesc.getName(),
+            classDesc);
     }
 
     public void remove(String className) {

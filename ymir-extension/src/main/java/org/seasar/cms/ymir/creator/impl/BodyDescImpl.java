@@ -24,7 +24,7 @@ public class BodyDescImpl implements BodyDesc {
     public BodyDescImpl(String body) {
 
         key_ = KEY_ASIS;
-        Map root = new HashMap();
+        Map<String, String> root = new HashMap<String, String>();
         root.put(KEY_BODY, body);
         root_ = root;
     }

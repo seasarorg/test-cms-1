@@ -40,7 +40,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
 
     Response actDefault(Request request, PathMetaData pathMetaData) {
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("method", request.getMethod());
@@ -59,7 +59,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
             gatherPaths());
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("method", method);
@@ -79,7 +79,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
             gatherPaths());
 
         String[] appliedClassNames = request.getParameterValues(PARAM_APPLY);
-        Set appliedClassNameSet = new HashSet();
+        Set<String> appliedClassNameSet = new HashSet<String>();
         if (appliedClassNames != null) {
             appliedClassNameSet.addAll(Arrays.asList(appliedClassNames));
         }
@@ -93,7 +93,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
 
         getSourceCreator().updateClasses(classDescBag, false);
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("method", method);
@@ -104,13 +104,13 @@ public class SystemConsoleAction extends AbstractUpdateAction {
 
     PathMetaData[] gatherPaths() {
 
-        List pathList = new ArrayList();
+        List<PathMetaData> pathList = new ArrayList<PathMetaData>();
         File dir = getSourceCreator().getWebappDirectory();
         gatherPaths(dir, "", pathList);
-        return (PathMetaData[]) pathList.toArray(new PathMetaData[0]);
+        return pathList.toArray(new PathMetaData[0]);
     }
 
-    void gatherPaths(File root, String path, List pathList) {
+    void gatherPaths(File root, String path, List<PathMetaData> pathList) {
 
         File dir;
         if (path.length() == 0) {
@@ -136,7 +136,8 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         }
     }
 
-    void addPathMetaDataIfNecessary(String path, String method, List pathList) {
+    void addPathMetaDataIfNecessary(String path, String method,
+        List<PathMetaData> pathList) {
 
         PathMetaData pathMetaData = new LazyPathMetaData(getSourceCreator(),
             path, method);

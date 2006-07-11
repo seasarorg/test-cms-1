@@ -37,7 +37,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
 
     Response actDefault(Request request, PathMetaData pathMetaData) {
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("pathMetaData", pathMetaData);
         return getSourceCreator().getResponseCreator().createResponse(
@@ -59,7 +59,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
             template = "";
         }
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("pathMetaData", pathMetaData);
@@ -92,7 +92,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
 
         getSourceCreator().writeSourceFile(classDesc, null);
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("pathMetaData", pathMetaData);

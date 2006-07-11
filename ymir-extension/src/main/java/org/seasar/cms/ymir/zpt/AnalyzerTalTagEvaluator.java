@@ -108,7 +108,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         String behaviorDuplicateTag = context
             .getProperty("behavior.duplicate-tag");
         String annotation = null;
-        List attrList = new ArrayList();
+        List<Attribute> attrList = new ArrayList<Attribute>();
         for (int i = 0; i < attrs.length; i++) {
             if ("tal:annotation".equals(attrs[i].getName())) {
                 if (annotation != null) {
@@ -123,7 +123,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
                 attrList.add(attrs[i]);
             }
         }
-        return new AnnotationResult(annotation, (Attribute[]) attrList
+        return new AnnotationResult(annotation, attrList
             .toArray(new Attribute[0]));
     }
 
@@ -151,7 +151,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         ExpressionEvaluator expEvaluator = context.getExpressionEvaluator();
         VariableResolver varResolver = context.getVariableResolver();
 
-        List attrList = new ArrayList();
+        List<Attribute> attrList = new ArrayList<Attribute>();
         Attribute attributesAttr = null;
         for (int i = 0; i < attrs.length; i++) {
             if (attrs[i].getName().startsWith("tal:")) {

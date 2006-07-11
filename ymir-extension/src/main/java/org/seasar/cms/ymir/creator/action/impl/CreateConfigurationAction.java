@@ -50,7 +50,7 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
             }
         }
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("configuration", configuration);
@@ -111,7 +111,7 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
             }
         }
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));

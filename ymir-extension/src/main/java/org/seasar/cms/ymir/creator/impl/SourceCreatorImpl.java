@@ -225,12 +225,12 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas) {
 
-        Map classDescMap = new LinkedHashMap();
+        Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         for (int i = 0; i < pathMetaDatas.length; i++) {
             gatherClassDescs(classDescMap, pathMetaDatas[i]);
         }
-        ClassDesc[] classDescs = addRelativeClassDescs((ClassDesc[]) classDescMap
-            .values().toArray(new ClassDesc[0]));
+        ClassDesc[] classDescs = addRelativeClassDescs(classDescMap.values()
+            .toArray(new ClassDesc[0]));
 
         return classifyClassDescs(classDescs);
     }
@@ -280,7 +280,8 @@ public class SourceCreatorImpl implements SourceCreator {
         writeSourceFiles(classDescBag, ClassDesc.KIND_PAGE, mergeMethod);
     }
 
-    public void gatherClassDescs(Map classDescMap, PathMetaData pathMetaData) {
+    public void gatherClassDescs(Map<String, ClassDesc> classDescMap,
+        PathMetaData pathMetaData) {
 
         String method = pathMetaData.getMethod();
         String className = pathMetaData.getClassName();
@@ -404,7 +405,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
     ClassDesc[] addRelativeClassDescs(ClassDesc[] classDescs) {
 
-        Map pageByDtoMap = new HashMap();
+        Map<String, List<ClassDesc>> pageByDtoMap = new HashMap<String, List<ClassDesc>>();
         for (int i = 0; i < classDescs.length; i++) {
             if (!classDescs[i].isKindOf(ClassDesc.KIND_PAGE)) {
                 continue;
@@ -415,16 +416,17 @@ public class SourceCreatorImpl implements SourceCreator {
                 if (!cd.isKindOf(ClassDesc.KIND_DTO)) {
                     continue;
                 }
-                List list = (List) pageByDtoMap.get(cd.getName());
+                List<ClassDesc> list = pageByDtoMap.get(cd.getName());
                 if (list == null) {
-                    list = new ArrayList();
+                    list = new ArrayList<ClassDesc>();
                     pageByDtoMap.put(cd.getName(), list);
                 }
                 list.add(classDescs[i]);
             }
         }
 
-        List classDescList = new ArrayList(Arrays.asList(classDescs));
+        List<ClassDesc> classDescList = new ArrayList<ClassDesc>(Arrays
+            .asList(classDescs));
         for (int i = 0; i < classDescs.length; i++) {
             if (classDescs[i].isKindOf(ClassDesc.KIND_DTO)) {
                 EntityMetaData metaData = new EntityMetaData(this,
@@ -459,25 +461,26 @@ public class SourceCreatorImpl implements SourceCreator {
             }
         }
 
-        return (ClassDesc[]) classDescList.toArray(new ClassDesc[0]);
+        return classDescList.toArray(new ClassDesc[0]);
     }
 
+    @SuppressWarnings("unchecked")
     void addSelectStatement(MethodDesc methodDesc, PropertyDesc propertyDesc,
         EntityMetaData metaData) {
 
         BodyDesc bodyDesc = methodDesc.getBodyDesc();
-        Map root;
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("entityMetaData", metaData);
         if (bodyDesc == null) {
-            root = new HashMap();
-            root.put("entityMetaData", metaData);
             bodyDesc = new BodyDescImpl(DefaultRequestProcessor.ACTION_RENDER,
                 root);
         } else {
-            root = (Map) bodyDesc.getRoot();
+            bodyDesc.setRoot(root);
         }
-        List propertyDescList = (List) root.get("propertyDescs");
+        List<PropertyDesc> propertyDescList = (List<PropertyDesc>) root
+            .get("propertyDescs");
         if (propertyDescList == null) {
-            propertyDescList = new ArrayList();
+            propertyDescList = new ArrayList<PropertyDesc>();
             root.put("propertyDescs", propertyDescList);
         }
         propertyDescList.add(propertyDesc);

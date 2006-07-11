@@ -119,7 +119,7 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
             .getParentFile(), "src"));
         getSourceCreator().setSourceDirectoryPath(sourceDir.getCanonicalPath());
 
-        Map classDescMap = new LinkedHashMap();
+        Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         target_.gatherClassDescs(classDescMap, new PathMetaDataImpl(
             "/test.html", Request.METHOD_GET, false, "testPage",
             "com.example.web.TestPage", null, null, null, getSourceCreator()

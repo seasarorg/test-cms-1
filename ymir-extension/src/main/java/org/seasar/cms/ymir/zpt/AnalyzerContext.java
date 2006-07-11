@@ -4,15 +4,15 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import net.skirnir.freyja.VariableResolver;
+import net.skirnir.freyja.zpt.ZptTemplateContext;
+
 import org.seasar.cms.ymir.creator.ClassDesc;
 import org.seasar.cms.ymir.creator.PropertyDesc;
 import org.seasar.cms.ymir.creator.SourceCreator;
 import org.seasar.cms.ymir.creator.TypeDesc;
 import org.seasar.cms.ymir.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
-
-import net.skirnir.freyja.VariableResolver;
-import net.skirnir.freyja.zpt.ZptTemplateContext;
 
 public class AnalyzerContext extends ZptTemplateContext {
 
@@ -28,9 +28,9 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private String method_;
 
-    private Map classDescMap_;
+    private Map<String, ClassDesc> classDescMap_;
 
-    private Map temporaryClassDescMap_ = new LinkedHashMap();
+    private Map<String, ClassDesc> temporaryClassDescMap_ = new LinkedHashMap<String, ClassDesc>();
 
     private String pageClassName_;
 
@@ -79,9 +79,9 @@ public class AnalyzerContext extends ZptTemplateContext {
         return classDescMap_;
     }
 
-    public void setClassDescMap(Map classDescriptorMap) {
+    public void setClassDescMap(Map<String, ClassDesc> classDescMap) {
 
-        classDescMap_ = classDescriptorMap;
+        classDescMap_ = classDescMap;
     }
 
     public ClassDesc getTemporaryClassDesc(String className) {

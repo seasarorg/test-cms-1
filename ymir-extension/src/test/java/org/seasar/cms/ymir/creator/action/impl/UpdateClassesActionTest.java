@@ -32,7 +32,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
                 "com.example.web.TestPage"), getSourceCreator()
                 .getTemplateFile("/test.html"))));
 
-        Map classDescMap = new LinkedHashMap();
+        Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         getSourceCreator().gatherClassDescs(
             classDescMap,
             new PathMetaDataImpl("/test.html", Request.METHOD_GET, false,

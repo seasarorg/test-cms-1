@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.seasar.cms.ymir.creator.ClassDesc;
 import org.seasar.cms.ymir.creator.SourceCreator;
 import org.seasar.cms.ymir.creator.TemplateAnalyzer;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
@@ -61,13 +62,14 @@ public class ZptAnalyzer implements TemplateAnalyzer {
 
     private SourceCreator sourceCreator_;
 
-    public void analyze(String method, Map classDescriptorMap,
-        InputStream inputStream, String encoding, String className) {
+    public void analyze(String method,
+        Map<String, ClassDesc> classDescMap, InputStream inputStream,
+        String encoding, String className) {
 
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
         context.setSourceCreator(sourceCreator_);
         context.setMethod(method);
-        context.setClassDescMap(classDescriptorMap);
+        context.setClassDescMap(classDescMap);
         context.setPageClassName(className);
         try {
             evaluator_.evaluate(context, new InputStreamReader(inputStream,

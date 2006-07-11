@@ -43,7 +43,7 @@ public class CreateTemplateAction extends AbstractUpdateAction {
             template = "";
         }
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
@@ -91,7 +91,7 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         templateFile.getParentFile().mkdirs();
         getSourceCreator().writeString(template, templateFile);
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));

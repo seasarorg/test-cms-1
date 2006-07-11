@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.creator.SourceCreator;
 import org.seasar.cms.ymir.creator.action.UpdateAction;
 import org.seasar.cms.ymir.creator.impl.SourceCreatorImpl;
 
@@ -24,7 +25,7 @@ abstract public class AbstractUpdateAction implements UpdateAction {
         sourceCreator_ = sourceCreator;
     }
 
-    public SourceCreatorImpl getSourceCreator() {
+    public SourceCreator getSourceCreator() {
 
         return sourceCreator_;
     }
@@ -56,7 +57,7 @@ abstract public class AbstractUpdateAction implements UpdateAction {
 
     protected Parameter[] getParameters(Request request) {
 
-        List list = new ArrayList();
+        List<Parameter> list = new ArrayList<Parameter>();
         for (Iterator itr = request.getParameterMap().entrySet().iterator(); itr
             .hasNext();) {
             Map.Entry entry = (Map.Entry) itr.next();
@@ -69,7 +70,7 @@ abstract public class AbstractUpdateAction implements UpdateAction {
                 list.add(new Parameter(name, values[i]));
             }
         }
-        return (Parameter[]) list.toArray(new Parameter[0]);
+        return list.toArray(new Parameter[0]);
     }
 
     public static class Parameter {

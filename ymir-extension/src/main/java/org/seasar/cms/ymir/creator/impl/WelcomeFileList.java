@@ -5,10 +5,10 @@ import java.util.List;
 
 public class WelcomeFileList {
 
-    private List welcomeFileList_ = new ArrayList();
+    private List<String> welcomeFileList_ = new ArrayList<String>();
 
     public String[] getWelcomeFiles() {
-        return (String[]) welcomeFileList_.toArray(new String[0]);
+        return welcomeFileList_.toArray(new String[0]);
     }
 
     public void addWelcomeFile(String welcomeFile) {

@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class ClassDescSet {
 
-    private Set classNameSet_ = new HashSet();
+    private Set<String> classNameSet_ = new HashSet<String>();
 
     public ClassDescSet() {
     }

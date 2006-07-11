@@ -17,9 +17,9 @@ public class ClassDescImpl extends AbstractClassDesc {
 
     private String superclassName_;
 
-    private Map propertyDescMap_ = new LinkedHashMap();
+    private Map<String, PropertyDesc> propertyDescMap_ = new LinkedHashMap<String, PropertyDesc>();
 
-    private Map methodDescMap_ = new LinkedHashMap();
+    private Map<MethodDescKey, MethodDesc> methodDescMap_ = new LinkedHashMap<MethodDescKey, MethodDesc>();
 
     public ClassDescImpl(String name) {
 
@@ -30,18 +30,18 @@ public class ClassDescImpl extends AbstractClassDesc {
 
         ClassDescImpl cloned = (ClassDescImpl) super.clone();
 
-        cloned.propertyDescMap_ = new LinkedHashMap();
+        cloned.propertyDescMap_ = new LinkedHashMap<String, PropertyDesc>();
         for (Iterator itr = propertyDescMap_.entrySet().iterator(); itr
             .hasNext();) {
             Map.Entry entry = (Map.Entry) itr.next();
-            cloned.propertyDescMap_.put(entry.getKey(), ((PropertyDesc) entry
-                .getValue()).clone());
+            cloned.propertyDescMap_.put((String) entry.getKey(),
+                (PropertyDesc) ((PropertyDesc) entry.getValue()).clone());
         }
-        cloned.methodDescMap_ = new LinkedHashMap();
+        cloned.methodDescMap_ = new LinkedHashMap<MethodDescKey, MethodDesc>();
         for (Iterator itr = methodDescMap_.entrySet().iterator(); itr.hasNext();) {
             Map.Entry entry = (Map.Entry) itr.next();
-            cloned.methodDescMap_.put(entry.getKey(), ((MethodDesc) entry
-                .getValue()).clone());
+            cloned.methodDescMap_.put((MethodDescKey) entry.getKey(),
+                (MethodDesc) ((MethodDesc) entry.getValue()).clone());
         }
         return cloned;
     }

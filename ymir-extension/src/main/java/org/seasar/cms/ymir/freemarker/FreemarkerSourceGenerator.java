@@ -45,7 +45,7 @@ public class FreemarkerSourceGenerator implements SourceGenerator {
         for (int i = 0; i < mds.length; i++) {
             mds[i].setEvaluatedBody(generateSource(mds[i].getBodyDesc()));
         }
-        Map root = new HashMap();
+        Map<String, Object> root = new HashMap<String, Object>();
         root.put("classDesc", classDesc);
         root.put("entityMetaData", new EntityMetaData(sourceCreator_, classDesc
             .getName()));

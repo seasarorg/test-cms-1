@@ -16,7 +16,7 @@ public class AbstractUpdateActionTest extends TestCase {
     public void testGetParameters() throws Exception {
 
         RequestImpl request = new RequestImpl();
-        Map parameterMap = new LinkedHashMap();
+        Map<String, String[]> parameterMap = new LinkedHashMap<String, String[]>();
         parameterMap.put("test", new String[] { "value1", "value2" });
         parameterMap.put("__cms__task", new String[] { "value" });
         parameterMap.put("__cms__template", new String[] { "value" });

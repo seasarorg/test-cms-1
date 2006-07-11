@@ -19,7 +19,7 @@ public class ZptAnalyzerTest extends TestCase {
 
     private ZptAnalyzer analyzer_ = new ZptAnalyzer();
 
-    private Map classDescriptorMap_ = new HashMap();
+    private Map<String, ClassDesc> classDescMap_ = new HashMap<String, ClassDesc>();
 
     protected void setUp() throws Exception {
 
@@ -58,14 +58,14 @@ public class ZptAnalyzerTest extends TestCase {
 
     private void act(String methodName) {
 
-        analyzer_.analyze(Request.METHOD_GET, classDescriptorMap_, getClass()
+        analyzer_.analyze(Request.METHOD_GET, classDescMap_, getClass()
             .getResourceAsStream("ZptAnalyzerTest_" + methodName + ".zpt"),
             "UTF-8", CLASSNAME);
     }
 
     private ClassDesc getClassDesc(String name) {
 
-        return (ClassDesc) classDescriptorMap_.get(name);
+        return (ClassDesc) classDescMap_.get(name);
     }
 
     public void testAnalyze1() throws Exception {

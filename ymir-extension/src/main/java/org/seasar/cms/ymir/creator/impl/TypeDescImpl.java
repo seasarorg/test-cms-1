@@ -20,11 +20,11 @@ public class TypeDescImpl implements TypeDesc {
 
     private boolean explicit_;
 
-    private static final Map defaultValueMap_;
+    private static final Map<String, String> defaultValueMap_;
 
     static {
 
-        defaultValueMap_ = new HashMap();
+        defaultValueMap_ = new HashMap<String, String>();
         defaultValueMap_.put("byte", "0");
         defaultValueMap_.put("short", "0");
         defaultValueMap_.put("int", "0");

@@ -2,8 +2,10 @@ package org.seasar.cms.ymir.creator;
 
 import java.io.File;
 
+import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.ResponseCreator;
 
 public class MockSourceCreator implements SourceCreator {
 
@@ -60,5 +62,35 @@ public class MockSourceCreator implements SourceCreator {
 
     public File getWebappDirectory() {
         return null;
+    }
+
+    public ResponseCreator getResponseCreator() {
+        return null;
+    }
+
+    public boolean writeSourceFile(ClassDesc classDesc, ClassDescSet classDescSet) {
+        return false;
+    }
+
+    public SourceGenerator getSourceGenerator() {
+        return null;
+    }
+
+    public void writeString(String string, File file) {
+    }
+
+    public Class getClass(String className) {
+        return null;
+    }
+
+    public Configuration getConfiguration() {
+        return null;
+    }
+
+    public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas) {
+        return null;
+    }
+
+    public void updateClasses(ClassDescBag classDescBag, boolean mergeMethod) {
     }
 }

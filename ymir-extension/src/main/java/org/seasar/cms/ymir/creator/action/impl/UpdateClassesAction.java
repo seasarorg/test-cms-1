@@ -49,7 +49,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             return null;
         }
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("templateFile", pathMetaData.getTemplateFile());
         variableMap.put("parameters", getParameters(request));
@@ -70,7 +70,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             new PathMetaData[] { pathMetaData });
 
         String[] appliedClassNames = request.getParameterValues(PARAM_APPLY);
-        Set appliedClassNameSet = new HashSet();
+        Set<String> appliedClassNameSet = new HashSet<String>();
         if (appliedClassNames != null) {
             appliedClassNameSet.addAll(Arrays.asList(appliedClassNames));
         }
@@ -87,7 +87,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         getSourceCreator().updateClasses(classDescBag, mergeMethod);
 
-        Map variableMap = new HashMap();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));
