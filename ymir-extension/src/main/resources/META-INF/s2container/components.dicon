@@ -2,6 +2,7 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
+  <include path="common.dicon" />
   <component class="org.seasar.cms.ymir.creator.impl.SourceCreatorImpl">
     <property name="sourceDirectoryPath">config.getProperty("sourceDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/java")</property>
     <property name="classesDirectoryPath">config.getProperty("classesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/webapp"))</property>
