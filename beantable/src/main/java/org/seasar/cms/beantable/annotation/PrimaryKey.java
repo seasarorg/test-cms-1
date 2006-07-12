@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * @author YOKOTA Takehiko
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 public @interface PrimaryKey
 {
     String value();

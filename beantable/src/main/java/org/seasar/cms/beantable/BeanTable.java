@@ -4,8 +4,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.seasar.cms.beantable.identity.Identity;
-import org.seasar.cms.beantable.impl.ColumnMetaData;
+import org.seasar.cms.database.identity.Identity;
+import org.seasar.cms.database.identity.TableMetaData;
 
 /**
  * <p>
@@ -36,11 +36,7 @@ public interface BeanTable {
 
     void setBeanClass(Class<?> beanClass);
 
-    String getTableName();
-
-    ColumnMetaData getColumnMetaData(String columnName);
-
-    ColumnMetaData[] getColumnMetaData();
+    TableMetaData getTableMetaData();
 
     /*
      * for framework

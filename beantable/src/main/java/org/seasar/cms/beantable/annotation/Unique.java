@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  * @author YOKOTA Takehiko
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 public @interface Unique
 {
-    String[] value();
+    String[] value() default {};
 }

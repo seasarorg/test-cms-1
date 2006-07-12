@@ -16,15 +16,12 @@ import java.sql.Date;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Struct;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +37,12 @@ import org.seasar.cms.beantable.annotation.Constraint;
 import org.seasar.cms.beantable.annotation.Index;
 import org.seasar.cms.beantable.annotation.PrimaryKey;
 import org.seasar.cms.beantable.annotation.Unique;
-import org.seasar.cms.beantable.identity.Identity;
-import org.seasar.cms.beantable.identity.impl.HsqlIdentity;
+import org.seasar.cms.database.identity.ColumnMetaData;
+import org.seasar.cms.database.identity.ConstraintMetaData;
+import org.seasar.cms.database.identity.Identity;
+import org.seasar.cms.database.identity.IndexMetaData;
+import org.seasar.cms.database.identity.TableMetaData;
+import org.seasar.cms.database.identity.impl.HsqlIdentity;
 import org.seasar.dao.annotation.tiger.Bean;
 import org.seasar.dao.annotation.tiger.Id;
 import org.seasar.framework.log.Logger;
@@ -55,29 +56,19 @@ import org.seasar.framework.log.Logger;
  */
 public class BeanTableImpl implements BeanTable {
 
-    private Class<?> beanClass_;
-
-    private BeanInfo beanInfo_;
-
-    private Bean s2daoBean_;
-
     private DataSource ds_;
 
     private Identity identity_;
+
+    private Class<?> beanClass_;
+
+    private BeanInfo beanInfo_;
 
     private Set<String> actualJdbcTypeNameSet_ = new HashSet<String>();
 
     private Map<JDBCType, String> actualJdbcTypeNameByTypeMap_ = new HashMap<JDBCType, String>();
 
-    private String tableName_;
-
-    private ColumnMetaData[] columns_;
-
-    private Map<String, ColumnMetaData> columnMap_ = new HashMap<String, ColumnMetaData>();
-
-    private TableConstraint[] tableConstraints_;
-
-    private Set<String> noPersistentPropertySet_ = new HashSet<String>();
+    private TableMetaData table_;
 
     private boolean activated_;
 
@@ -89,7 +80,6 @@ public class BeanTableImpl implements BeanTable {
     }
 
     public BeanTableImpl(Class<?> beanClass) {
-        this();
         setBeanClass(beanClass);
     }
 
@@ -160,57 +150,76 @@ public class BeanTableImpl implements BeanTable {
             return;
         }
 
-        gatherDatabaseMetaData(ds_);
-        tableName_ = getTableName0();
-        columns_ = getColumnMetaData0();
-        tableConstraints_ = getTableConstraints();
+        gatherDatabaseMetaData();
+        table_ = createTableMetaData();
 
         activated_ = true;
     }
 
     public Class getBeanClass() {
+
         return beanClass_;
     }
 
     public void setBeanClass(Class<?> beanClass) {
+
         beanClass_ = beanClass;
         try {
-            beanInfo_ = Introspector.getBeanInfo(beanClass);
+            beanInfo_ = Introspector.getBeanInfo(beanClass_);
         } catch (IntrospectionException ex) {
             throw new RuntimeException(ex);
         }
+    }
 
-        s2daoBean_ = beanClass.getAnnotation(Bean.class);
-        if (s2daoBean_ != null) {
-            String[] noPersistentProperty = s2daoBean_.noPersistentProperty();
-            for (int i = 0; i < noPersistentProperty.length; i++) {
-                noPersistentPropertySet_.add(noPersistentProperty[i]);
+    void gatherDatabaseMetaData() throws SQLException {
+
+        actualJdbcTypeNameSet_.clear();
+        actualJdbcTypeNameByTypeMap_.clear();
+
+        Connection con = null;
+        ResultSet rs = null;
+        try {
+            con = ds_.getConnection();
+            DatabaseMetaData metaData = con.getMetaData();
+            rs = metaData.getTypeInfo();
+            while (rs.next()) {
+                String typeName = rs.getString("TYPE_NAME");
+                JDBCType jdbcType = JDBCType
+                    .getInstance(rs.getInt("DATA_TYPE"));
+                actualJdbcTypeNameSet_.add(typeName);
+                if (!actualJdbcTypeNameByTypeMap_.containsKey(jdbcType)) {
+                    actualJdbcTypeNameByTypeMap_.put(jdbcType, typeName);
+                }
+            }
+        } finally {
+            DbUtils.closeQuietly(con, null, rs);
+        }
+
+        if (identity_ instanceof HsqlIdentity) {
+            if (!actualJdbcTypeNameSet_.contains("DATETIME")) {
+                actualJdbcTypeNameSet_.add("DATETIME");
             }
         }
-        // java.lang.Objectのメソッドは抜いておく。
-        BeanInfo beanInfo;
-        try {
-            beanInfo = Introspector.getBeanInfo(Object.class);
-        } catch (IntrospectionException ex) {
-            throw new RuntimeException(ex);
-        }
-        PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
-        for (int i = 0; i < pds.length; i++) {
-            noPersistentPropertySet_.add(pds[i].getName().toUpperCase());
-        }
     }
 
-    public String getTableName() {
-        return tableName_;
+    TableMetaData createTableMetaData() {
+
+        TableMetaData table = new TableMetaData(gatherTableName());
+        table.setColumns(gatherColumnMetaData(gatherNoPersistentProperties()));
+        table.setConstraints(gatherConstraintMetaData());
+        table.setIndexes(gatherIndexMetaData());
+        return table;
     }
 
-    String getTableName0() {
+    String gatherTableName() {
+
         String tableName = null;
 
-        if (s2daoBean_ != null) {
-            tableName = s2daoBean_.table();
+        Bean bean = beanClass_.getAnnotation(Bean.class);
+        if (bean != null) {
+            tableName = bean.table();
         }
-        if (tableName == null) {
+        if (tableName == null || tableName.length() == 0) {
             tableName = beanClass_.getName();
             int dot = tableName.lastIndexOf('.');
             if (dot >= 0) {
@@ -226,26 +235,43 @@ public class BeanTableImpl implements BeanTable {
         return tableName;
     }
 
-    public ColumnMetaData getColumnMetaData(String columnName) {
-        return (ColumnMetaData) columnMap_.get(columnName.toUpperCase());
+    Set<String> gatherNoPersistentProperties() {
+
+        Set<String> noPersistentPropertySet = new HashSet<String>();
+        Bean bean = beanClass_.getAnnotation(Bean.class);
+        if (bean != null) {
+            String[] noPersistentProperty = bean.noPersistentProperty();
+            for (int i = 0; i < noPersistentProperty.length; i++) {
+                noPersistentPropertySet.add(noPersistentProperty[i]);
+            }
+        }
+        // java.lang.Objectのメソッドは抜いておく。
+        BeanInfo beanInfo;
+        try {
+            beanInfo = Introspector.getBeanInfo(Object.class);
+        } catch (IntrospectionException ex) {
+            throw new RuntimeException(ex);
+        }
+        PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
+        for (int i = 0; i < pds.length; i++) {
+            noPersistentPropertySet.add(pds[i].getName().toUpperCase());
+        }
+
+        return noPersistentPropertySet;
     }
 
-    public ColumnMetaData[] getColumnMetaData() {
-        return columns_;
-    }
+    ColumnMetaData[] gatherColumnMetaData(Set<String> noPersistentPropertySet) {
 
-    ColumnMetaData[] getColumnMetaData0() {
         PropertyDescriptor[] descriptors = beanInfo_.getPropertyDescriptors();
         List<ColumnMetaData> columnMetaDataList = new ArrayList<ColumnMetaData>(
             descriptors.length);
         for (int i = 0; i < descriptors.length; i++) {
             String propertyName = descriptors[i].getName().toUpperCase();
-            if (noPersistentPropertySet_.contains(propertyName)) {
+            if (noPersistentPropertySet.contains(propertyName)) {
                 continue;
             }
 
             ColumnMetaData columnMetaData = new ColumnMetaData();
-            columnMetaData.setIdentity(identity_);
             columnMetaData.setPropertyDescriptor(descriptors[i]);
             columnMetaData.setName(propertyName);
             String jdbcTypeName = getSuitableJDBCTypeName(descriptors[i]
@@ -261,14 +287,13 @@ public class BeanTableImpl implements BeanTable {
             applyAnnotations(columnMetaData, descriptors[i].getWriteMethod());
 
             columnMetaDataList.add(columnMetaData);
-            columnMap_.put(columnMetaData.getName().toUpperCase(),
-                columnMetaData);
         }
 
         return columnMetaDataList.toArray(new ColumnMetaData[0]);
     }
 
     void applyAnnotations(ColumnMetaData columnMetaData, Method method) {
+
         if (method == null) {
             return;
         }
@@ -345,7 +370,8 @@ public class BeanTableImpl implements BeanTable {
         }
     }
 
-    private ColumnDetail getColumnAnnotation(Method method) {
+    ColumnDetail getColumnAnnotation(Method method) {
+
         ColumnDetail column = method.getAnnotation(ColumnDetail.class);
         if (column == null) {
             final org.seasar.dao.annotation.tiger.Column s2DaoColumn = method
@@ -412,8 +438,9 @@ public class BeanTableImpl implements BeanTable {
         return column;
     }
 
-    TableConstraint[] getTableConstraints() {
-        List<TableConstraint> tableConstraintList = new ArrayList<TableConstraint>();
+    ConstraintMetaData[] gatherConstraintMetaData() {
+
+        List<ConstraintMetaData> constraintList = new ArrayList<ConstraintMetaData>();
 
         do {
             PrimaryKey primaryKey = beanClass_.getAnnotation(PrimaryKey.class);
@@ -424,226 +451,28 @@ public class BeanTableImpl implements BeanTable {
             if (value == null) {
                 break;
             }
-            TableConstraint tableConstraint = new TableConstraint();
-            tableConstraint.setName(TableConstraint.PRIMARY_KEY);
-            tableConstraint.setColumnNames(toStringArray(value));
-            tableConstraintList.add(tableConstraint);
+            ConstraintMetaData constraint = new ConstraintMetaData();
+            constraint.setName(ConstraintMetaData.PRIMARY_KEY);
+            constraint.setColumnNames(toStringArray(value));
+            constraintList.add(constraint);
 
             Unique unique = beanClass_.getAnnotation(Unique.class);
             if (unique == null) {
                 break;
             }
             String[] values = unique.value();
-            if (values == null) {
+            if (values.length == 0) {
                 break;
             }
             for (int i = 0; i < values.length; i++) {
-                tableConstraint = new TableConstraint();
-                tableConstraint.setName(TableConstraint.UNIQUE);
-                tableConstraint.setColumnNames(toStringArray(values[i]));
-                tableConstraintList.add(tableConstraint);
+                constraint = new ConstraintMetaData();
+                constraint.setName(ConstraintMetaData.UNIQUE);
+                constraint.setColumnNames(toStringArray(values[i]));
+                constraintList.add(constraint);
             }
         } while (false);
 
-        return tableConstraintList.toArray(new TableConstraint[0]);
-    }
-
-    public boolean update() throws SQLException {
-        return update(true);
-    }
-
-    public boolean update(boolean correctTableSchema) throws SQLException {
-
-        if (!activated_) {
-            throw new IllegalStateException("Not activated");
-        }
-
-        if (!identity_.existsTable(tableName_)) {
-            return createTable();
-        } else if (correctTableSchema) {
-            return correctTableSchema();
-        }
-        return false;
-    }
-
-    public boolean createTable() throws SQLException {
-        return createTable(false);
-    }
-
-    public boolean createTable(boolean force) throws SQLException {
-        if (!force && identity_.existsTable(tableName_)) {
-            return false;
-        }
-        executeUpdate(constructCreateTableSQLs());
-        executeUpdate(constructCreateIndexSQLs());
-        return true;
-    }
-
-    public boolean correctTableSchema() throws SQLException {
-        boolean modified = false;
-
-        Set<String> currentColumnSet = new HashSet<String>();
-        String[] columnNames = identity_.getColumns(tableName_);
-        for (int i = 0; i < columnNames.length; i++) {
-            currentColumnSet.add(columnNames[i].toUpperCase());
-        }
-        for (int i = 0; i < columns_.length; i++) {
-            String columnName = columns_[i].getName().toUpperCase();
-            if (currentColumnSet.contains(columnName)) {
-                currentColumnSet.remove(columnName);
-            } else {
-                addColumn(columns_[i]);
-                modified = true;
-            }
-        }
-        for (Iterator itr = currentColumnSet.iterator(); itr.hasNext();) {
-            dropColumn((String) itr.next());
-            modified = true;
-        }
-
-        return modified;
-    }
-
-    public boolean dropTable() throws SQLException {
-        return dropTable(false);
-    }
-
-    public boolean dropTable(boolean force) throws SQLException {
-        if (!force && !identity_.existsTable(tableName_)) {
-            return false;
-        }
-        executeUpdate(constructDropTableSQLs());
-        executeUpdate(constructDropIndexSQLs());
-        return true;
-    }
-
-    public String[] constructCreateTableSQLs() {
-        List<String> sqlList = new ArrayList<String>();
-
-        StringBuffer sb = new StringBuffer();
-        sb.append("CREATE TABLE ").append(tableName_).append(" (");
-        String delim = "";
-        for (int i = 0; i < columns_.length; i++) {
-            sb.append(delim);
-            delim = ", ";
-            String columnName = columns_[i].getName();
-            sb.append(columnName).append(" ").append(
-                columns_[i].getDefinitionSQL(tableName_));
-            sqlList.addAll(Arrays.asList(columns_[i]
-                .getAdditionalDefinitionSQLs(tableName_)));
-        }
-        for (int i = 0; i < tableConstraints_.length; i++) {
-            String[] names = tableConstraints_[i].getColumnNames();
-            if (names.length == 0) {
-                continue;
-            }
-            sb.append(delim);
-            delim = ", ";
-            sb.append(tableConstraints_[i].getName()).append(" (");
-            String delim2 = "";
-            for (int j = 0; j < names.length; j++) {
-                sb.append(delim2);
-                delim2 = ", ";
-                sb.append(names[j]);
-            }
-            sb.append(")");
-        }
-        sb.append(")");
-        sqlList.add(sb.toString());
-
-        return sqlList.toArray(new String[0]);
-    }
-
-    public String[] constructCreateIndexSQLs() {
-        List<String> indexList = new ArrayList<String>();
-
-        for (int i = 0; i < columns_.length; i++) {
-            if (!columns_[i].isIndexCreated()) {
-                continue;
-            }
-            indexList.add("CREATE INDEX "
-                + columns_[i].getIndexName(tableName_) + " ("
-                + columns_[i].getName() + ")");
-        }
-
-        Index index = beanClass_.getAnnotation(Index.class);
-        if (index != null) {
-            String[] value = index.value();
-            for (int i = 0; i < value.length; i++) {
-                String[] columns = toStringArray(value[i]);
-                if (columns.length == 0) {
-                    continue;
-                }
-                StringBuffer sb = new StringBuffer();
-                sb.append("CREATE INDEX ");
-                appendIndexName(sb, columns).append(" (");
-                String delim = "";
-                for (int j = 0; j < columns.length; j++) {
-                    sb.append(delim);
-                    delim = ", ";
-                    sb.append(columns[j]);
-                }
-                sb.append(")");
-                indexList.add(sb.toString());
-            }
-        }
-        return indexList.toArray(new String[0]);
-    }
-
-    StringBuffer appendIndexName(StringBuffer sb, String[] columns) {
-        sb.append("_IDX_").append(tableName_);
-        for (int i = 0; i < columns.length; i++) {
-            sb.append("_").append(columns[i]);
-        }
-        return sb;
-    }
-
-    public String[] constructDropTableSQLs() {
-        List<String> sqlList = new ArrayList<String>();
-
-        sqlList.add("DROP TABLE " + tableName_);
-        for (int i = 0; i < columns_.length; i++) {
-            sqlList.addAll(Arrays.asList(columns_[i]
-                .getDeletionSQLs(tableName_)));
-        }
-
-        return sqlList.toArray(new String[0]);
-    }
-
-    public String[] constructDropIndexSQLs() {
-        List<String> indexList = new ArrayList<String>();
-
-        for (int i = 0; i < columns_.length; i++) {
-            if (!columns_[i].isIndexCreated()) {
-                continue;
-            }
-            indexList.add("DROP INDEX " + columns_[i].getIndexName(tableName_));
-        }
-
-        Index index = beanClass_.getAnnotation(Index.class);
-        if (index != null) {
-            String[] value = index.value();
-            for (int i = 0; i < value.length; i++) {
-                String[] columns = toStringArray(value[i]);
-                if (columns.length == 0) {
-                    continue;
-                }
-                StringBuffer sb = new StringBuffer();
-                sb.append("DROP INDEX ");
-                appendIndexName(sb, columns).append(")");
-                indexList.add(sb.toString());
-            }
-        }
-        return indexList.toArray(new String[0]);
-    }
-
-    void addColumn(ColumnMetaData column) throws SQLException {
-        executeUpdate(identity_.getAlterTableAddColumnSQL(tableName_, column));
-    }
-
-    void dropColumn(String columnName) throws SQLException {
-        executeUpdate(identity_.getAlterTableDropColumnSQL(tableName_,
-            columnName));
+        return constraintList.toArray(new ConstraintMetaData[0]);
     }
 
     String[] toStringArray(String value) {
@@ -659,6 +488,83 @@ public class BeanTableImpl implements BeanTable {
             }
         }
         return list.toArray(new String[0]);
+    }
+
+    IndexMetaData[] gatherIndexMetaData() {
+
+        List<IndexMetaData> indexList = new ArrayList<IndexMetaData>();
+
+        do {
+            Index index = beanClass_.getAnnotation(Index.class);
+            if (index == null) {
+                break;
+            }
+            String[] values = index.value();
+            if (values.length == 0) {
+                break;
+            }
+            for (int i = 0; i < values.length; i++) {
+                IndexMetaData metaData = new IndexMetaData();
+                metaData.setColumnNames(toStringArray(values[i]));
+                indexList.add(metaData);
+            }
+        } while (false);
+
+        return indexList.toArray(new IndexMetaData[0]);
+    }
+
+    public TableMetaData getTableMetaData() {
+
+        return table_;
+    }
+
+    public boolean update() throws SQLException {
+
+        return update(true);
+    }
+
+    public boolean update(boolean correctTableSchema) throws SQLException {
+
+        if (!activated_) {
+            throw new IllegalStateException("Not activated");
+        }
+
+        if (!identity_.existsTable(table_.getName())) {
+            return createTable();
+        } else if (correctTableSchema) {
+            return correctTableSchema();
+        }
+        return false;
+    }
+
+    public boolean createTable() throws SQLException {
+
+        return identity_.createTable(table_);
+    }
+
+    public boolean createTable(boolean force) throws SQLException {
+
+        return identity_.createTable(table_, force);
+    }
+
+    public boolean correctTableSchema() throws SQLException {
+
+        return identity_.correctTableSchema(table_);
+    }
+
+    public boolean correctTableSchema(boolean force) throws SQLException {
+
+        return identity_.correctTableSchema(table_, force);
+    }
+
+    public boolean dropTable() throws SQLException {
+
+        return identity_.dropTable(table_);
+    }
+
+    public boolean dropTable(boolean force) throws SQLException {
+
+        return identity_.dropTable(table_, force);
     }
 
     String getSuitableJDBCTypeName(String javaTypeName) {
@@ -679,64 +585,6 @@ public class BeanTableImpl implements BeanTable {
             }
         }
         return "VARCHAR";
-    }
-
-    void gatherDatabaseMetaData(DataSource ds) throws SQLException {
-        actualJdbcTypeNameSet_.clear();
-        actualJdbcTypeNameByTypeMap_.clear();
-
-        Connection con = null;
-        ResultSet rs = null;
-        try {
-            con = ds.getConnection();
-            DatabaseMetaData metaData = con.getMetaData();
-            rs = metaData.getTypeInfo();
-            while (rs.next()) {
-                String typeName = rs.getString("TYPE_NAME");
-                JDBCType jdbcType = JDBCType
-                    .getInstance(rs.getInt("DATA_TYPE"));
-                actualJdbcTypeNameSet_.add(typeName);
-                if (!actualJdbcTypeNameByTypeMap_.containsKey(jdbcType)) {
-                    actualJdbcTypeNameByTypeMap_.put(jdbcType, typeName);
-                }
-            }
-        } finally {
-            DbUtils.closeQuietly(con, null, rs);
-        }
-
-        if (identity_ instanceof HsqlIdentity) {
-            if (!actualJdbcTypeNameSet_.contains("DATETIME")) {
-                actualJdbcTypeNameSet_.add("DATETIME");
-            }
-        }
-    }
-
-    void executeUpdate(String sql) throws SQLException {
-        executeUpdate(new String[] { sql });
-    }
-
-    void executeUpdate(String[] sqls) throws SQLException {
-        Connection con = null;
-        try {
-            con = ds_.getConnection();
-            for (int i = 0; i < sqls.length; i++) {
-                Statement st = null;
-                try {
-                    st = con.createStatement();
-                    System.out.println("EXECUTE: " + sqls[i]);
-                    st.executeUpdate(sqls[i]);
-                } catch (SQLException ex) {
-                    if (logger_.isDebugEnabled()) {
-                        logger_.debug("SQL execution has been failed: SQL="
-                            + sqls[i], ex);
-                    }
-                } finally {
-                    DbUtils.closeQuietly(st);
-                }
-            }
-        } finally {
-            DbUtils.closeQuietly(con);
-        }
     }
 
     public void setDataSource(DataSource ds) {
