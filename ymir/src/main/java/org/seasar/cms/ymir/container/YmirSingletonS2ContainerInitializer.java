@@ -1,12 +1,15 @@
 package org.seasar.cms.ymir.container;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.deployer.ComponentDeployerFactory;
 import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;
+import org.seasar.framework.container.factory.CircularIncludeRuntimeException;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.container.impl.servlet.HttpServletExternalContext;
@@ -55,44 +58,60 @@ class YmirSingletonS2ContainerInitializer {
     }
 
     void integrate(S2Container container) {
-        includeContainer(container, gatherContainers());
+        include(container, ContainerUtils
+            .getResourceURLs(Globals.COMPONENTS_DICON));
     }
 
-    public S2Container[] gatherContainers() {
+    void include(S2Container parent, URL[] pathURLs) {
 
-        URL[] urls = getResourceURLs(Globals.COMPONENTS_DICON);
-        List containerList = new ArrayList();
-        for (int i = 0; i < urls.length; i++) {
-            try {
-                containerList.add(createContainer(urls[i]));
-            } catch (RuntimeException ignored) {
-                if (logger_.isInfoEnabled()) {
-                    logger_.info("Can't read configuration: " + urls[i]);
-                }
-            }
-        }
-        return (S2Container[]) containerList.toArray(new S2Container[0]);
+        include(parent, new HashSet(Arrays.asList(pathURLs)));
     }
 
-    URL[] getResourceURLs(String path) {
-        return ContainerUtils.getResourceURLs(path);
-    }
+    Set include(S2Container parent, Set pathURLSet) {
 
-    S2Container createContainer(URL url) {
-
-        return S2ContainerFactory.create(url.toExternalForm());
-    }
-
-    void includeContainer(S2Container parent, S2Container[] children) {
+        Set remain = pathURLSet;
 
         int size = parent.getChildSize();
         if (size == 0) {
-            for (int i = 0; i < children.length; i++) {
-                parent.include(children[i]);
-            }
+            remain = doInclude(parent, remain);
         } else {
             for (int i = 0; i < size; i++) {
-                includeContainer(parent.getChild(i), children);
+                remain = include(parent.getChild(i), remain);
+            }
+            if (!remain.isEmpty()) {
+                remain = doInclude(parent, remain);
+            }
+        }
+        return remain;
+    }
+
+    private Set doInclude(S2Container container, Set pathURLSet) {
+
+        Set remain = new HashSet(pathURLSet);
+        for (Iterator itr = pathURLSet.iterator(); itr.hasNext();) {
+            URL pathURL = (URL) itr.next();
+            String path = pathURL.toExternalForm();
+            try {
+                // FIXME S2ContainerFactory.include()で適切に循環参照のチェックを
+                // してくれるようになったらこのロジックは不要。
+                traverse(S2ContainerFactory.create(path), container.getPath());
+
+                S2ContainerFactory.include(container, path);
+                remain.remove(pathURL);
+            } catch (CircularIncludeRuntimeException ignore) {
+            }
+        }
+        return remain;
+    }
+
+    private void traverse(S2Container container, String path) {
+        int size = container.getChildSize();
+        for (int i = 0; i < size; i++) {
+            S2Container child = container.getChild(i);
+            if (path.equals(child.getPath())) {
+                throw new CircularIncludeRuntimeException(path, new HashSet());
+            } else {
+                traverse(child, path);
             }
         }
     }

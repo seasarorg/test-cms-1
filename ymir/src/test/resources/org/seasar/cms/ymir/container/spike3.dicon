@@ -2,6 +2,4 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
-  <include path="org/seasar/cms/ymir/container/included.dicon" />
-  <component class="org.seasar.cms.ymir.container.OneListener" />
 </components>
