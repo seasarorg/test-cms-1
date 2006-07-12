@@ -2,6 +2,7 @@ package org.seasar.cms.ymir.container;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLClassLoader;
 
 import junit.framework.TestCase;
 
@@ -50,6 +51,44 @@ public class YmirResourceResolverTest extends TestCase {
                 .create("org/seasar/cms/ymir/container/test.dicon");
         } catch (Throwable t) {
             fail("リソースパスで指定したdiconファイルからS2Containerを構築できること");
+        }
+    }
+
+    public void testCreateContainer4() throws Exception {
+
+        // ## Arrange ##
+        // ## Act ##
+        // ## Assert ##
+        URLClassLoader cl = new URLClassLoader(new URL[] { getClass()
+            .getResource("test.jar") }, getClass().getClassLoader());
+        ClassLoader old = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(cl);
+
+            S2ContainerFactory.create("depends:test.jar");
+        } catch (Throwable t) {
+            fail("依存するJARが持つdiconファイルからS2Containerを構築できること");
+        } finally {
+            Thread.currentThread().setContextClassLoader(old);
+        }
+    }
+
+    public void testCreateContainer5() throws Exception {
+
+        // ## Arrange ##
+        // ## Act ##
+        // ## Assert ##
+        URLClassLoader cl = new URLClassLoader(new URL[] { getClass()
+            .getResource("test.jar") }, getClass().getClassLoader());
+        ClassLoader old = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(cl);
+
+            S2ContainerFactory.create("depends:test2.jar");
+            fail("依存するJARが存在しない場合はS2Containerを構築できないこと");
+        } catch (Throwable expected) {
+        } finally {
+            Thread.currentThread().setContextClassLoader(old);
         }
     }
 }

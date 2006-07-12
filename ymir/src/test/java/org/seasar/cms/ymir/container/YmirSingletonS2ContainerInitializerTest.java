@@ -4,12 +4,12 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import junit.framework.TestCase;
+
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.util.ResourceUtil;
-
-import junit.framework.TestCase;
 
 public class YmirSingletonS2ContainerInitializerTest extends TestCase {
 
@@ -65,6 +65,10 @@ public class YmirSingletonS2ContainerInitializerTest extends TestCase {
         assertTrue(listeners[1] instanceof TwoListener);
     }
 
+    /*
+     * S2Container#findComponents()はコンテナをまたがってコンポーネントを
+     * 収集しないという仕様とのこと。
+     */
     public void testSpike1() throws Exception {
 
         // ## Arrange ##
@@ -75,8 +79,7 @@ public class YmirSingletonS2ContainerInitializerTest extends TestCase {
         Object[] listeners = container.findComponents(Listener.class);
 
         // ## Assert ##
-        assertEquals(2, listeners.length);
+        assertEquals(1, listeners.length);
         assertTrue(listeners[0] instanceof OneListener);
-        assertTrue(listeners[1] instanceof TwoListener);
     }
 }

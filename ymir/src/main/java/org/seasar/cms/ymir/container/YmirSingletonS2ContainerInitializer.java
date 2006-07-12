@@ -1,9 +1,7 @@
 package org.seasar.cms.ymir.container;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import org.seasar.framework.container.S2Container;
@@ -13,13 +11,10 @@ import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.container.impl.servlet.HttpServletExternalContext;
 import org.seasar.framework.container.impl.servlet.HttpServletExternalContextComponentDefRegister;
-import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.StringUtil;
 
 class YmirSingletonS2ContainerInitializer {
-
-    private static final String COMPONENTS_DICON = "META-INF/s2container/components.dicon";
 
     private Object application;
 
@@ -65,7 +60,7 @@ class YmirSingletonS2ContainerInitializer {
 
     public S2Container[] gatherContainers() {
 
-        URL[] urls = getResourceURLs(COMPONENTS_DICON);
+        URL[] urls = getResourceURLs(Globals.COMPONENTS_DICON);
         List containerList = new ArrayList();
         for (int i = 0; i < urls.length; i++) {
             try {
@@ -80,32 +75,12 @@ class YmirSingletonS2ContainerInitializer {
     }
 
     URL[] getResourceURLs(String path) {
-
-        Enumeration enm;
-        try {
-            enm = getClassLoader().getResources(path);
-        } catch (IOException ex) {
-            throw new IORuntimeException(ex);
-        }
-        List list = new ArrayList();
-        for (; enm.hasMoreElements();) {
-            list.add(enm.nextElement());
-        }
-        return (URL[]) list.toArray(new URL[0]);
+        return ContainerUtils.getResourceURLs(path);
     }
 
     S2Container createContainer(URL url) {
 
         return S2ContainerFactory.create(url.toExternalForm());
-    }
-
-    ClassLoader getClassLoader() {
-
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null) {
-            cl = getClass().getClassLoader();
-        }
-        return cl;
     }
 
     void includeContainer(S2Container parent, S2Container[] children) {
