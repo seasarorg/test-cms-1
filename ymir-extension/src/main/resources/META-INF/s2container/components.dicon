@@ -3,6 +3,7 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
   <include path="common.dicon" />
+  <include path="depends:beantable" />
   <component class="org.seasar.cms.ymir.creator.impl.SourceCreatorImpl">
     <property name="sourceDirectoryPath">config.getProperty("sourceDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/java")</property>
     <property name="classesDirectoryPath">config.getProperty("classesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/webapp"))</property>
@@ -13,4 +14,26 @@
   </component>
   <component class="org.seasar.cms.ymir.freemarker.FreemarkerSourceGenerator" />
   <component class="org.seasar.cms.ymir.zpt.ZptAnalyzer" />
+  <component class="org.seasar.cms.ymir.beantable.BeantableLifecycleListener">
+    <property name="classTraverser">beantableClassTraverser</property>
+  </component>
+  <component name="beantableClassTraverser"
+             class="org.seasar.cms.ymir.container.ClassTraverser">
+    <initMethod name="addReferenceClass">
+      <arg>
+        @org.seasar.cms.ymir.landmark.Landmark@class
+      </arg>
+    </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>config.getProperty("rootPackageName", "skeleton") + ".dao"</arg>
+      <arg>".*"</arg>
+    </initMethod>
+    <initMethod name="addIgnoreClassPattern">
+      <arg>config.getProperty("rootPackageName", "skeleton") + ".dao"</arg>
+      <arg>"(Abstract)?.*(Base|Dao)"</arg>
+    </initMethod>
+    <property name="classHandler">
+      <component class="org.seasar.cms.ymir.beantable.BeantableClassHandler" />
+    </property>
+  </component>
 </components>
