@@ -91,4 +91,24 @@ public class YmirResourceResolverTest extends TestCase {
             Thread.currentThread().setContextClassLoader(old);
         }
     }
+
+    public void testGetResourceURL() throws Exception {
+
+        // ## Arrange ##
+        URL[] urls = new URL[] {
+            new URL("jar:file:/path/to/jar/test-0.0.1.jar!/"),
+            new URL("jar:file:/path/to/jar/hoge-0.0.1.jar!/"), };
+
+        // ## Act ##
+        URL actual = new YmirResourceResolver().getResourceURL("test", urls);
+
+        // ## Assert ##
+        assertEquals(urls[0], actual);
+
+        // ## Act ##
+        actual = new YmirResourceResolver().getResourceURL("hoe", urls);
+
+        // ## Assert ##
+        assertNull(actual);
+    }
 }

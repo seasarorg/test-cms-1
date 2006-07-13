@@ -14,16 +14,13 @@ import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.container.impl.servlet.HttpServletExternalContext;
 import org.seasar.framework.container.impl.servlet.HttpServletExternalContextComponentDefRegister;
-import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.StringUtil;
 
-class YmirSingletonS2ContainerInitializer {
+public class YmirSingletonS2ContainerInitializer {
 
     private Object application;
 
     private String configPath;
-
-    private Logger logger_ = Logger.getLogger(getClass());
 
     public void initialize() {
         if (isAlreadyInitialized()) {
@@ -58,6 +55,7 @@ class YmirSingletonS2ContainerInitializer {
     }
 
     void integrate(S2Container container) {
+
         include(container, ContainerUtils
             .getResourceURLs(Globals.COMPONENTS_DICON));
     }

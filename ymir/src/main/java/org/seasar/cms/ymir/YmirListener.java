@@ -1,62 +1,25 @@
 package org.seasar.cms.ymir;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
-import org.seasar.cms.ymir.container.YmirS2ContainerListener;
-import org.seasar.cms.ymir.container.hotdeploy.OndemandUtils;
-import org.seasar.framework.container.S2Container;
-import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
+import org.seasar.cms.ymir.impl.YmirImpl;
 
-public class YmirListener extends YmirS2ContainerListener {
+public class YmirListener implements ServletContextListener {
+
+    public static final String CONFIG_PATH_KEY = "org.seasar.framework.container.configPath";
+
+    private Ymir ymir_ = new YmirImpl();
 
     public void contextInitialized(ServletContextEvent sce) {
 
-        super.contextInitialized(sce);
-
-        logger_.debug("Ymir initialize start");
-
-        Configuration config = getConfiguration();
-        if (config.getProperty(Configuration.KEY_WEBAPPROOT) == null) {
-            config.setProperty(Configuration.KEY_WEBAPPROOT, sce
-                .getServletContext().getRealPath("/"));
-        }
-
-        String projectStatus = config
-            .getProperty(Configuration.KEY_PROJECTSTATUS);
-        logger_.info("Project status is: "
-            + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
-
-        // developモード以外の時はhotdeployを無効にするために
-        // こうしている。
-        if (!Configuration.PROJECTSTATUS_DEVELOP.equals(projectStatus)) {
-            OndemandUtils.start(getContainer(), true);
-        }
-
-        logger_.debug("Ymir initialize end");
+        ServletContext sc = sce.getServletContext();
+        ymir_.init(sc, sc.getInitParameter(CONFIG_PATH_KEY));
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
 
-        logger_.debug("Ymir destroy start");
-
-        if (!Configuration.PROJECTSTATUS_DEVELOP.equals(getConfiguration()
-            .getProperty(Configuration.KEY_PROJECTSTATUS))) {
-
-            OndemandUtils.stop(getContainer(), true);
-        }
-
-        super.contextDestroyed(sce);
-
-        logger_.debug("Ymir destroy end");
-    }
-
-    S2Container getContainer() {
-
-        return SingletonS2ContainerFactory.getContainer();
-    }
-
-    Configuration getConfiguration() {
-
-        return (Configuration) getContainer().getComponent(Configuration.class);
+        ymir_.destroy();
     }
 }

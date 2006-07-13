@@ -14,12 +14,17 @@ public class YmirResourceResolver implements ResourceResolver {
 
     private static final String SCHEME_DEPENDS = "depends:";
 
+    private static final String SCHEME_JAR = "jar:";
+
+    private static final String SUFFIX_JAR = ".jar!";
+
     private ResourceResolver urlResourceResolver_ = new URLResourceResolver();
 
     private ResourceResolver classPathResourceResolver_ = new ClassPathResourceResolver();
 
     public InputStream getInputStream(String path) {
 
+        // TODO depends:の処理はPathResolverでやるべき。
         if (path.startsWith(SCHEME_DEPENDS)) {
             String jarName = path.substring(SCHEME_DEPENDS.length());
             URL url = getResourceURL(jarName);
@@ -41,12 +46,25 @@ public class YmirResourceResolver implements ResourceResolver {
 
     URL getResourceURL(String path) {
 
-        URL[] urls = ContainerUtils.getResourceURLs(Globals.COMPONENTS_DICON);
+        return getResourceURL(path, ContainerUtils
+            .getResourceURLs(Globals.COMPONENTS_DICON));
+    }
+
+    URL getResourceURL(String path, URL[] urls) {
         for (int i = 0; i < urls.length; i++) {
             String externalForm = urls[i].toExternalForm();
-            int idx = externalForm.indexOf(path);
-            if (idx >= 0 && externalForm.charAt(idx - 1) == '/'
-                && externalForm.charAt(idx + path.length()) == '!') {
+            if (!externalForm.startsWith(SCHEME_JAR)) {
+                continue;
+            }
+            int end = externalForm.indexOf(SUFFIX_JAR);
+            if (end < 0) {
+                continue;
+            }
+            int start = externalForm.lastIndexOf('/', end);
+            if (start < 0) {
+                continue;
+            }
+            if (externalForm.substring(start + 1, end).startsWith(path)) {
                 return urls[i];
             }
         }
