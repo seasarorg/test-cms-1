@@ -65,7 +65,7 @@ public class YmirResourceResolverTest extends TestCase {
         try {
             Thread.currentThread().setContextClassLoader(cl);
 
-            S2ContainerFactory.create("depends:test.jar");
+            S2ContainerFactory.create("depends:test");
         } catch (Throwable t) {
             fail("依存するJARが持つdiconファイルからS2Containerを構築できること");
         } finally {
@@ -84,31 +84,11 @@ public class YmirResourceResolverTest extends TestCase {
         try {
             Thread.currentThread().setContextClassLoader(cl);
 
-            S2ContainerFactory.create("depends:test2.jar");
+            S2ContainerFactory.create("depends:test2");
             fail("依存するJARが存在しない場合はS2Containerを構築できないこと");
         } catch (Throwable expected) {
         } finally {
             Thread.currentThread().setContextClassLoader(old);
         }
-    }
-
-    public void testGetResourceURL() throws Exception {
-
-        // ## Arrange ##
-        URL[] urls = new URL[] {
-            new URL("jar:file:/path/to/jar/test-0.0.1.jar!/"),
-            new URL("jar:file:/path/to/jar/hoge-0.0.1.jar!/"), };
-
-        // ## Act ##
-        URL actual = new YmirResourceResolver().getResourceURL("test", urls);
-
-        // ## Assert ##
-        assertEquals(urls[0], actual);
-
-        // ## Act ##
-        actual = new YmirResourceResolver().getResourceURL("hoe", urls);
-
-        // ## Assert ##
-        assertNull(actual);
     }
 }
