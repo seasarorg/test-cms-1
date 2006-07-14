@@ -18,7 +18,7 @@
     <property name="driverClassName">"org.hsqldb.jdbcDriver"</property>
     <property name="URL">
       "jdbc:hsqldb:file:"
-      + @org.seasar.framework.util.ResourceUtil@getBuildDir(@org.seasar.cms.beantable.impl.BeanTableImplTest@class).getCanonicalPath()
+      + @org.seasar.framework.util.ResourceUtil@getBuildDir(@org.seasar.cms.beantable.impl.BeantableImplTest@class).getCanonicalPath()
       + "/hsqldb/hsqldb"
     </property>
     <property name="user">"sa"</property>

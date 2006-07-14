@@ -3,7 +3,7 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
   <include path="depends:database" />
-  <component class="org.seasar.cms.beantable.impl.BeanTableImpl" instance="prototype">
+  <component class="org.seasar.cms.beantable.impl.BeantableImpl" instance="prototype">
     <property name="identity">identitySelector.getIdentity()</property>
   </component>
 </components>
