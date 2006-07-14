@@ -9,12 +9,12 @@ public class BeantableImplTest extends S2TestCase {
 
     private Identity identity_;
 
-    protected Beantable newBeanTable(Class beanClass) {
+    protected Beantable newBeantable(Class beanClass) {
 
-        BeantableImpl beanTable = new BeantableImpl(beanClass);
-        beanTable.setIdentity(identity_);
-        beanTable.setDataSource(getDataSource());
-        return beanTable;
+        BeantableImpl beantable = new BeantableImpl(beanClass);
+        beantable.setIdentity(identity_);
+        beantable.setDataSource(getDataSource());
+        return beantable;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class BeantableImplTest extends S2TestCase {
     public void testActivate() throws Exception {
 
         try {
-            newBeanTable(Hoge.class).activate();
+            newBeantable(Hoge.class).activate();
         } catch (Throwable t) {
             fail("正常にactivate()できること");
         }
@@ -52,7 +52,7 @@ public class BeantableImplTest extends S2TestCase {
 
     public void testCreateTable() throws Exception {
 
-        Beantable beanTable = newBeanTable(Hoge.class);
+        Beantable beanTable = newBeantable(Hoge.class);
         beanTable.activate();
         beanTable.dropTable(true);
 
@@ -62,7 +62,7 @@ public class BeantableImplTest extends S2TestCase {
 
     public void testCreateTable2() throws Exception {
 
-        Beantable beanTable = newBeanTable(Hoge2.class);
+        Beantable beanTable = newBeantable(Hoge2.class);
         beanTable.activate();
         beanTable.dropTable(true);
 
@@ -76,7 +76,7 @@ public class BeantableImplTest extends S2TestCase {
 
     public void testDropTable() throws Exception {
 
-        Beantable beanTable = newBeanTable(Hoge.class);
+        Beantable beanTable = newBeantable(Hoge.class);
         beanTable.activate();
         beanTable.createTable(true);
 
