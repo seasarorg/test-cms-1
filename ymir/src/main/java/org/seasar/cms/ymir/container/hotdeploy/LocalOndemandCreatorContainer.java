@@ -78,11 +78,22 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         }
         if (counter++ == 0) {
             originalClassLoader = container.getClassLoader();
-            hotdeployClassLoader = new HotdeployClassLoader(originalClassLoader);
-            hotdeployClassLoader.setPackageName(rootPackageName);
-            hotdeployClassLoader.addHotdeployListener(this);
+            hotdeployClassLoader = newHotdeployClassLoader(originalClassLoader);
             ((S2ContainerImpl) container).setClassLoader(hotdeployClassLoader);
         }
+    }
+
+    HotdeployClassLoader newHotdeployClassLoader(ClassLoader originalClassLoader) {
+        HotdeployClassLoader hotdeployClassLoader = new HotdeployClassLoader(
+            originalClassLoader);
+        hotdeployClassLoader.setPackageName(rootPackageName);
+        // FIXME findAllComponents()にしよう。
+        Object[] listeners = container.findComponents(HotdeployListener.class);
+        for (int i = 0; i < listeners.length; i++) {
+            hotdeployClassLoader
+                .addHotdeployListener((HotdeployListener) listeners[i]);
+        }
+        return hotdeployClassLoader;
     }
 
     public synchronized void stop() {
