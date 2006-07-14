@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 
-import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.autoregister.ClassPattern;
 import org.seasar.framework.util.ClassTraversal;
@@ -70,24 +69,24 @@ public class ClassTraverser {
         ignoreClassPatterns.add(classPattern);
     }
 
-    protected boolean hasComponentDef(String name) {
-        return findComponentDef(name) != null;
-    }
-
-    protected ComponentDef findComponentDef(String name) {
-        if (name == null) {
-            return null;
-        }
-        S2Container container = getContainer();
-        for (int i = 0; i < container.getComponentDefSize(); ++i) {
-            ComponentDef cd = container.getComponentDef(i);
-            if (name.equals(cd.getComponentName())) {
-                return cd;
-            }
-        }
-        return null;
-    }
-
+    //    protected boolean hasComponentDef(String name) {
+    //        return findComponentDef(name) != null;
+    //    }
+    //
+    //    protected ComponentDef findComponentDef(String name) {
+    //        if (name == null) {
+    //            return null;
+    //        }
+    //        S2Container container = getContainer();
+    //        for (int i = 0; i < container.getComponentDefSize(); ++i) {
+    //            ComponentDef cd = container.getComponentDef(i);
+    //            if (name.equals(cd.getComponentName())) {
+    //                return cd;
+    //            }
+    //        }
+    //        return null;
+    //    }
+    //
     protected boolean isIgnore(String packageName, String shortClassName) {
         if (ignoreClassPatterns.isEmpty()) {
             return false;
@@ -113,7 +112,11 @@ public class ClassTraverser {
     }
 
     public void setClassHandler(ClassHandler classHandler) {
-        this.classHandler = classHandler;
+        if (classHandler == null) {
+            this.classHandler = null;
+        } else {
+            this.classHandler = new FilteredClassHandler(classHandler);
+        }
     }
 
     public void traverse() {
@@ -185,6 +188,22 @@ public class ClassTraverser {
             final String jarFileName = urlString
                 .substring("zip:".length(), pos);
             return JarFileUtil.create(new File(jarFileName));
+        }
+    }
+
+    class FilteredClassHandler implements ClassHandler {
+
+        private ClassHandler classHandler_;
+
+        public FilteredClassHandler(ClassHandler classHandler) {
+            classHandler_ = classHandler;
+        }
+
+        public void processClass(String packageName, String shortClassName) {
+            if (isIgnore(packageName, shortClassName)) {
+                return;
+            }
+            classHandler_.processClass(packageName, shortClassName);
         }
     }
 }
