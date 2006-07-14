@@ -14,7 +14,7 @@
   </component>
   <component class="org.seasar.cms.ymir.freemarker.FreemarkerSourceGenerator" />
   <component class="org.seasar.cms.ymir.zpt.ZptAnalyzer" />
-  <component class="org.seasar.cms.ymir.beantable.BeantableLifecycleListener">
+  <component class="org.seasar.cms.ymir.beantable.BeantableManager">
     <property name="classTraverser">beantableClassTraverser</property>
   </component>
   <component name="beantableClassTraverser"

@@ -2,7 +2,7 @@ package org.seasar.cms.ymir.beantable;
 
 import java.sql.SQLException;
 
-import org.seasar.cms.beantable.BeanTable;
+import org.seasar.cms.beantable.Beantable;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.ClassTraversal.ClassHandler;
@@ -34,11 +34,11 @@ public class BeantableClassHandler implements ClassHandler {
             logger_.info("UPDATE TABLE FOR class: " + className);
         }
 
-        BeanTable beanTable = newBeanTable(beanClass);
+        Beantable beanTable = newBeantable(beanClass);
         try {
             beanTable.activate();
         } catch (SQLException ex) {
-            logger_.error("[SKIP] Can't activate BeanTable for: " + className,
+            logger_.error("[SKIP] Can't activate Beantable for: " + className,
                 ex);
             return;
         }
@@ -46,7 +46,7 @@ public class BeantableClassHandler implements ClassHandler {
             beanTable.update(false);
         } catch (SQLException ex) {
             logger_
-                .error("[SKIP] Can't update BeanTable for: " + className, ex);
+                .error("[SKIP] Can't update Beantable for: " + className, ex);
             return;
         }
 
@@ -55,10 +55,10 @@ public class BeantableClassHandler implements ClassHandler {
         }
     }
 
-    BeanTable newBeanTable(Class beanClass) {
+    Beantable newBeantable(Class beanClass) {
 
-        BeanTable beanTable = (BeanTable) container_
-            .getComponent(BeanTable.class);
+        Beantable beanTable = (Beantable) container_
+            .getComponent(Beantable.class);
         beanTable.setBeanClass(beanClass);
         return beanTable;
     }
