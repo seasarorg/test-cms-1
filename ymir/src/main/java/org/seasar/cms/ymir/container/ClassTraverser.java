@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
@@ -88,19 +89,7 @@ public class ClassTraverser {
     //    }
     //
     protected boolean isIgnore(String packageName, String shortClassName) {
-        if (ignoreClassPatterns.isEmpty()) {
-            return false;
-        }
-        for (int i = 0; i < ignoreClassPatterns.size(); ++i) {
-            ClassPattern cp = (ClassPattern) ignoreClassPatterns.get(i);
-            if (!cp.isAppliedPackageName(packageName)) {
-                continue;
-            }
-            if (cp.isAppliedShortClassName(shortClassName)) {
-                return true;
-            }
-        }
-        return false;
+        return isMatched(packageName, shortClassName, ignoreClassPatterns);
     }
 
     public void addReferenceClass(final Class referenceClass) {
@@ -129,6 +118,34 @@ public class ClassTraverser {
                 .getProtocol());
             strategy.process(referenceClass, url);
         }
+    }
+
+    public boolean isMatched(String packageName, String shortClassName) {
+        if (isIgnore(packageName, shortClassName)) {
+            return false;
+        } else if (isMatched(packageName, shortClassName, classPatterns)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    boolean isMatched(String packageName, String shortClassName,
+        List classPatternList) {
+
+        if (classPatternList.isEmpty()) {
+            return false;
+        }
+        for (Iterator itr = classPatternList.iterator(); itr.hasNext();) {
+            ClassPattern cp = (ClassPattern) itr.next();
+            if (!cp.isAppliedPackageName(packageName)) {
+                continue;
+            }
+            if (cp.isAppliedShortClassName(shortClassName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected interface Strategy {
