@@ -26,4 +26,6 @@ public interface Configuration {
     void removeProperty(String key);
 
     void save(OutputStream out, String header) throws IOException;
+    
+    boolean equalsProjectStatus(String status);
 }

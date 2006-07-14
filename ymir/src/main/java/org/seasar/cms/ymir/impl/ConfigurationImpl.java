@@ -72,4 +72,9 @@ public class ConfigurationImpl implements Configuration {
 
         properties_.store(out, header);
     }
+
+    public boolean equalsProjectStatus(String status) {
+
+        return status.equals(getProperty(KEY_PROJECTSTATUS));
+    }
 }
