@@ -1,6 +1,6 @@
-package org.seasar.cms.ymir.creator;
+package org.seasar.cms.ymir.extension.creator;
 
-import org.seasar.cms.ymir.creator.impl.SimpleClassDesc;
+import org.seasar.cms.ymir.extension.creator.impl.SimpleClassDesc;
 
 public interface TypeDesc extends Cloneable {
 

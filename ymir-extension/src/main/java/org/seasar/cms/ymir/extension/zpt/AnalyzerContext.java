@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.zpt;
+package org.seasar.cms.ymir.extension.zpt;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -7,11 +7,11 @@ import java.util.Map;
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
 
-import org.seasar.cms.ymir.creator.ClassDesc;
-import org.seasar.cms.ymir.creator.PropertyDesc;
-import org.seasar.cms.ymir.creator.SourceCreator;
-import org.seasar.cms.ymir.creator.TypeDesc;
-import org.seasar.cms.ymir.creator.impl.ClassDescImpl;
+import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.PropertyDesc;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.TypeDesc;
+import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 public class AnalyzerContext extends ZptTemplateContext {

@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.zpt;
+package org.seasar.cms.ymir.extension.zpt;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,11 +7,11 @@ import junit.framework.TestCase;
 
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.Request;
-import org.seasar.cms.ymir.creator.ClassDesc;
-import org.seasar.cms.ymir.creator.MethodDesc;
-import org.seasar.cms.ymir.creator.PropertyDesc;
-import org.seasar.cms.ymir.creator.impl.MethodDescImpl;
-import org.seasar.cms.ymir.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.MethodDesc;
+import org.seasar.cms.ymir.extension.creator.PropertyDesc;
+import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
+import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
 public class ZptAnalyzerTest extends TestCase {
 

@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.creator.action;
+package org.seasar.cms.ymir.extension.creator.action;
 
 public class Condition {
 

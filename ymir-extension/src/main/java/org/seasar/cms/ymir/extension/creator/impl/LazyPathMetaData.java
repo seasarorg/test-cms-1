@@ -1,9 +1,9 @@
-package org.seasar.cms.ymir.creator.impl;
+package org.seasar.cms.ymir.extension.creator.impl;
 
 import java.io.File;
 
-import org.seasar.cms.ymir.creator.PathMetaData;
-import org.seasar.cms.ymir.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
 
 public class LazyPathMetaData implements PathMetaData {
 

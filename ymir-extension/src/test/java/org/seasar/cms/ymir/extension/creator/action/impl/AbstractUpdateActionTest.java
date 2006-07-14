@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.creator.action.impl;
+package org.seasar.cms.ymir.extension.creator.action.impl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -7,8 +7,8 @@ import junit.framework.TestCase;
 
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.creator.PathMetaData;
-import org.seasar.cms.ymir.creator.action.impl.AbstractUpdateAction.Parameter;
+import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.action.impl.AbstractUpdateAction.Parameter;
 import org.seasar.cms.ymir.impl.RequestImpl;
 
 public class AbstractUpdateActionTest extends TestCase {

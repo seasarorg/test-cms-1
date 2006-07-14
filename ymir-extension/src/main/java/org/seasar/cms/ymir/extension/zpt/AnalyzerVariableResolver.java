@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.zpt;
+package org.seasar.cms.ymir.extension.zpt;
 
 import java.util.HashMap;
 

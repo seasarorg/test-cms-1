@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.zpt;
+package org.seasar.cms.ymir.extension.zpt;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,10 +7,10 @@ import java.util.Map;
 
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.Path;
-import org.seasar.cms.ymir.creator.ClassDesc;
-import org.seasar.cms.ymir.creator.PropertyDesc;
-import org.seasar.cms.ymir.creator.SourceCreator;
-import org.seasar.cms.ymir.creator.impl.MethodDescImpl;
+import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.PropertyDesc;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 
 import net.skirnir.freyja.Attribute;
 import net.skirnir.freyja.Element;

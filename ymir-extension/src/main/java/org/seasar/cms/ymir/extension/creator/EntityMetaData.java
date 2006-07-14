@@ -1,7 +1,7 @@
-package org.seasar.cms.ymir.creator;
+package org.seasar.cms.ymir.extension.creator;
 
-import org.seasar.cms.ymir.creator.impl.ClassDescImpl;
-import org.seasar.cms.ymir.creator.impl.SimpleClassDesc;
+import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
+import org.seasar.cms.ymir.extension.creator.impl.SimpleClassDesc;
 
 public class EntityMetaData {
 

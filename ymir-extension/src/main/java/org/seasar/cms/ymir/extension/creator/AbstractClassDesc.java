@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.creator;
+package org.seasar.cms.ymir.extension.creator;
 
 abstract public class AbstractClassDesc implements ClassDesc {
 

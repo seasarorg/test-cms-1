@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.beantable;
+package org.seasar.cms.ymir.extension.beantable;
 
 import java.sql.SQLException;
 

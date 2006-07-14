@@ -1,9 +1,9 @@
-package org.seasar.cms.ymir.creator.action;
+package org.seasar.cms.ymir.extension.creator.action;
 
 
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.PathMetaData;
 
 public interface UpdateAction {
 

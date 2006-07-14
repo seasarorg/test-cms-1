@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.creator;
+package org.seasar.cms.ymir.extension.creator;
 
 import java.util.HashSet;
 import java.util.Set;

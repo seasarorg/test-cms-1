@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.beantable;
+package org.seasar.cms.ymir.extension.beantable;
 
 import static org.seasar.cms.ymir.extension.Globals.CONFIG_KEY_BEANTABLE_ENABLE;
 

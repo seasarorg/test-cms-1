@@ -1,7 +1,7 @@
-package org.seasar.cms.ymir.creator.impl;
+package org.seasar.cms.ymir.extension.creator.impl;
 
-import org.seasar.cms.ymir.creator.ParameterDesc;
-import org.seasar.cms.ymir.creator.TypeDesc;
+import org.seasar.cms.ymir.extension.creator.ParameterDesc;
+import org.seasar.cms.ymir.extension.creator.TypeDesc;
 
 public class ParameterDescImpl implements ParameterDesc {
 

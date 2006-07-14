@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.creator.impl;
+package org.seasar.cms.ymir.extension.creator.impl;
 
 import junit.framework.TestCase;
 

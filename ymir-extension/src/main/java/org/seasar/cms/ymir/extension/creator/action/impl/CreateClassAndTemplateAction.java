@@ -1,17 +1,17 @@
-package org.seasar.cms.ymir.creator.action.impl;
+package org.seasar.cms.ymir.extension.creator.action.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.creator.ClassDesc;
-import org.seasar.cms.ymir.creator.MethodDesc;
-import org.seasar.cms.ymir.creator.PathMetaData;
-import org.seasar.cms.ymir.creator.impl.BodyDescImpl;
-import org.seasar.cms.ymir.creator.impl.ClassDescImpl;
-import org.seasar.cms.ymir.creator.impl.MethodDescImpl;
-import org.seasar.cms.ymir.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.MethodDesc;
+import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
+import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
+import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
+import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 public class CreateClassAndTemplateAction extends AbstractUpdateAction {
