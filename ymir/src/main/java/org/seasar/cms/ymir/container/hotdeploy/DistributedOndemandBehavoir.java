@@ -18,6 +18,7 @@ public class DistributedOndemandBehavoir extends DefaultProvider {
     protected ComponentDef findComponentDefFromCreatorContainers(
         S2Container container, Object key) {
 
+        // FIXME findAllComponents()をつかうべき？
         Object[] localOndemandCreatorContainers = container
             .findComponents(LocalOndemandCreatorContainer.class);
         for (int i = 0; i < localOndemandCreatorContainers.length; i++) {
