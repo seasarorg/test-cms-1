@@ -19,7 +19,6 @@ public class BeantableImplTest extends S2TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        // TODO Auto-generated method stub
         super.setUp();
         include("j2ee.dicon");
     }
