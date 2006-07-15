@@ -53,10 +53,8 @@ import org.seasar.cms.ymir.extension.creator.action.impl.CreateConfigurationActi
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateTemplateAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.SystemConsoleAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.UpdateClassesAction;
-import org.seasar.cms.ymir.extension.creator.impl.ParameterDescImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.cms.ymir.impl.RedirectResponse;
-import org.seasar.cms.ymir.extension.zpt.ZptResponseCreator;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
@@ -75,7 +73,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public static final String PARAM_TASK = PARAM_PREFIX + "task";
 
-    private S2Container container_;
+    private S2Container rootContainer_;
 
     private Configuration configuration_;
 
@@ -101,7 +99,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private SourceGenerator sourceGenerator_;
 
-    private ResponseCreator responseCreator_ = new ZptResponseCreator();
+    private ResponseCreator responseCreator_;
 
     private UpdateActionSelector actionSelector_ = new UpdateActionSelector()
         .register(new Condition(false, false, false, Request.METHOD_GET),
@@ -635,7 +633,7 @@ public class SourceCreatorImpl implements SourceCreator {
                 for (int i = 0; i < size; i++) {
                     try {
                         ComponentDef componentDef = creatorContainer_
-                            .getCreator(i).getComponentDef(container_,
+                            .getCreator(i).getComponentDef(rootContainer_,
                                 componentName);
                         if (componentDef != null) {
                             return componentDef.getComponentClass().getName();
@@ -680,7 +678,21 @@ public class SourceCreatorImpl implements SourceCreator {
             + ".class");
     }
 
-    public void setOndemandCreatorContainer(OndemandCreatorContainer container) {
+    public void setContainer(S2Container container) {
+
+        if (container == null) {
+            rootContainer_ = null;
+        } else {
+            rootContainer_ = container.getRoot();
+        }
+
+        creatorContainer_ = (LocalOndemandCreatorContainer) rootContainer_
+            .getComponent(LocalOndemandCreatorContainer.class);
+        defaultRequestProcessor_ = (DefaultRequestProcessor) rootContainer_
+            .getComponent(DefaultRequestProcessor.class);
+    }
+
+    void setOndemandCreatorContainer(OndemandCreatorContainer container) {
 
         if (container instanceof LocalOndemandCreatorContainer) {
             creatorContainer_ = (LocalOndemandCreatorContainer) container;
@@ -690,17 +702,7 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    public S2Container getContainer() {
-
-        return container_;
-    }
-
-    public void setContainer(S2Container container) {
-
-        container_ = container;
-    }
-
-    public void setRequestProcessor(RequestProcessor requestProcessor) {
+    void setRequestProcessor(RequestProcessor requestProcessor) {
 
         if (requestProcessor instanceof DefaultRequestProcessor) {
             defaultRequestProcessor_ = (DefaultRequestProcessor) requestProcessor;

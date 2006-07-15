@@ -12,8 +12,9 @@
     <property name="daoPackageName">config.getProperty("rootPackageName", "skeleton") + ".dao"</property>
     <property name="dxoPackageName">config.getProperty("rootPackageName", "skeleton") + ".dxo"</property>
   </component>
-  <component class="org.seasar.cms.ymir.extension.freemarker.FreemarkerSourceGenerator" />
   <component class="org.seasar.cms.ymir.extension.zpt.ZptAnalyzer" />
+  <component class="org.seasar.cms.ymir.extension.freemarker.FreemarkerSourceGenerator" />
+  <component class="org.seasar.cms.ymir.extension.zpt.ZptResponseCreator" />
   <component class="org.seasar.cms.ymir.extension.beantable.BeantableManager">
     <property name="classTraverser">beantableClassTraverser</property>
   </component>
