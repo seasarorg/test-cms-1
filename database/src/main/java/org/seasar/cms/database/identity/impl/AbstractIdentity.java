@@ -348,7 +348,6 @@ abstract public class AbstractIdentity implements Identity {
      * 
      * @param tableName テーブル名。
      * @param columnName カラム名。
-     * @param sequenceName TODO
      * @param sequenceName シーケンス名。nullを指定することもできます。
      * @return 自動採番されるカラムを削除するための部分SQL。
      */
