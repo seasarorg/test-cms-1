@@ -1,12 +1,11 @@
 package org.seasar.cms.ymir.impl;
 
-import java.util.Arrays;
-
 import javax.servlet.ServletContext;
 
 import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.Ymir;
+import org.seasar.cms.ymir.container.ContainerUtils;
 import org.seasar.cms.ymir.container.YmirSingletonS2ContainerInitializer;
 import org.seasar.cms.ymir.container.hotdeploy.OndemandUtils;
 import org.seasar.framework.container.S2Container;
@@ -69,9 +68,8 @@ public class YmirImpl implements Ymir {
     void initializeInternalComponents() {
 
         // FIXME findAllComponents()を使うようにしよう。
-        lifecycleListeners_ = (LifecycleListener[]) Arrays.asList(
-            getContainer().findComponents(LifecycleListener.class)).toArray(
-            new LifecycleListener[0]);
+        lifecycleListeners_ = (LifecycleListener[]) ContainerUtils
+            .findDescendantComponents(getContainer(), LifecycleListener.class);
     }
 
     public void destroy() {
@@ -86,8 +84,11 @@ public class YmirImpl implements Ymir {
 
     void destroyListeners() {
 
-        for (int i = 0; i < lifecycleListeners_.length; i++) {
-            lifecycleListeners_[i].destroy();
+        if (lifecycleListeners_ != null) {
+            for (int i = 0; i < lifecycleListeners_.length; i++) {
+                lifecycleListeners_[i].destroy();
+            }
+            lifecycleListeners_ = null;
         }
     }
 

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.cms.ymir.container.ContainerUtils;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
@@ -88,10 +89,10 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
             originalClassLoader);
         hotdeployClassLoader.setPackageName(rootPackageName);
         // FIXME findAllComponents()にしよう。
-        Object[] listeners = container.findComponents(HotdeployListener.class);
+        HotdeployListener[] listeners = (HotdeployListener[]) ContainerUtils
+            .findDescendantComponents(container, HotdeployListener.class);
         for (int i = 0; i < listeners.length; i++) {
-            hotdeployClassLoader
-                .addHotdeployListener((HotdeployListener) listeners[i]);
+            hotdeployClassLoader.addHotdeployListener(listeners[i]);
         }
         return hotdeployClassLoader;
     }

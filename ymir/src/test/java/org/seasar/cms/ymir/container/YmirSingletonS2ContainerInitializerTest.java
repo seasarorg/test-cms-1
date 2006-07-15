@@ -58,7 +58,8 @@ public class YmirSingletonS2ContainerInitializerTest extends TestCase {
             "org/seasar/cms/ymir/container/included.dicon"));
 
         // FIXME findComponents()の代わりにfindAllComponents()を使うようにしよう。
-        Object[] listeners = container.findComponents(Listener.class);
+        Listener[] listeners = (Listener[]) ContainerUtils.findDescendantComponents(
+            container, Listener.class);
         assertEquals(2, listeners.length);
         assertTrue(listeners[0] instanceof OneListener);
         assertTrue(listeners[1] instanceof TwoListener);
