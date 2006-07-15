@@ -34,6 +34,9 @@
     <property name="pathMappings">
       container.findComponents(@org.seasar.cms.ymir.PathMapping@class)
     </property>
+    <property name="updaters">
+      container.findComponents(@org.seasar.cms.ymir.Updater@class)
+    </property>
   </component>
   <component
     class="org.seasar.cms.ymir.impl.DefaultResponseProcessor" />
