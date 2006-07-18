@@ -73,7 +73,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public static final String PARAM_TASK = PARAM_PREFIX + "task";
 
-    private S2Container rootContainer_;
+    private S2Container container_;
 
     private Configuration configuration_;
 
@@ -633,7 +633,7 @@ public class SourceCreatorImpl implements SourceCreator {
                 for (int i = 0; i < size; i++) {
                     try {
                         ComponentDef componentDef = creatorContainer_
-                            .getCreator(i).getComponentDef(rootContainer_,
+                            .getCreator(i).getComponentDef(container_,
                                 componentName);
                         if (componentDef != null) {
                             return componentDef.getComponentClass().getName();
@@ -680,19 +680,10 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public void setContainer(S2Container container) {
 
-        if (container == null) {
-            rootContainer_ = null;
-        } else {
-            rootContainer_ = container.getRoot();
-        }
-
-        creatorContainer_ = (LocalOndemandCreatorContainer) rootContainer_
-            .getComponent(LocalOndemandCreatorContainer.class);
-        defaultRequestProcessor_ = (DefaultRequestProcessor) rootContainer_
-            .getComponent(DefaultRequestProcessor.class);
+        container_ = container;
     }
 
-    void setOndemandCreatorContainer(OndemandCreatorContainer container) {
+    public void setOndemandCreatorContainer(OndemandCreatorContainer container) {
 
         if (container instanceof LocalOndemandCreatorContainer) {
             creatorContainer_ = (LocalOndemandCreatorContainer) container;
@@ -702,7 +693,7 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    void setRequestProcessor(RequestProcessor requestProcessor) {
+    public void setRequestProcessor(RequestProcessor requestProcessor) {
 
         if (requestProcessor instanceof DefaultRequestProcessor) {
             defaultRequestProcessor_ = (DefaultRequestProcessor) requestProcessor;
