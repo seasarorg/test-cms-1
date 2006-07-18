@@ -10,6 +10,7 @@ import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.TooManyRegistrationRuntimeException;
 import org.seasar.framework.container.factory.CircularIncludeRuntimeException;
 import org.seasar.framework.container.factory.S2ContainerFactory;
+import org.seasar.framework.container.impl.S2ContainerImpl;
 import org.seasar.framework.util.ResourceUtil;
 
 public class YmirSingletonS2ContainerInitializerTest extends TestCase {
@@ -42,27 +43,23 @@ public class YmirSingletonS2ContainerInitializerTest extends TestCase {
                 .toURL(), };
     }
 
-    public void testInclude() throws Exception {
+    public void testIntegrate() throws Exception {
 
         // ## Arrange ##
-        S2Container container = S2ContainerFactory
-            .create("org/seasar/cms/ymir/container/root.dicon");
+        S2Container root = new S2ContainerImpl();
+        S2Container container = new S2ContainerImpl();
+        root.include(container);
 
         // ## Act ##
-        target_.include(container, resourceURLs_);
+        target_.integrate(root, container, resourceURLs_);
 
         // ## Assert ##
-        assertTrue(getChild(container,
-            "org/seasar/cms/ymir/container/included.dicon") == getChild(
-            getChild(container, resourceURLs_[0].toExternalForm()),
-            "org/seasar/cms/ymir/container/included.dicon"));
-
-        // FIXME findComponents()の代わりにfindAllComponents()を使うようにしよう。
-        Listener[] listeners = (Listener[]) ContainerUtils.findDescendantComponents(
-            container, Listener.class);
-        assertEquals(2, listeners.length);
-        assertTrue(listeners[0] instanceof OneListener);
-        assertTrue(listeners[1] instanceof TwoListener);
+        assertEquals(3, root.getChildSize());
+        assertEquals(0, container.getChildSize());
+        assertEquals(2, root.getChild(1).getChildSize());
+        assertSame(container, root.getChild(1).getChild(1));
+        assertEquals(1, root.getChild(2).getChildSize());
+        assertSame(container, root.getChild(2).getChild(0));
     }
 
     /*
