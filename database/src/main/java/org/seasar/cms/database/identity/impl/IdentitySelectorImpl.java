@@ -18,7 +18,14 @@ public class IdentitySelectorImpl implements IdentitySelector {
 
     private Identity identity_;
 
+    private boolean started_;
+
     public void start() {
+
+        if (started_) {
+            return;
+        }
+
         String productName;
         String productVersion;
         Connection con = null;
@@ -43,6 +50,23 @@ public class IdentitySelectorImpl implements IdentitySelector {
             throw new RuntimeException("Unsupported databse product: name="
                 + productName + ", version=" + productVersion);
         }
+
+        identity_.startUsingDatabase();
+
+        started_ = true;
+    }
+
+    public void stop() {
+
+        if (!started_) {
+            return;
+        }
+
+        if (identity_ != null) {
+            identity_.stopUsingDatabase();
+        }
+
+        started_ = false;
     }
 
     public Identity getIdentity() {
@@ -53,10 +77,7 @@ public class IdentitySelectorImpl implements IdentitySelector {
         ds_ = ds;
     }
 
-    public void setIdentities(Object[] identities) {
-        identities_ = new Identity[identities.length];
-        for (int i = 0; i < identities.length; i++) {
-            identities_[i] = ((Identity) identities[i]);
-        }
+    public void setIdentities(Identity[] identities) {
+        identities_ = identities;
     }
 }

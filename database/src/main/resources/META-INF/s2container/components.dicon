@@ -21,9 +21,7 @@
     <initMethod name="registerAll" />
   </component>
   <component name="identitySelector" class="org.seasar.cms.database.identity.impl.IdentitySelectorImpl">
-    <property name="identities">
-      container.findComponents(@org.seasar.cms.database.identity.Identity@class)
-    </property>
     <initMethod name="start" />
+    <destroyMethod name="stop" />
   </component>
 </components>
