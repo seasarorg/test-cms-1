@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.util.Traversal;
 import org.seasar.framework.exception.IORuntimeException;
 
 public class ContainerUtils {
@@ -42,11 +42,10 @@ public class ContainerUtils {
         return cl;
     }
 
-    // FIXME S2Container#findDescendantComponents()が実現されたら不要。
-    public static Object[] findDescendantComponents(S2Container container,
+    public static Object[] findAscendantComponents(S2Container container,
         Object key) {
 
-        ComponentDef[] componentDefs = findDescendantComponentDefs(container,
+        ComponentDef[] componentDefs = findAscendantComponentDefs(container,
             key);
 
         Class clazz;
@@ -63,58 +62,20 @@ public class ContainerUtils {
         return objs;
     }
 
-    public static ComponentDef[] findDescendantComponentDefs(
-        S2Container container, Object key) {
+    public static ComponentDef[] findAscendantComponentDefs(
+        final S2Container container, final Object componentKey) {
 
-        Set set = new LinkedHashSet();
-        synchronized (container) {
-            findComponentDefs(container, key, container.getRoot(), set);
+        synchronized (container.getRoot()) {
+            final List componentDefs = new ArrayList();
+            Traversal.forEachParentContainer(container,
+                new Traversal.S2ContainerHandler() {
+                    public Object processContainer(S2Container container) {
+                        componentDefs.addAll(Arrays.asList(container
+                            .findLocalComponentDefs(componentKey)));
+                        return null;
+                    }
+                });
+            return (ComponentDef[]) componentDefs.toArray(new ComponentDef[0]);
         }
-        return (ComponentDef[]) set.toArray(new ComponentDef[0]);
-    }
-
-    static void findComponentDefs(S2Container container, Object key,
-        S2Container rootContainer, Set set) {
-
-        if (rootContainer != null && container.getRoot() != rootContainer) {
-            return;
-        }
-        ComponentDef[] componentDefs = container.findComponentDefs(key);
-        for (int i = 0; i < componentDefs.length; i++) {
-            set.add(componentDefs[i]);
-        }
-        int size = container.getChildSize();
-        for (int i = 0; i < size; i++) {
-            findComponentDefs(container.getChild(i), key, rootContainer, set);
-        }
-    }
-
-    // FIXME S2Container#findAllComponents()が実現されたら不要。
-    public static Object[] findAllComponents(S2Container container, Object key) {
-
-        ComponentDef[] componentDefs = findAllComponentDefs(container, key);
-
-        Class clazz;
-        if (key instanceof Class) {
-            clazz = (Class) key;
-        } else {
-            clazz = Object.class;
-        }
-        Object[] objs = (Object[]) Array.newInstance(clazz,
-            componentDefs.length);
-        for (int i = 0; i < objs.length; i++) {
-            objs[i] = componentDefs[i].getComponent();
-        }
-        return objs;
-    }
-
-    public static ComponentDef[] findAllComponentDefs(S2Container container,
-        Object key) {
-
-        Set set = new LinkedHashSet();
-        synchronized (container) {
-            findComponentDefs(container, key, null, set);
-        }
-        return (ComponentDef[]) set.toArray(new ComponentDef[0]);
     }
 }

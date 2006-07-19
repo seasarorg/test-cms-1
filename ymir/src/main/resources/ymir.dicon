@@ -33,9 +33,6 @@
     <initMethod name="registerAll" />
   </component>
   <component class="org.seasar.cms.ymir.impl.DefaultRequestProcessor">
-    <property name="pathMappings">
-      container.findComponents(@org.seasar.cms.ymir.PathMapping@class)
-    </property>
     <property name="updaters">
       <meta name="delayed">
       @org.seasar.cms.container.ContainerUtils@findAscendantComponents(container, @org.seasar.cms.ymir.Updater@class)
@@ -44,15 +41,7 @@
   </component>
   <component class="org.seasar.cms.ymir.impl.DefaultResponseProcessor" />
   <component
-    class="org.seasar.cms.ymir.response.constructor.impl.ResponseConstructorSelectorImpl">
-    <property name="responseConstructors">
-      container.findComponents(@org.seasar.cms.ymir.response.constructor.ResponseConstructor@class)
-    </property>
-  </component>
+    class="org.seasar.cms.ymir.response.constructor.impl.ResponseConstructorSelectorImpl" />
   <component
-    class="org.seasar.cms.ymir.response.scheme.impl.StrategySelectorImpl">
-    <property name="strategies">
-      container.findComponents(@org.seasar.cms.ymir.response.scheme.Strategy@class)
-    </property>
-  </component>
+    class="org.seasar.cms.ymir.response.scheme.impl.StrategySelectorImpl" />
 </components>

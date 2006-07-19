@@ -1,6 +1,5 @@
 package org.seasar.cms.ymir.container.hotdeploy;
 
-import org.seasar.cms.ymir.container.ContainerUtils;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.impl.S2ContainerBehavior.DefaultProvider;
@@ -19,9 +18,8 @@ public class DistributedOndemandBehavoir extends DefaultProvider {
     protected ComponentDef findComponentDefFromCreatorContainers(
         S2Container container, Object key) {
 
-        // FIXME findAllComponents()をつかうべき？
-        LocalOndemandCreatorContainer[] localOndemandCreatorContainers = (LocalOndemandCreatorContainer[]) ContainerUtils
-            .findDescendantComponents(container, LocalOndemandCreatorContainer.class);
+        LocalOndemandCreatorContainer[] localOndemandCreatorContainers = (LocalOndemandCreatorContainer[]) container
+            .findAllComponents(LocalOndemandCreatorContainer.class);
         for (int i = 0; i < localOndemandCreatorContainers.length; i++) {
             ComponentDef cd = localOndemandCreatorContainers[i]
                 .findComponentDef(key);

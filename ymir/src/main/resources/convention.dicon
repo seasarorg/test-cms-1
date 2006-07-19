@@ -7,24 +7,31 @@
   <include path="j2ee.dicon" />
   <include path="dao.dicon" />
   <include path="s2dxo.dicon" />
+  <component class="org.seasar.framework.convention.impl.NamingConventionImpl" />
   <component
     class="org.seasar.cms.ymir.container.hotdeploy.LocalOndemandCreatorContainer">
-    <property name="rootPackageName">
-      config.getProperty("rootPackageName", "skeleton")
-    </property>
-    <initMethod name="addCreator">
+    <initMethod name="addProject">
       <arg>
-        <component
-          class="org.seasar.framework.container.hotdeploy.creator.PageCreator">
-           <property name="autoBindingDef">@org.seasar.framework.container.assembler.AutoBindingDefFactory@AUTO</property>
-           <property name="externalBinding">false</property>
+        <component class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
+          <property name="rootPackageName">
+            config.getProperty("rootPackageName", "skeleton")
+          </property>
         </component>
       </arg>
     </initMethod>
-    <initMethod name="addCreator">
-      <arg>
+    <property name="hotdeployListeners">
+      <meta name="delayed">
+      @org.seasar.cms.container.ContainerUtils@findAscendantComponents(container, @org.seasar.framework.container.hotdeploy.HotdeployListener@class)
+      </meta>
+    </property>
+  </component>
         <component
-          class="org.seasar.framework.container.hotdeploy.creator.DaoCreator">
+          class="org.seasar.framework.container.hotdeploy.creator.PageOndemandCreator">
+           <property name="autoBindingDef">@org.seasar.framework.container.assembler.AutoBindingDefFactory@AUTO</property>
+           <property name="externalBinding">false</property>
+        </component>
+        <component
+          class="org.seasar.framework.container.hotdeploy.creator.DaoOndemandCreator">
            <initMethod name="addCustomizer">
             <arg>
               <component
@@ -39,12 +46,8 @@
             </arg>
           </initMethod>
         </component>
-      </arg>
-    </initMethod>
-    <initMethod name="addCreator">
-      <arg>
         <component
-          class="org.seasar.framework.container.hotdeploy.creator.DxoCreator">
+          class="org.seasar.framework.container.hotdeploy.creator.DxoOndemandCreator">
            <initMethod name="addCustomizer">
             <arg>
               <component
@@ -54,7 +57,4 @@
             </arg>
           </initMethod>
         </component>
-      </arg>
-    </initMethod>
-  </component>
 </components>

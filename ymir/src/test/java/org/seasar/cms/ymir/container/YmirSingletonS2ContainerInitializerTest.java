@@ -19,17 +19,6 @@ public class YmirSingletonS2ContainerInitializerTest extends TestCase {
 
     private URL[] resourceURLs_;
 
-    private S2Container getChild(S2Container container, String path) {
-
-        int size = container.getChildSize();
-        for (int i = 0; i < size; i++) {
-            if (path.equals(container.getChild(i).getPath())) {
-                return container.getChild(i);
-            }
-        }
-        return null;
-    }
-
     protected void setUp() throws Exception {
         super.setUp();
 

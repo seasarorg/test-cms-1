@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.cms.ymir.container.ContainerUtils;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
@@ -13,15 +12,15 @@ import org.seasar.framework.container.cooldeploy.ConventionNaming;
 import org.seasar.framework.container.cooldeploy.DefaultConventionNaming;
 import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
 import org.seasar.framework.container.hotdeploy.HotdeployListener;
-import org.seasar.framework.container.hotdeploy.OndemandCreator;
-import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
+import org.seasar.framework.container.hotdeploy.OndemandProject;
+import org.seasar.framework.container.hotdeploy.OndemandS2Container;
 import org.seasar.framework.container.impl.S2ContainerImpl;
 import org.seasar.framework.container.util.S2ContainerUtil;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 import org.seasar.framework.exception.EmptyRuntimeException;
 
 public class LocalOndemandCreatorContainer implements HotdeployListener,
-    OndemandCreatorContainer {
+    OndemandS2Container {
 
     private S2Container container;
 
@@ -29,9 +28,7 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
 
     private HotdeployClassLoader hotdeployClassLoader;
 
-    private List creators = new ArrayList();
-
-    private String rootPackageName;
+    private List projects = new ArrayList();
 
     private Map componentDefCache = new HashMap();
 
@@ -41,25 +38,23 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
 
     private int counter = 0;
 
-    public OndemandCreator getCreator(int index) {
-        return (OndemandCreator) creators.get(index);
+    private HotdeployListener[] hotdeployListeners = new HotdeployListener[0];
+
+    public OndemandProject getProject(int index) {
+        return (OndemandProject) projects.get(index);
     }
 
-    public int getCreatorSize() {
-        return creators.size();
+    public OndemandProject[] getProjects() {
+        return (OndemandProject[]) projects
+            .toArray(new OndemandProject[projects.size()]);
     }
 
-    public void addCreator(OndemandCreator creator) {
-        creators.add(creator);
-        creator.setOndemandCreatorContainer(this);
+    public int getProjectSize() {
+        return projects.size();
     }
 
-    public String getRootPackageName() {
-        return rootPackageName;
-    }
-
-    public void setRootPackageName(String rootPackageName) {
-        this.rootPackageName = rootPackageName;
+    public void addProject(OndemandProject project) {
+        projects.add(project);
     }
 
     public ConventionNaming getConventionNaming() {
@@ -74,9 +69,6 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         if (container == null) {
             throw new EmptyRuntimeException("container");
         }
-        if (rootPackageName == null) {
-            throw new EmptyRuntimeException("rootPackageName");
-        }
         if (counter++ == 0) {
             originalClassLoader = container.getClassLoader();
             hotdeployClassLoader = newHotdeployClassLoader(originalClassLoader);
@@ -87,12 +79,9 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
     HotdeployClassLoader newHotdeployClassLoader(ClassLoader originalClassLoader) {
         HotdeployClassLoader hotdeployClassLoader = new HotdeployClassLoader(
             originalClassLoader);
-        hotdeployClassLoader.setPackageName(rootPackageName);
-        // FIXME findAllComponents()にしよう。
-        HotdeployListener[] listeners = (HotdeployListener[]) ContainerUtils
-            .findDescendantComponents(container, HotdeployListener.class);
-        for (int i = 0; i < listeners.length; i++) {
-            hotdeployClassLoader.addHotdeployListener(listeners[i]);
+        hotdeployClassLoader.setProjects(getProjects());
+        for (int i = 0; i < hotdeployListeners.length; i++) {
+            hotdeployClassLoader.addHotdeployListener(hotdeployListeners[i]);
         }
         return hotdeployClassLoader;
     }
@@ -139,9 +128,9 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(hotdeployClassLoader);
-            for (int i = 0; i < getCreatorSize(); ++i) {
-                OndemandCreator creator = getCreator(i);
-                if (creator.loadComponentDef(container, clazz)) {
+            for (int i = 0; i < getProjectSize(); ++i) {
+                OndemandProject project = getProject(i);
+                if (project.loadComponentDef(this, clazz)) {
                     break;
                 }
             }
@@ -154,9 +143,9 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(hotdeployClassLoader);
-            for (int i = 0; i < getCreatorSize(); ++i) {
-                OndemandCreator creator = getCreator(i);
-                ComponentDef cd = creator.getComponentDef(container, clazz);
+            for (int i = 0; i < getProjectSize(); ++i) {
+                OndemandProject project = getProject(i);
+                ComponentDef cd = project.getComponentDef(this, clazz);
                 if (cd != null) {
                     return cd;
                 }
@@ -171,11 +160,10 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(hotdeployClassLoader);
-            for (int i = 0; i < getCreatorSize(); ++i) {
-                OndemandCreator creator = getCreator(i);
+            for (int i = 0; i < getProjectSize(); ++i) {
+                OndemandProject project = getProject(i);
                 try {
-                    ComponentDef cd = creator.getComponentDef(container,
-                        componentName);
+                    ComponentDef cd = project.getComponentDef(this, componentName);
                     if (cd != null) {
                         return cd;
                     }
@@ -221,5 +209,9 @@ public class LocalOndemandCreatorContainer implements HotdeployListener,
 
     public ClassLoader getClassLoader() {
         return container.getClassLoader();
+    }
+
+    public void setHotdeployListeners(HotdeployListener[] hotdeployListeners) {
+        this.hotdeployListeners = hotdeployListeners;
     }
 }
