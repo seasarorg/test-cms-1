@@ -23,6 +23,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.skirnir.xom.IllegalSyntaxException;
+import net.skirnir.xom.ValidationException;
+import net.skirnir.xom.XMLParserFactory;
+import net.skirnir.xom.XOMapper;
+import net.skirnir.xom.XOMapperFactory;
+
 import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
@@ -57,23 +63,14 @@ import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.cms.ymir.impl.RedirectResponse;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
-import org.seasar.framework.container.S2Container;
-import org.seasar.framework.container.hotdeploy.OndemandCreatorContainer;
+import org.seasar.framework.container.hotdeploy.OndemandS2Container;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
-
-import net.skirnir.xom.IllegalSyntaxException;
-import net.skirnir.xom.ValidationException;
-import net.skirnir.xom.XMLParserFactory;
-import net.skirnir.xom.XOMapper;
-import net.skirnir.xom.XOMapperFactory;
 
 public class SourceCreatorImpl implements SourceCreator {
 
     public static final String PARAM_PREFIX = "__cms__";
 
     public static final String PARAM_TASK = PARAM_PREFIX + "task";
-
-    private S2Container container_;
 
     private Configuration configuration_;
 
@@ -629,11 +626,11 @@ public class SourceCreatorImpl implements SourceCreator {
             try {
                 Thread.currentThread().setContextClassLoader(
                     creatorContainer_.getClassLoader());
-                int size = creatorContainer_.getCreatorSize();
+                int size = creatorContainer_.getProjectSize();
                 for (int i = 0; i < size; i++) {
                     try {
                         ComponentDef componentDef = creatorContainer_
-                            .getCreator(i).getComponentDef(container_,
+                            .getProject(i).getComponentDef(creatorContainer_,
                                 componentName);
                         if (componentDef != null) {
                             return componentDef.getComponentClass().getName();
@@ -678,12 +675,7 @@ public class SourceCreatorImpl implements SourceCreator {
             + ".class");
     }
 
-    public void setContainer(S2Container container) {
-
-        container_ = container;
-    }
-
-    public void setOndemandCreatorContainer(OndemandCreatorContainer container) {
+    public void setOndemandCreatorContainer(OndemandS2Container container) {
 
         if (container instanceof LocalOndemandCreatorContainer) {
             creatorContainer_ = (LocalOndemandCreatorContainer) container;
