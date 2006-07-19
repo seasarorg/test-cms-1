@@ -23,19 +23,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.skirnir.xom.IllegalSyntaxException;
-import net.skirnir.xom.ValidationException;
-import net.skirnir.xom.XMLParserFactory;
-import net.skirnir.xom.XOMapper;
-import net.skirnir.xom.XOMapperFactory;
-
 import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
-import org.seasar.cms.ymir.container.hotdeploy.LocalOndemandCreatorContainer;
+import org.seasar.cms.ymir.container.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.extension.creator.BodyDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
@@ -63,8 +57,17 @@ import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.cms.ymir.impl.RedirectResponse;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
+import org.seasar.framework.container.hotdeploy.OndemandProject;
 import org.seasar.framework.container.hotdeploy.OndemandS2Container;
+import org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl;
+import org.seasar.framework.convention.NamingConvention;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
+
+import net.skirnir.xom.IllegalSyntaxException;
+import net.skirnir.xom.ValidationException;
+import net.skirnir.xom.XMLParserFactory;
+import net.skirnir.xom.XOMapper;
+import net.skirnir.xom.XOMapperFactory;
 
 public class SourceCreatorImpl implements SourceCreator {
 
@@ -76,7 +79,9 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private DefaultRequestProcessor defaultRequestProcessor_;
 
-    private LocalOndemandCreatorContainer creatorContainer_;
+    private LocalOndemandS2Container ondemandContainer_;
+
+    private NamingConvention namingConvention_;
 
     private File sourceDirectory_;
 
@@ -86,13 +91,9 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private String encoding_ = "UTF-8";
 
+    private String rootPackageName_;
+
     private String pagePackageName_;
-
-    private String dtoPackageName_;
-
-    private String daoPackageName_;
-
-    private String dxoPackageName_;
 
     private SourceGenerator sourceGenerator_;
 
@@ -625,12 +626,12 @@ public class SourceCreatorImpl implements SourceCreator {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(
-                    creatorContainer_.getClassLoader());
-                int size = creatorContainer_.getProjectSize();
+                    ondemandContainer_.getClassLoader());
+                int size = ondemandContainer_.getProjectSize();
                 for (int i = 0; i < size; i++) {
                     try {
-                        ComponentDef componentDef = creatorContainer_
-                            .getProject(i).getComponentDef(creatorContainer_,
+                        ComponentDef componentDef = ondemandContainer_
+                            .getProject(i).getComponentDef(ondemandContainer_,
                                 componentName);
                         if (componentDef != null) {
                             return componentDef.getComponentClass().getName();
@@ -652,7 +653,7 @@ public class SourceCreatorImpl implements SourceCreator {
             return null;
         }
         try {
-            return Class.forName(className, true, creatorContainer_
+            return Class.forName(className, true, ondemandContainer_
                 .getClassLoader());
         } catch (ClassNotFoundException ex) {
             return null;
@@ -675,14 +676,28 @@ public class SourceCreatorImpl implements SourceCreator {
             + ".class");
     }
 
-    public void setOndemandCreatorContainer(OndemandS2Container container) {
+    public void setOndemandS2Container(OndemandS2Container container) {
 
-        if (container instanceof LocalOndemandCreatorContainer) {
-            creatorContainer_ = (LocalOndemandCreatorContainer) container;
+        if (container instanceof LocalOndemandS2Container) {
+            ondemandContainer_ = (LocalOndemandS2Container) container;
+            if (rootPackageName_ == null) {
+                if (ondemandContainer_.getProjectSize() > 0) {
+                    OndemandProject project = ondemandContainer_.getProject(0);
+                    if (project instanceof OndemandProjectImpl) {
+                        rootPackageName_ = ((OndemandProjectImpl) project)
+                            .getRootPackageName();
+                    }
+                }
+            }
         } else {
             throw new ComponentNotFoundRuntimeException(
-                "LocalOndemandCreatorContainer");
+                "LocalOndemandS2Container");
         }
+    }
+
+    public void setNamingConvention(NamingConvention namingConvention) {
+
+        namingConvention_ = namingConvention;
     }
 
     public void setRequestProcessor(RequestProcessor requestProcessor) {
@@ -731,44 +746,34 @@ public class SourceCreatorImpl implements SourceCreator {
         encoding_ = encoding;
     }
 
-    public String getPagePackageName() {
+    public String getRootPackageName() {
 
-        return pagePackageName_;
+        return rootPackageName_;
     }
 
-    public void setPagePackageName(String pagePackageName) {
+    public void setRootPackageName(String rootPackageName) {
 
-        pagePackageName_ = pagePackageName;
+        rootPackageName_ = rootPackageName;
+    }
+
+    public String getPagePackageName() {
+
+        return rootPackageName_ + "." + namingConvention_.getWebPackageName();
     }
 
     public String getDtoPackageName() {
 
-        return dtoPackageName_;
-    }
-
-    public void setDtoPackageName(String dtoPackageName) {
-
-        dtoPackageName_ = dtoPackageName;
+        return rootPackageName_ + "." + namingConvention_.getDtoPackageName();
     }
 
     public String getDaoPackageName() {
 
-        return daoPackageName_;
-    }
-
-    public void setDaoPackageName(String daoPackageName) {
-
-        daoPackageName_ = daoPackageName;
+        return rootPackageName_ + "." + namingConvention_.getDaoPackageName();
     }
 
     public String getDxoPackageName() {
 
-        return dxoPackageName_;
-    }
-
-    public void setDxoPackageName(String dxoPackageName) {
-
-        dxoPackageName_ = dxoPackageName;
+        return rootPackageName_ + "." + namingConvention_.getDxoPackageName();
     }
 
     public SourceGenerator getSourceGenerator() {

@@ -12,6 +12,7 @@ import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
+import org.seasar.framework.convention.impl.NamingConventionImpl;
 
 public class ZptAnalyzerTest extends TestCase {
 
@@ -51,8 +52,8 @@ public class ZptAnalyzerTest extends TestCase {
                 return method;
             }
         };
-        creator.setPagePackageName("com.example.web");
-        creator.setDtoPackageName("com.example.dto");
+        creator.setNamingConvention(new NamingConventionImpl());
+        creator.setRootPackageName("com.example");
         analyzer_.setSourceCreator(creator);
     }
 

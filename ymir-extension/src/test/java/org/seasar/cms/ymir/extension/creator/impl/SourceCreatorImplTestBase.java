@@ -8,8 +8,9 @@ import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.YmirTestCase;
 import org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir;
-import org.seasar.cms.ymir.container.hotdeploy.LocalOndemandCreatorContainer;
+import org.seasar.cms.ymir.container.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.container.hotdeploy.OndemandUtils;
+import org.seasar.cms.ymir.convention.YmirNamingConvention;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
@@ -20,16 +21,15 @@ import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.deployer.ComponentDeployerFactory;
 import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;
+import org.seasar.framework.container.external.servlet.HttpServletExternalContext;
+import org.seasar.framework.container.external.servlet.HttpServletExternalContextComponentDefRegister;
 import org.seasar.framework.container.hotdeploy.OndemandCreator;
 import org.seasar.framework.container.hotdeploy.OndemandProject;
 import org.seasar.framework.container.hotdeploy.creator.PageOndemandCreator;
 import org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.container.impl.S2ContainerImpl;
-import org.seasar.framework.container.impl.servlet.HttpServletExternalContext;
-import org.seasar.framework.container.impl.servlet.HttpServletExternalContextComponentDefRegister;
 import org.seasar.framework.convention.NamingConvention;
-import org.seasar.framework.convention.impl.NamingConventionImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
@@ -73,9 +73,9 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
             new MockHttpServletResponseImpl(request));
         container_.register(SourceCreatorImpl.class);
         container_.register(DefaultRequestProcessor.class);
-        container_.register(LocalOndemandCreatorContainer.class);
+        container_.register(LocalOndemandS2Container.class);
         container_.register(OndemandProjectImpl.class);
-        container_.register(NamingConventionImpl.class);
+        container_.register(YmirNamingConvention.class);
         container_.register(ZptAnalyzer.class);
         container_.register(ConfigurationImpl.class);
 
@@ -89,8 +89,8 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         processor.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page", "_${method}",
             "", null);
 
-        LocalOndemandCreatorContainer creatorContainer = (LocalOndemandCreatorContainer) container_
-            .getComponent(LocalOndemandCreatorContainer.class);
+        LocalOndemandS2Container creatorContainer = (LocalOndemandS2Container) container_
+            .getComponent(LocalOndemandS2Container.class);
         OndemandProjectImpl project = (OndemandProjectImpl) container_
             .getComponent(OndemandProject.class);
         creatorContainer.addProject(project);
@@ -103,8 +103,7 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
         target_ = (SourceCreatorImpl) container_
             .getComponent(SourceCreator.class);
-        target_.setPagePackageName("com.example.page");
-        target_.setDtoPackageName("com.example.dto");
+        target_.setNamingConvention(namingConvention);
         target_.setSourceDirectoryPath(ResourceUtil.getBuildDir(getClass())
             .getCanonicalPath());
         target_.setClassesDirectoryPath(ResourceUtil.getBuildDir(getClass())
