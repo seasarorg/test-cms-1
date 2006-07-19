@@ -19,7 +19,7 @@ import org.seasar.framework.container.util.S2ContainerUtil;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 import org.seasar.framework.exception.EmptyRuntimeException;
 
-public class LocalOndemandCreatorContainer implements HotdeployListener,
+public class LocalOndemandS2Container implements HotdeployListener,
     OndemandS2Container {
 
     private S2Container container;

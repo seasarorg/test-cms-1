@@ -28,10 +28,10 @@ public class ResponseConstructorSelectorImpl implements
         constructorMap_.put(constructor.getTargetClass(), constructor);
     }
 
-    public void setResponseConstructors(Object[] constructors) {
+    public void setResponseConstructors(ResponseConstructor[] constructors) {
 
         for (int i = 0; i < constructors.length; i++) {
-            add((ResponseConstructor) constructors[i]);
+            add(constructors[i]);
         }
     }
 }

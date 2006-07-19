@@ -18,8 +18,8 @@ public class DistributedOndemandBehavoir extends DefaultProvider {
     protected ComponentDef findComponentDefFromCreatorContainers(
         S2Container container, Object key) {
 
-        LocalOndemandCreatorContainer[] localOndemandCreatorContainers = (LocalOndemandCreatorContainer[]) container
-            .findAllComponents(LocalOndemandCreatorContainer.class);
+        LocalOndemandS2Container[] localOndemandCreatorContainers = (LocalOndemandS2Container[]) container
+            .findAllComponents(LocalOndemandS2Container.class);
         for (int i = 0; i < localOndemandCreatorContainers.length; i++) {
             ComponentDef cd = localOndemandCreatorContainers[i]
                 .findComponentDef(key);

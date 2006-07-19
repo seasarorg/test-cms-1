@@ -40,14 +40,14 @@ public class OndemandUtils {
     protected static boolean hasLocalOndemandCreatorContainer(
         S2Container container, boolean recursive) {
 
-        if (!container.hasComponentDef(LocalOndemandCreatorContainer.class)) {
+        if (!container.hasComponentDef(LocalOndemandS2Container.class)) {
             return false;
         }
         if (recursive) {
             return true;
         } else {
             ComponentDef componentDef = container
-                .getComponentDef(LocalOndemandCreatorContainer.class);
+                .getComponentDef(LocalOndemandS2Container.class);
             if (componentDef.getContainer() != container) {
                 return false;
             }
@@ -55,25 +55,25 @@ public class OndemandUtils {
         }
     }
 
-    protected static LocalOndemandCreatorContainer getLocalOndemandCreatorContainer(
+    protected static LocalOndemandS2Container getLocalOndemandCreatorContainer(
         S2Container container, boolean recursive)
         throws ComponentNotFoundRuntimeException,
         TooManyRegistrationRuntimeException, CyclicReferenceRuntimeException {
 
         if (recursive) {
-            return (LocalOndemandCreatorContainer) container
-                .getComponent(LocalOndemandCreatorContainer.class);
+            return (LocalOndemandS2Container) container
+                .getComponent(LocalOndemandS2Container.class);
         } else {
             ComponentDef[] componentDefs = container
-                .findComponentDefs(LocalOndemandCreatorContainer.class);
+                .findComponentDefs(LocalOndemandS2Container.class);
             for (int i = 0; i < componentDefs.length; i++) {
                 if (componentDefs[i].getContainer() == container) {
-                    return (LocalOndemandCreatorContainer) componentDefs[i]
+                    return (LocalOndemandS2Container) componentDefs[i]
                         .getComponent();
                 }
             }
             throw new ComponentNotFoundRuntimeException(
-                "LocalOndemandCreatorContainer");
+                "LocalOndemandS2Container");
         }
     }
 }

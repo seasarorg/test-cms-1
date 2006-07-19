@@ -4,11 +4,6 @@
 <components>
   <include path="convention.dicon" />
   <include path="mapping.dicon" />
-  <component class="org.seasar.cms.ymir.impl.YmirImpl">
-    <property name="lifecycleListeners">
-      <meta name="delayed">@org.seasar.cms.container.ContainerUtils@findAscendantComponents(container, @org.seasar.cms.ymir.LifecycleListener@class)</meta>
-    </property>
-  </component>
   <component
     class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
     <initMethod name="addReferenceClass">
@@ -18,13 +13,13 @@
       <arg>"org.seasar.cms.ymir.response.constructor.impl"</arg>
       <arg>".*ResponseConstructor"</arg>
     </initMethod>
-    <initMethod name="addClassPattern">
-      <arg>"org.seasar.cms.ymir.response.scheme.impl"</arg>
-      <arg>".*Strategy"</arg>
-    </initMethod>
     <initMethod name="addIgnoreClassPattern">
       <arg>"org.seasar.cms.ymir.response.constructor.impl"</arg>
       <arg>"Abstract.*"</arg>
+    </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.ymir.response.scheme.impl"</arg>
+      <arg>".*Strategy"</arg>
     </initMethod>
     <initMethod name="addIgnoreClassPattern">
       <arg>"org.seasar.cms.ymir.response.scheme.impl"</arg>
@@ -32,10 +27,15 @@
     </initMethod>
     <initMethod name="registerAll" />
   </component>
+  <component class="org.seasar.cms.ymir.impl.YmirImpl">
+    <property name="lifecycleListeners">
+      <meta name="delayed">@org.seasar.cms.ymir.container.ContainerUtils@findAscendantComponents(container, @org.seasar.cms.ymir.LifecycleListener@class)</meta>
+    </property>
+  </component>
   <component class="org.seasar.cms.ymir.impl.DefaultRequestProcessor">
     <property name="updaters">
       <meta name="delayed">
-      @org.seasar.cms.container.ContainerUtils@findAscendantComponents(container, @org.seasar.cms.ymir.Updater@class)
+      @org.seasar.cms.ymir.container.ContainerUtils@findAscendantComponents(container, @org.seasar.cms.ymir.Updater@class)
       </meta>
     </property>
   </component>

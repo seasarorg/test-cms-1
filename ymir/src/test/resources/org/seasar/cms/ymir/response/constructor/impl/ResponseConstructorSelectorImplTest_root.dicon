@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <component class="org.seasar.cms.ymir.convention.YmirNamingConvention" />
+  <component
+    class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
+    <initMethod name="addReferenceClass">
+      <arg>@org.seasar.cms.ymir.Ymir@class</arg>
+    </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.ymir.response.constructor.impl"</arg>
+      <arg>".*ResponseConstructor"</arg>
+    </initMethod>
+    <initMethod name="addIgnoreClassPattern">
+      <arg>"org.seasar.cms.ymir.response.constructor.impl"</arg>
+      <arg>"Abstract.*"</arg>
+    </initMethod>
+    <initMethod name="registerAll" />
+  </component>
+  <component
+    class="org.seasar.cms.ymir.response.constructor.impl.ResponseConstructorSelectorImpl" />
+</components>

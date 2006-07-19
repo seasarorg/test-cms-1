@@ -7,12 +7,14 @@
   <include path="j2ee.dicon" />
   <include path="dao.dicon" />
   <include path="s2dxo.dicon" />
-  <component class="org.seasar.framework.convention.impl.NamingConventionImpl" />
   <component
-    class="org.seasar.cms.ymir.container.hotdeploy.LocalOndemandCreatorContainer">
+    class="org.seasar.cms.ymir.convention.YmirNamingConvention" />
+  <component
+    class="org.seasar.cms.ymir.container.hotdeploy.LocalOndemandS2Container">
     <initMethod name="addProject">
       <arg>
-        <component class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
+        <component
+          class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
           <property name="rootPackageName">
             config.getProperty("rootPackageName", "skeleton")
           </property>
@@ -21,40 +23,54 @@
     </initMethod>
     <property name="hotdeployListeners">
       <meta name="delayed">
-      @org.seasar.cms.container.ContainerUtils@findAscendantComponents(container, @org.seasar.framework.container.hotdeploy.HotdeployListener@class)
+        @org.seasar.cms.ymir.container.ContainerUtils@findAscendantComponents(container,
+        @org.seasar.framework.container.hotdeploy.HotdeployListener@class)
       </meta>
     </property>
   </component>
+  <component
+    class="org.seasar.framework.container.hotdeploy.creator.PageOndemandCreator">
+    <property name="autoBindingDef">
+      @org.seasar.framework.container.assembler.AutoBindingDefFactory@AUTO
+    </property>
+    <property name="externalBinding">false</property>
+  </component>
+  <component name="daoOndemandCreatorInterceptor"
+    class="org.seasar.framework.aop.interceptors.InterceptorChain"
+    instance="prototype">
+    <initMethod name="add">
+      <arg>j2ee.requiredTx</arg>
+    </initMethod>
+    <initMethod name="add">
+      <arg>dao.interceptor</arg>
+    </initMethod>
+  </component>
+  <component
+    class="org.seasar.framework.container.hotdeploy.creator.DaoOndemandCreator">
+    <initMethod name="addCustomizer">
+      <arg>
         <component
-          class="org.seasar.framework.container.hotdeploy.creator.PageOndemandCreator">
-           <property name="autoBindingDef">@org.seasar.framework.container.assembler.AutoBindingDefFactory@AUTO</property>
-           <property name="externalBinding">false</property>
+          class="org.seasar.framework.container.autoregister.AspectCustomizer"
+          autoBinding="none">
+          <property name="interceptorName">
+            "daoOndemandCreatorInterceptor"
+          </property>
         </component>
+      </arg>
+    </initMethod>
+  </component>
+  <component
+    class="org.seasar.framework.container.hotdeploy.creator.DxoOndemandCreator">
+    <initMethod name="addCustomizer">
+      <arg>
         <component
-          class="org.seasar.framework.container.hotdeploy.creator.DaoOndemandCreator">
-           <initMethod name="addCustomizer">
-            <arg>
-              <component
-                class="org.seasar.framework.container.autoregister.AspectCustomizer" autoBinding="none">
-                <property name="interceptor">
-                  <component class="org.seasar.framework.aop.interceptors.InterceptorChain" instance="prototype">
-                    <initMethod name="add"><arg>j2ee.requiredTx</arg></initMethod>
-                    <initMethod name="add"><arg>dao.interceptor</arg></initMethod>
-                  </component>
-                </property>
-              </component>
-            </arg>
-          </initMethod>
+          class="org.seasar.framework.container.autoregister.AspectCustomizer"
+          autoBinding="none">
+          <property name="interceptorName">
+            "s2dxo.s2DxoIntereceptor"
+          </property>
         </component>
-        <component
-          class="org.seasar.framework.container.hotdeploy.creator.DxoOndemandCreator">
-           <initMethod name="addCustomizer">
-            <arg>
-              <component
-                class="org.seasar.framework.container.autoregister.AspectCustomizer" autoBinding="none">
-                <property name="interceptor">s2dxo.s2DxoIntereceptor</property>
-              </component>
-            </arg>
-          </initMethod>
-        </component>
+      </arg>
+    </initMethod>
+  </component>
 </components>

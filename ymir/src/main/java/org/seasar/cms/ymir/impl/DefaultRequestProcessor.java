@@ -149,8 +149,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         Response response = PassthroughResponse.INSTANCE;
 
-        HttpServletRequest httpRequest = ((HttpServletRequest) container_
-            .getExternalContext().getRequest());
+        HttpServletRequest httpRequest = getHttpServletRequest();
         if (component != httpRequest.getAttribute(ATTR_PAGE)) {
             // 同一リクエストで直前に同一コンポーネントについて処理済みの
             // 場合はリクエストパラメータのinjectionもrenderメソッドの
@@ -190,6 +189,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         return response;
+    }
+
+    HttpServletRequest getHttpServletRequest() {
+
+        return ((HttpServletRequest) container_.getRoot().getExternalContext()
+            .getRequest());
     }
 
     Response invokeAction(Object component, String actionName) {
@@ -251,20 +256,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
-    // FIXME アンコメントするとpathMappingsをプロパティとしてみてくれなくなる。
-    // →framework.diconでエラーになる。
-    // Seasarで配列型へのインジェクションが実現したらどうにかしよう。
-    //    public PathMapping[] getPathMappings() {
-    //
-    //        return pathMappings_;
-    //    }
-    //
-    public void setPathMappings(Object[] pathMappings) {
+    public PathMapping[] getPathMappings() {
 
-        pathMappings_ = new PathMapping[pathMappings.length];
-        for (int i = 0; i < pathMappings_.length; i++) {
-            pathMappings_[i] = (PathMapping) pathMappings[i];
-        }
+        return pathMappings_;
+    }
+
+    public void setPathMappings(PathMapping[] pathMappings) {
+
+        pathMappings_ = pathMappings;
     }
 
     public void addPathMapping(String patternString,
@@ -295,12 +294,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
         responseConstructorSelector_ = responseConstructorSelector;
     }
 
-    public void setUpdaters(Object[] updaters) {
+    public void setUpdaters(Updater[] updaters) {
 
-        updaters_ = new Updater[updaters.length];
-        for (int i = 0; i < updaters.length; i++) {
-            updaters_[i] = (Updater) updaters[i];
-        }
+        updaters_ = updaters;
     }
 
     public void setConfiguration(Configuration configuration) {
