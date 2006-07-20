@@ -14,7 +14,7 @@
     <initMethod name="addProject">
       <arg>
         <component
-          class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
+          class="org.seasar.cms.ymir.container.hotdeploy.YmirOndemandProject">
           <property name="rootPackageName">
             config.getProperty("rootPackageName", "skeleton")
           </property>
