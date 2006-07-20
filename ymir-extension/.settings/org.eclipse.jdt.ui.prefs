@@ -1,5 +1,6 @@
-#Tue Jul 11 10:24:26 JST 2006
+#Thu Jul 20 16:17:58 JST 2006
 eclipse.preferences.version=1
-formatter_settings_version=8
+formatter_profile=_Seasar CMS Project
+formatter_settings_version=10
 internal.default.compliance=default
 org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<templates/>
