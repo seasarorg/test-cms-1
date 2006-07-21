@@ -3,6 +3,10 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
   <component
-    class="org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir" />
+    class="org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir">
+    <aspect>
+      <component class="org.seasar.cms.ymir.container.TraceS2Interceptor" />
+    </aspect>
+  </component>
   <component class="org.seasar.cms.ymir.container.YmirPathResolver" />
 </components>
