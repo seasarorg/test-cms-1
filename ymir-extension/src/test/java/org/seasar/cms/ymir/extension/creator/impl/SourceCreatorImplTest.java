@@ -37,6 +37,18 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
         assertEquals("com.example.web.IndexPage", actual);
     }
 
+    public void testGetClassName3() throws Exception {
+
+        String actual = target_.getClassName("hoehoePage");
+
+        assertEquals("com.example.web.HoehoePage", actual);
+    }
+
+    public void testGetClassName4() throws Exception {
+
+        assertNull(target_.getClassName("hoehoe"));
+    }
+
     public void testGetWelcomeFile() throws Exception {
 
         assertEquals("index.html", target_.getWelcomeFile());

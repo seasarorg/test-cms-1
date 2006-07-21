@@ -79,6 +79,17 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         container_.register(ZptAnalyzer.class);
         container_.register(ConfigurationImpl.class);
 
+        OndemandProjectImpl project = (OndemandProjectImpl) container_
+            .getComponent(OndemandProject.class);
+        project.setRootPackageName("com.example");
+        NamingConvention namingConvention = (NamingConvention) container_
+            .getComponent(NamingConvention.class);
+        project.setCreators(new OndemandCreator[] { new PageOndemandCreator(
+            namingConvention) });
+        LocalOndemandS2Container ondemandContainer = (LocalOndemandS2Container) container_
+            .getComponent(LocalOndemandS2Container.class);
+        ondemandContainer.addProject(project);
+
         Configuration configuration = (Configuration) container_
             .getComponent(Configuration.class);
         configuration.setProperty(Configuration.KEY_WEBAPPROOT, new File(
@@ -89,16 +100,6 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         processor.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page", "_${method}",
             "", null);
 
-        LocalOndemandS2Container creatorContainer = (LocalOndemandS2Container) container_
-            .getComponent(LocalOndemandS2Container.class);
-        OndemandProjectImpl project = (OndemandProjectImpl) container_
-            .getComponent(OndemandProject.class);
-        creatorContainer.addProject(project);
-        NamingConvention namingConvention = (NamingConvention) container_
-            .getComponent(NamingConvention.class);
-        project.setRootPackageName("com.example");
-        project.setCreators(new OndemandCreator[] { new PageOndemandCreator(
-            namingConvention) });
         OndemandUtils.start(container_);
 
         target_ = (SourceCreatorImpl) container_
