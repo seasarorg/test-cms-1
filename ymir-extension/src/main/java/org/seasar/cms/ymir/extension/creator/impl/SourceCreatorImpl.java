@@ -93,8 +93,6 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private String rootPackageName_;
 
-    private String pagePackageName_;
-
     private SourceGenerator sourceGenerator_;
 
     private ResponseCreator responseCreator_;
