@@ -6,5 +6,4 @@
   <component
     class="org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir" />
   <component class="org.seasar.cms.ymir.container.YmirPathResolver" />
-  <component class="org.seasar.cms.ymir.container.YmirResourceResolver" />
 </components>
