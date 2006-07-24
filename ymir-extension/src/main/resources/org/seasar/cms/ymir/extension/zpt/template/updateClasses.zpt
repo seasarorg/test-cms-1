@@ -9,20 +9,20 @@
 追加・更新したくないものについてはチェックを外して下さい。</p>
   <p tal:condition="classDescBag/createdClassDescs"><strong>追加されるクラス：</strong>
   <ul>
-    <li tal:repeat="classDesc classDescBag/createdClassDescs"><input type="checkbox" name="__cms__apply" tal:define="kind classDesc/kind" tal:attributes='value classDesc/name; checked not:java:kind.equals("Dao") || kind.equals("Bean")' /> <span tal:content="classDesc/name">CLASS</span></li>
+    <li tal:repeat="classDesc classDescBag/createdClassDescs"><input type="checkbox" name="__ymir__apply" tal:define="kind classDesc/kind" tal:attributes='value classDesc/name; checked not:java:kind.equals("Dao") || kind.equals("Bean")' /> <span tal:content="classDesc/name">CLASS</span></li>
   </ul>
   </p>
   <p tal:condition="classDescBag/updatedClassDescs"><strong>更新されるクラス：</strong>
   <ul>
-    <li tal:repeat="classDesc classDescBag/updatedClassDescs"><input type="checkbox" name="__cms__apply" tal:define="kind classDesc/kind" tal:attributes='value classDesc/name; checked not:java:kind.equals("Dao") || kind.equals("Bean")' /> <span tal:content="classDesc/name">CLASS</span></li>
+    <li tal:repeat="classDesc classDescBag/updatedClassDescs"><input type="checkbox" name="__ymir__apply" tal:define="kind classDesc/kind" tal:attributes='value classDesc/name; checked not:java:kind.equals("Dao") || kind.equals("Bean")' /> <span tal:content="classDesc/name">CLASS</span></li>
   </ul>
   </p>
-  <p><input type="checkbox" name="__cms__replace" value="true" /> 以前のクラスが持つメソッドやプロパティのうち、新しいクラスに含まれないものを除去する</p>
+  <p><input type="checkbox" name="__ymir__replace" value="true" /> 以前のクラスが持つメソッドやプロパティのうち、新しいクラスに含まれないものを除去する</p>
   <p>よろしいですか？</p>
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
-  <input type="hidden" name="__cms__task" value="updateClasses" />
-  <input type="hidden" name="__cms__subTask" value="update" />
-  <input type="hidden" name="__cms__method" tal:attributes="value request/method" />
+  <input type="hidden" name="__ymir__task" value="updateClasses" />
+  <input type="hidden" name="__ymir__subTask" value="update" />
+  <input type="hidden" name="__ymir__method" tal:attributes="value request/method" />
   <input type="submit" value=" OK " />
   <input type="button" value="戻る" onclick="history.back()" /></p>
 </form>

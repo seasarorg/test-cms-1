@@ -9,22 +9,22 @@
 以下の項目を埋めて「OK」ボタンを押して下さい。</p>
 <form tal:attributes="action request/absolutePath" method="post">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
-  <input type="hidden" name="__cms__task" value="createConfiguration" />
-  <input type="hidden" name="__cms__subTask" value="create" />
-  <input type="hidden" name="__cms__method" tal:attributes="value request/method" />
+  <input type="hidden" name="__ymir__task" value="createConfiguration" />
+  <input type="hidden" name="__ymir__subTask" value="create" />
+  <input type="hidden" name="__ymir__method" tal:attributes="value request/method" />
   <dl>
     <dt>projectRoot</dt>
     <dd>このWebアプリケーションのためのEclipseプロジェクトのパスを入力して下さい。<br />
-      <input type="text" name="__cms__key_projectRoot" size="64" tal:attributes="value configuration/property(projectRoot)" />
+      <input type="text" name="__ymir__key_projectRoot" size="64" tal:attributes="value configuration/property(projectRoot)" />
     </dd>
     <dt>rootPackageName</dt>
     <dd>このWebアプリケーションのJavaソースコードのルートパッケージ名を入力して下さい。<br />
-      <input type="text" name="__cms__key_rootPackageName" size="64" tal:attributes="value configuration/property(rootPackageName)" />
+      <input type="text" name="__ymir__key_rootPackageName" size="64" tal:attributes="value configuration/property(rootPackageName)" />
     </dd>
     <dt>extension.beantable.enable</dt>
     <dd>Bean定義からテーブルを自動生成するBeantable機能を利用するかどうかを指定して下さい。<br />
-      <input type="radio" name="__cms__key_extension.beantable.enable" value="true" tal:attributes="checked configuration/property(extension.beantable.enable) | false" /> 利用する
-      <input type="radio" name="__cms__key_extension.beantable.enable" value="false" checked="checked" tal:attributes="checked not:configuration/property(extension.beantable.enable) | false" /> 利用しない
+      <input type="radio" name="__ymir__key_extension.beantable.enable" value="true" tal:attributes="checked configuration/property(extension.beantable.enable) | false" /> 利用する
+      <input type="radio" name="__ymir__key_extension.beantable.enable" value="false" checked="checked" tal:attributes="checked not:configuration/property(extension.beantable.enable) | false" /> 利用しない
     </dd>
   </dl>
   <p><input type="submit" value=" OK " />

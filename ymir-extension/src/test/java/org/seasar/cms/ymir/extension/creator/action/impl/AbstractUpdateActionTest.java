@@ -18,8 +18,8 @@ public class AbstractUpdateActionTest extends TestCase {
         RequestImpl request = new RequestImpl();
         Map<String, String[]> parameterMap = new LinkedHashMap<String, String[]>();
         parameterMap.put("test", new String[] { "value1", "value2" });
-        parameterMap.put("__cms__task", new String[] { "value" });
-        parameterMap.put("__cms__template", new String[] { "value" });
+        parameterMap.put("__ymir__task", new String[] { "value" });
+        parameterMap.put("__ymir__template", new String[] { "value" });
         parameterMap.put("test2", new String[] { "value3" });
         request.setParameterMap(parameterMap);
 

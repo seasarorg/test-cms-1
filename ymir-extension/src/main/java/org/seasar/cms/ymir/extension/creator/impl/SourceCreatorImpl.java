@@ -68,7 +68,7 @@ import net.skirnir.xom.XOMapperFactory;
 
 public class SourceCreatorImpl implements SourceCreator {
 
-    public static final String PARAM_PREFIX = "__cms__";
+    public static final String PARAM_PREFIX = "__ymir__";
 
     public static final String PARAM_TASK = PARAM_PREFIX + "task";
 

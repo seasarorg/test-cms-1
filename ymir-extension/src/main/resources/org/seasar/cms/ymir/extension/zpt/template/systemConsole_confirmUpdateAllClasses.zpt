@@ -6,18 +6,18 @@
 <h1>SYSTEM CONSOLE</h1>
 <form tal:attributes="method method; action request/absolutePath">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
-  <input type="hidden" name="__cms__task" value="systemConsole" />
-  <input type="hidden" name="__cms__subTask" value="updateAllClasses" />
-  <input type="hidden" name="__cms__method" tal:attributes="value method" />
+  <input type="hidden" name="__ymir__task" value="systemConsole" />
+  <input type="hidden" name="__ymir__subTask" value="updateAllClasses" />
+  <input type="hidden" name="__ymir__method" tal:attributes="value method" />
 <p>クラスを一括更新します。</p>
 <p tal:condition="classDescBag/createdClassDescs">以下のクラスが追加されます：
 <ul>
-  <li tal:repeat="classDesc classDescBag/createdClassDescs"><input type="checkbox" name="__cms__apply" tal:define="kind classDesc/kind" tal:attributes='value classDesc/name; checked not:java:kind.equals("Dao") || kind.equals("Bean")' /> <span tal:content="classDesc/name">CLASS</span></li>
+  <li tal:repeat="classDesc classDescBag/createdClassDescs"><input type="checkbox" name="__ymir__apply" tal:define="kind classDesc/kind" tal:attributes='value classDesc/name; checked not:java:kind.equals("Dao") || kind.equals("Bean")' /> <span tal:content="classDesc/name">CLASS</span></li>
 </ul>
 </p>
 <p tal:condition="classDescBag/updatedClassDescs">以下のクラスが更新されます：
 <ul>
-  <li tal:repeat="classDesc classDescBag/updatedClassDescs"><input type="checkbox" name="__cms__apply" tal:define="kind classDesc/kind" tal:attributes='value classDesc/name; checked not:java:kind.equals("Dao") || kind.equals("Bean")' /> <span tal:content="classDesc/name">CLASS</span></li>
+  <li tal:repeat="classDesc classDescBag/updatedClassDescs"><input type="checkbox" name="__ymir__apply" tal:define="kind classDesc/kind" tal:attributes='value classDesc/name; checked not:java:kind.equals("Dao") || kind.equals("Bean")' /> <span tal:content="classDesc/name">CLASS</span></li>
 </ul>
 </p>
 <p>よろしいですか？</p>

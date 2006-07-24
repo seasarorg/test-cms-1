@@ -23,7 +23,7 @@
 <p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
 <form tal:attributes="method method; action request/absolutePath">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
-  <input type="hidden" name="__cms__task" value="systemConsole" />
+  <input type="hidden" name="__ymir__task" value="systemConsole" />
   <input type="submit" value=" OK " />
 </form>
   </body>

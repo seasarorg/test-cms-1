@@ -12,10 +12,10 @@
 <p>よろしければ「作成」ボタンを押して下さい。作成しない場合は「戻る」ボタンを押して下さい。</p>
 <form tal:attributes="action request/absolutePath" method="post">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
-  <input type="hidden" name="__cms__task" value="createClass" />
-  <input type="hidden" name="__cms__subTask" value="create" />
-  <input type="hidden" name="__cms__method" tal:attributes="value request/method" />
-  <p>処理後の遷移先：<input type="text" name="__cms__transition" value="" /></p>
+  <input type="hidden" name="__ymir__task" value="createClass" />
+  <input type="hidden" name="__ymir__subTask" value="create" />
+  <input type="hidden" name="__ymir__method" tal:attributes="value request/method" />
+  <p>処理後の遷移先：<input type="text" name="__ymir__transition" value="" /></p>
   <p><input type="submit" value="作成" />
   <input type="button" value="戻る" onclick="history.back()" /></p>
 </form>
