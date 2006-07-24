@@ -2,11 +2,21 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
+  <include path="common.dicon" />
+  <component name="statusFilterInterceptor"
+    class="org.seasar.cms.ymir.aop.interceptors.StatusFilterInterceptor">
+    <property name="interceptor">
+      <component
+        class="org.seasar.cms.ymir.aop.interceptors.TraceS2Interceptor" />
+    </property>
+    <initMethod name="addEnabledStatus">
+      <arg>"develop"</arg>
+    </initMethod>
+    <initMethod name="init" />
+  </component>
   <component
     class="org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir">
-    <aspect>
-      <component class="org.seasar.cms.ymir.container.TraceS2Interceptor" />
-    </aspect>
+    <aspect>statusFilterInterceptor</aspect>
   </component>
   <component class="org.seasar.cms.ymir.container.YmirPathResolver" />
 </components>

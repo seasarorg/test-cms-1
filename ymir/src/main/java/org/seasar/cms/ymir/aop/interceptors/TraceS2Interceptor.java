@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.container;
+package org.seasar.cms.ymir.aop.interceptors;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.seasar.framework.aop.interceptors.AbstractInterceptor;

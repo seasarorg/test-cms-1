@@ -6,7 +6,7 @@
     <property name="value">"value"</property>
   </component>
   <component name="bean2" class="org.seasar.cms.ymir.container.Bean">
-    <property name="value">
+    <property name="value" bindingType="none">
       <meta name="delayed">bean1.getValue()</meta>
     </property>
   </component>

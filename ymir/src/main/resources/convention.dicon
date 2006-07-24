@@ -21,7 +21,7 @@
         </component>
       </arg>
     </initMethod>
-    <property name="hotdeployListeners">
+    <property name="hotdeployListeners" bindingType="none">
       <meta name="delayed">
         @org.seasar.cms.ymir.container.ContainerUtils@findAscendantComponents(container,
         @org.seasar.framework.container.hotdeploy.HotdeployListener@class)
