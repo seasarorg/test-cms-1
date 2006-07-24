@@ -23,12 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.skirnir.xom.IllegalSyntaxException;
-import net.skirnir.xom.ValidationException;
-import net.skirnir.xom.XMLParserFactory;
-import net.skirnir.xom.XOMapper;
-import net.skirnir.xom.XOMapperFactory;
-
 import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
@@ -64,8 +58,13 @@ import org.seasar.cms.ymir.impl.RedirectResponse;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.hotdeploy.OndemandProject;
 import org.seasar.framework.container.hotdeploy.OndemandS2Container;
-import org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl;
 import org.seasar.framework.convention.NamingConvention;
+
+import net.skirnir.xom.IllegalSyntaxException;
+import net.skirnir.xom.ValidationException;
+import net.skirnir.xom.XMLParserFactory;
+import net.skirnir.xom.XOMapper;
+import net.skirnir.xom.XOMapperFactory;
 
 public class SourceCreatorImpl implements SourceCreator {
 
@@ -675,10 +674,7 @@ public class SourceCreatorImpl implements SourceCreator {
             if (rootPackageName_ == null) {
                 if (ondemandContainer_.getProjectSize() > 0) {
                     OndemandProject project = ondemandContainer_.getProject(0);
-                    if (project instanceof OndemandProjectImpl) {
-                        rootPackageName_ = ((OndemandProjectImpl) project)
-                            .getRootPackageName();
-                    }
+                    rootPackageName_ = project.getRootPackageName();
                 }
             }
         } else {
