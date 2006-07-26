@@ -2,6 +2,14 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
+  <component class="org.seasar.cms.ymir.container.ThreadContextImpl">
+    <destroyMethod name="destroy" />
+  </component>
+  <component
+    class="org.seasar.cms.ymir.container.ThreadContextComponentDefRegister">
+    <initMethod name="registerComponentDefs" />
+    <destroyMethod name="destroy" />
+  </component>
   <component
     class="org.seasar.cms.ymir.container.DelayedPropertySetter">
     <initMethod name="setAll" />

@@ -21,7 +21,7 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Updater;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
-import org.seasar.cms.ymir.container.ThreadLocalS2ContainerUtils;
+import org.seasar.cms.ymir.container.ThreadContext;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructorSelector;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
@@ -48,6 +48,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
     private final BeanUtilsBean beanUtilsBean_;
 
     private final Logger logger_ = Logger.getLogger(getClass());
+
+    private ThreadContext threadContext_;
 
     public DefaultRequestProcessor() {
 
@@ -139,12 +141,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
             return PassthroughResponse.INSTANCE;
         }
 
+        ThreadContext context = getThreadContext();
         Object component;
         try {
-            ThreadLocalS2ContainerUtils.register(container_, request);
+            context.setComponent(Request.class, request);
             component = container_.getComponent(componentName);
         } finally {
-            ThreadLocalS2ContainerUtils.deregister(container_, request);
+            context.setComponent(Request.class, null);
         }
 
         Response response = PassthroughResponse.INSTANCE;
@@ -189,6 +192,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         return response;
+    }
+
+    ThreadContext getThreadContext() {
+        if (threadContext_ == null) {
+            threadContext_ = (ThreadContext) container_.getRoot().getComponent(
+                ThreadContext.class);
+        }
+        return threadContext_;
     }
 
     HttpServletRequest getHttpServletRequest() {

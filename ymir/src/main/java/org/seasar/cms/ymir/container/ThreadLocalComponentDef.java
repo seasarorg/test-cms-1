@@ -23,4 +23,9 @@ public class ThreadLocalComponentDef extends SimpleComponentDef {
 
         component_.set(component);
     }
+
+    public void destroy() {
+        super.destroy();
+        component_ = null;
+    }
 }

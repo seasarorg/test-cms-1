@@ -27,6 +27,7 @@
     </initMethod>
     <initMethod name="registerAll" />
   </component>
+  <component class="org.seasar.cms.ymir.container.RequestComponentDefFactory" />
   <component class="org.seasar.cms.ymir.impl.YmirImpl">
     <property name="lifecycleListeners" bindingType="none">
       <meta name="delayed">@org.seasar.cms.ymir.container.ContainerUtils@findAscendantComponents(container, @org.seasar.cms.ymir.LifecycleListener@class)</meta>
