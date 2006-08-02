@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.container;
 
+import org.seasar.cms.pluggable.ThreadContextComponentDef;
+import org.seasar.cms.pluggable.ThreadContextComponentDefFactory;
 import org.seasar.cms.ymir.Request;
 
 public class RequestComponentDefFactory implements

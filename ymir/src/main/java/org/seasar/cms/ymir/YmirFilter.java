@@ -38,6 +38,10 @@ public class YmirFilter implements Filter {
     }
 
     public void destroy() {
+
+        context_ = null;
+        ymir_ = null;
+        dispatcher_ = null;
     }
 
     public void doFilter(ServletRequest req, ServletResponse res,

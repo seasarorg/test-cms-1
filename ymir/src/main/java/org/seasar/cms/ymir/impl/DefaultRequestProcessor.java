@@ -10,8 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.seasar.cms.ymir.Configuration;
+import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.FormFile;
+import org.seasar.cms.ymir.Globals;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.PathMapping;
@@ -19,9 +20,9 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Updater;
+import org.seasar.cms.ymir.YmirConfiguration;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
-import org.seasar.cms.ymir.container.ThreadContext;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructorSelector;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
@@ -43,7 +44,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private Updater[] updaters_ = new Updater[0];
 
-    private Configuration configuration_;
+    private YmirConfiguration configuration_;
 
     private final BeanUtilsBean beanUtilsBean_;
 
@@ -81,7 +82,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
             dispatcher, parameterMap, fileParameterMap, mapping
                 .getPathInfo(resolver));
 
-        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())) {
+        if (YmirConfiguration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())) {
             for (int i = 0; i < updaters_.length; i++) {
                 Response response = updaters_[i].update(path, request
                     .getMethod(), request);
@@ -108,13 +109,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
     boolean isResourceExists(String path) {
 
         return new File(configuration_
-            .getProperty(Configuration.KEY_WEBAPPROOT), path).exists();
+            .getProperty(Globals.KEY_WEBAPPROOT), path).exists();
     }
 
     String getProjectStatus() {
 
         if (configuration_ != null) {
-            return configuration_.getProperty(Configuration.KEY_PROJECTSTATUS);
+            return configuration_.getProperty(YmirConfiguration.KEY_PROJECTSTATUS);
         } else {
             return null;
         }
@@ -310,7 +311,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         updaters_ = updaters;
     }
 
-    public void setConfiguration(Configuration configuration) {
+    public void setConfiguration(YmirConfiguration configuration) {
 
         configuration_ = configuration;
     }

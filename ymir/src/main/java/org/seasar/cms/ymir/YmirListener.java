@@ -6,8 +6,6 @@ import javax.servlet.ServletContextListener;
 
 public class YmirListener implements ServletContextListener {
 
-    public static final String CONFIG_PATH_KEY = "org.seasar.framework.container.configPath";
-
     public static final String YMIR_KEY = "org.seasar.cms.ymir.ymir";
 
     private YmirBootstrap bootstrap_ = new YmirBootstrap();
@@ -16,8 +14,7 @@ public class YmirListener implements ServletContextListener {
 
         ServletContext sc = sce.getServletContext();
         try {
-            sc.setAttribute(YMIR_KEY, bootstrap_.init(sc, sc
-                .getInitParameter(CONFIG_PATH_KEY)));
+            sc.setAttribute(YMIR_KEY, bootstrap_.init(sc));
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             throw ex;

@@ -8,22 +8,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseProcessor;
 import org.seasar.cms.ymir.Ymir;
-import org.seasar.cms.ymir.container.hotdeploy.OndemandUtils;
-import org.seasar.framework.container.S2Container;
 import org.seasar.framework.log.Logger;
 
 public class YmirImpl implements Ymir {
-
-    private S2Container container_;
-
-    private Configuration configuration_;
 
     private LifecycleListener[] lifecycleListeners_;
 
@@ -37,24 +30,9 @@ public class YmirImpl implements Ymir {
 
         logger_.debug("Ymir initialize start");
 
-        initializeContainer();
         initializeListeners();
 
         logger_.debug("Ymir initialize end");
-    }
-
-    void initializeContainer() {
-
-        String projectStatus = getConfiguration().getProperty(
-            Configuration.KEY_PROJECTSTATUS);
-        logger_.info("Project status is: "
-            + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
-
-        // developモード以外の時はhotdeployを無効にするために
-        // こうしている。
-        if (!Configuration.PROJECTSTATUS_DEVELOP.equals(projectStatus)) {
-            OndemandUtils.start(container_, true);
-        }
     }
 
     void initializeListeners() {
@@ -85,8 +63,6 @@ public class YmirImpl implements Ymir {
         logger_.debug("Ymir destroy start");
 
         destroyListeners();
-        destroyContainer();
-        configuration_ = null;
         requestProcessor_ = null;
 
         logger_.debug("Ymir destroy end");
@@ -105,34 +81,6 @@ public class YmirImpl implements Ymir {
             }
             lifecycleListeners_ = null;
         }
-    }
-
-    void destroyContainer() {
-
-        if (container_ != null) {
-            if (!Configuration.PROJECTSTATUS_DEVELOP.equals(getConfiguration()
-                .getProperty(Configuration.KEY_PROJECTSTATUS))) {
-
-                OndemandUtils.stop(container_, true);
-            }
-            container_.destroy();
-            container_ = null;
-        }
-    }
-
-    public void setContainer(S2Container container) {
-
-        container_ = container;
-    }
-
-    public Configuration getConfiguration() {
-
-        return configuration_;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-
-        configuration_ = configuration;
     }
 
     public void setLifecycleListeners(LifecycleListener[] lifecycleListeners) {

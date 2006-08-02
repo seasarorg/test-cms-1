@@ -3,7 +3,7 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
   <include path="app.dicon" />
-  <include path="common.dicon" />
+  <include path="global.dicon" />
   <include path="j2ee.dicon" />
   <include path="dao.dicon" />
   <include path="s2dxo.dicon" />
