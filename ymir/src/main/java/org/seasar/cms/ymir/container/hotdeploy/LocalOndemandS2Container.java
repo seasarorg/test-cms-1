@@ -8,14 +8,14 @@ import java.util.Map;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
-import org.seasar.framework.container.cooldeploy.ConventionNaming;
-import org.seasar.framework.container.cooldeploy.DefaultConventionNaming;
 import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
 import org.seasar.framework.container.hotdeploy.HotdeployListener;
 import org.seasar.framework.container.hotdeploy.OndemandProject;
 import org.seasar.framework.container.hotdeploy.OndemandS2Container;
 import org.seasar.framework.container.impl.S2ContainerImpl;
 import org.seasar.framework.container.util.S2ContainerUtil;
+import org.seasar.framework.convention.NamingConvention;
+import org.seasar.framework.convention.impl.NamingConventionImpl;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 import org.seasar.framework.exception.EmptyRuntimeException;
 
@@ -32,9 +32,9 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     private Map componentDefCache = new HashMap();
 
-    public static final String conventionNaming_BINDING = "bindingType=may";
+    public static final String namingConvention_BINDING = "bindingType=may";
 
-    private ConventionNaming conventionNaming = new DefaultConventionNaming();
+    private NamingConvention namingConvention = new NamingConventionImpl();
 
     private int counter = 0;
 
@@ -57,12 +57,12 @@ public class LocalOndemandS2Container implements HotdeployListener,
         projects.add(project);
     }
 
-    public ConventionNaming getConventionNaming() {
-        return conventionNaming;
+    public NamingConvention getNamingConvention() {
+        return namingConvention;
     }
 
-    public void setConventionNaming(ConventionNaming conventionNaming) {
-        this.conventionNaming = conventionNaming;
+    public void setNamingConvention(NamingConvention namingConvention) {
+        this.namingConvention = namingConvention;
     }
 
     public synchronized void start() {
