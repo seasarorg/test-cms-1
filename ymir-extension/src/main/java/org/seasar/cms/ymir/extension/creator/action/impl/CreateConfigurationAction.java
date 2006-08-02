@@ -7,12 +7,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.seasar.cms.ymir.Configuration;
+import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.pluggable.impl.ConfigurationImpl;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
-import org.seasar.cms.ymir.impl.ConfigurationImpl;
 
 public class CreateConfigurationAction extends AbstractUpdateAction {
 
@@ -40,13 +41,11 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
     Response actDefault(Request request, PathMetaData pathMetaData) {
 
         Configuration configuration = getConfiguration();
-        String webappRoot = configuration
-            .getProperty(Configuration.KEY_WEBAPPROOT);
+        String webappRoot = configuration.getProperty(Globals.KEY_WEBAPPROOT);
         if (webappRoot != null) {
             String projectRoot = findProjectRootDirectory(webappRoot);
             if (projectRoot != null) {
-                configuration.setProperty(Configuration.KEY_PROJECTROOT,
-                    projectRoot);
+                configuration.setProperty(Globals.KEY_PROJECTROOT, projectRoot);
             }
         }
 
@@ -89,8 +88,7 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
                 value);
         }
 
-        String projectRoot = configuration
-            .getProperty(Configuration.KEY_PROJECTROOT);
+        String projectRoot = configuration.getProperty(Globals.KEY_PROJECTROOT);
         if (projectRoot != null) {
             File file = new File(projectRoot, APP_PROPERTIES_PATH);
             file.getParentFile().mkdirs();

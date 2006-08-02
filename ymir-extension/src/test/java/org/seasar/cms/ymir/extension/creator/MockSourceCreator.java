@@ -3,7 +3,7 @@ package org.seasar.cms.ymir.extension.creator;
 import java.io.File;
 import java.util.Properties;
 
-import org.seasar.cms.ymir.Configuration;
+import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;

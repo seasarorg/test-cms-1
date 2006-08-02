@@ -26,13 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.cms.ymir.Configuration;
+import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
-import org.seasar.cms.ymir.container.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.BodyDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
@@ -170,13 +171,12 @@ public class SourceCreatorImpl implements SourceCreator {
 
         if (configuration_ == null) {
             return false;
-        } else if (configuration_.getProperty(Configuration.KEY_PROJECTROOT) == null) {
+        } else if (configuration_.getProperty(Globals.KEY_PROJECTROOT) == null) {
             return false;
         } else if (!new File(configuration_
-            .getProperty(Configuration.KEY_PROJECTROOT)).exists()) {
+            .getProperty(Globals.KEY_PROJECTROOT)).exists()) {
             return false;
-        } else if (configuration_
-            .getProperty(Configuration.KEY_ROOTPACKAGENAME) == null) {
+        } else if (configuration_.getProperty(Globals.KEY_ROOTPACKAGENAME) == null) {
             return false;
         }
         return true;
@@ -628,7 +628,7 @@ public class SourceCreatorImpl implements SourceCreator {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(
-                    ondemandContainer_.getClassLoader());
+                    ondemandContainer_.getContainer().getClassLoader());
                 int size = ondemandContainer_.getProjectSize();
                 for (int i = 0; i < size; i++) {
                     String className = ondemandContainer_.getProject(i)
@@ -652,7 +652,7 @@ public class SourceCreatorImpl implements SourceCreator {
         }
         try {
             return Class.forName(className, true, ondemandContainer_
-                .getClassLoader());
+                .getContainer().getClassLoader());
         } catch (ClassNotFoundException ex) {
             return null;
         }
@@ -792,8 +792,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public File getWebappDirectory() {
 
-        return new File(configuration_
-            .getProperty(Configuration.KEY_WEBAPPROOT));
+        return new File(configuration_.getProperty(Globals.KEY_WEBAPPROOT));
     }
 
     public TemplateAnalyzer getTemplateAnalyzer() {

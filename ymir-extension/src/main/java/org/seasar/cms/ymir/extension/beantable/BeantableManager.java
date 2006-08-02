@@ -5,13 +5,12 @@ import static org.seasar.cms.ymir.extension.Globals.CONFIG_KEY_BEANTABLE_ENABLE;
 import java.sql.SQLException;
 
 import org.seasar.cms.beantable.Beantable;
-import org.seasar.cms.ymir.Configuration;
+import org.seasar.cms.pluggable.ClassTraverser;
+import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.LifecycleListener;
-import org.seasar.cms.ymir.container.ClassTraverser;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.hotdeploy.HotdeployListener;
 import org.seasar.framework.log.Logger;
-import static org.seasar.cms.ymir.Configuration.PROJECTSTATUS_DEVELOP;
 
 public class BeantableManager implements LifecycleListener, HotdeployListener {
 
@@ -51,7 +50,8 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
 
     public void definedClass(Class clazz) {
 
-        if (!configuration_.equalsProjectStatus(PROJECTSTATUS_DEVELOP)) {
+        if (!configuration_
+            .equalsProjectStatus(Configuration.PROJECTSTATUS_DEVELOP)) {
             return;
         }
         if (!isEnabled()) {

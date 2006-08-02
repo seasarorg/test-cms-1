@@ -4,23 +4,22 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
-import org.seasar.cms.ymir.Configuration;
+import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
+import org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior;
+import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.pluggable.impl.ConfigurationImpl;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.YmirTestCase;
-import org.seasar.cms.ymir.container.hotdeploy.DistributedOndemandBehavoir;
-import org.seasar.cms.ymir.container.hotdeploy.LocalOndemandS2Container;
-import org.seasar.cms.ymir.container.hotdeploy.OndemandUtils;
 import org.seasar.cms.ymir.convention.YmirNamingConvention;
+import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.freemarker.FreemarkerSourceGenerator;
 import org.seasar.cms.ymir.extension.zpt.ZptAnalyzer;
-import org.seasar.cms.ymir.impl.ConfigurationImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.framework.container.S2Container;
-import org.seasar.framework.container.deployer.ComponentDeployerFactory;
-import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContext;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContextComponentDefRegister;
 import org.seasar.framework.container.hotdeploy.OndemandCreator;
@@ -39,6 +38,8 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
     protected S2Container container_;
 
+    protected DistributedOndemandBehavior ondemandBehavior_;
+
     protected SourceCreatorImpl target_;
 
     protected ClassDesc constructClassDesc() {
@@ -56,12 +57,13 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
     protected void setUp() throws Exception {
 
-        ComponentDeployerFactory
-            .setProvider(new ExternalComponentDeployerProvider());
-        S2ContainerBehavior.setProvider(new DistributedOndemandBehavoir());
+        SingletonPluggableContainerFactory.prepareForContainer();
+
         container_ = new S2ContainerImpl();
         ((S2ContainerImpl) container_).setClassLoader(getClass()
             .getClassLoader());
+        SingletonPluggableContainerFactory.getRootContainer().include(
+            container_);
         container_.setExternalContext(new HttpServletExternalContext());
         container_
             .setExternalContextComponentDefRegister(new HttpServletExternalContextComponentDefRegister());
@@ -79,6 +81,9 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         container_.register(ZptAnalyzer.class);
         container_.register(ConfigurationImpl.class);
 
+        ondemandBehavior_ = (DistributedOndemandBehavior) S2ContainerBehavior
+            .getProvider();
+
         OndemandProjectImpl project = (OndemandProjectImpl) container_
             .getComponent(OndemandProject.class);
         project.setRootPackageName("com.example");
@@ -92,15 +97,13 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
         Configuration configuration = (Configuration) container_
             .getComponent(Configuration.class);
-        configuration.setProperty(Configuration.KEY_WEBAPPROOT, new File(
-            ResourceUtil.getBuildDir(getClass()), "webapp").getCanonicalPath());
+        configuration.setProperty(Globals.KEY_WEBAPPROOT, new File(ResourceUtil
+            .getBuildDir(getClass()), "webapp").getCanonicalPath());
 
         DefaultRequestProcessor processor = (DefaultRequestProcessor) container_
             .getComponent(RequestProcessor.class);
         processor.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page", "_${method}",
             "", null);
-
-        OndemandUtils.start(container_);
 
         target_ = (SourceCreatorImpl) container_
             .getComponent(SourceCreator.class);
@@ -114,10 +117,12 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         FreemarkerSourceGenerator sourceGenerator = new FreemarkerSourceGenerator();
         sourceGenerator.setSourceCreator(target_);
         target_.setSourceGenerator(sourceGenerator);
+
+        SingletonPluggableContainerFactory.init();
     }
 
     protected void tearDown() throws Exception {
 
-        OndemandUtils.stop(container_);
+        SingletonPluggableContainerFactory.destroy();
     }
 }
