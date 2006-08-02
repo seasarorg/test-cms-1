@@ -15,8 +15,13 @@ public class YmirListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
 
         ServletContext sc = sce.getServletContext();
-        sc.setAttribute(YMIR_KEY, bootstrap_.init(sc, sc
-            .getInitParameter(CONFIG_PATH_KEY)));
+        try {
+            sc.setAttribute(YMIR_KEY, bootstrap_.init(sc, sc
+                .getInitParameter(CONFIG_PATH_KEY)));
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
