@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.seasar.cms.ymir.Request;
@@ -22,6 +23,8 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
     private static final String PARAM_REPLACE = SourceCreatorImpl.PARAM_PREFIX
         + "replace";
+
+    private static final String PREFIX_CHECKEDTIME = "updateClassesAction.checkedTime.";
 
     public UpdateClassesAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
@@ -115,8 +118,33 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         if (!templateFile.exists()) {
             return false;
         }
+        return (templateFile.lastModified() > getLastCheckedTime(pathMetaData));
+    }
+
+    long getLastCheckedTime(PathMetaData pathMetaData) {
+
         File sourceFile = pathMetaData.getSourceFile();
-        return (!sourceFile.exists() || templateFile.lastModified() > sourceFile
-            .lastModified());
+        if (sourceFile.exists()) {
+            return sourceFile.lastModified();
+        } else {
+            return getAndUpdateCheckedTime(pathMetaData.getClassName());
+        }
+    }
+
+    long getAndUpdateCheckedTime(String className) {
+
+        Properties prop = getSourceCreator().getSourceCreatorProperties();
+        String key = PREFIX_CHECKEDTIME + className;
+        String timeString = prop.getProperty(key);
+        long time;
+        if (timeString == null) {
+            time = 0L;
+        } else {
+            time = Long.parseLong(timeString);
+        }
+        prop.setProperty(key, String.valueOf(System.currentTimeMillis()));
+        getSourceCreator().saveSourceCreatorProperties();
+
+        return time;
     }
 }

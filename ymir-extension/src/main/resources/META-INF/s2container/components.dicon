@@ -7,6 +7,7 @@
   <component class="org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl">
     <property name="sourceDirectoryPath">config.getProperty("sourceDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/java")</property>
     <property name="classesDirectoryPath">config.getProperty("classesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/webapp"))</property>
+    <property name="resourcesDirectoryPath">config.getProperty("resourcesDirectory", config.getProperty("webappDirectory", config.getProperty("projectRoot", "skeleton") + "/src/main/resources"))</property>
   </component>
   <component class="org.seasar.cms.ymir.extension.zpt.ZptAnalyzer" />
   <component class="org.seasar.cms.ymir.extension.freemarker.FreemarkerSourceGenerator" />

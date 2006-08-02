@@ -2,16 +2,16 @@ package org.seasar.cms.ymir.extension.creator.action;
 
 public class Condition {
 
-    private boolean classBound_;
+    private State classBound_;
 
-    private boolean classExists_;
+    private State classExists_;
 
-    private boolean templateExists_;
+    private State templateExists_;
 
     private String method_;
 
-    public Condition(boolean classBound, boolean classExists,
-        boolean templateExists, String method) {
+    public Condition(State classBound, State classExists, State templateExists,
+        String method) {
 
         classBound_ = classBound;
         classExists_ = classExists;
@@ -22,9 +22,9 @@ public class Condition {
     public int hashCode() {
 
         int code = 0;
-        code += (classBound_ ? 1 : 0);
-        code += (classExists_ ? 1 : 0);
-        code += (templateExists_ ? 1 : 0);
+        code += classBound_.ordinal();
+        code += classExists_.ordinal();
+        code += templateExists_.ordinal();
         code += (method_ != null ? method_.hashCode() : 0);
         return code;
     }
@@ -53,5 +53,21 @@ public class Condition {
         }
 
         return true;
+    }
+
+    public State getClassBound() {
+        return classBound_;
+    }
+
+    public State getClassExists() {
+        return classExists_;
+    }
+
+    public State getTemplateExists() {
+        return templateExists_;
+    }
+
+    public String getMethod() {
+        return method_;
     }
 }

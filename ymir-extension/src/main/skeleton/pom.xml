@@ -49,7 +49,7 @@
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>org.seasar.cms.ymir-extension</groupId>
+      <groupId>org.seasar.cms.ymir</groupId>
       <artifactId>ymir-extension</artifactId>
       <version>0.0.1</version>
     </dependency>

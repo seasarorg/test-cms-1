@@ -109,6 +109,8 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
             .getCanonicalPath());
         target_.setClassesDirectoryPath(ResourceUtil.getBuildDir(getClass())
             .getCanonicalPath());
+        target_.setResourcesDirectoryPath(ResourceUtil.getBuildDir(getClass())
+            .getCanonicalPath());
         FreemarkerSourceGenerator sourceGenerator = new FreemarkerSourceGenerator();
         sourceGenerator.setSourceCreator(target_);
         target_.setSourceGenerator(sourceGenerator);

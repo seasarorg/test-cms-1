@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.extension.creator;
 
 import java.io.File;
+import java.util.Properties;
 
 import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.Request;
@@ -19,6 +20,12 @@ public interface SourceCreator extends Updater {
     String getDxoPackageName();
 
     File getWebappDirectory();
+
+    File getSourceDirectory();
+
+    File getClassesDirectory();
+
+    File getResourcesDirectory();
 
     boolean isDenied(String path, String method);
 
@@ -51,4 +58,8 @@ public interface SourceCreator extends Updater {
     ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas);
 
     void updateClasses(ClassDescBag classDescBag, boolean mergeMethod);
+
+    Properties getSourceCreatorProperties();
+
+    void saveSourceCreatorProperties();
 }

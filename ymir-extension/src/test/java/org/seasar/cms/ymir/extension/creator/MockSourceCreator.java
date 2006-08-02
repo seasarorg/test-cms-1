@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.extension.creator;
 
 import java.io.File;
+import java.util.Properties;
 
 import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.Request;
@@ -68,7 +69,8 @@ public class MockSourceCreator implements SourceCreator {
         return null;
     }
 
-    public boolean writeSourceFile(ClassDesc classDesc, ClassDescSet classDescSet) {
+    public boolean writeSourceFile(ClassDesc classDesc,
+        ClassDescSet classDescSet) {
         return false;
     }
 
@@ -92,5 +94,24 @@ public class MockSourceCreator implements SourceCreator {
     }
 
     public void updateClasses(ClassDescBag classDescBag, boolean mergeMethod) {
+    }
+
+    public File getClassesDirectory() {
+        return null;
+    }
+
+    public File getResourcesDirectory() {
+        return null;
+    }
+
+    public Properties getSourceCreatorProperties() {
+        return null;
+    }
+
+    public File getSourceDirectory() {
+        return null;
+    }
+
+    public void saveSourceCreatorProperties() {
     }
 }

@@ -4,6 +4,8 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.seasar.cms.ymir.Configuration;
 import org.seasar.cms.ymir.MatchedPathMapping;
@@ -45,6 +48,7 @@ import org.seasar.cms.ymir.extension.creator.SourceGenerator;
 import org.seasar.cms.ymir.extension.creator.TemplateAnalyzer;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.action.Condition;
+import org.seasar.cms.ymir.extension.creator.action.State;
 import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
 import org.seasar.cms.ymir.extension.creator.action.UpdateActionSelector;
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateClassAction;
@@ -59,6 +63,7 @@ import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.hotdeploy.OndemandProject;
 import org.seasar.framework.container.hotdeploy.OndemandS2Container;
 import org.seasar.framework.convention.NamingConvention;
+import org.seasar.framework.log.Logger;
 
 import net.skirnir.xom.IllegalSyntaxException;
 import net.skirnir.xom.ValidationException;
@@ -72,6 +77,8 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public static final String PARAM_TASK = PARAM_PREFIX + "task";
 
+    private static final String SOURCECREATOR_PROPERTIES = "sourceCreator.properties";
+
     private Configuration configuration_;
 
     private DefaultRequestProcessor defaultRequestProcessor_;
@@ -84,6 +91,8 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private File classesDirectory_;
 
+    private File resourcesDirectory_;
+
     private TemplateAnalyzer analyzer_;
 
     private String encoding_ = "UTF-8";
@@ -94,33 +103,30 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private ResponseCreator responseCreator_;
 
+    public Properties sourceCreatorProperties_;
+
     private UpdateActionSelector actionSelector_ = new UpdateActionSelector()
-        .register(new Condition(false, false, false, Request.METHOD_GET),
-            new CreateTemplateAction(this)).register(
-            new Condition(true, false, false, Request.METHOD_GET),
-            new CreateTemplateAction(this)).register(
-            new Condition(true, false, true, Request.METHOD_GET),
+        .register(
+            new Condition(State.ANY, State.ANY, State.FALSE, Request.METHOD_GET),
+            new CreateTemplateAction(this))
+        .register(
+            new Condition(State.TRUE, State.ANY, State.TRUE, Request.METHOD_GET),
             new UpdateClassesAction(this)).register(
-            new Condition(true, true, false, Request.METHOD_GET),
-            new CreateTemplateAction(this)).register(
-            new Condition(true, true, true, Request.METHOD_GET),
-            new UpdateClassesAction(this)).register(
-            new Condition(false, false, false, Request.METHOD_POST),
-            new CreateClassAndTemplateAction(this)).register(
-            new Condition(true, false, false, Request.METHOD_POST),
-            new CreateClassAndTemplateAction(this)).register(
-            new Condition(true, false, true, Request.METHOD_POST),
-            new UpdateClassesAction(this)).register(
-            new Condition(true, true, false, Request.METHOD_POST),
-            new CreateTemplateAction(this)).register(
-            new Condition(true, true, true, Request.METHOD_POST),
-            new UpdateClassesAction(this)).register("createClass",
-            new CreateClassAction(this)).register("createTemplate",
-            new CreateTemplateAction(this)).register("createClassAndTemplate",
-            new CreateClassAndTemplateAction(this)).register("updateClasses",
-            new UpdateClassesAction(this)).register("createConfiguration",
-            new CreateConfigurationAction(this)).register("systemConsole",
-            new SystemConsoleAction(this));
+            new Condition(State.ANY, State.FALSE, State.FALSE,
+                Request.METHOD_POST), new CreateClassAndTemplateAction(this))
+        .register(
+            new Condition(State.TRUE, State.ANY, State.TRUE,
+                Request.METHOD_POST), new UpdateClassesAction(this)).register(
+            new Condition(State.TRUE, State.TRUE, State.FALSE,
+                Request.METHOD_POST), new CreateTemplateAction(this)).register(
+            "createClass", new CreateClassAction(this)).register(
+            "createTemplate", new CreateTemplateAction(this)).register(
+            "createClassAndTemplate", new CreateClassAndTemplateAction(this))
+        .register("updateClasses", new UpdateClassesAction(this)).register(
+            "createConfiguration", new CreateConfigurationAction(this))
+        .register("systemConsole", new SystemConsoleAction(this));
+
+    public Logger logger_ = Logger.getLogger(getClass());
 
     public Response update(String path, String method, Request request) {
 
@@ -146,8 +152,9 @@ public class SourceCreatorImpl implements SourceCreator {
                 }
                 condition = "createClass";
             } else {
-                condition = new Condition((className != null), sourceFile
-                    .exists(), templateFile.exists(), method);
+                condition = new Condition(State.valueOf(className != null),
+                    State.valueOf(sourceFile.exists()), State
+                        .valueOf(templateFile.exists()), method);
             }
         }
 
@@ -496,8 +503,8 @@ public class SourceCreatorImpl implements SourceCreator {
         ClassDesc[] classDescs = classDescBag.getClassDescs(kind);
         for (int i = 0; i < classDescs.length; i++) {
             // 既存のクラスがあればマージする。
-            classDescs[i].merge(getClassDesc(classDescs[i].getName()),
-                mergeMethod);
+            classDescs[i].merge(
+                getClassDesc(classDescs[i].getSuperclassName()), mergeMethod);
             if (!writeSourceFile(classDescs[i], classDescBag.getClassDescSet())) {
                 // ソースファイルの生成に失敗した。
                 classDescBag.remove(classDescs[i].getName());
@@ -667,6 +674,61 @@ public class SourceCreatorImpl implements SourceCreator {
             + ".class");
     }
 
+    public Properties getSourceCreatorProperties() {
+
+        if (sourceCreatorProperties_ == null) {
+            sourceCreatorProperties_ = new Properties();
+            File file = getSourceCreatorPropertiesFile();
+            if (file.exists()) {
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(file);
+                    sourceCreatorProperties_.load(new BufferedInputStream(fis));
+                } catch (IOException ex) {
+                    logger_.error("Can't read properties: " + file);
+                } finally {
+                    if (fis != null) {
+                        try {
+                            fis.close();
+                        } catch (IOException ignore) {
+                        }
+                    }
+                }
+            }
+        }
+        return sourceCreatorProperties_;
+    }
+
+    public File getSourceCreatorPropertiesFile() {
+
+        return new File(getResourcesDirectory(), SOURCECREATOR_PROPERTIES);
+    }
+
+    public void saveSourceCreatorProperties() {
+
+        if (sourceCreatorProperties_ == null) {
+            return;
+        }
+        File file = getSourceCreatorPropertiesFile();
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+        }
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            sourceCreatorProperties_.store(new BufferedOutputStream(fos), null);
+        } catch (IOException ex) {
+            logger_.error("Can't write properties: " + file);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException ignore) {
+                }
+            }
+        }
+    }
+
     public void setOndemandS2Container(OndemandS2Container container) {
 
         if (container instanceof LocalOndemandS2Container) {
@@ -698,14 +760,34 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
+    public File getSourceDirectory() {
+
+        return sourceDirectory_;
+    }
+
     public void setSourceDirectoryPath(String sourceDirectoryPath) {
 
         sourceDirectory_ = new File(sourceDirectoryPath);
     }
 
+    public File getClassesDirectory() {
+
+        return classesDirectory_;
+    }
+
     public void setClassesDirectoryPath(String classesDirectoryPath) {
 
         classesDirectory_ = new File(classesDirectoryPath);
+    }
+
+    public File getResourcesDirectory() {
+
+        return resourcesDirectory_;
+    }
+
+    public void setResourcesDirectoryPath(String resourcesDirectoryPath) {
+
+        resourcesDirectory_ = new File(resourcesDirectoryPath);
     }
 
     public File getWebappDirectory() {

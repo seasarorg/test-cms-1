@@ -27,10 +27,15 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
             .getParentFile(), "src"));
         getSourceCreator().setSourceDirectoryPath(sourceDir.getCanonicalPath());
 
-        assertTrue(target_.shouldUpdate(new PathMetaDataImpl(null, null, false,
+        PathMetaDataImpl pathMetaData = new PathMetaDataImpl(null, null, false,
             null, null, null, null, getSourceCreator().getSourceFile(
                 "com.example.web.TestPage"), getSourceCreator()
-                .getTemplateFile("/test.html"))));
+                .getTemplateFile("/test.html"));
+        getSourceCreator().getSourceCreatorProperties().clear();
+        assertTrue("ソースファイルが存在しない場合は最初だけtrueになること", target_
+            .shouldUpdate(pathMetaData));
+        assertFalse("ソースファイルが存在しない場合は最初だけtrueになること", target_
+            .shouldUpdate(pathMetaData));
 
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         getSourceCreator().gatherClassDescs(
@@ -56,9 +61,6 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         assertTrue(new File(sourceDir, "com/example/dto/EntityDtoBase.java")
             .exists());
 
-        assertFalse(target_.shouldUpdate(new PathMetaDataImpl(null, null,
-            false, null, null, null, null, getSourceCreator().getSourceFile(
-                "com.example.web.TestPage"), getSourceCreator()
-                .getTemplateFile("/test.html"))));
+        assertFalse(target_.shouldUpdate(pathMetaData));
     }
 }
