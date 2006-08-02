@@ -6,6 +6,7 @@ import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.MetaDef;
 import org.seasar.framework.container.PropertyDef;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.impl.SimpleComponentDef;
 import org.seasar.framework.container.util.BindingUtil;
 import org.seasar.framework.container.util.Traversal;
 import org.seasar.framework.container.util.Traversal.S2ContainerHandler;
@@ -38,6 +39,11 @@ public class DelayedPropertySetter {
 
     void setDelayedProperties(ComponentDef componentDef) {
 
+        if (componentDef instanceof SimpleComponentDef) {
+            // SimpleComponentDefは大抵のメソッドがUnsupportedOperationException
+            // なので、何もしない。
+            return;
+        }
         Object component = componentDef.getComponent();
         BeanDesc beanDesc = BindingUtil.getBeanDesc(componentDef, component);
         int size = componentDef.getPropertyDefSize();
