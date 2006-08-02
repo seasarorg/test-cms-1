@@ -47,7 +47,7 @@
   </component>
   <component
     class="org.seasar.framework.container.hotdeploy.creator.DaoOndemandCreator">
-    <initMethod name="addCustomizer">
+    <initMethod name="setDaoCustomizer">
       <arg>
         <component
           class="org.seasar.framework.container.autoregister.AspectCustomizer"
@@ -61,7 +61,7 @@
   </component>
   <component
     class="org.seasar.framework.container.hotdeploy.creator.DxoOndemandCreator">
-    <initMethod name="addCustomizer">
+    <initMethod name="setDxoCustomizer">
       <arg>
         <component
           class="org.seasar.framework.container.autoregister.AspectCustomizer"
