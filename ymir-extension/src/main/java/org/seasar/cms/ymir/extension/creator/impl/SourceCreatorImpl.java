@@ -107,25 +107,30 @@ public class SourceCreatorImpl implements SourceCreator {
     public Properties sourceCreatorProperties_;
 
     private UpdateActionSelector actionSelector_ = new UpdateActionSelector()
-        .register(
-            new Condition(State.ANY, State.ANY, State.FALSE, Request.METHOD_GET),
-            new CreateTemplateAction(this))
-        .register(
-            new Condition(State.TRUE, State.ANY, State.TRUE, Request.METHOD_GET),
-            new UpdateClassesAction(this)).register(
-            new Condition(State.ANY, State.FALSE, State.FALSE,
-                Request.METHOD_POST), new CreateClassAndTemplateAction(this))
-        .register(
-            new Condition(State.TRUE, State.ANY, State.TRUE,
-                Request.METHOD_POST), new UpdateClassesAction(this)).register(
-            new Condition(State.TRUE, State.TRUE, State.FALSE,
-                Request.METHOD_POST), new CreateTemplateAction(this)).register(
-            "createClass", new CreateClassAction(this)).register(
-            "createTemplate", new CreateTemplateAction(this)).register(
-            "createClassAndTemplate", new CreateClassAndTemplateAction(this))
-        .register("updateClasses", new UpdateClassesAction(this)).register(
-            "createConfiguration", new CreateConfigurationAction(this))
-        .register("systemConsole", new SystemConsoleAction(this));
+            .register(
+                    new Condition(State.ANY, State.ANY, State.FALSE,
+                            Request.METHOD_GET), new CreateTemplateAction(this))
+            .register(
+                    new Condition(State.TRUE, State.ANY, State.TRUE,
+                            Request.METHOD_GET), new UpdateClassesAction(this))
+            .register(
+                    new Condition(State.ANY, State.FALSE, State.FALSE,
+                            Request.METHOD_POST),
+                    new CreateClassAndTemplateAction(this))
+            .register(
+                    new Condition(State.TRUE, State.ANY, State.TRUE,
+                            Request.METHOD_POST), new UpdateClassesAction(this))
+            .register(
+                    new Condition(State.TRUE, State.TRUE, State.FALSE,
+                            Request.METHOD_POST),
+                    new CreateTemplateAction(this)).register("createClass",
+                    new CreateClassAction(this)).register("createTemplate",
+                    new CreateTemplateAction(this)).register(
+                    "createClassAndTemplate",
+                    new CreateClassAndTemplateAction(this)).register(
+                    "updateClasses", new UpdateClassesAction(this)).register(
+                    "createConfiguration", new CreateConfigurationAction(this))
+            .register("systemConsole", new SystemConsoleAction(this));
 
     public Logger logger_ = Logger.getLogger(getClass());
 
@@ -154,8 +159,8 @@ public class SourceCreatorImpl implements SourceCreator {
                 condition = "createClass";
             } else {
                 condition = new Condition(State.valueOf(className != null),
-                    State.valueOf(sourceFile.exists()), State
-                        .valueOf(templateFile.exists()), method);
+                        State.valueOf(sourceFile.exists()), State
+                                .valueOf(templateFile.exists()), method);
             }
         }
 
@@ -174,7 +179,7 @@ public class SourceCreatorImpl implements SourceCreator {
         } else if (configuration_.getProperty(Globals.KEY_PROJECTROOT) == null) {
             return false;
         } else if (!new File(configuration_
-            .getProperty(Globals.KEY_PROJECTROOT)).exists()) {
+                .getProperty(Globals.KEY_PROJECTROOT)).exists()) {
             return false;
         } else if (configuration_.getProperty(Globals.KEY_ROOTPACKAGENAME) == null) {
             return false;
@@ -193,11 +198,10 @@ public class SourceCreatorImpl implements SourceCreator {
 
         WebApp webApp;
         try {
-            webApp = (WebApp) mapper.toBean(
-                XMLParserFactory.newInstance()
+            webApp = (WebApp) mapper.toBean(XMLParserFactory.newInstance()
                     .parse(
-                        new InputStreamReader(new FileInputStream(webXml),
-                            "UTF-8")).getRootElement(), WebApp.class);
+                            new InputStreamReader(new FileInputStream(webXml),
+                                    "UTF-8")).getRootElement(), WebApp.class);
         } catch (ValidationException ex) {
             throw new RuntimeException(ex);
         } catch (IllegalSyntaxException ex) {
@@ -228,7 +232,7 @@ public class SourceCreatorImpl implements SourceCreator {
             gatherClassDescs(classDescMap, pathMetaDatas[i]);
         }
         ClassDesc[] classDescs = addRelativeClassDescs(classDescMap.values()
-            .toArray(new ClassDesc[0]));
+                .toArray(new ClassDesc[0]));
 
         return classifyClassDescs(classDescs);
     }
@@ -243,7 +247,7 @@ public class SourceCreatorImpl implements SourceCreator {
         writeSourceFiles(classDescBag, ClassDesc.KIND_DXO, mergeMethod);
 
         ClassDesc[] pageClassDescs = classDescBag
-            .getClassDescs(ClassDesc.KIND_PAGE);
+                .getClassDescs(ClassDesc.KIND_PAGE);
         for (int i = 0; i < pageClassDescs.length; i++) {
             // Dtoに触るようなプロパティを持っているなら
             // Dtoに対応するBeanに対応するDaoのsetterを自動生成する。
@@ -253,24 +257,25 @@ public class SourceCreatorImpl implements SourceCreator {
             for (int j = 0; j < pds.length; j++) {
                 TypeDesc td = pds[j].getTypeDesc();
                 if (!DescValidator.isValid(td, classDescSet)
-                    || !ClassDesc.KIND_DTO.equals(td.getClassDesc().getKind())) {
+                        || !ClassDesc.KIND_DTO.equals(td.getClassDesc()
+                                .getKind())) {
                     continue;
                 }
 
                 EntityMetaData metaData = new EntityMetaData(this, td
-                    .getClassDesc().getName());
+                        .getClassDesc().getName());
                 boolean daoExists = addPropertyIfValid(pageClassDescs[i],
-                    new TypeDescImpl(metaData.getDaoClassDesc()),
-                    PropertyDesc.WRITE, classDescSet);
+                        new TypeDescImpl(metaData.getDaoClassDesc()),
+                        PropertyDesc.WRITE, classDescSet);
                 boolean dxoExists = addPropertyIfValid(pageClassDescs[i],
-                    new TypeDescImpl(metaData.getDxoClassDesc()),
-                    PropertyDesc.WRITE, classDescSet);
+                        new TypeDescImpl(metaData.getDxoClassDesc()),
+                        PropertyDesc.WRITE, classDescSet);
 
                 MethodDesc md = pageClassDescs[i]
-                    .getMethodDesc(new MethodDescImpl(
-                        DefaultRequestProcessor.ACTION_RENDER));
+                        .getMethodDesc(new MethodDescImpl(
+                                DefaultRequestProcessor.ACTION_RENDER));
                 if (md != null && td.isArray() && pds[j].isReadable()
-                    && daoExists && dxoExists) {
+                        && daoExists && dxoExists) {
                     addSelectStatement(md, pds[j], metaData);
                 }
             }
@@ -279,13 +284,13 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public void gatherClassDescs(Map<String, ClassDesc> classDescMap,
-        PathMetaData pathMetaData) {
+            PathMetaData pathMetaData) {
 
         String method = pathMetaData.getMethod();
         String className = pathMetaData.getClassName();
         try {
             analyzer_.analyze(method, classDescMap, new FileInputStream(
-                pathMetaData.getTemplateFile()), encoding_, className);
+                    pathMetaData.getTemplateFile()), encoding_, className);
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
@@ -299,9 +304,9 @@ public class SourceCreatorImpl implements SourceCreator {
         }
         if (classDesc != null) {
             classDesc.setMethodDesc(new MethodDescImpl(getActionName(
-                pathMetaData.getPath(), method)));
+                    pathMetaData.getPath(), method)));
             MethodDesc methodDesc = new MethodDescImpl(
-                DefaultRequestProcessor.ACTION_RENDER);
+                    DefaultRequestProcessor.ACTION_RENDER);
             classDesc.setMethodDesc(methodDesc);
         }
     }
@@ -362,7 +367,7 @@ public class SourceCreatorImpl implements SourceCreator {
             propertyDesc.setMode(mode);
             Class propertyType = pds[i].getPropertyType();
             if (propertyType == null) {
-                System.out.println("**** PropertyType is NULL: name=" + name);
+                logger_.info("**** PropertyType is NULL: name=" + name);
                 continue;
             }
 
@@ -386,7 +391,7 @@ public class SourceCreatorImpl implements SourceCreator {
             }
             String name = methods[i].getName();
             if (name.startsWith("get") || name.startsWith("is")
-                || name.startsWith("set")) {
+                    || name.startsWith("set")) {
                 continue;
             }
             if (methods[i].getDeclaringClass() == Object.class) {
@@ -394,7 +399,7 @@ public class SourceCreatorImpl implements SourceCreator {
             }
             MethodDesc methodDesc = new MethodDescImpl(name);
             methodDesc.getReturnTypeDesc().setClassDesc(
-                new SimpleClassDesc(methods[i].getReturnType().getName()));
+                    new SimpleClassDesc(methods[i].getReturnType().getName()));
             classDesc.setMethodDesc(methodDesc);
         }
 
@@ -424,11 +429,11 @@ public class SourceCreatorImpl implements SourceCreator {
         }
 
         List<ClassDesc> classDescList = new ArrayList<ClassDesc>(Arrays
-            .asList(classDescs));
+                .asList(classDescs));
         for (int i = 0; i < classDescs.length; i++) {
             if (classDescs[i].isKindOf(ClassDesc.KIND_DTO)) {
                 EntityMetaData metaData = new EntityMetaData(this,
-                    classDescs[i].getName());
+                        classDescs[i].getName());
 
                 // Dao用のClassDescを生成しておく。
                 classDescList.add(metaData.getDaoClassDesc());
@@ -448,10 +453,10 @@ public class SourceCreatorImpl implements SourceCreator {
                     for (Iterator itr = list.iterator(); itr.hasNext();) {
                         MethodDescImpl md = new MethodDescImpl("convert");
                         ParameterDesc[] pmds = new ParameterDesc[] { new ParameterDescImpl(
-                            new TypeDescImpl(((ClassDesc) itr.next()))) };
+                                new TypeDescImpl(((ClassDesc) itr.next()))) };
                         md.setParameterDescs(pmds);
                         md.setReturnTypeDesc(metaData.getBeanClassDesc()
-                            .getName());
+                                .getName());
                         classDesc.setMethodDesc(md);
                     }
                 }
@@ -464,19 +469,19 @@ public class SourceCreatorImpl implements SourceCreator {
 
     @SuppressWarnings("unchecked")
     void addSelectStatement(MethodDesc methodDesc, PropertyDesc propertyDesc,
-        EntityMetaData metaData) {
+            EntityMetaData metaData) {
 
         BodyDesc bodyDesc = methodDesc.getBodyDesc();
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("entityMetaData", metaData);
         if (bodyDesc == null) {
             bodyDesc = new BodyDescImpl(DefaultRequestProcessor.ACTION_RENDER,
-                root);
+                    root);
         } else {
             bodyDesc.setRoot(root);
         }
         List<PropertyDesc> propertyDescList = (List<PropertyDesc>) root
-            .get("propertyDescs");
+                .get("propertyDescs");
         if (propertyDescList == null) {
             propertyDescList = new ArrayList<PropertyDesc>();
             root.put("propertyDescs", propertyDescList);
@@ -486,11 +491,11 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     boolean addPropertyIfValid(ClassDesc classDesc, TypeDesc typeDesc,
-        int mode, ClassDescSet classDescSet) {
+            int mode, ClassDescSet classDescSet) {
 
         if (DescValidator.isValid(typeDesc, classDescSet)) {
             classDesc.addProperty(typeDesc.getInstanceName(), mode)
-                .setTypeDesc(typeDesc);
+                    .setTypeDesc(typeDesc);
             return true;
         } else {
             return false;
@@ -498,13 +503,14 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     void writeSourceFiles(ClassDescBag classDescBag, String kind,
-        boolean mergeMethod) {
+            boolean mergeMethod) {
 
         ClassDesc[] classDescs = classDescBag.getClassDescs(kind);
         for (int i = 0; i < classDescs.length; i++) {
             // 既存のクラスがあればマージする。
             classDescs[i].merge(
-                getClassDesc(classDescs[i].getSuperclassName()), mergeMethod);
+                    getClassDesc(classDescs[i].getSuperclassName()),
+                    mergeMethod);
             if (!writeSourceFile(classDescs[i], classDescBag.getClassDescSet())) {
                 // ソースファイルの生成に失敗した。
                 classDescBag.remove(classDescs[i].getName());
@@ -515,20 +521,20 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public boolean writeSourceFile(ClassDesc classDesc,
-        ClassDescSet classDescSet) {
+            ClassDescSet classDescSet) {
 
         if (!DescValidator.isValid(classDesc, classDescSet)) {
             return false;
         }
 
         writeString(sourceGenerator_.generateBaseSource(classDesc),
-            getSourceFile(classDesc.getName() + "Base"));
+                getSourceFile(classDesc.getName() + "Base"));
 
         // gap側のクラスは存在しない場合のみ生成する。
         File sourceFile = getSourceFile(classDesc.getName());
         if (!sourceFile.exists()) {
             writeString(sourceGenerator_.generateGapSource(classDesc),
-                sourceFile);
+                    sourceFile);
         }
 
         return true;
@@ -546,7 +552,7 @@ public class SourceCreatorImpl implements SourceCreator {
         try {
             os = new FileOutputStream(file);
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                os, encoding_));
+                    os, encoding_));
             writer.write(string);
             writer.flush();
         } catch (IOException ex) {
@@ -567,7 +573,7 @@ public class SourceCreatorImpl implements SourceCreator {
             return true;
         }
         MatchedPathMapping matched = defaultRequestProcessor_
-            .findMatchedPathMapping(path, method);
+                .findMatchedPathMapping(path, method);
         if (matched == null) {
             return true;
         } else {
@@ -581,12 +587,12 @@ public class SourceCreatorImpl implements SourceCreator {
             return null;
         }
         MatchedPathMapping matched = defaultRequestProcessor_
-            .findMatchedPathMapping(path, method);
+                .findMatchedPathMapping(path, method);
         if (matched == null) {
             return null;
         } else {
             return matched.getPathMapping().getComponentName(
-                matched.getVariableResolver());
+                    matched.getVariableResolver());
         }
     }
 
@@ -596,12 +602,12 @@ public class SourceCreatorImpl implements SourceCreator {
             return null;
         }
         MatchedPathMapping matched = defaultRequestProcessor_
-            .findMatchedPathMapping(path, method);
+                .findMatchedPathMapping(path, method);
         if (matched == null) {
             return null;
         } else {
             return matched.getPathMapping().getActionName(
-                matched.getVariableResolver());
+                    matched.getVariableResolver());
         }
     }
 
@@ -611,12 +617,12 @@ public class SourceCreatorImpl implements SourceCreator {
             return null;
         }
         MatchedPathMapping matched = defaultRequestProcessor_
-            .findMatchedPathMapping(path, method);
+                .findMatchedPathMapping(path, method);
         if (matched == null) {
             return null;
         } else {
             return matched.getPathMapping().getDefaultPath(
-                matched.getVariableResolver());
+                    matched.getVariableResolver());
         }
     }
 
@@ -625,15 +631,16 @@ public class SourceCreatorImpl implements SourceCreator {
         if (componentName == null) {
             return null;
         } else {
+            // FIXME クラスローダの設定はs2-framework-2.4.0-beta-5以降では不要。
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(
-                    ondemandContainer_.getContainer().getClassLoader());
+                        ondemandContainer_.getContainer().getClassLoader());
                 int size = ondemandContainer_.getProjectSize();
                 for (int i = 0; i < size; i++) {
                     String className = ondemandContainer_.getProject(i)
-                        .fromComponentNameToClassName(ondemandContainer_,
-                            componentName);
+                            .fromComponentNameToClassName(ondemandContainer_,
+                                    componentName);
                     if (className != null) {
                         return className;
                     }
@@ -652,7 +659,7 @@ public class SourceCreatorImpl implements SourceCreator {
         }
         try {
             return Class.forName(className, true, ondemandContainer_
-                .getContainer().getClassLoader());
+                    .getContainer().getClassLoader());
         } catch (ClassNotFoundException ex) {
             return null;
         }
@@ -671,7 +678,7 @@ public class SourceCreatorImpl implements SourceCreator {
     File getClassFile(String className) {
 
         return new File(classesDirectory_, className.replace('.', '/')
-            + ".class");
+                + ".class");
     }
 
     public Properties getSourceCreatorProperties() {
@@ -741,7 +748,7 @@ public class SourceCreatorImpl implements SourceCreator {
             }
         } else {
             throw new ComponentNotFoundRuntimeException(
-                "LocalOndemandS2Container");
+                    "LocalOndemandS2Container");
         }
     }
 
@@ -756,7 +763,7 @@ public class SourceCreatorImpl implements SourceCreator {
             defaultRequestProcessor_ = (DefaultRequestProcessor) requestProcessor;
         } else {
             throw new ComponentNotFoundRuntimeException(
-                "DefaultRequestProcessor");
+                    "DefaultRequestProcessor");
         }
     }
 
