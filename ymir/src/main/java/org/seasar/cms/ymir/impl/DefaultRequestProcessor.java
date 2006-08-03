@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.Globals;
@@ -20,7 +21,6 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Updater;
-import org.seasar.cms.ymir.YmirConfiguration;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
@@ -44,7 +44,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private Updater[] updaters_ = new Updater[0];
 
-    private YmirConfiguration configuration_;
+    private Configuration configuration_;
 
     private final BeanUtilsBean beanUtilsBean_;
 
@@ -82,7 +82,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
             dispatcher, parameterMap, fileParameterMap, mapping
                 .getPathInfo(resolver));
 
-        if (YmirConfiguration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())) {
+        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())) {
             for (int i = 0; i < updaters_.length; i++) {
                 Response response = updaters_[i].update(path, request
                     .getMethod(), request);
@@ -115,7 +115,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     String getProjectStatus() {
 
         if (configuration_ != null) {
-            return configuration_.getProperty(YmirConfiguration.KEY_PROJECTSTATUS);
+            return configuration_.getProperty(Configuration.KEY_PROJECTSTATUS);
         } else {
             return null;
         }
@@ -311,7 +311,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         updaters_ = updaters;
     }
 
-    public void setConfiguration(YmirConfiguration configuration) {
+    public void setConfiguration(Configuration configuration) {
 
         configuration_ = configuration;
     }

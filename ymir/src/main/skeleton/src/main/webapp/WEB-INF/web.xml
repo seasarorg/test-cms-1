@@ -33,7 +33,7 @@
   <filter>
     <filter-name>ymir.request</filter-name>
     <filter-class>
-      org.seasar.cms.ymir.YmirFilter
+      org.seasar.cms.ymir.servlet.YmirFilter
     </filter-class>
     <init-param>
       <param-name>dispatcher</param-name>
@@ -43,7 +43,7 @@
   <filter>
     <filter-name>ymir.forward</filter-name>
     <filter-class>
-      org.seasar.cms.ymir.YmirFilter
+      org.seasar.cms.ymir.servlet.YmirFilter
     </filter-class>
     <init-param>
       <param-name>dispatcher</param-name>
@@ -53,7 +53,7 @@
   <filter>
     <filter-name>ymir.include</filter-name>
     <filter-class>
-      org.seasar.cms.ymir.YmirFilter
+      org.seasar.cms.ymir.servlet.YmirFilter
     </filter-class>
     <init-param>
       <param-name>dispatcher</param-name>
@@ -92,7 +92,7 @@
       org.seasar.cms.pluggable.servlet.PluggableListener
     </listener-class>
     <listener-class>
-      org.seasar.cms.ymir.YmirListener
+      org.seasar.cms.ymir.servlet.YmirListener
     </listener-class>
   </listener>
 </web-app>

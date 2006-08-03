@@ -1,8 +1,10 @@
-package org.seasar.cms.ymir;
+package org.seasar.cms.ymir.servlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
+import org.seasar.cms.ymir.YmirBootstrap;
 
 public class YmirListener implements ServletContextListener {
 

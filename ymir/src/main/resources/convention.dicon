@@ -10,7 +10,7 @@
   <component
     class="org.seasar.cms.ymir.convention.YmirNamingConvention" />
   <component
-    class="org.seasar.cms.ymir.container.hotdeploy.LocalOndemandS2Container">
+    class="org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container">
     <initMethod name="addProject">
       <arg>
         <component
@@ -21,12 +21,6 @@
         </component>
       </arg>
     </initMethod>
-    <property name="hotdeployListeners" bindingType="none">
-      <meta name="delayed">
-        @org.seasar.cms.ymir.container.ContainerUtils@findAscendantComponents(container,
-        @org.seasar.framework.container.hotdeploy.HotdeployListener@class)
-      </meta>
-    </property>
   </component>
   <component
     class="org.seasar.framework.container.hotdeploy.creator.PageOndemandCreator">

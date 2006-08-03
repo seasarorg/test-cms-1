@@ -27,16 +27,21 @@
     </initMethod>
     <initMethod name="registerAll" />
   </component>
-  <component class="org.seasar.cms.ymir.container.RequestComponentDefFactory" />
+  <component
+    class="org.seasar.cms.ymir.container.RequestComponentDefFactory" />
   <component class="org.seasar.cms.ymir.impl.YmirImpl">
     <property name="lifecycleListeners" bindingType="none">
-      <meta name="delayed">@org.seasar.cms.ymir.container.ContainerUtils@findAscendantComponents(container, @org.seasar.cms.ymir.LifecycleListener@class)</meta>
+      <meta name="delayed">
+        @org.seasar.cms.pluggable.util.PluggableUtils@findAscendantComponents(container,
+        @org.seasar.cms.ymir.LifecycleListener@class)
+      </meta>
     </property>
   </component>
   <component class="org.seasar.cms.ymir.impl.DefaultRequestProcessor">
     <property name="updaters" bindingType="none">
       <meta name="delayed">
-      @org.seasar.cms.ymir.container.ContainerUtils@findAscendantComponents(container, @org.seasar.cms.ymir.Updater@class)
+        @org.seasar.cms.pluggable.util.PluggableUtils@findAscendantComponents(container,
+        @org.seasar.cms.ymir.Updater@class)
       </meta>
     </property>
   </component>
