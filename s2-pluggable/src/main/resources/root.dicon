@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <include path="global.dicon" />
+  <component class="org.seasar.cms.pluggable.impl.ThreadContextImpl">
+    <destroyMethod name="destroy" />
+  </component>
+  <component
+    class="org.seasar.cms.pluggable.ThreadContextComponentDefRegister">
+    <initMethod name="registerComponentDefs" />
+    <destroyMethod name="destroy" />
+  </component>
+  <component class="org.seasar.cms.pluggable.DelayedPropertySetter">
+    <initMethod name="setAll" />
+  </component>
+</components>
