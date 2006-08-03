@@ -20,7 +20,7 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
     public void testGetComponentName() throws Exception {
 
         String actual = target_.getComponentName("/index.html",
-            Request.METHOD_GET);
+                Request.METHOD_GET);
 
         assertEquals("indexPage", actual);
     }
@@ -56,12 +56,13 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
 
     public void testGetClassDesc1() throws Exception {
 
-        assertNull(target_.getClassDesc("hoge"));
+        assertNull(target_.getClassDesc("hoge", false));
     }
 
     public void testGetClassDesc2() throws Exception {
 
-        ClassDesc actual = target_.getClassDesc("com.example.web.IndexPage");
+        ClassDesc actual = target_.getClassDesc("com.example.web.IndexPage",
+                false);
 
         assertNotNull(actual);
         assertEquals("com.example.web.IndexPage", actual.getName());
@@ -82,13 +83,25 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
         assertEquals("void", md.getReturnTypeDesc().getName());
     }
 
+    public void testGetClassDesc3() throws Exception {
+
+        ClassDesc actual = target_.getClassDesc("com.example.web.IndexPage",
+                true);
+
+        assertNotNull(actual);
+        assertEquals("com.example.web.IndexPage", actual.getName());
+        assertNull(actual.getSuperclassName());
+        assertEquals(0, actual.getPropertyDescs().length);
+        assertEquals(0, actual.getMethodDescs().length);
+    }
+
     public void testWriteSourceFile1() throws Exception {
 
         ClassDesc classDesc = constructClassDesc();
         File testPage = new File(ResourceUtil.getBuildDir(getClass()),
-            classDesc.getName().replace('.', '/') + ".java");
+                classDesc.getName().replace('.', '/') + ".java");
         File testPageBase = new File(ResourceUtil.getBuildDir(getClass()),
-            classDesc.getName().replace('.', '/') + "Base.java");
+                classDesc.getName().replace('.', '/') + "Base.java");
 
         testPage.delete();
 
@@ -102,9 +115,9 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
 
         ClassDesc classDesc = constructClassDesc();
         File testPage = new File(ResourceUtil.getBuildDir(getClass()),
-            classDesc.getName().replace('.', '/') + ".java");
+                classDesc.getName().replace('.', '/') + ".java");
         File testPageBase = new File(ResourceUtil.getBuildDir(getClass()),
-            classDesc.getName().replace('.', '/') + "Base.java");
+                classDesc.getName().replace('.', '/') + "Base.java");
 
         testPage.getParentFile().mkdirs();
         testPageBase.getParentFile().mkdirs();
@@ -118,26 +131,26 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
         target_.writeSourceFile(classDesc, null);
 
         String actual = IOUtils.readString(new FileInputStream(testPage),
-            "UTF-8", false);
+                "UTF-8", false);
         assertEquals(" ", actual);
         actual = IOUtils.readString(new FileInputStream(testPageBase), "UTF-8",
-            false);
+                false);
         assertFalse(" ".equals(actual));
     }
 
     public void testGatherClassDescs() throws Exception {
 
         File sourceDir = clean(new File(ResourceUtil.getBuildDir(getClass())
-            .getParentFile(), "src"));
+                .getParentFile(), "src"));
         getSourceCreator().setSourceDirectoryPath(sourceDir.getCanonicalPath());
 
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         target_.gatherClassDescs(classDescMap, new PathMetaDataImpl(
-            "/test.html", Request.METHOD_GET, false, "testPage",
-            "com.example.web.TestPage", null, null, null, getSourceCreator()
-                .getTemplateFile("/test.html")));
+                "/test.html", Request.METHOD_GET, false, "testPage",
+                "com.example.web.TestPage", null, null, null,
+                getSourceCreator().getTemplateFile("/test.html")));
         ClassDesc[] actual = (ClassDesc[]) classDescMap.values().toArray(
-            new ClassDesc[0]);
+                new ClassDesc[0]);
 
         assertNotNull(actual);
         assertEquals(2, actual.length);

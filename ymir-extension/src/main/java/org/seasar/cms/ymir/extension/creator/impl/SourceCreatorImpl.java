@@ -315,7 +315,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
         ClassDescBag classDescBag = new ClassDescBag();
         for (int i = 0; i < classDescs.length; i++) {
-            if (getClassDesc(classDescs[i].getName()) == null) {
+            if (getClassDesc(classDescs[i].getName(), false) == null) {
                 classDescBag.addAsCreated(classDescs[i]);
             } else {
                 classDescBag.addAsUpdated(classDescs[i]);
@@ -325,16 +325,27 @@ public class SourceCreatorImpl implements SourceCreator {
         return classDescBag;
     }
 
-    public ClassDesc getClassDesc(String className) {
+    public ClassDesc getClassDesc(String className,
+            boolean onlyBaseInfoIfBaseExists) {
 
         Class clazz = getClass(className);
         if (clazz == null) {
             return null;
         }
 
+        Class introspecedClass;
+        if (onlyBaseInfoIfBaseExists) {
+            introspecedClass = clazz.getSuperclass();
+            if (introspecedClass == null) {
+                introspecedClass = clazz;
+            }
+        } else {
+            introspecedClass = clazz;
+        }
+
         BeanInfo beanInfo;
         try {
-            beanInfo = Introspector.getBeanInfo(clazz);
+            beanInfo = Introspector.getBeanInfo(introspecedClass);
         } catch (IntrospectionException ex) {
             throw new RuntimeException(ex);
         }
@@ -384,7 +395,7 @@ public class SourceCreatorImpl implements SourceCreator {
             classDesc.setPropertyDesc(propertyDesc);
         }
 
-        Method[] methods = clazz.getMethods();
+        Method[] methods = introspecedClass.getMethods();
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getParameterTypes().length > 0) {
                 continue;
@@ -508,8 +519,7 @@ public class SourceCreatorImpl implements SourceCreator {
         ClassDesc[] classDescs = classDescBag.getClassDescs(kind);
         for (int i = 0; i < classDescs.length; i++) {
             // 既存のクラスがあればマージする。
-            classDescs[i].merge(
-                    getClassDesc(classDescs[i].getSuperclassName()),
+            classDescs[i].merge(getClassDesc(classDescs[i].getName(), true),
                     mergeMethod);
             if (!writeSourceFile(classDescs[i], classDescBag.getClassDescSet())) {
                 // ソースファイルの生成に失敗した。
