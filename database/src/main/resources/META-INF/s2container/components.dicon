@@ -5,10 +5,11 @@
   <include path="j2ee.dicon" />
   <component
     class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
+    <property name="namingConvention">
+      <component class="org.seasar.cms.pluggable.LegacyNamingConvention" />
+    </property>
     <initMethod name="addReferenceClass">
-      <arg>
-        @org.seasar.cms.database.identity.Identity@class
-      </arg>
+      <arg>@org.seasar.cms.database.identity.Identity@class</arg>
     </initMethod>
     <initMethod name="addClassPattern">
       <arg>"org.seasar.cms.database.identity.impl"</arg>
@@ -20,7 +21,8 @@
     </initMethod>
     <initMethod name="registerAll" />
   </component>
-  <component name="identitySelector" class="org.seasar.cms.database.identity.impl.IdentitySelectorImpl">
+  <component name="identitySelector"
+    class="org.seasar.cms.database.identity.impl.IdentitySelectorImpl">
     <initMethod name="start" />
     <destroyMethod name="stop" />
   </component>
