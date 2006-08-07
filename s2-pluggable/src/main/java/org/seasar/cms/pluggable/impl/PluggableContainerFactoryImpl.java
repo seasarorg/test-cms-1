@@ -1,7 +1,9 @@
 package org.seasar.cms.pluggable.impl;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.seasar.cms.pluggable.Configuration;
@@ -13,12 +15,15 @@ import org.seasar.framework.container.ExternalContext;
 import org.seasar.framework.container.ExternalContextComponentDefRegister;
 import org.seasar.framework.container.MetaDef;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.autoregister.AbstractAutoRegister;
 import org.seasar.framework.container.deployer.ComponentDeployerFactory;
 import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContext;
+import org.seasar.framework.container.factory.CircularIncludeRuntimeException;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
-import org.seasar.framework.container.impl.S2ContainerImpl;
+import org.seasar.framework.container.util.Traversal;
+import org.seasar.framework.container.util.Traversal.ComponentDefHandler;
 import org.seasar.framework.exception.EmptyRuntimeException;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.DisposableUtil;
@@ -132,17 +137,31 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             }
 
             if (configPath == null) {
-                instance = new S2ContainerImpl();
+                instance = PluggableUtils.newContainer();
                 rootContainer_.include(instance);
             } else {
                 instance = S2ContainerFactory.include(rootContainer_,
                         configPath);
             }
             integrate(rootContainer_, instance, dependencies);
+            invokeAutoRegisters(instance);
             return instance;
         } finally {
             Thread.currentThread().setContextClassLoader(oldLoader);
         }
+    }
+
+    void invokeAutoRegisters(S2Container container) {
+        Traversal.forEachComponent(container, new ComponentDefHandler() {
+            public Object processComponent(ComponentDef componentDef) {
+                if (AbstractAutoRegister.class.isAssignableFrom(componentDef
+                        .getComponentClass())) {
+                    ((AbstractAutoRegister) componentDef.getComponent())
+                            .registerAll();
+                }
+                return null;
+            }
+        }, false);
     }
 
     void integrate(S2Container root, S2Container container,
@@ -204,14 +223,36 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     }
 
     void include(S2Container container, S2Container[] dependencies) {
+        if (GLOBAL_DICON.equals(container.getPath())) {
+            return;
+        }
         if (dependencies.length > 0) {
             for (int i = 0; i < dependencies.length; i++) {
-                container.include(dependencies[i]);
+                include(container, dependencies[i]);
             }
         } else {
-            if (!GLOBAL_DICON.equals(container.getPath())) {
-                S2ContainerFactory.include(container, GLOBAL_DICON);
+            S2ContainerFactory.include(container, GLOBAL_DICON);
+        }
+    }
+
+    void include(S2Container parent, S2Container child) {
+        assertNotCircularInclude(child, parent, new LinkedList());
+        parent.include(child);
+    }
+
+    void assertNotCircularInclude(final S2Container container,
+            final S2Container target, LinkedList paths) {
+        paths.addFirst(container.getPath());
+        try {
+            if (container == target) {
+                throw new CircularIncludeRuntimeException(target.getPath(),
+                        new ArrayList(paths));
             }
+            for (int i = 0; i < container.getChildSize(); ++i) {
+                assertNotCircularInclude(container.getChild(i), target, paths);
+            }
+        } finally {
+            paths.removeFirst();
         }
     }
 

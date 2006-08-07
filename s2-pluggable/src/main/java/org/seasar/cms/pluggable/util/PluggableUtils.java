@@ -28,7 +28,7 @@ public class PluggableUtils {
     public static URL[] getResourceURLs(String path) {
 
         return getResourceURLs(path, Thread.currentThread()
-            .getContextClassLoader());
+                .getContextClassLoader());
     }
 
     public static URL[] getResourceURLs(String path, ClassLoader classLoader) {
@@ -50,10 +50,10 @@ public class PluggableUtils {
     }
 
     public static Object[] findAscendantComponents(S2Container container,
-        Object key) {
+            Object key) {
 
         ComponentDef[] componentDefs = findAscendantComponentDefs(container,
-            key);
+                key);
 
         Class clazz;
         if (key instanceof Class) {
@@ -62,7 +62,7 @@ public class PluggableUtils {
             clazz = Object.class;
         }
         Object[] objs = (Object[]) Array.newInstance(clazz,
-            componentDefs.length);
+                componentDefs.length);
         for (int i = 0; i < objs.length; i++) {
             objs[i] = componentDefs[i].getComponent();
         }
@@ -70,24 +70,25 @@ public class PluggableUtils {
     }
 
     public static ComponentDef[] findAscendantComponentDefs(
-        final S2Container container, final Object componentKey) {
+            final S2Container container, final Object componentKey) {
 
         synchronized (container.getRoot()) {
             final List componentDefs = new ArrayList();
             Traversal.forEachParentContainer(container,
-                new Traversal.S2ContainerHandler() {
-                    public Object processContainer(S2Container container) {
-                        componentDefs.addAll(Arrays.asList(container
-                            .findLocalComponentDefs(componentKey)));
-                        return null;
-                    }
-                });
+                    new Traversal.S2ContainerHandler() {
+                        public Object processContainer(S2Container container) {
+                            componentDefs.addAll(Arrays.asList(container
+                                    .findLocalComponentDefs(componentKey)));
+                            return null;
+                        }
+                    });
             return (ComponentDef[]) componentDefs.toArray(new ComponentDef[0]);
         }
     }
 
     public static S2Container newContainer() {
-        S2Container container = S2ContainerFactory.create(EMPTY_DICON);
+        S2Container container = S2ContainerFactory.create(EMPTY_DICON,
+                PluggableUtils.class.getClassLoader());
         container.setPath(newPath());
         return container;
     }
