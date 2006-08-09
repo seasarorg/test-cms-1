@@ -6,7 +6,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
@@ -42,11 +44,11 @@ public class PluggableUtils {
         } catch (IOException ex) {
             throw new IORuntimeException(ex);
         }
-        List list = new ArrayList();
+        Set urlSet = new LinkedHashSet();
         for (; enm.hasMoreElements();) {
-            list.add(enm.nextElement());
+            urlSet.add(enm.nextElement());
         }
-        return (URL[]) list.toArray(new URL[0]);
+        return (URL[]) urlSet.toArray(new URL[0]);
     }
 
     public static Object[] findAscendantComponents(S2Container container,

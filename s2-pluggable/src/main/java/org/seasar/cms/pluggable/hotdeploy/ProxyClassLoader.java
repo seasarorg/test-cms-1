@@ -5,52 +5,38 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
-
-public class ProxyClassLoader extends ClassLoader
-{
+public class ProxyClassLoader extends ClassLoader {
     private ClassLoader classLoader_;
 
-
-    public ProxyClassLoader(ClassLoader classLoader)
-    {
+    public ProxyClassLoader(ClassLoader classLoader) {
         setClassLoader(classLoader);
     }
 
+    public String toString() {
+        return "Proxy( classLoader=" + classLoader_ + " )";
+    }
 
-    public ClassLoader getClassLoader()
-    {
+    public ClassLoader getClassLoader() {
         return classLoader_;
     }
 
-
-    public void setClassLoader(ClassLoader classLoader)
-    {
+    public void setClassLoader(ClassLoader classLoader) {
         classLoader_ = classLoader;
     }
 
-
-    public URL getResource(String name)
-    {
+    public URL getResource(String name) {
         return classLoader_.getResource(name);
     }
 
-
-    public InputStream getResourceAsStream(String name)
-    {
+    public InputStream getResourceAsStream(String name) {
         return classLoader_.getResourceAsStream(name);
     }
 
-
-    public Enumeration getResources(String name)
-        throws IOException
-    {
+    public Enumeration getResources(String name) throws IOException {
         return classLoader_.getResources(name);
     }
 
-
-    public Class loadClass(String name)
-        throws ClassNotFoundException
-    {
+    public Class loadClass(String name) throws ClassNotFoundException {
         return classLoader_.loadClass(name);
     }
 }

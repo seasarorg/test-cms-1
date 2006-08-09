@@ -94,6 +94,19 @@ public class PluggableContainerFactoryImplTest extends TestCase {
                 .findAllComponents(List.class).length);
     }
 
+    public void testIntegrate4() throws Exception {
+
+        target_.prepareForContainer();
+        S2Container container1 = target_.integrate(getClass().getName()
+                .replace('.', '/')
+                + "_testIntegrate4_1.dicon", new S2Container[0]);
+        target_.integrate(getClass().getName().replace('.', '/')
+                + "_testIntegrate4_2.dicon", new S2Container[] { container1 });
+        assertEquals("一度invokeAutoRegister()されたコンテナについては再度registerAll()されないこと",
+                1, ((MockAutoRegister) container1
+                        .getComponent(MockAutoRegister.class)).getCount());
+    }
+
     /*
      * S2Container#findComponents()はコンテナをまたがってコンポーネントを
      * 収集しないという仕様とのこと。

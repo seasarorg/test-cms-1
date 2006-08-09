@@ -85,8 +85,26 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             return;
         }
         initializeComponentDeployerProvider();
-        rootContainer_ = S2ContainerFactory.create(configPath);
+        rootContainer_ = createS2Container(configPath);
         prepareForExternalContext();
+    }
+
+    S2Container createS2Container(String path) {
+        try {
+            return S2ContainerFactory.create(path);
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(
+                    "Can't create S2Container: path=" + path, ex);
+        }
+    }
+
+    S2Container includeS2Container(S2Container parent, String path) {
+        try {
+            return S2ContainerFactory.include(parent, path);
+        } catch (RuntimeException ex) {
+            throw new RuntimeException("Can't include: parent="
+                    + parent.getPath() + ", path=" + path, ex);
+        }
     }
 
     void prepareForExternalContext() {
@@ -140,8 +158,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
                 instance = PluggableUtils.newContainer();
                 rootContainer_.include(instance);
             } else {
-                instance = S2ContainerFactory.include(rootContainer_,
-                        configPath);
+                instance = includeS2Container(rootContainer_, configPath);
             }
             integrate(rootContainer_, instance, dependencies);
             invokeAutoRegisters(instance);
@@ -156,8 +173,10 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             public Object processComponent(ComponentDef componentDef) {
                 if (AbstractAutoRegister.class.isAssignableFrom(componentDef
                         .getComponentClass())) {
-                    ((AbstractAutoRegister) componentDef.getComponent())
-                            .registerAll();
+                    // *.diconをロードする際にS2Containerが自動的に
+                    // <initMethod="registerAll" />をつけてくれるため、
+                    // コンポーネントのインスタンス化の際に自動的にregisterAll()が呼ばれる。
+                    componentDef.getComponent();
                 }
                 return null;
             }
@@ -177,8 +196,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         includeToLeaves(container, dependencies);
 
         for (int i = 0; i < pathURLs.length; i++) {
-            S2Container c = S2ContainerFactory.create(pathURLs[i]
-                    .toExternalForm());
+            S2Container c = createS2Container(pathURLs[i].toExternalForm());
             includeChildren(container, c);
             int size = c.getMetaDefSize();
             for (int j = 0; j < size; j++) {
@@ -231,7 +249,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
                 include(container, dependencies[i]);
             }
         } else {
-            S2ContainerFactory.include(container, GLOBAL_DICON);
+            includeS2Container(container, GLOBAL_DICON);
         }
     }
 
