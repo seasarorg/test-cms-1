@@ -19,4 +19,5 @@
     class="org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior">
     <aspect>statusFilterInterceptor</aspect>
   </component>
+  <component class="org.seasar.cms.pluggable.PluggablePathResolver" />
 </components>
