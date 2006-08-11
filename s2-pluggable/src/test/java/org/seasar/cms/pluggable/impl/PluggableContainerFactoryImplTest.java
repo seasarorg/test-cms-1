@@ -50,8 +50,9 @@ public class PluggableContainerFactoryImplTest extends TestCase {
         assertSame(container, root.getChild(0));
         assertEquals(2, container.getChildSize());
         assertSame(dependency, container.getChild(0));
-        assertEquals("org/seasar/cms/pluggable/included.dicon", container
-                .getChild(1).getPath());
+        assertEquals(ResourceUtil.getResourceNoException(
+                "org/seasar/cms/pluggable/included.dicon").toExternalForm(),
+                container.getChild(1).getPath());
     }
 
     public void testIntegrate2() throws Exception {
