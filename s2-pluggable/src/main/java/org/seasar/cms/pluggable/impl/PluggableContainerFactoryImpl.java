@@ -241,7 +241,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     }
 
     void include(S2Container container, S2Container[] dependencies) {
-        if (GLOBAL_DICON.equals(container.getPath())) {
+        if (isGlobalDicon(container.getPath())) {
             return;
         }
         if (dependencies.length > 0) {
@@ -250,6 +250,16 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             }
         } else {
             includeS2Container(container, GLOBAL_DICON);
+        }
+    }
+
+    boolean isGlobalDicon(String path) {
+        if (GLOBAL_DICON.equals(path)) {
+            return true;
+        } else {
+            URL global = Thread.currentThread().getContextClassLoader()
+                    .getResource(GLOBAL_DICON);
+            return (global != null && global.toExternalForm().equals(path));
         }
     }
 
