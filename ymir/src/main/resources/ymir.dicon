@@ -50,4 +50,5 @@
     class="org.seasar.cms.ymir.response.constructor.impl.ResponseConstructorSelectorImpl" />
   <component
     class="org.seasar.cms.ymir.response.scheme.impl.StrategySelectorImpl" />
+  <component class="org.seasar.cms.ymir.impl.ApplicationManagerImpl" />
 </components>

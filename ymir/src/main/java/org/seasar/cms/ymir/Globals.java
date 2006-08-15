@@ -2,9 +2,7 @@ package org.seasar.cms.ymir;
 
 public interface Globals {
 
-    String KEY_PROJECTROOT = "projectRoot";
+    String ATTR_APPLICATION = "org.seasar.cms.ymir.application";
 
-    String KEY_WEBAPPROOT = "webappRoot";
-
-    String KEY_ROOTPACKAGENAME = "rootPackageName";
+    String LANDMARK_CLASSNAME = "org.seasar.cms.ymir.landmark.Landmark";
 }

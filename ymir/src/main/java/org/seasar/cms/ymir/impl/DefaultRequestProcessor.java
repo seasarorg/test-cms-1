@@ -1,10 +1,10 @@
 package org.seasar.cms.ymir.impl;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
@@ -12,6 +12,7 @@ import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.ThreadContext;
+import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.Globals;
 import org.seasar.cms.ymir.MatchedPathMapping;
@@ -27,6 +28,7 @@ import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructorSelector;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.log.Logger;
 import org.seasar.kvasir.util.el.VariableResolver;
 
@@ -39,8 +41,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
     private PathMapping[] pathMappings_;
 
     private ResponseConstructorSelector responseConstructorSelector_;
-
-    private S2Container container_;
 
     private Updater[] updaters_ = new Updater[0];
 
@@ -57,14 +57,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
         ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
         convertUtilsBean.register(new FormFileConverter(), FormFile.class);
         convertUtilsBean.register(new FormFileArrayConverter(),
-            FormFile[].class);
+                FormFile[].class);
         beanUtilsBean_ = new BeanUtilsBean(convertUtilsBean,
-            new PropertyUtilsBean());
+                new PropertyUtilsBean());
     }
 
     public Response process(String contextPath, String path, String method,
-        String dispatcher, Map parameterMap, Map fileParameterMap)
-        throws PageNotFoundException {
+            String dispatcher, Map parameterMap, Map fileParameterMap)
+            throws PageNotFoundException {
 
         MatchedPathMapping matched = findMatchedPathMapping(path, method);
         if (matched == null) {
@@ -79,13 +79,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
         String componentName = mapping.getComponentName(resolver);
         String actionName = mapping.getActionName(resolver);
         Request request = new RequestImpl(contextPath, path, method,
-            dispatcher, parameterMap, fileParameterMap, mapping
-                .getPathInfo(resolver));
+                dispatcher, parameterMap, fileParameterMap, mapping
+                        .getPathInfo(resolver));
 
         if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())) {
             for (int i = 0; i < updaters_.length; i++) {
                 Response response = updaters_[i].update(path, request
-                    .getMethod(), request);
+                        .getMethod(), request);
                 if (response != null) {
                     return response;
                 }
@@ -98,7 +98,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         // 対応するリソースが存在しない場合はデフォルトパスにリダイレクトする。
         if (response.getType() == Response.TYPE_PASSTHROUGH) {
             String defaultPath = mapping.getDefaultPath(resolver);
-            if (defaultPath != null && !isResourceExists(path)) {
+            if (defaultPath != null && !getApplication().isResourceExists(path)) {
                 response = new RedirectResponse(defaultPath);
             }
         }
@@ -106,10 +106,22 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return response;
     }
 
-    boolean isResourceExists(String path) {
+    Application getApplication() {
+        return (Application) getServletContext().getAttribute(
+                Globals.ATTR_APPLICATION);
+    }
 
-        return new File(configuration_
-            .getProperty(Globals.KEY_WEBAPPROOT), path).exists();
+    ServletContext getServletContext() {
+        return (ServletContext) getRootS2Container().getComponent(
+                ServletContext.class);
+    }
+
+    S2Container getS2Container() {
+        return getApplication().getS2Container();
+    }
+
+    S2Container getRootS2Container() {
+        return SingletonS2ContainerFactory.getContainer();
     }
 
     String getProjectStatus() {
@@ -136,9 +148,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Response processRequest(Request request, String componentName,
-        String actionName) {
+            String actionName) {
 
-        if (!container_.hasComponentDef(componentName)) {
+        if (!getS2Container().hasComponentDef(componentName)) {
             return PassthroughResponse.INSTANCE;
         }
 
@@ -146,7 +158,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         Object component;
         try {
             context.setComponent(Request.class, request);
-            component = container_.getComponent(componentName);
+            component = getS2Container().getComponent(componentName);
         } finally {
             context.setComponent(Request.class, null);
         }
@@ -168,11 +180,11 @@ public class DefaultRequestProcessor implements RequestProcessor {
             }
             try {
                 beanUtilsBean_.copyProperties(component, request
-                    .getFileParameterMap());
+                        .getFileParameterMap());
             } catch (Throwable t) {
                 if (logger_.isDebugEnabled()) {
                     logger_.debug(
-                        "Can't populate request parameters (FormFile)", t);
+                            "Can't populate request parameters (FormFile)", t);
                 }
             }
 
@@ -197,16 +209,16 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     ThreadContext getThreadContext() {
         if (threadContext_ == null) {
-            threadContext_ = (ThreadContext) container_.getRoot().getComponent(
-                ThreadContext.class);
+            threadContext_ = (ThreadContext) getRootS2Container().getComponent(
+                    ThreadContext.class);
         }
         return threadContext_;
     }
 
     HttpServletRequest getHttpServletRequest() {
 
-        return ((HttpServletRequest) container_.getRoot().getExternalContext()
-            .getRequest());
+        return (HttpServletRequest) getRootS2Container().getComponent(
+                HttpServletRequest.class);
     }
 
     Response invokeAction(Object component, String actionName) {
@@ -218,7 +230,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         try {
             return constructResponse(component, method.getReturnType(), method
-                .invoke(component, new Object[0]));
+                    .invoke(component, new Object[0]));
         } catch (IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         } catch (IllegalAccessException ex) {
@@ -226,11 +238,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
         } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
         }
-    }
-
-    public void setS2Container(S2Container container) {
-
-        container_ = container;
     }
 
     public Method getActionMethod(Object component, String actionName) {
@@ -251,17 +258,17 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         ResponseConstructor constructor = responseConstructorSelector_
-            .getResponseConstructor(type);
+                .getResponseConstructor(type);
         if (constructor == null) {
             throw new ComponentNotFoundRuntimeException(
-                "Can't find ResponseConstructor for type '" + type
-                    + "' in ResponseConstructorSelector");
+                    "Can't find ResponseConstructor for type '" + type
+                            + "' in ResponseConstructorSelector");
         }
 
         ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(
-                component.getClass().getClassLoader());
+                    component.getClass().getClassLoader());
             return constructor.constructResponse(component, returnValue);
         } finally {
             Thread.currentThread().setContextClassLoader(oldLoader);
@@ -279,12 +286,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     public void addPathMapping(String patternString,
-        String componentNameTemplate, String actionNameTemplate,
-        String pathInfoTemplate, String defaultPathTemplate) {
+            String componentNameTemplate, String actionNameTemplate,
+            String pathInfoTemplate, String defaultPathTemplate) {
 
         pathMappings_ = addPathMapping(pathMappings_, new PathMappingImpl(
-            patternString, componentNameTemplate, actionNameTemplate,
-            pathInfoTemplate, defaultPathTemplate));
+                patternString, componentNameTemplate, actionNameTemplate,
+                pathInfoTemplate, defaultPathTemplate));
     }
 
     PathMapping[] addPathMapping(PathMapping[] patterns, PathMapping pattern) {
@@ -301,7 +308,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     public void setResponseConstructorSelector(
-        ResponseConstructorSelector responseConstructorSelector) {
+            ResponseConstructorSelector responseConstructorSelector) {
 
         responseConstructorSelector_ = responseConstructorSelector;
     }

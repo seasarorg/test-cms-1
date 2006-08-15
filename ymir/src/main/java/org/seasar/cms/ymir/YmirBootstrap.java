@@ -3,6 +3,7 @@ package org.seasar.cms.ymir;
 import javax.servlet.ServletContext;
 
 import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
@@ -10,21 +11,33 @@ public class YmirBootstrap {
 
     private Ymir ymir_;
 
-    public Ymir init(ServletContext servletContext) {
+    public Ymir init() {
 
         ymir_ = (Ymir) getContainer().getComponent(Ymir.class);
-        initializeConfiguration(ymir_, servletContext);
+        initializeApplication(ymir_, getServletContext());
         ymir_.init();
         return ymir_;
     }
 
-    void initializeConfiguration(Ymir ymir, ServletContext servletContext) {
+    ServletContext getServletContext() {
+        return (ServletContext) getContainer().getComponent(
+                ServletContext.class);
+    }
 
-        Configuration config = getConfiguration();
-        if (config.getProperty(Globals.KEY_WEBAPPROOT) == null) {
-            config.setProperty(Globals.KEY_WEBAPPROOT, servletContext
-                .getRealPath("/"));
+    void initializeApplication(Ymir ymir, ServletContext servletContext) {
+
+        Class landmark = null;
+        try {
+            landmark = Class.forName(Globals.LANDMARK_CLASSNAME);
+        } catch (ClassNotFoundException ignored) {
         }
+        Application application = new SingleApplication(getConfiguration(),
+                servletContext.getRealPath("/"), landmark);
+        servletContext.setAttribute(Globals.ATTR_APPLICATION, application);
+
+        ApplicationManager applicationManager = (ApplicationManager) getContainer()
+                .getComponent(ApplicationManager.class);
+        applicationManager.addApplication(application);
     }
 
     Configuration getConfiguration() {
@@ -37,7 +50,6 @@ public class YmirBootstrap {
         if (ymir_ != null) {
             ymir_.destroy();
         }
-        SingletonS2ContainerFactory.destroy();
     }
 
     S2Container getContainer() {

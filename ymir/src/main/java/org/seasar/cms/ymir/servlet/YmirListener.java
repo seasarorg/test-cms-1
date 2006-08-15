@@ -16,7 +16,7 @@ public class YmirListener implements ServletContextListener {
 
         ServletContext sc = sce.getServletContext();
         try {
-            sc.setAttribute(YMIR_KEY, bootstrap_.init(sc));
+            sc.setAttribute(YMIR_KEY, bootstrap_.init());
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             throw ex;

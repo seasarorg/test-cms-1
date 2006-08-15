@@ -1,0 +1,95 @@
+package org.seasar.cms.ymir.impl;
+
+import java.io.File;
+
+import org.seasar.cms.ymir.Application;
+
+abstract public class AbstractApplication implements Application {
+
+    public static final String KEY_PROJECTROOT = "projectRoot";
+
+    public static final String KEY_ROOTPACKAGENAME = "rootPackageName";
+
+    public static final String KEY_CLASSESDIRECTORY = "classesDirectory";
+
+    public static final String KEY_RESOURCESDIRECTORY = "resourcesDirectory";
+
+    public static final String KEY_SOURCEDIRECTORY = "sourceDirectory";
+
+    private static final String PROPERTIESFILEPATH = "/app.properties";
+
+    public String getProjectRoot() {
+        return getProperty(KEY_PROJECTROOT);
+    }
+
+    public void setProjectRoot(String projectRoot) {
+        setProperty(KEY_PROJECTROOT, projectRoot);
+    }
+
+    public String getRootPackageName() {
+        return getProperty(KEY_ROOTPACKAGENAME);
+    }
+
+    public void setRootPackageName(String rootPackageName) {
+        setProperty(KEY_ROOTPACKAGENAME, rootPackageName);
+    }
+
+    public boolean isResourceExists(String path) {
+        return new File(getWebappRoot(), path).exists();
+    }
+
+    public String getClassesDirectory() {
+        String classesDirectory = getProperty(KEY_CLASSESDIRECTORY);
+        if (classesDirectory == null) {
+            classesDirectory = getWebappRoot() + "/WEB-INF/classes";
+        }
+        return classesDirectory;
+    }
+
+    public void setClassesDirectory(String classesDirectory) {
+        setProperty(KEY_CLASSESDIRECTORY, classesDirectory);
+    }
+
+    public String getResourcesDirectory() {
+        String resourcesDirectory = getProperty(KEY_RESOURCESDIRECTORY);
+        if (resourcesDirectory == null) {
+            String projectRoot = getProjectRoot();
+            if (projectRoot == null) {
+                return null;
+            } else {
+                resourcesDirectory = projectRoot + "/src/main/resources";
+            }
+        }
+        return resourcesDirectory;
+    }
+
+    public void setResourcesDirectory(String resourcesDirectory) {
+        setProperty(KEY_RESOURCESDIRECTORY, resourcesDirectory);
+    }
+
+    public String getSourceDirectory() {
+        String sourceDirectory = getProperty(KEY_SOURCEDIRECTORY);
+        if (sourceDirectory == null) {
+            String projectRoot = getProjectRoot();
+            if (projectRoot == null) {
+                return null;
+            } else {
+                sourceDirectory = projectRoot + "/src/main/java";
+            }
+        }
+        return sourceDirectory;
+    }
+
+    public void setSourceDirectory(String sourceDirectory) {
+        setProperty(KEY_SOURCEDIRECTORY, sourceDirectory);
+    }
+
+    public String getDefaultPropertiesFilePath() {
+        String resourcesDirectory = getResourcesDirectory();
+        if (resourcesDirectory == null) {
+            return null;
+        } else {
+            return resourcesDirectory + PROPERTIESFILEPATH;
+        }
+    }
+}
