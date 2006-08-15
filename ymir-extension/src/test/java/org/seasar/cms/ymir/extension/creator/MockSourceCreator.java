@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Properties;
 
 import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
@@ -61,7 +62,7 @@ public class MockSourceCreator implements SourceCreator {
         return null;
     }
 
-    public File getWebappDirectory() {
+    public File getWebappRoot() {
         return null;
     }
 
@@ -113,5 +114,9 @@ public class MockSourceCreator implements SourceCreator {
     }
 
     public void saveSourceCreatorProperties() {
+    }
+
+    public Application getApplication() {
+        return null;
     }
 }

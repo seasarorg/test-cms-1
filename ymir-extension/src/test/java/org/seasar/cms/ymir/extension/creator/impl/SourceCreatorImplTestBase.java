@@ -19,7 +19,9 @@ import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.freemarker.FreemarkerSourceGenerator;
 import org.seasar.cms.ymir.extension.zpt.ZptAnalyzer;
+import org.seasar.cms.ymir.impl.AbstractApplication;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
+import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContext;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContextComponentDefRegister;
@@ -58,6 +60,8 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
     protected void setUp() throws Exception {
 
+        ServletContext context = new MockServletContextImpl("/context");
+        SingletonPluggableContainerFactory.setApplication(context);
         SingletonPluggableContainerFactory.prepareForContainer();
 
         container_ = new S2ContainerImpl();
@@ -67,12 +71,12 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         container_.setExternalContext(new HttpServletExternalContext());
         container_
                 .setExternalContextComponentDefRegister(new HttpServletExternalContextComponentDefRegister());
-        ServletContext context = new MockServletContextImpl("/context");
         MockHttpServletRequestImpl request = new MockHttpServletRequestImpl(
                 context, "/servlet");
         container_.getExternalContext().setRequest(request);
         container_.getExternalContext().setResponse(
                 new MockHttpServletResponseImpl(request));
+        container_.getExternalContext().setApplication(context);
         container_.register(SourceCreatorImpl.class);
         container_.register(DefaultRequestProcessor.class);
         container_.register(TemporaryLocalOndemandS2Container.class);
@@ -97,8 +101,15 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
         Configuration configuration = (Configuration) container_
                 .getComponent(Configuration.class);
-        configuration.setProperty(Globals.KEY_WEBAPPROOT, new File(ResourceUtil
-                .getBuildDir(getClass()), "webapp").getCanonicalPath());
+        context.setAttribute(Globals.ATTR_APPLICATION, new SingleApplication(
+                configuration, new File(ResourceUtil.getBuildDir(getClass()),
+                        "webapp").getCanonicalPath(), null));
+        configuration.setProperty(AbstractApplication.KEY_SOURCEDIRECTORY,
+                ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
+        configuration.setProperty(AbstractApplication.KEY_CLASSESDIRECTORY,
+                ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
+        configuration.setProperty(AbstractApplication.KEY_RESOURCESDIRECTORY,
+                ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
 
         DefaultRequestProcessor processor = (DefaultRequestProcessor) container_
                 .getComponent(RequestProcessor.class);
@@ -108,12 +119,6 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         target_ = (SourceCreatorImpl) container_
                 .getComponent(SourceCreator.class);
         target_.setNamingConvention(namingConvention);
-        target_.setSourceDirectoryPath(ResourceUtil.getBuildDir(getClass())
-                .getCanonicalPath());
-        target_.setClassesDirectoryPath(ResourceUtil.getBuildDir(getClass())
-                .getCanonicalPath());
-        target_.setResourcesDirectoryPath(ResourceUtil.getBuildDir(getClass())
-                .getCanonicalPath());
         FreemarkerSourceGenerator sourceGenerator = new FreemarkerSourceGenerator();
         sourceGenerator.setSourceCreator(target_);
         target_.setSourceGenerator(sourceGenerator);

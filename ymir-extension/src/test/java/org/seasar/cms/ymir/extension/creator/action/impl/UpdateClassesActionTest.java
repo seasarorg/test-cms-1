@@ -9,6 +9,7 @@ import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescSet;
 import org.seasar.cms.ymir.extension.creator.impl.PathMetaDataImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImplTestBase;
+import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.util.ResourceUtil;
 
 public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
@@ -24,42 +25,46 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
     public void testShouldUpdate() throws Exception {
 
         File sourceDir = clean(new File(ResourceUtil.getBuildDir(getClass())
-            .getParentFile(), "src"));
-        getSourceCreator().setSourceDirectoryPath(sourceDir.getCanonicalPath());
+                .getParentFile(), "src"));
+        getSourceCreator().getConfiguration().setProperty(
+                SingleApplication.KEY_SOURCEDIRECTORY,
+                sourceDir.getCanonicalPath());
 
         PathMetaDataImpl pathMetaData = new PathMetaDataImpl(null, null, false,
-            null, null, null, null, getSourceCreator().getSourceFile(
-                "com.example.web.TestPage"), getSourceCreator()
-                .getTemplateFile("/test.html"));
+                null, null, null, null, getSourceCreator().getSourceFile(
+                        "com.example.web.TestPage"), getSourceCreator()
+                        .getTemplateFile("/test.html"));
         getSourceCreator().getSourceCreatorProperties().clear();
         assertTrue("ソースファイルが存在しない場合は最初だけtrueになること", target_
-            .shouldUpdate(pathMetaData));
+                .shouldUpdate(pathMetaData));
         assertFalse("ソースファイルが存在しない場合は最初だけtrueになること", target_
-            .shouldUpdate(pathMetaData));
+                .shouldUpdate(pathMetaData));
 
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
-        getSourceCreator().gatherClassDescs(
-            classDescMap,
-            new PathMetaDataImpl("/test.html", Request.METHOD_GET, false,
-                "testPage", "com.example.web.TestPage", null, null, null,
-                getSourceCreator().getTemplateFile("/test.html")));
+        getSourceCreator()
+                .gatherClassDescs(
+                        classDescMap,
+                        new PathMetaDataImpl("/test.html", Request.METHOD_GET,
+                                false, "testPage", "com.example.web.TestPage",
+                                null, null, null, getSourceCreator()
+                                        .getTemplateFile("/test.html")));
         ClassDesc[] classDescs = (ClassDesc[]) classDescMap.values().toArray(
-            new ClassDesc[0]);
+                new ClassDesc[0]);
         ClassDescSet classDescSet = new ClassDescSet(classDescs);
         for (int i = classDescs.length - 1; i >= 0; i--) {
             classDescs[i].merge(getSourceCreator().getClassDesc(
-                classDescs[i].getName(), false), true);
+                    classDescs[i].getName(), false), true);
             getSourceCreator().writeSourceFile(classDescs[i], classDescSet);
         }
 
         assertTrue(new File(sourceDir, "com/example/web/TestPage.java")
-            .exists());
+                .exists());
         assertTrue(new File(sourceDir, "com/example/web/TestPageBase.java")
-            .exists());
+                .exists());
         assertTrue(new File(sourceDir, "com/example/dto/EntityDto.java")
-            .exists());
+                .exists());
         assertTrue(new File(sourceDir, "com/example/dto/EntityDtoBase.java")
-            .exists());
+                .exists());
 
         assertFalse(target_.shouldUpdate(pathMetaData));
     }

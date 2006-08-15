@@ -12,6 +12,7 @@ import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
+import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.util.ResourceUtil;
 import org.seasar.kvasir.util.io.IOUtils;
 
@@ -142,7 +143,9 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
 
         File sourceDir = clean(new File(ResourceUtil.getBuildDir(getClass())
                 .getParentFile(), "src"));
-        getSourceCreator().setSourceDirectoryPath(sourceDir.getCanonicalPath());
+        getSourceCreator().getConfiguration().setProperty(
+                SingleApplication.KEY_SOURCEDIRECTORY,
+                sourceDir.getCanonicalPath());
 
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         target_.gatherClassDescs(classDescMap, new PathMetaDataImpl(

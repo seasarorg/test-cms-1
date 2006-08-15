@@ -26,8 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
@@ -61,6 +64,8 @@ import org.seasar.cms.ymir.extension.creator.action.impl.UpdateClassesAction;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.cms.ymir.impl.RedirectResponse;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
+import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.container.hotdeploy.OndemandProject;
 import org.seasar.framework.container.hotdeploy.OndemandS2Container;
 import org.seasar.framework.convention.NamingConvention;
@@ -87,12 +92,6 @@ public class SourceCreatorImpl implements SourceCreator {
     private LocalOndemandS2Container ondemandContainer_;
 
     private NamingConvention namingConvention_;
-
-    private File sourceDirectory_;
-
-    private File classesDirectory_;
-
-    private File resourcesDirectory_;
 
     private TemplateAnalyzer analyzer_;
 
@@ -143,7 +142,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
         Object condition;
 
-        if (!validateConfiguration()) {
+        if (!validateApplication(getApplication())) {
             condition = "createConfiguration";
         } else if (request.getParameter(PARAM_TASK) != null) {
             condition = request.getParameter(PARAM_TASK);
@@ -172,16 +171,13 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    boolean validateConfiguration() {
+    boolean validateApplication(Application application) {
 
-        if (configuration_ == null) {
+        if (application.getProjectRoot() == null) {
             return false;
-        } else if (configuration_.getProperty(Globals.KEY_PROJECTROOT) == null) {
+        } else if (!new File(application.getProjectRoot()).exists()) {
             return false;
-        } else if (!new File(configuration_
-                .getProperty(Globals.KEY_PROJECTROOT)).exists()) {
-            return false;
-        } else if (configuration_.getProperty(Globals.KEY_ROOTPACKAGENAME) == null) {
+        } else if (application.getRootPackageName() == null) {
             return false;
         }
         return true;
@@ -191,7 +187,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
         XOMapper mapper = XOMapperFactory.newInstance();
         mapper.setStrict(false);
-        File webXml = new File(getWebappDirectory(), "WEB-INF/web.xml");
+        File webXml = new File(getWebappRoot(), "WEB-INF/web.xml");
         if (!webXml.exists()) {
             return null;
         }
@@ -677,17 +673,18 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public File getTemplateFile(String path) {
 
-        return new File(getWebappDirectory(), path);
+        return new File(getWebappRoot(), path);
     }
 
     public File getSourceFile(String className) {
 
-        return new File(sourceDirectory_, className.replace('.', '/') + ".java");
+        return new File(getSourceDirectory(), className.replace('.', '/')
+                + ".java");
     }
 
     File getClassFile(String className) {
 
-        return new File(classesDirectory_, className.replace('.', '/')
+        return new File(getClassesDirectory(), className.replace('.', '/')
                 + ".class");
     }
 
@@ -779,37 +776,37 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public File getSourceDirectory() {
 
-        return sourceDirectory_;
-    }
-
-    public void setSourceDirectoryPath(String sourceDirectoryPath) {
-
-        sourceDirectory_ = new File(sourceDirectoryPath);
+        String sourceDirectory = getApplication().getSourceDirectory();
+        if (sourceDirectory != null) {
+            return new File(sourceDirectory);
+        } else {
+            return null;
+        }
     }
 
     public File getClassesDirectory() {
 
-        return classesDirectory_;
-    }
-
-    public void setClassesDirectoryPath(String classesDirectoryPath) {
-
-        classesDirectory_ = new File(classesDirectoryPath);
+        String classesDirectory = getApplication().getClassesDirectory();
+        if (classesDirectory != null) {
+            return new File(classesDirectory);
+        } else {
+            return null;
+        }
     }
 
     public File getResourcesDirectory() {
 
-        return resourcesDirectory_;
+        String resourcesDirectory = getApplication().getResourcesDirectory();
+        if (resourcesDirectory != null) {
+            return new File(resourcesDirectory);
+        } else {
+            return null;
+        }
     }
 
-    public void setResourcesDirectoryPath(String resourcesDirectoryPath) {
+    public File getWebappRoot() {
 
-        resourcesDirectory_ = new File(resourcesDirectoryPath);
-    }
-
-    public File getWebappDirectory() {
-
-        return new File(configuration_.getProperty(Globals.KEY_WEBAPPROOT));
+        return new File(getApplication().getWebappRoot());
     }
 
     public TemplateAnalyzer getTemplateAnalyzer() {
@@ -890,6 +887,24 @@ public class SourceCreatorImpl implements SourceCreator {
     public void setConfiguration(Configuration configuration) {
 
         configuration_ = configuration;
+    }
+
+    public Application getApplication() {
+        return (Application) getServletContext().getAttribute(
+                Globals.ATTR_APPLICATION);
+    }
+
+    ServletContext getServletContext() {
+        return (ServletContext) getRootS2Container().getComponent(
+                ServletContext.class);
+    }
+
+    S2Container getS2Container() {
+        return getApplication().getS2Container();
+    }
+
+    S2Container getRootS2Container() {
+        return SingletonS2ContainerFactory.getContainer();
     }
 
     public void registerUpdateAction(Object condition, UpdateAction updateAction) {

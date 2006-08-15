@@ -105,7 +105,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
     PathMetaData[] gatherPaths() {
 
         List<PathMetaData> pathList = new ArrayList<PathMetaData>();
-        File dir = getSourceCreator().getWebappDirectory();
+        File dir = getSourceCreator().getWebappRoot();
         gatherPaths(dir, "", pathList);
         return pathList.toArray(new PathMetaData[0]);
     }

@@ -9,20 +9,25 @@ import java.util.Map;
 
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.impl.ConfigurationImpl;
+import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.impl.SingleApplication;
 
 public class CreateConfigurationAction extends AbstractUpdateAction {
 
-    private static final String APP_PROPERTIES_PATH = "src/main/resources/app.properties";
-
     private static final String PARAMPREFIX_KEY = SourceCreatorImpl.PARAM_PREFIX
-        + "key_";
+            + "key_";
 
     private static final String POM_XML = "pom.xml";
+
+    private static final Object KEY_PROJECTROOT = "projectRoot";
+
+    private static final String KEY_ROOTPACKAGENAME = "rootPackageName";
+
+    private static final String KEY_WEBAPPROOT = "webappRoot";
 
     public CreateConfigurationAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
@@ -40,21 +45,21 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
 
     Response actDefault(Request request, PathMetaData pathMetaData) {
 
-        Configuration configuration = getConfiguration();
-        String webappRoot = configuration.getProperty(Globals.KEY_WEBAPPROOT);
+        Application application = getSourceCreator().getApplication();
+        String webappRoot = application.getWebappRoot();
         if (webappRoot != null) {
             String projectRoot = findProjectRootDirectory(webappRoot);
             if (projectRoot != null) {
-                configuration.setProperty(Globals.KEY_PROJECTROOT, projectRoot);
+                application.setProjectRoot(projectRoot);
             }
         }
 
         Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("parameters", getParameters(request));
-        variableMap.put("configuration", configuration);
+        variableMap.put("application", application);
         return getSourceCreator().getResponseCreator().createResponse(
-            "createConfiguration", variableMap);
+                "createConfiguration", variableMap);
     }
 
     String findProjectRootDirectory(String webappRoot) {
@@ -77,28 +82,34 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
             return null;
         }
 
-        Configuration configuration = new ConfigurationImpl();
+        Application application = getSourceCreator().getApplication();
         for (Iterator itr = request.getParameterNames(); itr.hasNext();) {
             String name = (String) itr.next();
             if (!name.startsWith(PARAMPREFIX_KEY)) {
                 continue;
             }
+            String key = name.substring(PARAMPREFIX_KEY.length());
             String value = request.getParameter(name);
-            configuration.setProperty(name.substring(PARAMPREFIX_KEY.length()),
-                value);
+            if (SingleApplication.KEY_PROJECTROOT.equals(key)) {
+                application.setProjectRoot(value);
+            } else if (SingleApplication.KEY_ROOTPACKAGENAME.equals(key)) {
+                application.setRootPackageName(value);
+            } else {
+                application.setProperty(key, value);
+            }
         }
 
-        String projectRoot = configuration.getProperty(Globals.KEY_PROJECTROOT);
-        if (projectRoot != null) {
-            File file = new File(projectRoot, APP_PROPERTIES_PATH);
+        String propertiesFilePath = application.getDefaultPropertiesFilePath();
+        if (propertiesFilePath != null) {
+            File file = new File(propertiesFilePath);
             file.getParentFile().mkdirs();
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(file);
-                configuration.save(fos, null);
+                application.save(fos, null);
             } catch (IOException ex) {
                 throw new RuntimeException("Can't write property file: "
-                    + file.getAbsolutePath());
+                        + file.getAbsolutePath());
             } finally {
                 if (fos != null) {
                     try {
@@ -114,7 +125,7 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));
         return getSourceCreator().getResponseCreator().createResponse(
-            "createConfiguration_create", variableMap);
+                "createConfiguration_create", variableMap);
     }
 
     Configuration getConfiguration() {

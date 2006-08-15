@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Properties;
 
 import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
@@ -19,11 +20,9 @@ public interface SourceCreator extends Updater {
 
     String getDxoPackageName();
 
-    File getWebappDirectory();
+    File getWebappRoot();
 
     File getSourceDirectory();
-
-    File getClassesDirectory();
 
     File getResourcesDirectory();
 
@@ -54,6 +53,8 @@ public interface SourceCreator extends Updater {
     Class getClass(String className);
 
     Configuration getConfiguration();
+
+    Application getApplication();
 
     ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas);
 
