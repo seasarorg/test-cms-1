@@ -1,7 +1,6 @@
 package org.seasar.cms.pluggable.impl;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -19,7 +18,6 @@ import org.seasar.framework.container.autoregister.AbstractAutoRegister;
 import org.seasar.framework.container.deployer.ComponentDeployerFactory;
 import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContext;
-import org.seasar.framework.container.factory.CircularIncludeRuntimeException;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.container.util.Traversal;
@@ -171,8 +169,10 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     void invokeAutoRegisters(S2Container container) {
         Traversal.forEachComponent(container, new ComponentDefHandler() {
             public Object processComponent(ComponentDef componentDef) {
-                if (AbstractAutoRegister.class.isAssignableFrom(componentDef
-                        .getComponentClass())) {
+                Class componentClass = componentDef.getComponentClass();
+                if (componentClass != null
+                        && AbstractAutoRegister.class
+                                .isAssignableFrom(componentClass)) {
                     // *.diconをロードする際にS2Containerが自動的に
                     // <initMethod="registerAll" />をつけてくれるため、
                     // コンポーネントのインスタンス化の際に自動的にregisterAll()が呼ばれる。
@@ -264,21 +264,24 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     }
 
     void include(S2Container parent, S2Container child) {
-        assertNotCircularInclude(child, parent, new LinkedList());
-        parent.include(child);
+        if (!isCircular(child, parent, new LinkedList())) {
+            parent.include(child);
+        }
     }
 
-    void assertNotCircularInclude(final S2Container container,
-            final S2Container target, LinkedList paths) {
+    boolean isCircular(final S2Container container, final S2Container target,
+            LinkedList paths) {
         paths.addFirst(container.getPath());
         try {
             if (container == target) {
-                throw new CircularIncludeRuntimeException(target.getPath(),
-                        new ArrayList(paths));
+                return true;
             }
             for (int i = 0; i < container.getChildSize(); ++i) {
-                assertNotCircularInclude(container.getChild(i), target, paths);
+                if (isCircular(container.getChild(i), target, paths)) {
+                    return true;
+                }
             }
+            return false;
         } finally {
             paths.removeFirst();
         }

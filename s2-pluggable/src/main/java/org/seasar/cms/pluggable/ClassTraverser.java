@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 
-import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.autoregister.ClassPattern;
 import org.seasar.framework.util.ClassTraversal;
 import org.seasar.framework.util.JarFileUtil;
@@ -17,8 +16,6 @@ import org.seasar.framework.util.ResourceUtil;
 import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
 public class ClassTraverser {
-
-    private S2Container container;
 
     private List classPatterns = new ArrayList();
 
@@ -34,14 +31,6 @@ public class ClassTraverser {
         strategies.put("file", new FileSystemStrategy());
         strategies.put("jar", new JarFileStrategy());
         strategies.put("zip", new ZipFileStrategy());
-    }
-
-    public S2Container getContainer() {
-        return container;
-    }
-
-    public void setContainer(S2Container container) {
-        this.container = container;
     }
 
     public int getClassPatternSize() {
@@ -112,10 +101,10 @@ public class ClassTraverser {
         for (int i = 0; i < referenceClasses.size(); ++i) {
             final Class referenceClass = (Class) referenceClasses.get(i);
             final String baseClassPath = ResourceUtil
-                .getResourcePath(referenceClass);
+                    .getResourcePath(referenceClass);
             final URL url = ResourceUtil.getResource(baseClassPath);
             final Strategy strategy = (Strategy) strategies.get(url
-                .getProtocol());
+                    .getProtocol());
             strategy.process(referenceClass, url);
         }
     }
@@ -131,7 +120,7 @@ public class ClassTraverser {
     }
 
     boolean isMatched(String packageName, String shortClassName,
-        List classPatternList) {
+            List classPatternList) {
 
         if (classPatternList.isEmpty()) {
             return false;
@@ -159,7 +148,7 @@ public class ClassTraverser {
             final File rootDir = getRootDir(referenceClass, url);
             for (int i = 0; i < getClassPatternSize(); ++i) {
                 ClassTraversal.forEach(rootDir, getClassPattern(i)
-                    .getPackageName(), classHandler);
+                        .getPackageName(), classHandler);
             }
         }
 
@@ -184,13 +173,13 @@ public class ClassTraverser {
             final String urlString = ResourceUtil.toExternalForm(url);
             final int pos = urlString.lastIndexOf('!');
             final String jarFileName = urlString.substring(
-                "jar:file:".length(), pos);
+                    "jar:file:".length(), pos);
             return JarFileUtil.create(new File(jarFileName));
         }
     }
 
     /**
-     * WebLogic固有�?�<code>zip:</code>プロトコルで表現されるURLをサポ�?�トするストラ�?ジです�??
+     * WebLogic固有�?�<code>zip:</code>プロトコルで表現されるURLをサポ�?�トするストラ�?ジです�??
      */
     protected class ZipFileStrategy implements Strategy {
 
@@ -203,7 +192,7 @@ public class ClassTraverser {
             final String urlString = ResourceUtil.toExternalForm(url);
             final int pos = urlString.lastIndexOf('!');
             final String jarFileName = urlString
-                .substring("zip:".length(), pos);
+                    .substring("zip:".length(), pos);
             return JarFileUtil.create(new File(jarFileName));
         }
     }

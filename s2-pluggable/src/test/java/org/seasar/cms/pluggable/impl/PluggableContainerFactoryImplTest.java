@@ -169,4 +169,24 @@ public class PluggableContainerFactoryImplTest extends TestCase {
             fail("同じdiconを複数インクルードしていてもコンテナとしては1つとして扱われること");
         }
     }
+
+    public void testIncludeToLeaves1() throws Exception {
+
+        S2Container root = new S2ContainerImpl();
+
+        S2Container container = new S2ContainerImpl();
+        container.setRoot(root);
+        S2Container leaf = new S2ContainerImpl();
+        container.include(leaf);
+
+        S2Container dep = new S2ContainerImpl();
+        dep.setRoot(root);
+        dep.include(leaf);
+
+        try {
+            target_.includeToLeaves(container, new S2Container[] { dep });
+        } catch (CircularIncludeRuntimeException ex) {
+            fail("循環参照を起こすようなincludeはしないこと");
+        }
+    }
 }

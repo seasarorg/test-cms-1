@@ -3,6 +3,8 @@ package org.seasar.cms.pluggable.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import org.seasar.cms.pluggable.Configuration;
@@ -29,14 +31,32 @@ public class ConfigurationImpl implements Configuration {
 
     void load0(String configPath) {
 
-        InputStream is = Thread.currentThread().getContextClassLoader()
-            .getResourceAsStream(configPath);
+        InputStream is = null;
+        if (configPath.indexOf(':') >= 0) {
+            try {
+                is = new URL(configPath).openStream();
+            } catch (MalformedURLException ignored) {
+            } catch (IOException ex) {
+                log_.info("Can't open configuration resource: path="
+                        + configPath);
+                if (log_.isDebugEnabled()) {
+                    log_.debug("Can't open configuration resource: path="
+                            + configPath, ex);
+                }
+                return;
+            }
+        }
+        if (is == null) {
+            is = Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream(configPath);
+        }
         if (is != null) {
             try {
                 properties_.load(is);
             } catch (IOException ex) {
                 throw new RuntimeException(
-                    "Can't load configration resource: path=" + configPath, ex);
+                        "Can't load configration resource: path=" + configPath,
+                        ex);
             } finally {
                 try {
                     is.close();
@@ -45,7 +65,7 @@ public class ConfigurationImpl implements Configuration {
             }
         } else {
             log_.info("Configuration resource does not exist: path="
-                + configPath);
+                    + configPath);
         }
     }
 

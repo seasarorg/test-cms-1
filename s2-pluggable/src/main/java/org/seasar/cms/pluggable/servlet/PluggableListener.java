@@ -22,7 +22,7 @@ public class PluggableListener implements ServletContextListener {
 
             if (configPath != null) {
                 SingletonPluggableContainerFactory.integrate(configPath,
-                    new S2Container[0]);
+                        new S2Container[0]);
             }
 
             SingletonPluggableContainerFactory.init();
@@ -33,5 +33,6 @@ public class PluggableListener implements ServletContextListener {
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
+        SingletonPluggableContainerFactory.destroy();
     }
 }
