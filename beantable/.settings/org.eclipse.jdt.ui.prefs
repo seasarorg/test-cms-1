@@ -1,5 +1,10 @@
-#Thu Jul 20 16:17:48 JST 2006
+#Wed Aug 16 10:55:58 JST 2006
 eclipse.preferences.version=1
 formatter_profile=_Seasar CMS Project
 formatter_settings_version=10
 internal.default.compliance=default
+org.eclipse.jdt.ui.ignorelowercasenames=true
+org.eclipse.jdt.ui.importorder=java;javax;org;com;net;
+org.eclipse.jdt.ui.ondemandthreshold=99
+org.eclipse.jdt.ui.staticondemandthreshold=99
+org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8"?><templates/>
