@@ -1,4 +1,8 @@
-#Fri Jul 07 00:49:30 JST 2006
+#Wed Aug 16 10:55:36 JST 2006
 eclipse.preferences.version=1
 formatter_settings_version=8
 internal.default.compliance=default
+org.eclipse.jdt.ui.ignorelowercasenames=true
+org.eclipse.jdt.ui.importorder=java;javax;org;com;net;
+org.eclipse.jdt.ui.ondemandthreshold=99
+org.eclipse.jdt.ui.staticondemandthreshold=99
