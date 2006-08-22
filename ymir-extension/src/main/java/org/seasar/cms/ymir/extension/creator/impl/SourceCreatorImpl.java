@@ -31,12 +31,12 @@ import javax.servlet.ServletContext;
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.Application;
+import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
-import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.BodyDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
@@ -104,6 +104,8 @@ public class SourceCreatorImpl implements SourceCreator {
     private ResponseCreator responseCreator_;
 
     public Properties sourceCreatorProperties_;
+
+    private ApplicationManager applicationManager_;
 
     private UpdateActionSelector actionSelector_ = new UpdateActionSelector()
             .register(
@@ -890,8 +892,7 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public Application getApplication() {
-        return (Application) getServletContext().getAttribute(
-                Globals.ATTR_APPLICATION);
+        return applicationManager_.getContextApplication();
     }
 
     ServletContext getServletContext() {
@@ -910,5 +911,10 @@ public class SourceCreatorImpl implements SourceCreator {
     public void registerUpdateAction(Object condition, UpdateAction updateAction) {
 
         actionSelector_.register(condition, updateAction);
+    }
+
+    public void setApplicationManager(ApplicationManager applicationManager) {
+
+        applicationManager_ = applicationManager;
     }
 }

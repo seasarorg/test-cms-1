@@ -27,53 +27,57 @@ import net.skirnir.freyja.zpt.webapp.ServletTalesExpressionEvaluator;
 public class ZptAnalyzer implements TemplateAnalyzer {
 
     private TemplateEvaluator evaluator_ = new TemplateEvaluator(
-        new MetalTagEvaluator(new AnalyzerTalTagEvaluator()) {
-            public String[] getSpecialTagPatternStrings() {
-                return new String[] { "form", "input", "select", "textarea" };
-            }
+            new MetalTagEvaluator(new AnalyzerTalTagEvaluator()) {
+                public String[] getSpecialTagPatternStrings() {
+                    return new String[] { "form", "input", "select", "textarea" };
+                }
 
-            public TemplateContext newContext() {
-                return new AnalyzerContext();
-            }
-        }, new ServletTalesExpressionEvaluator() {
-            public HttpServletRequest getRequest(VariableResolver varResolver) {
-                return new MockHttpServletRequestImpl(
-                    new MockServletContextImpl("/") {
-                        private static final long serialVersionUID = -4251298552610359164L;
+                public TemplateContext newContext() {
+                    return new AnalyzerContext();
+                }
+            }, new ServletTalesExpressionEvaluator() {
+                public HttpServletRequest getRequest(
+                        VariableResolver varResolver) {
+                    return new MockHttpServletRequestImpl(
+                            new MockServletContextImpl("/") {
+                                private static final long serialVersionUID = -4251298552610359164L;
 
-                        public String getServletContextName() {
-                            return "";
-                        }
-                    }, "/");
-            }
+                                public String getServletContextName() {
+                                    return "";
+                                }
+                            }, "/");
+                }
 
-            public HttpServletResponse getResponse(VariableResolver varResolver) {
-                return new MockHttpServletResponseImpl(
-                    new MockHttpServletRequestImpl(new MockServletContextImpl(
-                        "/"), "/"));
-            }
+                public HttpServletResponse getResponse(
+                        VariableResolver varResolver) {
+                    return new MockHttpServletResponseImpl(
+                            new MockHttpServletRequestImpl(
+                                    new MockServletContextImpl("/"), "/"));
+                }
 
-            public String getResponseEncoding() {
-                return "UTF-8";
-            }
+                public String getResponseEncoding() {
+                    return "UTF-8";
+                }
 
-        }.addTypePrefix("path", new AnalyzerPathTypePrefixHandler('/')
-            .addPathResolver(new BeanPathResolver()), true));
+            }.addTypePrefix("path", new AnalyzerPathTypePrefixHandler('/')
+                    .addPathResolver(new BeanPathResolver()), true));
 
     private SourceCreator sourceCreator_;
 
-    public void analyze(String method,
-        Map<String, ClassDesc> classDescMap, InputStream inputStream,
-        String encoding, String className) {
+    private PathNormalizer pathNormalizer_ = new PathNormalizerImpl();
+
+    public void analyze(String method, Map<String, ClassDesc> classDescMap,
+            InputStream inputStream, String encoding, String className) {
 
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
         context.setSourceCreator(sourceCreator_);
+        context.setPathNormalizer(pathNormalizer_);
         context.setMethod(method);
         context.setClassDescMap(classDescMap);
         context.setPageClassName(className);
         try {
             evaluator_.evaluate(context, new InputStreamReader(inputStream,
-                encoding));
+                    encoding));
             context.close();
         } catch (RuntimeException ex) {
             if (ex.getCause() instanceof IllegalSyntaxException) {
@@ -96,5 +100,9 @@ public class ZptAnalyzer implements TemplateAnalyzer {
     public void setSourceCreator(SourceCreator sourceCreator) {
 
         sourceCreator_ = sourceCreator;
+    }
+
+    public void setPathNormalizer(PathNormalizer pathNormalizer) {
+        pathNormalizer_ = pathNormalizer;
     }
 }

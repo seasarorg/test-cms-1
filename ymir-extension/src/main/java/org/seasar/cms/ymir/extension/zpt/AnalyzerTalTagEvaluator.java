@@ -25,7 +25,7 @@ import net.skirnir.freyja.zpt.ZptTemplateContext;
 public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 
     public String evaluate(TemplateContext context, String name,
-        Attribute[] attrs, Element[] body) {
+            Attribute[] attrs, Element[] body) {
 
         AnnotationResult result = findAnnotation(context, name, attrs);
         String annotation = result.getAnnotation();
@@ -35,11 +35,11 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 
         if ("form".equals(name)) {
             ClassDesc classDesc = registerClassDesc(analyzeContext, attrMap,
-                "action", getAttributeValue(attrMap, "method", "GET")
-                    .toUpperCase());
+                    "action", getAttributeValue(attrMap, "method", "GET")
+                            .toUpperCase());
             analyzeContext
-                .setFormActionPageClassName((classDesc != null ? classDesc
-                    .getName() : null));
+                    .setFormActionPageClassName((classDesc != null ? classDesc
+                            .getName() : null));
             try {
                 return super.evaluate(context, name, attrs, body);
             } finally {
@@ -48,12 +48,12 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         } else if ("input".equals(name)) {
             String type = getAttributeValue(attrMap, "type", null);
             if (!("button".equals(type) || "image".equals(type) || "submit"
-                .equals(type))) {
+                    .equals(type))) {
                 PropertyDesc propertyDesc = processParameterTag(
-                    toAnalyzeContext(context), attrs, annotation);
+                        toAnalyzeContext(context), attrs, annotation);
                 if ("file".equals(type) && propertyDesc != null) {
                     propertyDesc.getTypeDesc().setClassDesc(
-                        FormFile.class.getName());
+                            FormFile.class.getName());
                 }
             }
         } else if ("select".equals(name) || "textarea".equals(name)) {
@@ -67,15 +67,16 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
     }
 
     ClassDesc registerClassDesc(AnalyzerContext analyzerContext, Map attrMap,
-        String attrName, String method) {
+            String attrName, String method) {
 
         SourceCreator creator = analyzerContext.getSourceCreator();
-        Path path = constructPath(getAttributeValue(attrMap, attrName, null));
+        Path path = constructPath(analyzerContext.getPathNormalizer()
+                .normalize(getAttributeValue(attrMap, attrName, null)));
         if (path == null) {
             return null;
         }
         String className = creator.getClassName(creator.getComponentName(path
-            .getTrunk(), method));
+                .getTrunk(), method));
         if (className == null) {
             return null;
         }
@@ -86,9 +87,9 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         ClassDesc classDesc = analyzerContext.getTemporaryClassDesc(className);
         classDesc.setMethodDesc(new MethodDescImpl(actionName));
         for (Iterator itr = path.getParameterMap().keySet().iterator(); itr
-            .hasNext();) {
+                .hasNext();) {
             classDesc.addProperty((String) itr.next(), PropertyDesc.WRITE
-                | PropertyDesc.READ);
+                    | PropertyDesc.READ);
         }
         return classDesc;
     }
@@ -103,10 +104,10 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
     }
 
     AnnotationResult findAnnotation(TemplateContext context, String name,
-        Attribute[] attrs) {
+            Attribute[] attrs) {
 
         String behaviorDuplicateTag = context
-            .getProperty("behavior.duplicate-tag");
+                .getProperty("behavior.duplicate-tag");
         String annotation = null;
         List<Attribute> attrList = new ArrayList<Attribute>();
         for (int i = 0; i < attrs.length; i++) {
@@ -114,8 +115,10 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
                 if (annotation != null) {
                     if (!"ignore".equals(behaviorDuplicateTag)) {
                         throw new EvaluationException("Duplicate tag found: "
-                            + attrs[i].getName() + ": "
-                            + TagEvaluatorUtils.getBeginTagString(name, attrs));
+                                + attrs[i].getName()
+                                + ": "
+                                + TagEvaluatorUtils.getBeginTagString(name,
+                                        attrs));
                     }
                 }
                 annotation = attrs[i].getValue();
@@ -124,11 +127,11 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             }
         }
         return new AnnotationResult(annotation, attrList
-            .toArray(new Attribute[0]));
+                .toArray(new Attribute[0]));
     }
 
     PropertyDesc processParameterTag(AnalyzerContext context,
-        Attribute[] attrs, String annotation) {
+            Attribute[] attrs, String annotation) {
 
         String className = context.getFormActionPageClassName();
         if (className == null) {
@@ -139,9 +142,9 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         Attribute attr = (Attribute) attrMap.get("name");
         if (attr != null) {
             return context.getPropertyDesc(context
-                .getTemporaryClassDesc(className), TagEvaluatorUtils
-                .defilter(attr.getValue()), PropertyDesc.READ
-                | PropertyDesc.WRITE);
+                    .getTemporaryClassDesc(className), TagEvaluatorUtils
+                    .defilter(attr.getValue()), PropertyDesc.READ
+                    | PropertyDesc.WRITE);
         }
         return null;
     }
@@ -164,7 +167,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         }
         if (attributesAttr != null) {
             attrs = processAttributes(context, expEvaluator, varResolver,
-                attributesAttr, attrs, true);
+                    attributesAttr, attrs, true);
         }
         return TagEvaluatorUtils.toMap(attrs);
     }
@@ -192,7 +195,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         private Attribute[] theOtherAttributes_;
 
         public AnnotationResult(String annotation,
-            Attribute[] theOtherAttributes) {
+                Attribute[] theOtherAttributes) {
             annotation_ = annotation;
             theOtherAttributes_ = theOtherAttributes;
         }

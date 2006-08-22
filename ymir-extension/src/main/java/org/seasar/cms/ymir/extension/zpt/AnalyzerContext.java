@@ -4,15 +4,15 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.skirnir.freyja.VariableResolver;
-import net.skirnir.freyja.zpt.ZptTemplateContext;
-
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
+
+import net.skirnir.freyja.VariableResolver;
+import net.skirnir.freyja.zpt.ZptTemplateContext;
 
 public class AnalyzerContext extends ZptTemplateContext {
 
@@ -25,6 +25,8 @@ public class AnalyzerContext extends ZptTemplateContext {
     private VariableResolver variableResolver_;
 
     private SourceCreator sourceCreator_;
+
+    private PathNormalizer pathNormalizer_;
 
     private String method_;
 
@@ -39,7 +41,7 @@ public class AnalyzerContext extends ZptTemplateContext {
     public AnalyzerContext() {
 
         variableResolver_ = new AnalyzerVariableResolver(super
-            .getVariableResolver());
+                .getVariableResolver());
     }
 
     public VariableResolver getVariableResolver() {
@@ -131,6 +133,16 @@ public class AnalyzerContext extends ZptTemplateContext {
         sourceCreator_ = sourceCreator;
     }
 
+    public PathNormalizer getPathNormalizer() {
+
+        return pathNormalizer_;
+    }
+
+    public void setPathNormalizer(PathNormalizer pathNormalizer) {
+
+        pathNormalizer_ = pathNormalizer;
+    }
+
     public ClassDesc getPageClassDescriptor() {
 
         return getTemporaryClassDesc(pageClassName_);
@@ -149,7 +161,7 @@ public class AnalyzerContext extends ZptTemplateContext {
     public void close() {
 
         for (Iterator itr = temporaryClassDescMap_.entrySet().iterator(); itr
-            .hasNext();) {
+                .hasNext();) {
             Map.Entry entry = (Map.Entry) itr.next();
             String name = (String) entry.getKey();
             ClassDesc classDesc = (ClassDesc) entry.getValue();
@@ -164,7 +176,7 @@ public class AnalyzerContext extends ZptTemplateContext {
                 for (int i = 0; i < pds.length; i++) {
                     if (isEmptyDto(pds[i].getTypeDesc().getClassDesc())) {
                         pds[i].getTypeDesc().setClassDesc(
-                            TypeDesc.DEFAULT_CLASSDESC);
+                                TypeDesc.DEFAULT_CLASSDESC);
                     }
                 }
             }
@@ -176,13 +188,13 @@ public class AnalyzerContext extends ZptTemplateContext {
     boolean isEmptyDto(ClassDesc classDesc) {
 
         return (ClassDesc.KIND_DTO.equals(classDesc.getKind()) && classDesc
-            .isEmpty());
+                .isEmpty());
     }
 
     public String getDtoClassName(String baseName) {
 
         return sourceCreator_.getDtoPackageName() + "." + capFirst(baseName)
-            + ClassDesc.KIND_DTO;
+                + ClassDesc.KIND_DTO;
     }
 
     String capFirst(String string) {
@@ -191,12 +203,12 @@ public class AnalyzerContext extends ZptTemplateContext {
             return string;
         } else {
             return Character.toUpperCase(string.charAt(0))
-                + string.substring(1);
+                    + string.substring(1);
         }
     }
 
     public PropertyDesc getPropertyDesc(ClassDesc classDesc, String name,
-        int mode) {
+            int mode) {
 
         int dot = name.indexOf('.');
         if (dot < 0) {
@@ -204,11 +216,11 @@ public class AnalyzerContext extends ZptTemplateContext {
         } else {
             String baseName = name.substring(0, dot);
             PropertyDesc propertyDesc = getSinglePropertyDesc(classDesc,
-                baseName, PropertyDesc.READ);
+                    baseName, PropertyDesc.READ);
             ClassDesc typeClassDesc = prepareTypeClassDesc(propertyDesc);
             if (typeClassDesc != null) {
                 return getPropertyDesc(typeClassDesc, name.substring(dot + 1),
-                    mode);
+                        mode);
             } else {
                 return propertyDesc;
             }
@@ -216,7 +228,7 @@ public class AnalyzerContext extends ZptTemplateContext {
     }
 
     PropertyDesc getSinglePropertyDesc(ClassDesc classDesc, String name,
-        int mode) {
+            int mode) {
 
         boolean array = false;
         int lparen = name.indexOf(STR_ARRAY_LPAREN);
@@ -241,10 +253,10 @@ public class AnalyzerContext extends ZptTemplateContext {
         if (cd == TypeDesc.DEFAULT_CLASSDESC) {
             String name = propertyDesc.getName();
             if (propertyDesc.getTypeDesc().isArray()
-                && name.endsWith(MULTIPLE_SUFFIX)) {
+                    && name.endsWith(MULTIPLE_SUFFIX)) {
                 // 名前を単数形にする。
                 name = name.substring(0, name.length()
-                    - MULTIPLE_SUFFIX.length());
+                        - MULTIPLE_SUFFIX.length());
             }
             returned = getTemporaryClassDesc(name);
             propertyDesc.getTypeDesc().setClassDesc(returned);
