@@ -33,11 +33,10 @@ public class YmirBootstrap {
         }
         Application application = new SingleApplication(getConfiguration(),
                 servletContext.getRealPath("/"), landmark);
-        servletContext.setAttribute(Globals.ATTR_APPLICATION, application);
 
         ApplicationManager applicationManager = (ApplicationManager) getContainer()
                 .getComponent(ApplicationManager.class);
-        applicationManager.addApplication(application);
+        applicationManager.setBaseApplication(application);
     }
 
     Configuration getConfiguration() {

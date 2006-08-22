@@ -13,8 +13,8 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.Application;
+import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.FormFile;
-import org.seasar.cms.ymir.Globals;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.PathMapping;
@@ -46,11 +46,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private Configuration configuration_;
 
+    private ApplicationManager applicationManager_;
+
     private final BeanUtilsBean beanUtilsBean_;
 
-    private final Logger logger_ = Logger.getLogger(getClass());
-
     private ThreadContext threadContext_;
+
+    private final Logger logger_ = Logger.getLogger(getClass());
 
     public DefaultRequestProcessor() {
 
@@ -107,8 +109,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Application getApplication() {
-        return (Application) getServletContext().getAttribute(
-                Globals.ATTR_APPLICATION);
+        return applicationManager_.getContextApplication();
     }
 
     ServletContext getServletContext() {
@@ -321,5 +322,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public void setConfiguration(Configuration configuration) {
 
         configuration_ = configuration;
+    }
+
+    public void setApplicationManager(ApplicationManager applicationManager) {
+
+        applicationManager_ = applicationManager;
     }
 }
