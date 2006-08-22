@@ -117,10 +117,12 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             if (externalContext_ != null) {
                 rootContainer_.setExternalContext(externalContext_);
             }
-        } else if (rootContainer_.getExternalContext().getApplication() == null
-                && externalContext_ != null) {
-            rootContainer_.getExternalContext().setApplication(
-                    externalContext_.getApplication());
+        }
+        if (rootContainer_.getExternalContext().getApplication() == null) {
+            if (application_ != null) {
+                rootContainer_.getExternalContext()
+                        .setApplication(application_);
+            }
         }
         if (rootContainer_.getExternalContextComponentDefRegister() == null
                 && externalContextComponentDefRegister_ != null) {
