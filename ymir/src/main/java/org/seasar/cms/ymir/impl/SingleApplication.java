@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.ymir.PathMappingProvider;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
@@ -16,7 +18,9 @@ public class SingleApplication extends AbstractApplication {
     private Class referenceClass_;
 
     public SingleApplication(Configuration config, String webappRoot,
-            Class referenceClass) {
+            Class referenceClass, LocalOndemandS2Container ondemandContainer,
+            PathMappingProvider pathMappingProvider) {
+        super(ondemandContainer, pathMappingProvider);
         config_ = config;
         webappRoot_ = webappRoot;
         referenceClass_ = referenceClass;
@@ -55,6 +59,10 @@ public class SingleApplication extends AbstractApplication {
     }
 
     public boolean isCapable(Class clazz) {
+        return true;
+    }
+
+    public boolean isBeingDeveloped() {
         return true;
     }
 }

@@ -3,6 +3,7 @@ package org.seasar.cms.ymir;
 import javax.servlet.ServletContext;
 
 import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
@@ -32,7 +33,11 @@ public class YmirBootstrap {
         } catch (ClassNotFoundException ignored) {
         }
         Application application = new SingleApplication(getConfiguration(),
-                servletContext.getRealPath("/"), landmark);
+                servletContext.getRealPath("/"), landmark,
+                (LocalOndemandS2Container) getContainer().getComponent(
+                        LocalOndemandS2Container.class),
+                (PathMappingProvider) getContainer().getComponent(
+                        PathMappingProvider.class));
 
         ApplicationManager applicationManager = (ApplicationManager) getContainer()
                 .getComponent(ApplicationManager.class);

@@ -2,6 +2,11 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
+  <component class="org.seasar.cms.ymir.impl.PathMappingProviderImpl">
+    <property name="pathMappings">
+      container.findLocalComponents(@org.seasar.cms.ymir.PathMapping@class)
+    </property>
+  </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
     <arg>"^$"</arg>
     <arg>"DefaultPage"</arg>

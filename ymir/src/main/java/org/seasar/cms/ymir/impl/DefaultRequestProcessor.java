@@ -38,8 +38,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     public static final String ATTR_PAGE = "PAGE";
 
-    private PathMapping[] pathMappings_;
-
     private ResponseConstructorSelector responseConstructorSelector_;
 
     private Updater[] updaters_ = new Updater[0];
@@ -84,7 +82,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 dispatcher, parameterMap, fileParameterMap, mapping
                         .getPathInfo(resolver));
 
-        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())) {
+        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
+                && getApplication().isBeingDeveloped()) {
             for (int i = 0; i < updaters_.length; i++) {
                 Response response = updaters_[i].update(path, request
                         .getMethod(), request);
@@ -112,6 +111,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return applicationManager_.getContextApplication();
     }
 
+    PathMapping[] getPathMappings() {
+        return getApplication().getPathMappingProvider().getPathMappings();
+    }
+
     ServletContext getServletContext() {
         return (ServletContext) getRootS2Container().getComponent(
                 ServletContext.class);
@@ -137,11 +140,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public MatchedPathMapping findMatchedPathMapping(String path, String method) {
 
         VariableResolver resolver = null;
-        if (pathMappings_ != null) {
-            for (int i = 0; i < pathMappings_.length; i++) {
-                resolver = pathMappings_[i].match(path, method);
+        PathMapping[] pathMappings = getPathMappings();
+        if (pathMappings != null) {
+            for (int i = 0; i < pathMappings.length; i++) {
+                resolver = pathMappings[i].match(path, method);
                 if (resolver != null) {
-                    return new MatchedPathMapping(pathMappings_[i], resolver);
+                    return new MatchedPathMapping(pathMappings[i], resolver);
                 }
             }
         }
@@ -274,38 +278,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
         } finally {
             Thread.currentThread().setContextClassLoader(oldLoader);
         }
-    }
-
-    public PathMapping[] getPathMappings() {
-
-        return pathMappings_;
-    }
-
-    public void setPathMappings(PathMapping[] pathMappings) {
-
-        pathMappings_ = pathMappings;
-    }
-
-    public void addPathMapping(String patternString,
-            String componentNameTemplate, String actionNameTemplate,
-            String pathInfoTemplate, String defaultPathTemplate) {
-
-        pathMappings_ = addPathMapping(pathMappings_, new PathMappingImpl(
-                patternString, componentNameTemplate, actionNameTemplate,
-                pathInfoTemplate, defaultPathTemplate));
-    }
-
-    PathMapping[] addPathMapping(PathMapping[] patterns, PathMapping pattern) {
-
-        PathMapping[] newPatterns;
-        if (patterns == null) {
-            newPatterns = new PathMapping[] { pattern };
-        } else {
-            newPatterns = new PathMapping[patterns.length + 1];
-            System.arraycopy(patterns, 0, newPatterns, 0, patterns.length);
-            newPatterns[patterns.length] = pattern;
-        }
-        return newPatterns;
     }
 
     public void setResponseConstructorSelector(

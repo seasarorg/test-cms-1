@@ -3,6 +3,7 @@ package org.seasar.cms.ymir;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.framework.container.S2Container;
 
 public interface Application {
@@ -14,6 +15,8 @@ public interface Application {
      * @return Webアプリケーションのトップディレクトリのパス。
      */
     String getWebappRoot();
+
+    String getWebappSourceRoot();
 
     Class getReferenceClass();
 
@@ -54,4 +57,10 @@ public interface Application {
     void save(OutputStream out, String header) throws IOException;
 
     String getDefaultPropertiesFilePath();
+
+    LocalOndemandS2Container getOndemandS2Container();
+
+    PathMappingProvider getPathMappingProvider();
+
+    boolean isBeingDeveloped();
 }

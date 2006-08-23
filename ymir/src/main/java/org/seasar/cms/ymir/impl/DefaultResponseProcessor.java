@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.ResponsePathNormalizer;
 import org.seasar.cms.ymir.ResponseProcessor;
 import org.seasar.cms.ymir.util.ServletUtils;
 
@@ -19,9 +20,11 @@ public class DefaultResponseProcessor implements ResponseProcessor {
 
     private static final int BUF_SIZE = 4096;
 
+    private ResponsePathNormalizer responsePathNormalizer_ = new DefaultResponsePathNormalizer();
+
     public boolean process(ServletContext context,
-        HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-        Response response) throws IOException, ServletException {
+            HttpServletRequest httpRequest, HttpServletResponse httpResponse,
+            Response response) throws IOException, ServletException {
 
         if (response.getStatus() != Response.STATUS_UNDEFINED) {
             httpResponse.setStatus(response.getStatus());
@@ -35,8 +38,10 @@ public class DefaultResponseProcessor implements ResponseProcessor {
             return true;
 
         case Response.TYPE_FORWARD:
-            context.getRequestDispatcher(response.getPath()).forward(
-                httpRequest, httpResponse);
+            context.getRequestDispatcher(
+                    responsePathNormalizer_.normalize(response.getPath(),
+                            false, httpRequest)).forward(httpRequest,
+                    httpResponse);
             return false;
 
         case Response.TYPE_REDIRECT:
@@ -47,7 +52,8 @@ public class DefaultResponseProcessor implements ResponseProcessor {
                     path = "/";
                 }
             }
-            httpResponse.sendRedirect(path);
+            httpResponse.sendRedirect(responsePathNormalizer_.normalize(
+                    response.getPath(), true, httpRequest));
             return false;
 
         case Response.TYPE_SELF_CONTAINED:
@@ -83,7 +89,12 @@ public class DefaultResponseProcessor implements ResponseProcessor {
 
         default:
             throw new RuntimeException("Unknown response type:"
-                + response.getType());
+                    + response.getType());
         }
+    }
+
+    public void setResponsePathNormalizer(
+            ResponsePathNormalizer responsePathNormalizer) {
+        responsePathNormalizer_ = responsePathNormalizer;
     }
 }
