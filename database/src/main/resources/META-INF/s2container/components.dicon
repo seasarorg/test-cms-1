@@ -5,9 +5,6 @@
   <include path="j2ee.dicon" />
   <component
     class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
-    <property name="namingConvention">
-      <component class="org.seasar.cms.pluggable.LegacyNamingConvention" />
-    </property>
     <initMethod name="addReferenceClass">
       <arg>@org.seasar.cms.database.identity.Identity@class</arg>
     </initMethod>
