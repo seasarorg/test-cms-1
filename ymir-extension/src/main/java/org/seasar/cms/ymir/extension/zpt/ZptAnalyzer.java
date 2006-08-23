@@ -64,14 +64,14 @@ public class ZptAnalyzer implements TemplateAnalyzer {
 
     private SourceCreator sourceCreator_;
 
-    private PathNormalizer pathNormalizer_ = new PathNormalizerImpl();
+    private TemplatePathNormalizer templatePathNormalizer_ = new DefaultTemplatePathNormalizer();
 
     public void analyze(String method, Map<String, ClassDesc> classDescMap,
             InputStream inputStream, String encoding, String className) {
 
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
         context.setSourceCreator(sourceCreator_);
-        context.setPathNormalizer(pathNormalizer_);
+        context.setPathNormalizer(templatePathNormalizer_);
         context.setMethod(method);
         context.setClassDescMap(classDescMap);
         context.setPageClassName(className);
@@ -102,7 +102,8 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         sourceCreator_ = sourceCreator;
     }
 
-    public void setPathNormalizer(PathNormalizer pathNormalizer) {
-        pathNormalizer_ = pathNormalizer;
+    public void setTemplatePathNormalizer(
+            TemplatePathNormalizer templatePathNormalizer) {
+        templatePathNormalizer_ = templatePathNormalizer;
     }
 }

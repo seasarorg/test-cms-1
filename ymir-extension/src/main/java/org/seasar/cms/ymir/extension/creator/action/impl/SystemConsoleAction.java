@@ -20,7 +20,7 @@ import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 public class SystemConsoleAction extends AbstractUpdateAction {
 
     private static final String PARAM_APPLY = SourceCreatorImpl.PARAM_PREFIX
-        + "apply";
+            + "apply";
 
     public SystemConsoleAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
@@ -45,11 +45,11 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         variableMap.put("parameters", getParameters(request));
         variableMap.put("method", request.getMethod());
         return getSourceCreator().getResponseCreator().createResponse(
-            "systemConsole", variableMap);
+                "systemConsole", variableMap);
     }
 
     Response actConfirmUpdateAllClasses(Request request,
-        PathMetaData pathMetaData) {
+            PathMetaData pathMetaData) {
 
         String method = request.getParameter(PARAM_METHOD);
         if (method == null) {
@@ -57,7 +57,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         }
 
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
-            gatherPaths());
+                gatherPaths());
 
         Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
@@ -65,7 +65,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         variableMap.put("method", method);
         variableMap.put("classDescBag", classDescBag);
         return getSourceCreator().getResponseCreator().createResponse(
-            "systemConsole_confirmUpdateAllClasses", variableMap);
+                "systemConsole_confirmUpdateAllClasses", variableMap);
     }
 
     Response actUpdateAllClasses(Request request, PathMetaData pathMetaData) {
@@ -76,7 +76,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         }
 
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
-            gatherPaths());
+                gatherPaths());
 
         String[] appliedClassNames = request.getParameterValues(PARAM_APPLY);
         Set<String> appliedClassNameSet = new HashSet<String>();
@@ -99,13 +99,13 @@ public class SystemConsoleAction extends AbstractUpdateAction {
         variableMap.put("method", method);
         variableMap.put("classDescBag", classDescBag);
         return getSourceCreator().getResponseCreator().createResponse(
-            "systemConsole_updateAllClasses", variableMap);
+                "systemConsole_updateAllClasses", variableMap);
     }
 
     PathMetaData[] gatherPaths() {
 
         List<PathMetaData> pathList = new ArrayList<PathMetaData>();
-        File dir = getSourceCreator().getWebappRoot();
+        File dir = getSourceCreator().getWebappSourceRoot();
         gatherPaths(dir, "", pathList);
         return pathList.toArray(new PathMetaData[0]);
     }
@@ -129,18 +129,18 @@ public class SystemConsoleAction extends AbstractUpdateAction {
                 gatherPaths(root, childPath, pathList);
             } else {
                 addPathMetaDataIfNecessary(childPath, Request.METHOD_GET,
-                    pathList);
+                        pathList);
                 addPathMetaDataIfNecessary(childPath, Request.METHOD_POST,
-                    pathList);
+                        pathList);
             }
         }
     }
 
     void addPathMetaDataIfNecessary(String path, String method,
-        List<PathMetaData> pathList) {
+            List<PathMetaData> pathList) {
 
         PathMetaData pathMetaData = new LazyPathMetaData(getSourceCreator(),
-            path, method);
+                path, method);
         if (pathMetaData.getComponentName() != null && !pathMetaData.isDenied()) {
             pathList.add(pathMetaData);
         }
@@ -149,7 +149,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
     boolean shouldIgnore(String path, String name) {
 
         if (path.equals("/WEB-INF/classes") || path.equals("/WEB-INF/lib")
-            || path.equals("/WEB-INF/web.xml") || path.equals("/META-INF")) {
+                || path.equals("/WEB-INF/web.xml") || path.equals("/META-INF")) {
             return true;
         }
 

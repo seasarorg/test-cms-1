@@ -66,12 +66,16 @@ public class MockSourceCreator implements SourceCreator {
         return null;
     }
 
+    public File getWebappSourceRoot() {
+        return null;
+    }
+
     public ResponseCreator getResponseCreator() {
         return null;
     }
 
     public boolean writeSourceFile(ClassDesc classDesc,
-        ClassDescSet classDescSet) {
+            ClassDescSet classDescSet) {
         return false;
     }
 

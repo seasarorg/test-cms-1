@@ -22,6 +22,8 @@ public interface SourceCreator extends Updater {
 
     File getWebappRoot();
 
+    File getWebappSourceRoot();
+
     File getSourceDirectory();
 
     File getResourcesDirectory();

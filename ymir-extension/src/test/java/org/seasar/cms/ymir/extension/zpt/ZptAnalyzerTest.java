@@ -41,8 +41,8 @@ public class ZptAnalyzerTest extends TestCase {
             public String getClassName(String componentName) {
                 if (componentName.endsWith("Page")) {
                     return "com.example.web."
-                        + Character.toUpperCase(componentName.charAt(0))
-                        + componentName.substring(1);
+                            + Character.toUpperCase(componentName.charAt(0))
+                            + componentName.substring(1);
                 } else {
                     return null;
                 }
@@ -51,17 +51,21 @@ public class ZptAnalyzerTest extends TestCase {
             public String getActionName(String path, String method) {
                 return method;
             }
+
+            @Override
+            public String getRootPackageName() {
+                return "com.example";
+            }
         };
         creator.setNamingConvention(new NamingConventionImpl());
-        creator.setRootPackageName("com.example");
         analyzer_.setSourceCreator(creator);
     }
 
     private void act(String methodName) {
 
         analyzer_.analyze(Request.METHOD_GET, classDescMap_, getClass()
-            .getResourceAsStream("ZptAnalyzerTest_" + methodName + ".zpt"),
-            "UTF-8", CLASSNAME);
+                .getResourceAsStream("ZptAnalyzerTest_" + methodName + ".zpt"),
+                "UTF-8", CLASSNAME);
     }
 
     private ClassDesc getClassDesc(String name) {
@@ -77,7 +81,7 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(cd);
         assertNotNull(cd.getPropertyDesc("body"));
         assertNull("TemplateAnalyzerではリクエストメソッドのためのメソッド定義を生成しないこと", cd
-            .getMethodDesc(new MethodDescImpl("GET")));
+                .getMethodDesc(new MethodDescImpl("GET")));
     }
 
     public void testAnalyze2() throws Exception {
@@ -126,11 +130,11 @@ public class ZptAnalyzerTest extends TestCase {
         assertTrue(pd.isReadable());
         assertFalse(pd.getTypeDesc().isExplicit());
         assertEquals("プロパティを持たないリピート対象変数はStringの配列になること", "String[]", pd
-            .getTypeDesc().getName());
+                .getTypeDesc().getName());
 
         pd = cd.getPropertyDesc("entities");
         assertEquals("プロパティを持つリピート対象変数はDtoの配列になること",
-            "com.example.dto.EntityDto[]", pd.getTypeDesc().getName());
+                "com.example.dto.EntityDto[]", pd.getTypeDesc().getName());
         cd = getClassDesc("com.example.dto.EntityDto");
         assertNotNull("プロパティを持つリピート対象変数の型が生成されていること", cd);
         assertNotNull("Dto型がプロパティを持つこと", cd.getPropertyDesc("content"));
@@ -221,7 +225,7 @@ public class ZptAnalyzerTest extends TestCase {
         ClassDesc cd = getClassDesc("com.example.dto.TestDto");
         PropertyDesc pd = cd.getPropertyDesc("file");
         assertEquals("ファイルパラメータについてはプロパティの型がFormFileになること", FormFile.class
-            .getName(), pd.getTypeDesc().getName());
+                .getName(), pd.getTypeDesc().getName());
     }
 
     public void testAnalyze11() throws Exception {
@@ -232,7 +236,7 @@ public class ZptAnalyzerTest extends TestCase {
         PropertyDesc pd = cd.getPropertyDesc("tests");
         assertTrue("フォームパラメータ名に添字指定がある場合は配列になること", pd.getTypeDesc().isArray());
         assertEquals("tests配列プロパティのDto型名は単数形になること", "com.example.dto.TestDto",
-            pd.getTypeDesc().getClassDesc().getName());
+                pd.getTypeDesc().getClassDesc().getName());
     }
 
     public void testAnalyze12() throws Exception {
@@ -242,7 +246,7 @@ public class ZptAnalyzerTest extends TestCase {
         ClassDesc cd = getClassDesc("com.example.dto.TestDto");
         PropertyDesc pd = cd.getPropertyDesc("files");
         assertEquals("添字指定があるファイルパラメータについてはプロパティの型がFormFileの配列になること",
-            FormFile.class.getName() + "[]", pd.getTypeDesc().getName());
+                FormFile.class.getName() + "[]", pd.getTypeDesc().getName());
     }
 
     public void testAnalyze13() throws Exception {

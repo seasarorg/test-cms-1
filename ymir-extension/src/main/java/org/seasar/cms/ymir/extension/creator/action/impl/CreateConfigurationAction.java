@@ -29,6 +29,8 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
 
     private static final String KEY_WEBAPPROOT = "webappRoot";
 
+    private static final String KEY_WEBAPPSOURCEROOT = "webappSourceRoot";
+
     public CreateConfigurationAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
     }

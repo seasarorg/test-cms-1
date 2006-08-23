@@ -37,12 +37,16 @@ public class LazyPathMetaData implements PathMetaData {
 
     private boolean sourceFileLoaded_;
 
+    private File baseSourceFile_;
+
+    private boolean baseSourceFileLoaded_;
+
     private File templateFile_;
 
     private boolean templateFileLoaded_;
 
     public LazyPathMetaData(SourceCreator sourceCreator, String path,
-        String method) {
+            String method) {
 
         sourceCreator_ = sourceCreator;
         path_ = path;
@@ -99,10 +103,19 @@ public class LazyPathMetaData implements PathMetaData {
         return defaultPath_;
     }
 
+    public File getBaseSourceFile() {
+
+        if (!baseSourceFileLoaded_) {
+            baseSourceFile_ = sourceCreator_.getSourceFile(getClassName()
+                    + "Base");
+        }
+        return sourceFile_;
+    }
+
     public File getSourceFile() {
 
         if (!sourceFileLoaded_) {
-            sourceFile_ = sourceCreator_.getSourceFile(getClassName() + "Base");
+            sourceFile_ = sourceCreator_.getSourceFile(getClassName());
         }
         return sourceFile_;
     }

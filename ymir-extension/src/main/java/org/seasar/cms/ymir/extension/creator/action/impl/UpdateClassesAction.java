@@ -123,7 +123,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
     long getLastCheckedTime(PathMetaData pathMetaData) {
 
-        File sourceFile = pathMetaData.getSourceFile();
+        File sourceFile = pathMetaData.getBaseSourceFile();
         if (sourceFile.exists()) {
             return sourceFile.lastModified();
         } else {

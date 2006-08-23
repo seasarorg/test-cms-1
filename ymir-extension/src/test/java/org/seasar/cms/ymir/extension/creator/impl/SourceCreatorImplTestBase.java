@@ -11,7 +11,6 @@ import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.pluggable.hotdeploy.TemporaryLocalOndemandS2Container;
 import org.seasar.cms.pluggable.impl.ConfigurationImpl;
 import org.seasar.cms.ymir.ApplicationManager;
-import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.YmirTestCase;
 import org.seasar.cms.ymir.convention.YmirNamingConvention;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
@@ -22,6 +21,7 @@ import org.seasar.cms.ymir.extension.zpt.ZptAnalyzer;
 import org.seasar.cms.ymir.impl.AbstractApplication;
 import org.seasar.cms.ymir.impl.ApplicationManagerImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
+import org.seasar.cms.ymir.impl.PathMappingProviderImpl;
 import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContext;
@@ -103,22 +103,23 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
         Configuration configuration = (Configuration) container_
                 .getComponent(Configuration.class);
+        configuration.setProperty(AbstractApplication.KEY_ROOTPACKAGENAME,
+                "com.example");
         ApplicationManager applicationManager = (ApplicationManager) container_
                 .getComponent(ApplicationManager.class);
+        PathMappingProviderImpl pathMappingProvider = new PathMappingProviderImpl();
+        pathMappingProvider.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page",
+                "_${method}", "", null);
         applicationManager.setBaseApplication(new SingleApplication(
                 configuration, new File(ResourceUtil.getBuildDir(getClass()),
-                        "webapp").getCanonicalPath(), null));
+                        "webapp").getCanonicalPath(), null, ondemandContainer,
+                pathMappingProvider));
         configuration.setProperty(AbstractApplication.KEY_SOURCEDIRECTORY,
                 ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
         configuration.setProperty(AbstractApplication.KEY_CLASSESDIRECTORY,
                 ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
         configuration.setProperty(AbstractApplication.KEY_RESOURCESDIRECTORY,
                 ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
-
-        DefaultRequestProcessor processor = (DefaultRequestProcessor) container_
-                .getComponent(RequestProcessor.class);
-        processor.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page", "_${method}",
-                "", null);
 
         target_ = (SourceCreatorImpl) container_
                 .getComponent(SourceCreator.class);

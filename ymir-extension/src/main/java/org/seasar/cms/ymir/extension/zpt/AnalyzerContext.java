@@ -26,7 +26,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private SourceCreator sourceCreator_;
 
-    private PathNormalizer pathNormalizer_;
+    private TemplatePathNormalizer pathNormalizer_;
 
     private String method_;
 
@@ -133,12 +133,12 @@ public class AnalyzerContext extends ZptTemplateContext {
         sourceCreator_ = sourceCreator;
     }
 
-    public PathNormalizer getPathNormalizer() {
+    public TemplatePathNormalizer getPathNormalizer() {
 
         return pathNormalizer_;
     }
 
-    public void setPathNormalizer(PathNormalizer pathNormalizer) {
+    public void setPathNormalizer(TemplatePathNormalizer pathNormalizer) {
 
         pathNormalizer_ = pathNormalizer;
     }

@@ -18,6 +18,8 @@ public interface PathMetaData {
 
     String getDefaultPath();
 
+    File getBaseSourceFile();
+
     File getSourceFile();
 
     File getTemplateFile();

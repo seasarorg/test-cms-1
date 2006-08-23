@@ -66,8 +66,6 @@ import org.seasar.cms.ymir.impl.RedirectResponse;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
-import org.seasar.framework.container.hotdeploy.OndemandProject;
-import org.seasar.framework.container.hotdeploy.OndemandS2Container;
 import org.seasar.framework.convention.NamingConvention;
 import org.seasar.framework.log.Logger;
 
@@ -89,15 +87,11 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private DefaultRequestProcessor defaultRequestProcessor_;
 
-    private LocalOndemandS2Container ondemandContainer_;
-
     private NamingConvention namingConvention_;
 
     private TemplateAnalyzer analyzer_;
 
     private String encoding_ = "UTF-8";
-
-    private String rootPackageName_;
 
     private SourceGenerator sourceGenerator_;
 
@@ -189,7 +183,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
         XOMapper mapper = XOMapperFactory.newInstance();
         mapper.setStrict(false);
-        File webXml = new File(getWebappRoot(), "WEB-INF/web.xml");
+        File webXml = new File(getWebappSourceRoot(), "WEB-INF/web.xml");
         if (!webXml.exists()) {
             return null;
         }
@@ -639,22 +633,16 @@ public class SourceCreatorImpl implements SourceCreator {
         if (componentName == null) {
             return null;
         } else {
-            // FIXME クラスローダの設定はs2-framework-2.4.0-beta-5以降では不要。
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            try {
-                Thread.currentThread().setContextClassLoader(
-                        ondemandContainer_.getContainer().getClassLoader());
-                int size = ondemandContainer_.getProjectSize();
-                for (int i = 0; i < size; i++) {
-                    String className = ondemandContainer_.getProject(i)
-                            .fromComponentNameToClassName(ondemandContainer_,
-                                    componentName);
-                    if (className != null) {
-                        return className;
-                    }
+            LocalOndemandS2Container ondemandContainer = getApplication()
+                    .getOndemandS2Container();
+            int size = ondemandContainer.getProjectSize();
+            for (int i = 0; i < size; i++) {
+                String className = ondemandContainer.getProject(i)
+                        .fromComponentNameToClassName(ondemandContainer,
+                                componentName);
+                if (className != null) {
+                    return className;
                 }
-            } finally {
-                Thread.currentThread().setContextClassLoader(cl);
             }
         }
         return null;
@@ -666,8 +654,8 @@ public class SourceCreatorImpl implements SourceCreator {
             return null;
         }
         try {
-            return Class.forName(className, true, ondemandContainer_
-                    .getContainer().getClassLoader());
+            return Class.forName(className, true, getS2Container()
+                    .getClassLoader());
         } catch (ClassNotFoundException ex) {
             return null;
         }
@@ -675,7 +663,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public File getTemplateFile(String path) {
 
-        return new File(getWebappRoot(), path);
+        return new File(getWebappSourceRoot(), path);
     }
 
     public File getSourceFile(String className) {
@@ -745,22 +733,6 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    public void setOndemandS2Container(OndemandS2Container container) {
-
-        if (container instanceof LocalOndemandS2Container) {
-            ondemandContainer_ = (LocalOndemandS2Container) container;
-            if (rootPackageName_ == null) {
-                if (ondemandContainer_.getProjectSize() > 0) {
-                    OndemandProject project = ondemandContainer_.getProject(0);
-                    rootPackageName_ = project.getRootPackageName();
-                }
-            }
-        } else {
-            throw new ComponentNotFoundRuntimeException(
-                    "LocalOndemandS2Container");
-        }
-    }
-
     public void setNamingConvention(NamingConvention namingConvention) {
 
         namingConvention_ = namingConvention;
@@ -811,6 +783,11 @@ public class SourceCreatorImpl implements SourceCreator {
         return new File(getApplication().getWebappRoot());
     }
 
+    public File getWebappSourceRoot() {
+
+        return new File(getApplication().getWebappSourceRoot());
+    }
+
     public TemplateAnalyzer getTemplateAnalyzer() {
 
         return analyzer_;
@@ -833,32 +810,31 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public String getRootPackageName() {
 
-        return rootPackageName_;
-    }
-
-    public void setRootPackageName(String rootPackageName) {
-
-        rootPackageName_ = rootPackageName;
+        return getApplication().getRootPackageName();
     }
 
     public String getPagePackageName() {
 
-        return rootPackageName_ + "." + namingConvention_.getWebPackageName();
+        return getRootPackageName() + "."
+                + namingConvention_.getWebPackageName();
     }
 
     public String getDtoPackageName() {
 
-        return rootPackageName_ + "." + namingConvention_.getDtoPackageName();
+        return getRootPackageName() + "."
+                + namingConvention_.getDtoPackageName();
     }
 
     public String getDaoPackageName() {
 
-        return rootPackageName_ + "." + namingConvention_.getDaoPackageName();
+        return getRootPackageName() + "."
+                + namingConvention_.getDaoPackageName();
     }
 
     public String getDxoPackageName() {
 
-        return rootPackageName_ + "." + namingConvention_.getDxoPackageName();
+        return getRootPackageName() + "."
+                + namingConvention_.getDxoPackageName();
     }
 
     public SourceGenerator getSourceGenerator() {
@@ -892,19 +868,23 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public Application getApplication() {
+
         return applicationManager_.getContextApplication();
     }
 
     ServletContext getServletContext() {
+
         return (ServletContext) getRootS2Container().getComponent(
                 ServletContext.class);
     }
 
     S2Container getS2Container() {
+
         return getApplication().getS2Container();
     }
 
     S2Container getRootS2Container() {
+
         return SingletonS2ContainerFactory.getContainer();
     }
 

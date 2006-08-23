@@ -22,11 +22,13 @@ public class PathMetaDataImpl implements PathMetaData {
 
     private File sourceFile_;
 
+    private File baseSourceFile_;
+
     private File templateFile_;
 
     public PathMetaDataImpl(String path, String method, boolean denied,
-        String componentName, String className, String actionName,
-        String defaultPath, File sourceFile, File templateFile) {
+            String componentName, String className, String actionName,
+            String defaultPath, File sourceFile, File templateFile) {
 
         path_ = path;
         method_ = method;
@@ -36,7 +38,24 @@ public class PathMetaDataImpl implements PathMetaData {
         actionName_ = actionName;
         defaultPath_ = defaultPath;
         sourceFile_ = sourceFile;
+        baseSourceFile_ = toBaseSourceFile(sourceFile);
         templateFile_ = templateFile;
+    }
+
+    File toBaseSourceFile(File sourceFile) {
+
+        if (sourceFile == null) {
+            return null;
+        }
+
+        String name = sourceFile.getName();
+        int dot = name.lastIndexOf('.');
+        if (dot < 0) {
+            return new File(sourceFile.getParentFile(), name + "Base");
+        } else {
+            return new File(sourceFile.getParentFile(), name.substring(0, dot)
+                    + "Base" + name.substring(dot));
+        }
     }
 
     public String getMethod() {
@@ -75,6 +94,11 @@ public class PathMetaDataImpl implements PathMetaData {
     public File getSourceFile() {
 
         return sourceFile_;
+    }
+
+    public File getBaseSourceFile() {
+
+        return baseSourceFile_;
     }
 
     public File getTemplateFile() {

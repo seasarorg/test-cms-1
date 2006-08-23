@@ -14,12 +14,16 @@
   <input type="hidden" name="__ymir__method" tal:attributes="value request/method" />
   <dl>
     <dt>projectRoot</dt>
-    <dd>このWebアプリケーションのためのEclipseプロジェクトのパスを入力して下さい。<br />
+    <dd>このWebアプリケーションのためのEclipseプロジェクトのパスを入力して下さい。（例：<tt>C:\eclipse\workspace\skeleton</tt>）<br />
       <input type="text" name="__ymir__key_projectRoot" size="64" tal:attributes="value application/projectRoot" />
     </dd>
     <dt>rootPackageName</dt>
-    <dd>このWebアプリケーションのJavaソースコードのルートパッケージ名を入力して下さい。<br />
+    <dd>このWebアプリケーションのJavaソースコードのルートパッケージ名を入力して下さい。（例：<tt>com.example</tt>）<br />
       <input type="text" name="__ymir__key_rootPackageName" size="64" tal:attributes="value application/rootPackageName" />
+    </dd>
+    <dt>webappSourceRoot</dt>
+    <dd>このWebアプリケーションのリソースが格納されているソースディレクトリのパスを入力して下さい。（例：<tt>C:\eclipse\workspace\skeleton\src\main\webapp</tt>）<br />
+      <input type="text" name="__ymir__key_webappSourceRoot" size="64" tal:attributes="value application/webappSourceRoot" />
     </dd>
     <dt>extension.beantable.enable</dt>
     <dd>Bean定義からテーブルを自動生成するBeantable機能を利用するかどうかを指定して下さい。<br />
