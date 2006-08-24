@@ -22,7 +22,7 @@
       <input type="text" name="__ymir__key_rootPackageName" size="64" tal:attributes="value application/rootPackageName" />
     </dd>
     <dt>webappSourceRoot</dt>
-    <dd>このWebアプリケーションのリソースが格納されているソースディレクトリのパスを入力して下さい。（例：<tt>C:\eclipse\workspace\skeleton\src\main\webapp</tt>）<br />
+    <dd>このWebアプリケーションのリソースが格納されているソースディレクトリのパスをprojectRoot相対パスで入力して下さい。（例：<tt>src\main\webapp</tt>）<br />
       <input type="text" name="__ymir__key_webappSourceRoot" size="64" tal:attributes="value application/webappSourceRoot" />
     </dd>
     <dt>extension.beantable.enable</dt>
