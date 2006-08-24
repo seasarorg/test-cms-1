@@ -56,6 +56,11 @@ abstract public class AbstractApplication implements Application {
         String classesDirectory = getProperty(KEY_CLASSESDIRECTORY);
         if (classesDirectory == null) {
             classesDirectory = getWebappRoot() + "/WEB-INF/classes";
+        } else {
+            String projectRoot = getProjectRoot();
+            if (projectRoot != null) {
+                classesDirectory = projectRoot + "/" + classesDirectory;
+            }
         }
         return classesDirectory;
     }
@@ -68,10 +73,13 @@ abstract public class AbstractApplication implements Application {
         String resourcesDirectory = getProperty(KEY_RESOURCESDIRECTORY);
         if (resourcesDirectory == null) {
             String projectRoot = getProjectRoot();
-            if (projectRoot == null) {
-                return null;
-            } else {
+            if (projectRoot != null) {
                 resourcesDirectory = projectRoot + "/src/main/resources";
+            }
+        } else {
+            String projectRoot = getProjectRoot();
+            if (projectRoot != null) {
+                resourcesDirectory = projectRoot + "/" + resourcesDirectory;
             }
         }
         return resourcesDirectory;
@@ -87,6 +95,11 @@ abstract public class AbstractApplication implements Application {
             String projectRoot = getProjectRoot();
             if (projectRoot != null) {
                 sourceDirectory = projectRoot + "/src/main/java";
+            }
+        } else {
+            String projectRoot = getProjectRoot();
+            if (projectRoot != null) {
+                sourceDirectory = projectRoot + "/" + sourceDirectory;
             }
         }
         return sourceDirectory;
@@ -105,6 +118,11 @@ abstract public class AbstractApplication implements Application {
                 if (projectRoot != null) {
                     webappSourceRoot = projectRoot + "/src/main/webapp";
                 }
+            }
+        } else {
+            String projectRoot = getProjectRoot();
+            if (projectRoot != null) {
+                webappSourceRoot = projectRoot + "/" + webappSourceRoot;
             }
         }
         return webappSourceRoot;
@@ -129,5 +147,9 @@ abstract public class AbstractApplication implements Application {
 
     public PathMappingProvider getPathMappingProvider() {
         return pathMappingProvider_;
+    }
+
+    public boolean isCapable(Class clazz) {
+        return clazz.getName().startsWith(getRootPackageName() + ".");
     }
 }

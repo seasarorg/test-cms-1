@@ -58,10 +58,6 @@ public class SingleApplication extends AbstractApplication {
         config_.setProperty(key, value);
     }
 
-    public boolean isCapable(Class clazz) {
-        return true;
-    }
-
     public boolean isBeingDeveloped() {
         return true;
     }
