@@ -1,5 +1,6 @@
 package org.seasar.cms.pluggable.hotdeploy;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.seasar.framework.convention.impl.NamingConventionImpl;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 
 public class LocalOndemandS2Container implements HotdeployListener,
-    OndemandS2Container {
+        OndemandS2Container {
 
     private S2Container container_;
 
@@ -33,6 +34,8 @@ public class LocalOndemandS2Container implements HotdeployListener,
     public static final String namingConvention_BINDING = "bindingType=may";
 
     private NamingConvention namingConvention_ = new NamingConventionImpl();
+
+    private File classesDirectory_;
 
     public OndemandProject getProject(int index) {
         return (OndemandProject) projects_.get(index);
@@ -88,7 +91,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(
-                getHotdeployClassLoader());
+                    getHotdeployClassLoader());
             for (int i = 0; i < getProjectSize(); ++i) {
                 OndemandProject project = getProject(i);
                 if (project.loadComponentDef(this, clazz)) {
@@ -104,7 +107,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(
-                getHotdeployClassLoader());
+                    getHotdeployClassLoader());
             for (int i = 0; i < getProjectSize(); ++i) {
                 OndemandProject project = getProject(i);
                 ComponentDef cd = project.getComponentDef(this, clazz);
@@ -122,12 +125,12 @@ public class LocalOndemandS2Container implements HotdeployListener,
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(
-                getHotdeployClassLoader());
+                    getHotdeployClassLoader());
             for (int i = 0; i < getProjectSize(); ++i) {
                 OndemandProject project = getProject(i);
                 try {
                     ComponentDef cd = project.getComponentDef(this,
-                        componentName);
+                            componentName);
                     if (cd != null) {
                         return cd;
                     }
@@ -156,7 +159,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     protected void registerByClass(ComponentDef componentDef) {
         Class[] classes = S2ContainerUtil.getAssignableClasses(componentDef
-            .getComponentClass());
+                .getComponentClass());
         for (int i = 0; i < classes.length; ++i) {
             registerMap(classes[i], componentDef);
         }
@@ -192,7 +195,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
         if (originalClassLoader_ instanceof ProxyClassLoader) {
             ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
             hotdeployClassLoader_ = newHotdeployClassLoader(proxyClassLoader
-                .getClassLoader());
+                    .getClassLoader());
             proxyClassLoader.setClassLoader(hotdeployClassLoader_);
         } else {
             hotdeployClassLoader_ = newHotdeployClassLoader(originalClassLoader_);
@@ -201,9 +204,12 @@ public class LocalOndemandS2Container implements HotdeployListener,
     }
 
     HotdeployClassLoader newHotdeployClassLoader(ClassLoader originalClassLoader) {
-        HotdeployClassLoader hotdeployClassLoader = new HotdeployClassLoader(
-            originalClassLoader);
+        PluggableHotdeployClassLoader hotdeployClassLoader = new PluggableHotdeployClassLoader(
+                originalClassLoader);
         hotdeployClassLoader.setProjects(getProjects());
+        if (classesDirectory_ != null) {
+            hotdeployClassLoader.setClassesDirectory(classesDirectory_);
+        }
         return hotdeployClassLoader;
     }
 
@@ -220,4 +226,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
         componentDefCache_.clear();
     }
 
+    public void setClassesDirectory(String classesDirectory) {
+        classesDirectory_ = new File(classesDirectory);
+    }
 }
