@@ -17,6 +17,7 @@ import org.seasar.framework.container.util.S2ContainerUtil;
 import org.seasar.framework.convention.NamingConvention;
 import org.seasar.framework.convention.impl.NamingConventionImpl;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
+import org.seasar.framework.log.Logger;
 
 public class LocalOndemandS2Container implements HotdeployListener,
         OndemandS2Container {
@@ -36,6 +37,8 @@ public class LocalOndemandS2Container implements HotdeployListener,
     private NamingConvention namingConvention_ = new NamingConventionImpl();
 
     private File classesDirectory_;
+
+    private Logger logger_ = Logger.getLogger(getClass());
 
     public OndemandProject getProject(int index) {
         return (OndemandProject) projects_.get(index);
@@ -191,15 +194,28 @@ public class LocalOndemandS2Container implements HotdeployListener,
     }
 
     public void start() {
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("OndemandContainer's start() method called");
+        }
         originalClassLoader_ = container_.getClassLoader();
         if (originalClassLoader_ instanceof ProxyClassLoader) {
             ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
             hotdeployClassLoader_ = newHotdeployClassLoader(proxyClassLoader
                     .getClassLoader());
             proxyClassLoader.setClassLoader(hotdeployClassLoader_);
+            if (logger_.isDebugEnabled()) {
+                logger_
+                        .debug("Set HotdeployClassLoader in ProxyClassLoader: id="
+                                + System
+                                        .identityHashCode(hotdeployClassLoader_));
+            }
         } else {
             hotdeployClassLoader_ = newHotdeployClassLoader(originalClassLoader_);
             container_.setClassLoader(hotdeployClassLoader_);
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("Set HotdeployClassLoader: id="
+                        + System.identityHashCode(hotdeployClassLoader_));
+            }
         }
     }
 
@@ -214,10 +230,19 @@ public class LocalOndemandS2Container implements HotdeployListener,
     }
 
     public void stop() {
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("OndemandContainer's stop() method called");
+        }
         if (originalClassLoader_ instanceof ProxyClassLoader) {
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("Unset HotdeployClassLoader in ProxyClassLoader");
+            }
             ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
             proxyClassLoader.setClassLoader(hotdeployClassLoader_.getParent());
         } else {
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("Unset HotdeployClassLoader");
+            }
             container_.setClassLoader(originalClassLoader_);
         }
         hotdeployClassLoader_ = null;

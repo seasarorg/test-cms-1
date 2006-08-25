@@ -14,6 +14,7 @@ import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
 import org.seasar.framework.container.hotdeploy.HotdeployListener;
 import org.seasar.framework.container.hotdeploy.OndemandProject;
 import org.seasar.framework.container.impl.S2ContainerBehavior.DefaultProvider;
+import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.DisposableUtil;
 
 public class DistributedOndemandBehavior extends DefaultProvider {
@@ -24,8 +25,16 @@ public class DistributedOndemandBehavior extends DefaultProvider {
 
     private int counter_ = 0;
 
+    private Logger logger_ = Logger.getLogger(getClass());
+
     public synchronized void start() {
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("OndemandBehavior's start() method called");
+        }
         if (counter_++ == 0) {
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("ONDEMAND BEHAVIOR STARTING...");
+            }
             // 所属コンテナのクラスローダ毎にHotdeployListenerを分類しておく。
             ComponentDef[] componentDefs = getContainer().findAllComponentDefs(
                 HotdeployListener.class);
@@ -59,6 +68,9 @@ public class DistributedOndemandBehavior extends DefaultProvider {
                     }
                 }
             }
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("ONDEMAND BEHAVIOR STARTED");
+            }
         }
     }
 
@@ -75,7 +87,13 @@ public class DistributedOndemandBehavior extends DefaultProvider {
     }
 
     public synchronized void stop() {
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("OndemandBehavior's stop() method called");
+        }
         if (--counter_ == 0) {
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("ONDEMAND BEHAVIOR STOPPING...");
+            }
             DisposableUtil.dispose();
 
             LocalOndemandS2Container[] containers = getOndemandS2Containers();
@@ -84,6 +102,9 @@ public class DistributedOndemandBehavior extends DefaultProvider {
             }
 
             BeanDescFactory.clear();
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("ONDEMAND BEHAVIOR STOPPED");
+            }
         } else if (counter_ < 0) {
             throw new IllegalStateException("Unbalanced stop() calling");
         }

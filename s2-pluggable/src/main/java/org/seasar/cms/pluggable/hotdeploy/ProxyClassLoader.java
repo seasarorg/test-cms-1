@@ -39,4 +39,13 @@ public class ProxyClassLoader extends ClassLoader {
     public Class loadClass(String name) throws ClassNotFoundException {
         return classLoader_.loadClass(name);
     }
+
+    protected synchronized Class loadClass(String name, boolean resolve)
+            throws ClassNotFoundException {
+        Class clazz = classLoader_.loadClass(name);
+        if (resolve) {
+            resolveClass(clazz);
+        }
+        return clazz;
+    }
 }
