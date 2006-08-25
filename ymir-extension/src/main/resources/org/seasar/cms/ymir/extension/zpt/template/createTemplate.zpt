@@ -6,9 +6,6 @@
 <h1>SYSTEM NOTIFICATION</h1>
 <p>リクエストされたパス<span tal:replace="request/path">PATH</span>に対応するテンプレート<span tal:replace="pathMetaData/templateFile/name">TEMPLTATE</span>が見つかりませんでした。</p>
 <p>テンプレートを作成する場合は「作成」ボタンを押して下さい。</p>
-<p>なお、他のパスにリダイレクトさせたい場合などはパスに対応するPageクラス<span tal:replace="string:${pathMetaData/className}">CLASSNAME</span>の<span tal:replace="pathMetaData/actionName">ACTIONNAME</span>()メソッドの返り値の型をvoid以外にして適切な値を返すようにして下さい。
-例えば<span tal:replace="pathMetaData/actionName">ACTIONNAME</span>()メソッドの返り値の型をStringにして返り値として"redirect:/path/to/redirect.html"を返すようにすると、
-CONTEXT_PATH/path/to/redirect.htmlにリダイレクトされます。</p>
 <form tal:attributes="action request/absolutePath" method="post">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
   <input type="hidden" name="__ymir__task" value="createTemplate" />
@@ -18,5 +15,11 @@ CONTEXT_PATH/path/to/redirect.htmlにリダイレクトされます。</p>
   <p><input type="submit" value="作成" />
   <input type="button" value="戻る" onclick="history.back()" /></p>
 </form>
+<p><strong>その他のアドバイス：</strong>
+<ul>
+  <li tal:condition="actionMethodNotFound">リクエストされたパスに対応するPageクラス<span tal:replace="pathMetaData/className">CLASSNAME</span>は存在しますが、HTTPリクエストメソッド<span tal:replace="pathMetaData/method">METHOD</span>を処理するための<span tal:replace="pathMetaData/actionName">ACTIONNAME</span>()メソッドが存在しません。テンプレートに処理を遷移させる前にロジックを実行したい場合は<span tal:replace="pathMetaData/actionName">ACTIONNAME</span>()メソッドをPageクラスに追加して下さい。</li>
+  <li>テンプレートを作成するのではなく他のパスにリダイレクトさせたい場合などは、パスに対応するPageクラス<span tal:replace="pathMetaData/className">CLASSNAME</span>の<span tal:replace="pathMetaData/actionName">ACTIONNAME</span>()メソッドの返り値の型をvoid以外にして適切な値を返すようにして下さい。例えば<span tal:replace="pathMetaData/actionName">ACTIONNAME</span>()メソッドの返り値の型をStringにして返り値として"redirect:/path/to/redirect.html"を返すようにすると、CONTEXT_PATH/path/to/redirect.htmlにリダイレクトされます。</li>
+</ul>
+</p>
   </body>
 </html>

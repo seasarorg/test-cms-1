@@ -13,7 +13,7 @@ import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 public class CreateTemplateAction extends AbstractUpdateAction {
 
     private static final String PARAM_TEMPLATE = SourceCreatorImpl.PARAM_PREFIX
-        + "template";
+            + "template";
 
     public CreateTemplateAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
@@ -35,10 +35,21 @@ public class CreateTemplateAction extends AbstractUpdateAction {
             return null;
         }
 
+        boolean actionMethodNotFound = false;
+        Class pageClass = getSourceCreator().getClass(
+                pathMetaData.getClassName());
+        if (pageClass != null) {
+            Method actionMethod = getActionMethod(pageClass, pathMetaData
+                    .getActionName());
+            if (actionMethod == null) {
+                actionMethodNotFound = true;
+            }
+        }
+
         String template = getSourceCreator().getSourceGenerator()
-            .generateTemplateSource(
-                getSuffix(pathMetaData.getTemplateFile().getName()),
-                new HashMap());
+                .generateTemplateSource(
+                        getSuffix(pathMetaData.getTemplateFile().getName()),
+                        new HashMap());
         if (template == null) {
             template = "";
         }
@@ -48,30 +59,37 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("template", template);
+        variableMap.put("actionMethodNotFound", actionMethodNotFound);
         return getSourceCreator().getResponseCreator().createResponse(
-            "createTemplate", variableMap);
+                "createTemplate", variableMap);
     }
 
     boolean isOwnTemplateUsed(PathMetaData pathMetaData) {
 
         Class pageClass = getSourceCreator().getClass(
-            pathMetaData.getClassName());
+                pathMetaData.getClassName());
         if (pageClass == null) {
             return true;
         }
-        Method actionMethod;
-        try {
-            actionMethod = pageClass.getMethod(pathMetaData.getActionName(),
-                new Class[0]);
-        } catch (SecurityException ex) {
-            return true;
-        } catch (NoSuchMethodException ex) {
+        Method actionMethod = getActionMethod(pageClass, pathMetaData
+                .getActionName());
+        if (actionMethod == null) {
             return true;
         }
         if (actionMethod.getReturnType() == Void.TYPE) {
             return (pathMetaData.getDefaultPath() == null);
         } else {
             return false;
+        }
+    }
+
+    Method getActionMethod(Class pageClass, String actionName) {
+        try {
+            return pageClass.getMethod(actionName, new Class[0]);
+        } catch (SecurityException ex) {
+            return null;
+        } catch (NoSuchMethodException ex) {
+            return null;
         }
     }
 
@@ -97,6 +115,6 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
         return getSourceCreator().getResponseCreator().createResponse(
-            "createTemplate_create", variableMap);
+                "createTemplate_create", variableMap);
     }
 }
