@@ -198,25 +198,25 @@ public class LocalOndemandS2Container implements HotdeployListener,
             logger_.debug("OndemandContainer's start() method called");
         }
         originalClassLoader_ = container_.getClassLoader();
-        if (originalClassLoader_ instanceof ProxyClassLoader) {
-            ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
-            hotdeployClassLoader_ = newHotdeployClassLoader(proxyClassLoader
-                    .getClassLoader());
-            proxyClassLoader.setClassLoader(hotdeployClassLoader_);
-            if (logger_.isDebugEnabled()) {
-                logger_
-                        .debug("Set HotdeployClassLoader in ProxyClassLoader: id="
-                                + System
-                                        .identityHashCode(hotdeployClassLoader_));
-            }
-        } else {
-            hotdeployClassLoader_ = newHotdeployClassLoader(originalClassLoader_);
-            container_.setClassLoader(hotdeployClassLoader_);
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("Set HotdeployClassLoader: id="
-                        + System.identityHashCode(hotdeployClassLoader_));
-            }
+        //        if (originalClassLoader_ instanceof ProxyClassLoader) {
+        //            ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
+        //            hotdeployClassLoader_ = newHotdeployClassLoader(proxyClassLoader
+        //                    .getClassLoader());
+        //            proxyClassLoader.setClassLoader(hotdeployClassLoader_);
+        //            if (logger_.isDebugEnabled()) {
+        //                logger_
+        //                        .debug("Set HotdeployClassLoader in ProxyClassLoader: id="
+        //                                + System
+        //                                        .identityHashCode(hotdeployClassLoader_));
+        //            }
+        //        } else {
+        hotdeployClassLoader_ = newHotdeployClassLoader(originalClassLoader_);
+        container_.setClassLoader(hotdeployClassLoader_);
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("Set HotdeployClassLoader: id="
+                    + System.identityHashCode(hotdeployClassLoader_));
         }
+        //        }
     }
 
     HotdeployClassLoader newHotdeployClassLoader(ClassLoader originalClassLoader) {
@@ -233,18 +233,18 @@ public class LocalOndemandS2Container implements HotdeployListener,
         if (logger_.isDebugEnabled()) {
             logger_.debug("OndemandContainer's stop() method called");
         }
-        if (originalClassLoader_ instanceof ProxyClassLoader) {
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("Unset HotdeployClassLoader in ProxyClassLoader");
-            }
-            ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
-            proxyClassLoader.setClassLoader(hotdeployClassLoader_.getParent());
-        } else {
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("Unset HotdeployClassLoader");
-            }
-            container_.setClassLoader(originalClassLoader_);
+        //        if (originalClassLoader_ instanceof ProxyClassLoader) {
+        //            if (logger_.isDebugEnabled()) {
+        //                logger_.debug("Unset HotdeployClassLoader in ProxyClassLoader");
+        //            }
+        //            ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
+        //            proxyClassLoader.setClassLoader(hotdeployClassLoader_.getParent());
+        //        } else {
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("Unset HotdeployClassLoader");
         }
+        container_.setClassLoader(originalClassLoader_);
+        //        }
         hotdeployClassLoader_ = null;
         originalClassLoader_ = null;
 
