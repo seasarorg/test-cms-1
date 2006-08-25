@@ -26,7 +26,9 @@ public class TraceS2Interceptor extends AbstractInterceptor {
         StringBuffer sb = new StringBuffer("[TRACE] getComponent(");
         appendStringRepresentation(key, sb).append(") from ").append(
                 container.getPath());
-        logger.info(sb.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug(sb.toString());
+        }
 
         Object ret = null;
         Throwable cause = null;
@@ -39,7 +41,9 @@ public class TraceS2Interceptor extends AbstractInterceptor {
                     .append(")");
             cause = t;
         }
-        logger.info(sb.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug(sb.toString());
+        }
         if (cause == null) {
             return ret;
         }
