@@ -196,4 +196,11 @@
       </url>
     </repository>
   </distributionManagement>
+  <modules>
+    <module>../s2-pluggable</module>
+    <module>../cms-database</module>
+    <module>../beantable</module>
+    <module>../ymir</module>
+    <module>../ymir-extension</module>
+  </modules>
 </project>
