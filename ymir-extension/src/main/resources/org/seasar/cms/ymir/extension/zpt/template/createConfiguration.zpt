@@ -21,10 +21,6 @@
     <dd>このWebアプリケーションのJavaソースコードのルートパッケージ名を入力して下さい。（例：<tt>com.example</tt>）<br />
       <input type="text" name="__ymir__key_rootPackageName" size="64" tal:attributes="value application/rootPackageName" />
     </dd>
-    <dt>webappSourceRoot</dt>
-    <dd>このWebアプリケーションのリソースが格納されているソースディレクトリのパスをprojectRoot相対パスで入力して下さい。（例：<tt>src\main\webapp</tt>）<br />
-      <input type="text" name="__ymir__key_webappSourceRoot" size="64" tal:attributes="value application/webappSourceRoot" />
-    </dd>
     <dt>extension.beantable.enable</dt>
     <dd>Bean定義からテーブルを自動生成するBeantable機能を利用するかどうかを指定して下さい。<br />
       <input type="radio" name="__ymir__key_extension.beantable.enable" value="true" tal:attributes="checked application/property(extension.beantable.enable) | false" /> 利用する
