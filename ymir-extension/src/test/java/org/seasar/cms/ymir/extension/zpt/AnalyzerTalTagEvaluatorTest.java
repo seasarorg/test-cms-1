@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.seasar.cms.ymir.extension.zpt.AnalyzerTalTagEvaluator.AnnotationResult;
 
 import net.skirnir.freyja.Attribute;
-import net.skirnir.freyja.EvaluationException;
+import net.skirnir.freyja.EvaluationRuntimeException;
 
 public class AnalyzerTalTagEvaluatorTest extends TestCase {
 
@@ -16,7 +16,7 @@ public class AnalyzerTalTagEvaluatorTest extends TestCase {
         Attribute attr2 = new Attribute("tal:attributes", "value", "\"");
         AnalyzerTalTagEvaluator evaluator = new AnalyzerTalTagEvaluator();
         AnnotationResult result = evaluator.findAnnotation(evaluator
-            .newContext(), "tag", new Attribute[] { attr0, attr1, attr2, });
+                .newContext(), "tag", new Attribute[] { attr0, attr1, attr2, });
         assertEquals("annotation", result.getAnnotation());
         Attribute[] attrs = result.getTheOtherAttributes();
         assertEquals(2, attrs.length);
@@ -30,7 +30,7 @@ public class AnalyzerTalTagEvaluatorTest extends TestCase {
         Attribute attr1 = new Attribute("tal:attributes", "value", "\"");
         AnalyzerTalTagEvaluator evaluator = new AnalyzerTalTagEvaluator();
         AnnotationResult result = evaluator.findAnnotation(evaluator
-            .newContext(), "tag", new Attribute[] { attr0, attr1, });
+                .newContext(), "tag", new Attribute[] { attr0, attr1, });
         assertNull(result.getAnnotation());
         Attribute[] attrs = result.getTheOtherAttributes();
         assertEquals(2, attrs.length);
@@ -47,9 +47,9 @@ public class AnalyzerTalTagEvaluatorTest extends TestCase {
         AnalyzerTalTagEvaluator evaluator = new AnalyzerTalTagEvaluator();
         try {
             evaluator.findAnnotation(evaluator.newContext(), "tag",
-                new Attribute[] { attr0, attr1, attr2, attr3 });
+                    new Attribute[] { attr0, attr1, attr2, attr3 });
             fail();
-        } catch (EvaluationException expected) {
+        } catch (EvaluationRuntimeException expected) {
         }
     }
 }

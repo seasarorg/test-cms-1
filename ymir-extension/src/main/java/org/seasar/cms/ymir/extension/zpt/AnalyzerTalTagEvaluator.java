@@ -14,7 +14,7 @@ import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 
 import net.skirnir.freyja.Attribute;
 import net.skirnir.freyja.Element;
-import net.skirnir.freyja.EvaluationException;
+import net.skirnir.freyja.EvaluationRuntimeException;
 import net.skirnir.freyja.ExpressionEvaluator;
 import net.skirnir.freyja.TagEvaluatorUtils;
 import net.skirnir.freyja.TemplateContext;
@@ -114,11 +114,14 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             if ("tal:annotation".equals(attrs[i].getName())) {
                 if (annotation != null) {
                     if (!"ignore".equals(behaviorDuplicateTag)) {
-                        throw new EvaluationException("Duplicate tag found: "
-                                + attrs[i].getName()
-                                + ": "
-                                + TagEvaluatorUtils.getBeginTagString(name,
-                                        attrs));
+                        throw new EvaluationRuntimeException(
+                                "Duplicate tag found: "
+                                        + attrs[i].getName()
+                                        + ": "
+                                        + TagEvaluatorUtils.getBeginTagString(
+                                                name, attrs)).setLineNumber(
+                                attrs[i].getLineNumber()).setColumnNumber(
+                                attrs[i].getColumnNumber());
                     }
                 }
                 annotation = attrs[i].getValue();
