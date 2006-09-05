@@ -13,12 +13,16 @@ public interface Ymir {
     void init();
 
     Response processRequest(String contextPath, String path, String method,
-        String dispatcher, Map parameterMap, Map fileParameterMap)
-        throws PageNotFoundException;
+            String dispatcher, Map parameterMap, Map fileParameterMap)
+            throws PageNotFoundException;
 
     boolean processResponse(ServletContext context_,
-        HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-        Response response) throws IOException, ServletException;
+            HttpServletRequest httpRequest, HttpServletResponse httpResponse,
+            Response response) throws IOException, ServletException;
 
     void destroy();
+
+    Object backupForInclusion();
+
+    void restoreForInclusion(Object backupped);
 }

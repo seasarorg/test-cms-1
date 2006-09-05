@@ -107,6 +107,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return response;
     }
 
+    public Object backupForInclusion() {
+        return getHttpServletRequest().getAttribute(ATTR_PAGE);
+    }
+
+    public void restoreForInclusion(Object backupped) {
+        getHttpServletRequest().setAttribute(ATTR_PAGE, backupped);
+    }
+
     Application getApplication() {
         return applicationManager_.getContextApplication();
     }
@@ -193,6 +201,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 }
             }
 
+            // 各コンテキストが持つ属性をinjectする。
+            injectContextAttributes(component);
+
             if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
                 // Actionの呼び出しはdispatcherがREQUESTの時だけ。
                 response = invokeAction(component, actionName);
@@ -205,11 +216,20 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 invokeAction(component, ACTION_RENDER);
             }
 
+            // 各コンテキストに属性をoutjectする。
+            outjectContextAttributes(component);
+
             // コンポーネント自体をrequestにバインドしておく。
             httpRequest.setAttribute(ATTR_PAGE, component);
         }
 
         return response;
+    }
+
+    void injectContextAttributes(Object component) {
+    }
+
+    void outjectContextAttributes(Object component) {
     }
 
     ThreadContext getThreadContext() {

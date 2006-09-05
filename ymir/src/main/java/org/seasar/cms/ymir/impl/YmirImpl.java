@@ -43,19 +43,19 @@ public class YmirImpl implements Ymir {
     }
 
     public Response processRequest(String contextPath, String path,
-        String method, String dispatcher, Map parameterMap, Map fileParameterMap)
-        throws PageNotFoundException {
+            String method, String dispatcher, Map parameterMap,
+            Map fileParameterMap) throws PageNotFoundException {
 
         return requestProcessor_.process(contextPath, path, method, dispatcher,
-            parameterMap, fileParameterMap);
+                parameterMap, fileParameterMap);
     }
 
     public boolean processResponse(ServletContext servletContext,
-        HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-        Response response) throws IOException, ServletException {
+            HttpServletRequest httpRequest, HttpServletResponse httpResponse,
+            Response response) throws IOException, ServletException {
 
         return responseProcessor_.process(servletContext, httpRequest,
-            httpResponse, response);
+                httpResponse, response);
     }
 
     public void destroy() {
@@ -76,11 +76,21 @@ public class YmirImpl implements Ymir {
                     lifecycleListeners_[i].destroy();
                 } catch (Throwable t) {
                     logger_.error("Can't destroy lifecycleListener: "
-                        + lifecycleListeners_[i], t);
+                            + lifecycleListeners_[i], t);
                 }
             }
             lifecycleListeners_ = null;
         }
+    }
+
+    public Object backupForInclusion() {
+
+        return requestProcessor_.backupForInclusion();
+    }
+
+    public void restoreForInclusion(Object backupped) {
+
+        requestProcessor_.restoreForInclusion(backupped);
     }
 
     public void setLifecycleListeners(LifecycleListener[] lifecycleListeners) {

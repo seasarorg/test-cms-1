@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.ymir.MultipartServletRequest;
 import org.seasar.cms.ymir.PageNotFoundException;
+import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.util.ServletUtils;
@@ -36,7 +37,7 @@ public class YmirFilter implements Filter {
         String dispatcher = config.getInitParameter("dispatcher");
         if (dispatcher == null) {
             throw new ServletException(
-                "Init-param 'dispatcher' must be specified");
+                    "Init-param 'dispatcher' must be specified");
         }
         dispatcher_ = dispatcher.toUpperCase();
     }
@@ -49,33 +50,41 @@ public class YmirFilter implements Filter {
     }
 
     public void doFilter(ServletRequest req, ServletResponse res,
-        FilterChain chain) throws IOException, ServletException {
+            FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) req;
         HttpServletResponse httpResponse = (HttpServletResponse) res;
 
         Map fileParameterMap = (Map) httpRequest
-            .getAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
+                .getAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
         if (fileParameterMap != null) {
             httpRequest
-                .removeAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
+                    .removeAttribute(MultipartServletRequest.ATTR_FORMFILEMAP);
         } else {
             fileParameterMap = new HashMap();
         }
 
+        Object backupped = null;
+        if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
+            backupped = ymir_.backupForInclusion();
+        }
         try {
             Response response = ymir_.processRequest(ServletUtils
-                .getContextPath(httpRequest),
-                ServletUtils.getPath(httpRequest), httpRequest.getMethod()
+                    .getContextPath(httpRequest), ServletUtils
+                    .getPath(httpRequest), httpRequest.getMethod()
                     .toUpperCase(), dispatcher_, httpRequest.getParameterMap(),
-                fileParameterMap);
+                    fileParameterMap);
 
             if (ymir_.processResponse(context_, httpRequest, httpResponse,
-                response)) {
+                    response)) {
                 chain.doFilter(httpRequest, httpResponse);
             }
         } catch (PageNotFoundException ex) {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } finally {
+            if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
+                ymir_.restoreForInclusion(backupped);
+            }
         }
     }
 }
