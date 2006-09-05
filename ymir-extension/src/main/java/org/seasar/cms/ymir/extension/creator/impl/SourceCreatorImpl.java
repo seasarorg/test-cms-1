@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.extension.creator.impl;
 
+import static org.seasar.cms.ymir.extension.creator.action.UpdateAction.PARAM_METHOD;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -131,6 +133,10 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public Response update(String path, String method, Request request) {
 
+        String originalMethod = request.getParameter(PARAM_METHOD);
+        if (originalMethod != null) {
+            method = originalMethod;
+        }
         PathMetaData pathMetaData = new LazyPathMetaData(this, path, method);
         String className = pathMetaData.getClassName();
         File sourceFile = pathMetaData.getSourceFile();

@@ -19,10 +19,10 @@ import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 public class UpdateClassesAction extends AbstractUpdateAction {
 
     private static final String PARAM_APPLY = SourceCreatorImpl.PARAM_PREFIX
-        + "apply";
+            + "apply";
 
     private static final String PARAM_REPLACE = SourceCreatorImpl.PARAM_PREFIX
-        + "replace";
+            + "replace";
 
     private static final String PREFIX_CHECKEDTIME = "updateClassesAction.checkedTime.";
 
@@ -47,7 +47,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         }
 
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
-            new PathMetaData[] { pathMetaData });
+                new PathMetaData[] { pathMetaData });
         if (classDescBag.isEmpty()) {
             return null;
         }
@@ -59,7 +59,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("classDescBag", classDescBag);
         return getSourceCreator().getResponseCreator().createResponse(
-            "updateClasses", variableMap);
+                "updateClasses", variableMap);
     }
 
     Response actUpdate(Request request, PathMetaData pathMetaData) {
@@ -70,7 +70,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         }
 
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
-            new PathMetaData[] { pathMetaData });
+                new PathMetaData[] { pathMetaData });
 
         String[] appliedClassNames = request.getParameterValues(PARAM_APPLY);
         Set<String> appliedClassNameSet = new HashSet<String>();
@@ -86,7 +86,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         }
 
         boolean mergeMethod = !"true".equals(request
-            .getParameter(PARAM_REPLACE));
+                .getParameter(PARAM_REPLACE));
 
         getSourceCreator().updateClasses(classDescBag, mergeMethod);
 
@@ -97,19 +97,19 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("classDescBag", classDescBag);
         variableMap.put("actionName", getSourceCreator().getActionName(
-            request.getPath(), method));
-        variableMap.put("suggestionExists", Boolean
-            .valueOf(classDescBag.getClassDescMap(ClassDesc.KIND_PAGE).size()
+                request.getPath(), method));
+        variableMap.put("suggestionExists", Boolean.valueOf(classDescBag
+                .getClassDescMap(ClassDesc.KIND_PAGE).size()
                 + classDescBag.getCreatedClassDescMap(ClassDesc.KIND_BEAN)
-                    .size() > 0));
+                        .size() > 0));
         variableMap.put("pageClassDescs", classDescBag
-            .getClassDescs(ClassDesc.KIND_PAGE));
+                .getClassDescs(ClassDesc.KIND_PAGE));
         variableMap.put("renderActionName",
-            DefaultRequestProcessor.ACTION_RENDER);
+                DefaultRequestProcessor.ACTION_RENDER);
         variableMap.put("createdBeanClassDescs", classDescBag
-            .getCreatedClassDescs(ClassDesc.KIND_BEAN));
+                .getCreatedClassDescs(ClassDesc.KIND_BEAN));
         return getSourceCreator().getResponseCreator().createResponse(
-            "updateClasses_update", variableMap);
+                "updateClasses_update", variableMap);
     }
 
     boolean shouldUpdate(PathMetaData pathMetaData) {

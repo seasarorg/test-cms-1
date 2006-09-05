@@ -15,9 +15,6 @@ abstract public class AbstractUpdateAction implements UpdateAction {
     public static final String PARAM_SUBTASK = SourceCreatorImpl.PARAM_PREFIX
         + "subTask";
 
-    public static final String PARAM_METHOD = SourceCreatorImpl.PARAM_PREFIX
-        + "method";
-
     private SourceCreatorImpl sourceCreator_;
 
     public AbstractUpdateAction(SourceCreatorImpl sourceCreator) {

@@ -109,7 +109,7 @@ public class LazyPathMetaData implements PathMetaData {
             baseSourceFile_ = sourceCreator_.getSourceFile(getClassName()
                     + "Base");
         }
-        return sourceFile_;
+        return baseSourceFile_;
     }
 
     public File getSourceFile() {

@@ -59,8 +59,12 @@ public class ZptAnalyzer implements TemplateAnalyzer {
                     return "UTF-8";
                 }
 
-            }.addTypePrefix("path", new AnalyzerPathTypePrefixHandler('/')
-                    .addPathResolver(new BeanPathResolver()), true));
+            }.addTypePrefix("not", new AnalyzerNotTypePrefixHandler())
+                    .addTypePrefix(
+                            "path",
+                            new AnalyzerPathTypePrefixHandler('/')
+                                    .addPathResolver(new BeanPathResolver()),
+                            true));
 
     private SourceCreator sourceCreator_;
 
