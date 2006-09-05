@@ -12,8 +12,10 @@ import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.ThreadContext;
+import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
+import org.seasar.cms.ymir.AttributeHandler;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.PageNotFoundException;
@@ -45,6 +47,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
     private Configuration configuration_;
 
     private ApplicationManager applicationManager_;
+
+    private AnnotationHandler annotationHandler_ = new DefaultAnnotationHandler();
 
     private final BeanUtilsBean beanUtilsBean_;
 
@@ -184,6 +188,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
             // 場合はリクエストパラメータのinjectionもrenderメソッドの
             // 呼び出しもしない。そうでない場合のみ処理を行なう。
 
+            // 各コンテキストが持つ属性をinjectする。
+            injectContextAttributes(component);
+
+            // リクエストパラメータをinjectする。
             try {
                 beanUtilsBean_.populate(component, request.getParameterMap());
             } catch (Throwable t) {
@@ -191,6 +199,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     logger_.debug("Can't populate request parameters", t);
                 }
             }
+
+            // FormFileのリクエストパラメータをinjectする。
             try {
                 beanUtilsBean_.copyProperties(component, request
                         .getFileParameterMap());
@@ -200,9 +210,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
                             "Can't populate request parameters (FormFile)", t);
                 }
             }
-
-            // 各コンテキストが持つ属性をinjectする。
-            injectContextAttributes(component);
 
             if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
                 // Actionの呼び出しはdispatcherがREQUESTの時だけ。
@@ -227,9 +234,19 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     void injectContextAttributes(Object component) {
+        AttributeHandler[] handlers = annotationHandler_
+                .getInjectedScopeAttributes(component);
+        for (int i = 0; i < handlers.length; i++) {
+            handlers[i].injectTo(component);
+        }
     }
 
     void outjectContextAttributes(Object component) {
+        AttributeHandler[] handlers = annotationHandler_
+                .getOutjectedScopeAttributes(component);
+        for (int i = 0; i < handlers.length; i++) {
+            handlers[i].outjectFrom(component);
+        }
     }
 
     ThreadContext getThreadContext() {
@@ -319,5 +336,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public void setApplicationManager(ApplicationManager applicationManager) {
 
         applicationManager_ = applicationManager;
+    }
+
+    public void setAnnotationHandler(AnnotationHandler annotationHandler) {
+
+        annotationHandler_ = annotationHandler;
     }
 }

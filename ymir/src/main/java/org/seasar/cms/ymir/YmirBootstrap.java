@@ -5,6 +5,7 @@ import javax.servlet.ServletContext;
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.impl.SingleApplication;
+import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
@@ -32,10 +33,11 @@ public class YmirBootstrap {
             landmark = Class.forName(Globals.LANDMARK_CLASSNAME);
         } catch (ClassNotFoundException ignored) {
         }
+        ComponentDef cd = getContainer().getComponentDef(
+                LocalOndemandS2Container.class);
         Application application = new SingleApplication(getConfiguration(),
-                servletContext.getRealPath("/"), landmark,
-                (LocalOndemandS2Container) getContainer().getComponent(
-                        LocalOndemandS2Container.class),
+                servletContext.getRealPath("/"), landmark, cd.getContainer(),
+                (LocalOndemandS2Container) cd.getComponent(),
                 (PathMappingProvider) getContainer().getComponent(
                         PathMappingProvider.class));
 

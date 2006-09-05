@@ -51,4 +51,6 @@
   <component
     class="org.seasar.cms.ymir.response.scheme.impl.StrategySelectorImpl" />
   <component class="org.seasar.cms.ymir.impl.ApplicationManagerImpl" />
+  <component name="sessionScope"
+    class="org.seasar.cms.ymir.scope.impl.HttpSessionScope" />
 </components>

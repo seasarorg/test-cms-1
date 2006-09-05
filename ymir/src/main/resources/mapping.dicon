@@ -19,7 +19,7 @@
     <arg>"${1}Page"</arg>
     <arg>"_${method}"</arg>
     <arg>""</arg>
-    <arg>null</arg>
+    <arg>"/${1}.html"</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
     <arg>"^/([^/]+)/([^/]+)\\.(.+)$"</arg>
