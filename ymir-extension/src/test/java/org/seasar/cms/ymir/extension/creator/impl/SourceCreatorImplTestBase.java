@@ -112,8 +112,8 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
                 "_${method}", "", null);
         applicationManager.setBaseApplication(new SingleApplication(
                 configuration, new File(ResourceUtil.getBuildDir(getClass()),
-                        "webapp").getCanonicalPath(), null, ondemandContainer,
-                pathMappingProvider));
+                        "webapp").getCanonicalPath(), null, container_,
+                ondemandContainer, pathMappingProvider));
         configuration.setProperty(AbstractApplication.KEY_SOURCEDIRECTORY,
                 ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
         configuration.setProperty(AbstractApplication.KEY_CLASSESDIRECTORY,
