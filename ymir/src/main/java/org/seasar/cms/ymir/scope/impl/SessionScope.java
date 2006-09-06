@@ -6,7 +6,7 @@ import javax.servlet.http.HttpSession;
 import org.seasar.cms.ymir.scope.Scope;
 import org.seasar.framework.container.S2Container;
 
-public class HttpSessionScope implements Scope {
+public class SessionScope implements Scope {
 
     private S2Container container_;
 
