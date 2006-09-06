@@ -75,6 +75,11 @@ public class Path {
 
     public String toString() {
 
+        return asString();
+    }
+
+    public String asString() {
+
         StringBuffer sb = new StringBuffer();
         sb.append(trunk_);
         if (parameterMap_ != null) {

@@ -20,6 +20,6 @@ public class PathResponseConstructor implements ResponseConstructor {
             return VoidResponse.INSTANCE;
         }
 
-        return new RedirectResponse(path.toString());
+        return new RedirectResponse(path.asString());
     }
 }
