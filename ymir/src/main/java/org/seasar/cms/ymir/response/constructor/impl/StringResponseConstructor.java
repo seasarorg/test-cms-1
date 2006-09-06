@@ -2,10 +2,14 @@ package org.seasar.cms.ymir.response.constructor.impl;
 
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.impl.VoidResponse;
+import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.scheme.Strategy;
+import org.seasar.cms.ymir.response.scheme.StrategySelector;
 import org.seasar.cms.ymir.response.scheme.impl.PageStrategy;
 
-public class StringResponseConstructor extends AbstractResponseConstructor {
+public class StringResponseConstructor implements ResponseConstructor {
+
+    private StrategySelector strategySelector_;
 
     public Class getTargetClass() {
 
@@ -32,8 +36,13 @@ public class StringResponseConstructor extends AbstractResponseConstructor {
         Strategy strategy = strategySelector_.getStrategy(scheme);
         if (strategy == null) {
             throw new RuntimeException("Unknown scheme '" + scheme
-                + "' is specified: " + string);
+                    + "' is specified: " + string);
         }
         return strategy.constructResponse(path, component);
+    }
+
+    public void setStrategySelector(StrategySelector strategySelector) {
+
+        strategySelector_ = strategySelector;
     }
 }

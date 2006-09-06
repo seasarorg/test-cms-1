@@ -2,8 +2,9 @@ package org.seasar.cms.ymir.response.constructor.impl;
 
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.impl.VoidResponse;
+import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 
-public class ResponseResponseConstructor extends AbstractResponseConstructor {
+public class ResponseResponseConstructor implements ResponseConstructor {
 
     public Class getTargetClass() {
 

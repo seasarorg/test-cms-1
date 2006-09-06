@@ -4,8 +4,9 @@ import org.seasar.cms.ymir.Path;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.impl.RedirectResponse;
 import org.seasar.cms.ymir.impl.VoidResponse;
+import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 
-public class PathResponseConstructor extends AbstractResponseConstructor {
+public class PathResponseConstructor implements ResponseConstructor {
 
     public Class getTargetClass() {
 
