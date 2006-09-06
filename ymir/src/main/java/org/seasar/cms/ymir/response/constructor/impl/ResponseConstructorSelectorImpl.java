@@ -7,19 +7,24 @@ import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructorSelector;
 
 public class ResponseConstructorSelectorImpl implements
-    ResponseConstructorSelector {
+        ResponseConstructorSelector {
 
     private Map constructorMap_ = new HashMap();
+
+    public boolean hasResponseConstructor(Class type) {
+
+        return constructorMap_.containsKey(type);
+    }
 
     public ResponseConstructor getResponseConstructor(Class type) {
 
         ResponseConstructor constructor = (ResponseConstructor) constructorMap_
-            .get(type);
+                .get(type);
         if (constructor != null) {
             return constructor;
         } else {
             throw new RuntimeException(
-                "ResponseConstructor does not exist for class: " + type);
+                    "ResponseConstructor does not exist for class: " + type);
         }
     }
 

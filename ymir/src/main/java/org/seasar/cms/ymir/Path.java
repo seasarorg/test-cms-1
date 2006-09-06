@@ -37,6 +37,11 @@ public class Path {
     }
 
     void analyze(String path) {
+
+        if (path == null) {
+            return;
+        }
+
         int question = path.indexOf('?');
         if (question < 0) {
             trunk_ = path;
@@ -59,9 +64,9 @@ public class Path {
         if (equal >= 0) {
             try {
                 addParameter(URLDecoder.decode(
-                    encodedParam.substring(0, equal), parameterEncoding_),
-                    URLDecoder.decode(encodedParam.substring(equal + 1),
-                        parameterEncoding_));
+                        encodedParam.substring(0, equal), parameterEncoding_),
+                        URLDecoder.decode(encodedParam.substring(equal + 1),
+                                parameterEncoding_));
             } catch (UnsupportedEncodingException ex) {
                 throw new RuntimeException(ex);
             }
@@ -75,7 +80,7 @@ public class Path {
         if (parameterMap_ != null) {
             String delim = "?";
             for (Iterator itr = parameterMap_.entrySet().iterator(); itr
-                .hasNext();) {
+                    .hasNext();) {
                 Map.Entry entry = (Map.Entry) itr.next();
                 String key = (String) entry.getKey();
                 String[] values = (String[]) entry.getValue();
@@ -95,7 +100,7 @@ public class Path {
                     sb.append("=");
                     try {
                         sb.append(URLEncoder.encode(values[i],
-                            parameterEncoding_));
+                                parameterEncoding_));
                     } catch (UnsupportedEncodingException ex) {
                         throw new RuntimeException(ex);
                     }
