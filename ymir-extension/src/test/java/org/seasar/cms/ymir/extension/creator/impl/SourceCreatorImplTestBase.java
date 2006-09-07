@@ -8,7 +8,6 @@ import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
 import org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior;
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
-import org.seasar.cms.pluggable.hotdeploy.TemporaryLocalOndemandS2Container;
 import org.seasar.cms.pluggable.impl.ConfigurationImpl;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.YmirTestCase;
@@ -80,7 +79,7 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         container_.getExternalContext().setApplication(context);
         container_.register(SourceCreatorImpl.class);
         container_.register(DefaultRequestProcessor.class);
-        container_.register(TemporaryLocalOndemandS2Container.class);
+        container_.register(LocalOndemandS2Container.class);
         container_.register(OndemandProjectImpl.class);
         container_.register(YmirNamingConvention.class);
         container_.register(ZptAnalyzer.class);
