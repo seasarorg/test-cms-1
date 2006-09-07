@@ -13,6 +13,7 @@ import org.seasar.framework.container.hotdeploy.HotdeployListener;
 import org.seasar.framework.container.hotdeploy.OndemandProject;
 import org.seasar.framework.container.hotdeploy.OndemandS2Container;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
+import org.seasar.framework.container.impl.S2ContainerImpl;
 import org.seasar.framework.container.util.S2ContainerUtil;
 import org.seasar.framework.convention.NamingConvention;
 import org.seasar.framework.convention.impl.NamingConventionImpl;
@@ -175,10 +176,14 @@ public class LocalOndemandS2Container implements HotdeployListener,
         }
     }
 
-    protected void registerMap(Object key, ComponentDef componentDef) {
-        if (componentDefCache_.put(key, componentDef) != null) {
-            throw new IllegalStateException(key.toString());
+    protected synchronized void registerMap(Object key,
+            ComponentDef componentDef) {
+        ComponentDef current = (ComponentDef) componentDefCache_.get(key);
+        if (current != null) {
+            componentDef = S2ContainerImpl.createTooManyRegistration(key,
+                    current, componentDef);
         }
+        componentDefCache_.put(key, componentDef);
     }
 
     public S2Container getContainer() {
