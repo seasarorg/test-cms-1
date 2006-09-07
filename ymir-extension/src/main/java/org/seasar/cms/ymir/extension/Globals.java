@@ -7,4 +7,6 @@ public interface Globals extends org.seasar.cms.ymir.Globals {
     String APPKEY_SOURCEDIRECTORY = "extension.sourceDirectory";
 
     String APPKEY_RESOURCESDIRECTORY = "extension.resourcesDirectory";
+
+    String APPKEY_SOURCECREATOR_ENABLE = "extension.sourceCreator.enable";
 }

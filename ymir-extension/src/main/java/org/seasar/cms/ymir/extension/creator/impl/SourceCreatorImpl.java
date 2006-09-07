@@ -1,5 +1,6 @@
 package org.seasar.cms.ymir.extension.creator.impl;
 
+import static org.seasar.cms.ymir.extension.Globals.APPKEY_SOURCECREATOR_ENABLE;
 import static org.seasar.cms.ymir.extension.creator.action.UpdateAction.PARAM_METHOD;
 
 import java.beans.BeanInfo;
@@ -133,6 +134,12 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public Response update(String path, String method, Request request) {
 
+        Application application = getApplication();
+        if ("false"
+                .equals(application.getProperty(APPKEY_SOURCECREATOR_ENABLE))) {
+            return null;
+        }
+
         String originalMethod = request.getParameter(PARAM_METHOD);
         if (originalMethod != null) {
             method = originalMethod;
@@ -144,7 +151,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
         Object condition;
 
-        if (!validateApplication(getApplication())) {
+        if (!validateApplication(application)) {
             condition = "createConfiguration";
         } else if (request.getParameter(PARAM_TASK) != null) {
             condition = request.getParameter(PARAM_TASK);
