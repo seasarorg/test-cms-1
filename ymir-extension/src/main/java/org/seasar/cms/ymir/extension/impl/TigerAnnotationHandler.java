@@ -10,7 +10,7 @@ import org.seasar.cms.ymir.AttributeHandler;
 import org.seasar.cms.ymir.extension.annotation.In;
 import org.seasar.cms.ymir.extension.annotation.Out;
 import org.seasar.cms.ymir.scope.Scope;
-import org.seasar.cms.ymir.scope.impl.HttpSessionScope;
+import org.seasar.cms.ymir.scope.impl.RequestScope;
 import org.seasar.framework.container.S2Container;
 
 public class TigerAnnotationHandler implements AnnotationHandler {
@@ -66,7 +66,7 @@ public class TigerAnnotationHandler implements AnnotationHandler {
         } else if (in.value() != Object.class) {
             key = in.value();
         } else {
-            key = HttpSessionScope.class;
+            key = RequestScope.class;
         }
         return (Scope) container_.getComponent(key);
     }
@@ -113,7 +113,7 @@ public class TigerAnnotationHandler implements AnnotationHandler {
         } else if (out.value() != Object.class) {
             key = out.value();
         } else {
-            key = HttpSessionScope.class;
+            key = RequestScope.class;
         }
         return (Scope) container_.getComponent(key);
     }
