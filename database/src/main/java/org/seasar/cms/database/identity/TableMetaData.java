@@ -1,10 +1,13 @@
 package org.seasar.cms.database.identity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TableMetaData {
 
     private String name_;
 
-    private ColumnMetaData[] columns_;
+    private Map<String, ColumnMetaData> columnMap_ = new HashMap<String, ColumnMetaData>();
 
     private ConstraintMetaData[] constraints_;
 
@@ -27,11 +30,18 @@ public class TableMetaData {
     }
 
     public ColumnMetaData[] getColumns() {
-        return columns_;
+        return columnMap_.values().toArray(new ColumnMetaData[0]);
     }
 
     public void setColumns(ColumnMetaData[] columns) {
-        columns_ = columns;
+        columnMap_.clear();
+        for (int i = 0; i < columns.length; i++) {
+            columnMap_.put(columns[i].getName(), columns[i]);
+        }
+    }
+
+    public ColumnMetaData getColumn(String columnName) {
+        return columnMap_.get(columnName);
     }
 
     public ConstraintMetaData[] getConstraints() {
