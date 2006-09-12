@@ -74,17 +74,15 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (matched == null) {
             return PassthroughResponse.INSTANCE;
         }
-        PathMapping mapping = matched.getPathMapping();
-        if (mapping.isDenied() && Request.DISPATCHER_REQUEST.equals(dispatcher)) {
+        if (matched.isDenied() && Request.DISPATCHER_REQUEST.equals(dispatcher)) {
             throw new PageNotFoundException(path);
         }
 
-        VariableResolver resolver = matched.getVariableResolver();
-        String componentName = mapping.getComponentName(resolver);
-        String actionName = mapping.getActionName(resolver);
+        String componentName = matched.getComponentName();
+        String actionName = matched.getActionName();
         Request request = new RequestImpl(contextPath, path, method,
-                dispatcher, parameterMap, fileParameterMap, mapping
-                        .getPathInfo(resolver));
+                dispatcher, parameterMap, fileParameterMap, matched
+                        .getPathInfo());
 
         if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
                 && getApplication().isBeingDeveloped()) {
@@ -102,7 +100,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         // デフォルトパスが指定されており、かつpassthroughの場合でパスに
         // 対応するリソースが存在しない場合はデフォルトパスにリダイレクトする。
         if (response.getType() == Response.TYPE_PASSTHROUGH) {
-            String defaultPath = mapping.getDefaultPath(resolver);
+            String defaultPath = matched.getDefaultPath();
             if (defaultPath != null && !getApplication().isResourceExists(path)) {
                 response = new RedirectResponse(defaultPath);
             }

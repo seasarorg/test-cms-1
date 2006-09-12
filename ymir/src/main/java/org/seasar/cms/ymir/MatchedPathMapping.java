@@ -12,7 +12,7 @@ public class MatchedPathMapping {
     }
 
     public MatchedPathMapping(PathMapping pathMapping,
-        VariableResolver variableResolver) {
+            VariableResolver variableResolver) {
 
         setPathMapping(pathMapping);
         setVariableResolver(variableResolver);
@@ -32,5 +32,26 @@ public class MatchedPathMapping {
 
     public void setVariableResolver(VariableResolver variableResolver) {
         variableResolver_ = variableResolver;
+    }
+
+    public String getComponentName() {
+        return pathMapping_.getComponentName(variableResolver_);
+    }
+
+    public String getActionName() {
+        return pathMapping_.getActionName(variableResolver_);
+    }
+
+    public String getPathInfo() {
+        return pathMapping_.getPathInfo(variableResolver_);
+
+    }
+
+    public String getDefaultPath() {
+        return pathMapping_.getDefaultPath(variableResolver_);
+    }
+
+    public boolean isDenied() {
+        return pathMapping_.isDenied();
     }
 }
