@@ -12,6 +12,8 @@ public interface PluggableContainerFactory {
 
     String GLOBAL_DICON = "global.dicon";
 
+    String META_EXPAND = "expand";
+
     String getConfigPath();
 
     void setConfigPath(String path);
@@ -23,7 +25,7 @@ public interface PluggableContainerFactory {
     ExternalContextComponentDefRegister getExternalContextComponentDefRegister();
 
     void setExternalContextComponentDefRegister(
-        ExternalContextComponentDefRegister extCtxComponentDefRegister);
+            ExternalContextComponentDefRegister extCtxComponentDefRegister);
 
     Object getApplication();
 
@@ -34,7 +36,7 @@ public interface PluggableContainerFactory {
     S2Container integrate(String configPath, S2Container[] dependencies);
 
     S2Container integrate(String configPath, ClassLoader classLoader,
-        S2Container[] dependencies);
+            S2Container[] dependencies);
 
     void init();
 

@@ -4,6 +4,7 @@
 <components>
   <include path="external.dicon" />
   <include path="global.dicon" />
+  <component class="org.seasar.cms.pluggable.PluggableProvider" />
   <component name="statusFilterInterceptor"
     class="org.seasar.cms.pluggable.aop.interceptors.StatusFilterInterceptor">
     <property name="interceptor">

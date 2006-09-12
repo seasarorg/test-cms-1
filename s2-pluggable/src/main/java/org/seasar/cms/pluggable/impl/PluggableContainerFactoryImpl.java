@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.PluggableContainerFactory;
+import org.seasar.cms.pluggable.PluggableProvider;
 import org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior;
 import org.seasar.cms.pluggable.util.PluggableUtils;
 import org.seasar.framework.container.ComponentDef;
@@ -195,22 +196,65 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     void integrate(S2Container root, S2Container container,
             S2Container[] dependencies, URL[] pathURLs) {
 
-        includeToLeaves(container, dependencies);
-
+        MetaDef metaDef = container.getMetaDef(META_EXPAND);
+        if (metaDef != null) {
+            Object value = metaDef.getValue();
+            if (value == null) {
+                throw new NullPointerException("container '"
+                        + container.getPath() + "' has null 'expand' meta-data");
+            }
+            String[] paths = value.toString().split(",");
+            for (int i = 0; i < paths.length; i++) {
+                URL[] urls = PluggableUtils.getResourceURLs(paths[i].trim());
+                if (urls.length == 1) {
+                    addAll(container, readS2Container(urls[0].toExternalForm()));
+                } else if (urls.length == 0) {
+                    throw new RuntimeException(
+                            "Resource to expand not found: container="
+                                    + container.getPath() + ", name="
+                                    + paths[i]);
+                } else {
+                    StringBuffer sb = new StringBuffer();
+                    String delim = "";
+                    for (int j = 0; j < urls.length; j++) {
+                        sb.append(delim).append(urls[i].toExternalForm());
+                        delim = ", ";
+                    }
+                    throw new RuntimeException(
+                            "Too many resources to expand: container="
+                                    + container.getPath() + ", name="
+                                    + paths[i] + ", resources=" + sb.toString());
+                }
+            }
+        }
         for (int i = 0; i < pathURLs.length; i++) {
-            S2Container c = createS2Container(pathURLs[i].toExternalForm());
-            includeChildren(container, c);
-            int size = c.getMetaDefSize();
-            for (int j = 0; j < size; j++) {
-                MetaDef md = c.getMetaDef(j);
-                container.addMetaDef(md);
-            }
-            size = c.getComponentDefSize();
-            for (int j = 0; j < size; j++) {
-                ComponentDef cd = c.getComponentDef(j);
-                cd.setContainer(null);
-                container.register(cd);
-            }
+            addAll(container, readS2Container(pathURLs[i].toExternalForm()));
+        }
+
+        includeToLeaves(container, dependencies);
+    }
+
+    S2Container readS2Container(String path) {
+        PluggableProvider.setUsingPluggableRoot(true);
+        try {
+            return createS2Container(path);
+        } finally {
+            PluggableProvider.setUsingPluggableRoot(false);
+        }
+    }
+
+    void addAll(S2Container container, S2Container added) {
+        includeChildren(container, added);
+        int size = added.getMetaDefSize();
+        for (int j = 0; j < size; j++) {
+            MetaDef md = added.getMetaDef(j);
+            container.addMetaDef(md);
+        }
+        size = added.getComponentDefSize();
+        for (int j = 0; j < size; j++) {
+            ComponentDef cd = added.getComponentDef(j);
+            cd.setContainer(null);
+            container.register(cd);
         }
     }
 

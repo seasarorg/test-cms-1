@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 
 import org.seasar.cms.pluggable.Listener;
 import org.seasar.cms.pluggable.OneListener;
+import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.TooManyRegistrationRuntimeException;
 import org.seasar.framework.container.factory.CircularIncludeRuntimeException;
@@ -25,6 +26,7 @@ public class PluggableContainerFactoryImplTest extends TestCase {
         super.setUp();
 
         target_ = new PluggableContainerFactoryImpl();
+        SingletonPluggableContainerFactory.setInstance(target_);
         resourceURLs_ = new URL[] {
             new File(ResourceUtil.getBuildDir(getClass()),
                     "org/seasar/cms/pluggable/listener1.dicon").toURI().toURL(),
@@ -40,19 +42,23 @@ public class PluggableContainerFactoryImplTest extends TestCase {
         root.include(container);
         S2Container dependency = new S2ContainerImpl();
         root.include(dependency);
+        target_.setRootContainer(root);
 
         // ## Act ##
         target_.integrate(root, container, new S2Container[] { dependency },
                 resourceURLs_);
 
         // ## Assert ##
-        assertEquals(2, root.getChildSize());
-        assertSame(container, root.getChild(0));
-        assertEquals(2, container.getChildSize());
-        assertSame(dependency, container.getChild(0));
-        assertEquals(ResourceUtil.getResourceNoException(
+        assertEquals("rootの子はcontainerとdependency", 2, root.getChildSize());
+        assertSame("最初の子はcontainer", container, root.getChild(0));
+        assertEquals(
+                "includedがcontainerの子になる（それによってcontainerはleafではなくなり、直接dependencyを子として持たなくなる）",
+                1, container.getChildSize());
+        assertEquals("2番目の子はincluded", ResourceUtil.getResourceNoException(
                 "org/seasar/cms/pluggable/included.dicon").toExternalForm(),
-                container.getChild(1).getPath());
+                container.getChild(0).getPath());
+        assertSame("includedのルートはrootになる", root, container.getChild(0)
+                .getRoot());
     }
 
     public void testIntegrate2() throws Exception {
@@ -106,6 +112,34 @@ public class PluggableContainerFactoryImplTest extends TestCase {
         assertEquals("一度invokeAutoRegister()されたコンテナについては再度registerAll()されないこと",
                 1, ((MockAutoRegister) container1
                         .getComponent(MockAutoRegister.class)).getCount());
+    }
+
+    public void testIntegrate5() throws Exception {
+
+        target_.prepareForContainer();
+        S2Container actual = target_.integrate(getClass().getName().replace(
+                '.', '/')
+                + "_testIntegrate5.dicon", new S2Container[0]);
+        assertTrue("expand対象のcontainerの中身が展開されること", actual
+                .hasComponentDef(List.class));
+    }
+
+    public void testIntegrate6() throws Exception {
+
+        target_.prepareForContainer();
+        S2Container included = target_.createS2Container(getClass()
+                .getPackage().getName().replace('.', '/')
+                + "/included6.dicon");
+        target_.getRootContainer().include(included);
+        target_.getRootContainer().registerDescendant(included);
+
+        S2Container actual = target_.integrate(getClass().getName().replace(
+                '.', '/')
+                + "_testIntegrate6.dicon", new S2Container[0]);
+
+        assertSame(
+                "expand対象の中でincludeされているものが既にrootにincludeされていたら同じオブジェクトを指すようになること",
+                included, actual.getChild(0));
     }
 
     /*
