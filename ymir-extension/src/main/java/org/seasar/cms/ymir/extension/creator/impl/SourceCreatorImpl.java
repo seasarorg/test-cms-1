@@ -65,7 +65,6 @@ import org.seasar.cms.ymir.extension.creator.action.impl.CreateTemplateAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.SystemConsoleAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.UpdateClassesAction;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
-import org.seasar.cms.ymir.impl.RedirectResponse;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
@@ -132,55 +131,79 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public Logger logger_ = Logger.getLogger(getClass());
 
-    public Response update(String path, String method, Request request) {
+    public Response update(String path, String method, Request request,
+            Response response) {
 
         Application application = getApplication();
-        if ("false"
-                .equals(application.getProperty(APPKEY_SOURCECREATOR_ENABLE))) {
-            return null;
+        if (!shouldUpdate(application)) {
+            return response;
         }
 
-        String originalMethod = request.getParameter(PARAM_METHOD);
-        if (originalMethod != null) {
-            method = originalMethod;
+        method = getOriginalMethod(request, method);
+        String forwardPath = null;
+        if (response.getType() == Response.TYPE_FORWARD) {
+            forwardPath = response.getPath();
+        } else if (response.getType() == Response.TYPE_PASSTHROUGH) {
+            forwardPath = path;
         }
-        PathMetaData pathMetaData = new LazyPathMetaData(this, path, method);
-        String className = pathMetaData.getClassName();
-        File sourceFile = pathMetaData.getSourceFile();
-        File templateFile = pathMetaData.getTemplateFile();
+        PathMetaData pathMetaData = new LazyPathMetaData(this, path, method,
+                forwardPath);
 
         Object condition;
 
-        if (!validateApplication(application)) {
+        if (!isAlreadyConfigured(application)) {
             condition = "createConfiguration";
         } else if (request.getParameter(PARAM_TASK) != null) {
             condition = request.getParameter(PARAM_TASK);
         } else {
-            if ("".equals(path)) {
+            String className = pathMetaData.getClassName();
+            File sourceFile = pathMetaData.getSourceFile();
+            File templateFile = pathMetaData.getTemplateFile();
+
+            if ("".equals(forwardPath)) {
                 String welcomeFile = getWelcomeFile();
                 if (welcomeFile != null) {
-                    return new RedirectResponse("/" + welcomeFile);
+                    return response;
                 }
                 if (className == null || sourceFile.exists()) {
-                    return null;
+                    return response;
                 }
                 condition = "createClass";
             } else {
                 condition = new Condition(State.valueOf(className != null),
                         State.valueOf(sourceFile.exists()), State
-                                .valueOf(templateFile.exists()), method);
+                                .valueOf(templateFile != null ? templateFile
+                                        .exists() : true), method);
             }
         }
 
         UpdateAction action = actionSelector_.getAction(condition);
         if (action != null) {
-            return action.act(request, pathMetaData);
+            Response newResponse = action.act(request, pathMetaData);
+            if (newResponse != null) {
+                response = newResponse;
+            }
+        }
+        return response;
+    }
+
+    String getOriginalMethod(Request request, String method) {
+
+        String originalMethod = request.getParameter(PARAM_METHOD);
+        if (originalMethod != null) {
+            return originalMethod;
         } else {
-            return null;
+            return method;
         }
     }
 
-    boolean validateApplication(Application application) {
+    boolean shouldUpdate(Application application) {
+
+        return (!"false".equals(application
+                .getProperty(APPKEY_SOURCECREATOR_ENABLE)));
+    }
+
+    boolean isAlreadyConfigured(Application application) {
 
         if (application.getProjectRoot() == null) {
             return false;
@@ -291,10 +314,11 @@ public class SourceCreatorImpl implements SourceCreator {
     public void gatherClassDescs(Map<String, ClassDesc> classDescMap,
             PathMetaData pathMetaData) {
 
+        String path = pathMetaData.getPath();
         String method = pathMetaData.getMethod();
         String className = pathMetaData.getClassName();
         try {
-            analyzer_.analyze(method, classDescMap, new FileInputStream(
+            analyzer_.analyze(path, method, classDescMap, new FileInputStream(
                     pathMetaData.getTemplateFile()), encoding_, className);
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
@@ -685,12 +709,6 @@ public class SourceCreatorImpl implements SourceCreator {
                 + ".java");
     }
 
-    File getClassFile(String className) {
-
-        return new File(getClassesDirectory(), className.replace('.', '/')
-                + ".class");
-    }
-
     public Properties getSourceCreatorProperties() {
 
         if (sourceCreatorProperties_ == null) {
@@ -771,16 +789,6 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    public File getClassesDirectory() {
-
-        String classesDirectory = getApplication().getClassesDirectory();
-        if (classesDirectory != null) {
-            return new File(classesDirectory);
-        } else {
-            return null;
-        }
-    }
-
     public File getResourcesDirectory() {
 
         String resourcesDirectory = getApplication().getResourcesDirectory();
@@ -789,11 +797,6 @@ public class SourceCreatorImpl implements SourceCreator {
         } else {
             return null;
         }
-    }
-
-    public File getWebappRoot() {
-
-        return new File(getApplication().getWebappRoot());
     }
 
     public File getWebappSourceRoot() {

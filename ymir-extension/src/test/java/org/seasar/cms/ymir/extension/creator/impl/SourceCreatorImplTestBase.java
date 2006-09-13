@@ -1,6 +1,8 @@
 package org.seasar.cms.ymir.extension.creator.impl;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.servlet.ServletContext;
 
@@ -60,7 +62,18 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
 
     protected void setUp() throws Exception {
 
-        ServletContext context = new MockServletContextImpl("/context");
+        ServletContext context = new MockServletContextImpl("/context") {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public URL getResource(String path) throws MalformedURLException {
+                if (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                return new File(new File(ResourceUtil.getBuildDir(getClass()),
+                        "webapp"), path).toURI().toURL();
+            }
+        };
         SingletonPluggableContainerFactory.setApplication(context);
         SingletonPluggableContainerFactory.prepareForContainer();
 
@@ -109,13 +122,13 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         PathMappingProviderImpl pathMappingProvider = new PathMappingProviderImpl();
         pathMappingProvider.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page",
                 "_${method}", "", null);
-        applicationManager.setBaseApplication(new SingleApplication(
-                configuration, new File(ResourceUtil.getBuildDir(getClass()),
-                        "webapp").getCanonicalPath(), null, container_,
-                ondemandContainer, pathMappingProvider));
+        applicationManager.setBaseApplication(new SingleApplication(context,
+                configuration, null, container_, ondemandContainer,
+                pathMappingProvider));
+        configuration.setProperty(AbstractApplication.KEY_WEBAPPSOURCEROOT,
+                new File(ResourceUtil.getBuildDir(getClass()), "webapp")
+                        .getAbsolutePath());
         configuration.setProperty(AbstractApplication.KEY_SOURCEDIRECTORY,
-                ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
-        configuration.setProperty(AbstractApplication.KEY_CLASSESDIRECTORY,
                 ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
         configuration.setProperty(AbstractApplication.KEY_RESOURCESDIRECTORY,
                 ResourceUtil.getBuildDir(getClass()).getCanonicalPath());

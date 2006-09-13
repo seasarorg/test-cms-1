@@ -63,7 +63,7 @@ public class ZptAnalyzerTest extends TestCase {
 
     private void act(String methodName) {
 
-        analyzer_.analyze(Request.METHOD_GET, classDescMap_, getClass()
+        analyzer_.analyze("/hoe", Request.METHOD_GET, classDescMap_, getClass()
                 .getResourceAsStream("ZptAnalyzerTest_" + methodName + ".zpt"),
                 "UTF-8", CLASSNAME);
     }

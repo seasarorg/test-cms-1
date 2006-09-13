@@ -20,8 +20,6 @@ public interface SourceCreator extends Updater {
 
     String getDxoPackageName();
 
-    File getWebappRoot();
-
     File getWebappSourceRoot();
 
     File getSourceDirectory();
@@ -42,7 +40,8 @@ public interface SourceCreator extends Updater {
 
     File getTemplateFile(String className);
 
-    Response update(String path, String method, Request request);
+    Response update(String path, String method, Request request,
+            Response response);
 
     ResponseCreator getResponseCreator();
 

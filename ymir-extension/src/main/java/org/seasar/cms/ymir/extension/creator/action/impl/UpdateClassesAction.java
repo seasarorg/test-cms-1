@@ -115,7 +115,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
     boolean shouldUpdate(PathMetaData pathMetaData) {
 
         File templateFile = pathMetaData.getTemplateFile();
-        if (!templateFile.exists()) {
+        if (templateFile == null || !templateFile.exists()) {
             return false;
         }
         return (templateFile.lastModified() > getLastCheckedTime(pathMetaData));

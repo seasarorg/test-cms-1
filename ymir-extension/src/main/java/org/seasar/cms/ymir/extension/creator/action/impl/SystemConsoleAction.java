@@ -140,7 +140,7 @@ public class SystemConsoleAction extends AbstractUpdateAction {
             List<PathMetaData> pathList) {
 
         PathMetaData pathMetaData = new LazyPathMetaData(getSourceCreator(),
-                path, method);
+                path, method, path);
         if (pathMetaData.getComponentName() != null && !pathMetaData.isDenied()) {
             pathList.add(pathMetaData);
         }

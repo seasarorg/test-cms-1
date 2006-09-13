@@ -13,6 +13,8 @@ public class LazyPathMetaData implements PathMetaData {
 
     private String method_;
 
+    private String forwardPath_;
+
     private boolean deniedLoaded_;
 
     private boolean denied_;
@@ -46,11 +48,24 @@ public class LazyPathMetaData implements PathMetaData {
     private boolean templateFileLoaded_;
 
     public LazyPathMetaData(SourceCreator sourceCreator, String path,
-            String method) {
+            String method, String forwardPath) {
 
         sourceCreator_ = sourceCreator;
         path_ = path;
         method_ = method;
+        forwardPath_ = strip(forwardPath);
+    }
+
+    String strip(String path) {
+        if (path == null) {
+            return null;
+        }
+        int question = path.indexOf('?');
+        if (question < 0) {
+            return path;
+        } else {
+            return path.substring(0, question);
+        }
     }
 
     public String getMethod() {
@@ -63,10 +78,16 @@ public class LazyPathMetaData implements PathMetaData {
         return path_;
     }
 
+    public String getForwardPath() {
+
+        return forwardPath_;
+    }
+
     public boolean isDenied() {
 
         if (!deniedLoaded_) {
             denied_ = sourceCreator_.isDenied(path_, method_);
+            defaultPathLoaded_ = true;
         }
         return denied_;
     }
@@ -75,6 +96,7 @@ public class LazyPathMetaData implements PathMetaData {
 
         if (!componentNameLoaded_) {
             componentName_ = sourceCreator_.getComponentName(path_, method_);
+            componentNameLoaded_ = true;
         }
         return componentName_;
     }
@@ -83,6 +105,7 @@ public class LazyPathMetaData implements PathMetaData {
 
         if (!classNameLoaded_) {
             className_ = sourceCreator_.getClassName(getComponentName());
+            classNameLoaded_ = true;
         }
         return className_;
     }
@@ -91,6 +114,7 @@ public class LazyPathMetaData implements PathMetaData {
 
         if (!actionNameLoaded_) {
             actionName_ = sourceCreator_.getActionName(path_, method_);
+            actionNameLoaded_ = true;
         }
         return actionName_;
     }
@@ -99,6 +123,7 @@ public class LazyPathMetaData implements PathMetaData {
 
         if (!defaultPathLoaded_) {
             defaultPath_ = sourceCreator_.getDefaultPath(path_, method_);
+            defaultPathLoaded_ = true;
         }
         return defaultPath_;
     }
@@ -108,6 +133,7 @@ public class LazyPathMetaData implements PathMetaData {
         if (!baseSourceFileLoaded_) {
             baseSourceFile_ = sourceCreator_.getSourceFile(getClassName()
                     + "Base");
+            baseSourceFileLoaded_ = true;
         }
         return baseSourceFile_;
     }
@@ -116,6 +142,7 @@ public class LazyPathMetaData implements PathMetaData {
 
         if (!sourceFileLoaded_) {
             sourceFile_ = sourceCreator_.getSourceFile(getClassName());
+            sourceFileLoaded_ = true;
         }
         return sourceFile_;
     }
@@ -123,7 +150,12 @@ public class LazyPathMetaData implements PathMetaData {
     public File getTemplateFile() {
 
         if (!templateFileLoaded_) {
-            templateFile_ = sourceCreator_.getTemplateFile(path_);
+            if (forwardPath_ != null) {
+                templateFile_ = sourceCreator_.getTemplateFile(forwardPath_);
+            } else {
+                templateFile_ = null;
+            }
+            templateFileLoaded_ = true;
         }
         return templateFile_;
     }
