@@ -2,6 +2,9 @@ package org.seasar.cms.ymir.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+
+import javax.servlet.ServletContext;
 
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
@@ -10,31 +13,27 @@ import org.seasar.framework.container.S2Container;
 
 public class SingleApplication extends AbstractApplication {
 
-    private Configuration config_;
+    private ServletContext context_;
 
-    private String webappRoot_;
+    private Configuration config_;
 
     private Class referenceClass_;
 
     private S2Container container_;
 
-    public SingleApplication(Configuration config, String webappRoot,
+    public SingleApplication(ServletContext context, Configuration config,
             Class referenceClass, S2Container container,
             LocalOndemandS2Container ondemandContainer,
             PathMappingProvider pathMappingProvider) {
         super(ondemandContainer, pathMappingProvider);
+        context_ = context;
         config_ = config;
-        webappRoot_ = webappRoot;
         referenceClass_ = referenceClass;
         container_ = container;
     }
 
     public S2Container getS2Container() {
         return container_;
-    }
-
-    public String getWebappRoot() {
-        return webappRoot_;
     }
 
     public Class getReferenceClass() {
@@ -63,5 +62,17 @@ public class SingleApplication extends AbstractApplication {
 
     public boolean isBeingDeveloped() {
         return true;
+    }
+
+    public boolean isResourceExists(String path) {
+        try {
+            return (context_.getResource(path) != null);
+        } catch (MalformedURLException ex) {
+            return false;
+        }
+    }
+
+    public String getWebappRoot() {
+        return context_.getRealPath("");
     }
 }

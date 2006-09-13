@@ -1,7 +1,5 @@
 package org.seasar.cms.ymir.impl;
 
-import java.io.File;
-
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.PathMappingProvider;
@@ -13,8 +11,6 @@ abstract public class AbstractApplication implements Application {
     public static final String KEY_WEBAPPSOURCEROOT = "webappSourceRoot";
 
     public static final String KEY_ROOTPACKAGENAME = "rootPackageName";
-
-    public static final String KEY_CLASSESDIRECTORY = "classesDirectory";
 
     public static final String KEY_RESOURCESDIRECTORY = "resourcesDirectory";
 
@@ -46,27 +42,6 @@ abstract public class AbstractApplication implements Application {
 
     public void setRootPackageName(String rootPackageName) {
         setProperty(KEY_ROOTPACKAGENAME, rootPackageName);
-    }
-
-    public boolean isResourceExists(String path) {
-        return new File(getWebappRoot(), path).exists();
-    }
-
-    public String getClassesDirectory() {
-        String classesDirectory = getProperty(KEY_CLASSESDIRECTORY);
-        if (classesDirectory == null) {
-            classesDirectory = getWebappRoot() + "/WEB-INF/classes";
-        } else {
-            String projectRoot = getProjectRoot();
-            if (projectRoot != null) {
-                classesDirectory = projectRoot + "/" + classesDirectory;
-            }
-        }
-        return classesDirectory;
-    }
-
-    public void setClassesDirectory(String classesDirectory) {
-        setProperty(KEY_CLASSESDIRECTORY, classesDirectory);
     }
 
     public String getResourcesDirectory() {
@@ -112,12 +87,9 @@ abstract public class AbstractApplication implements Application {
     public String getWebappSourceRoot() {
         String webappSourceRoot = getProperty(KEY_WEBAPPSOURCEROOT);
         if (webappSourceRoot == null) {
-            webappSourceRoot = getWebappRoot();
-            if (webappSourceRoot == null) {
-                String projectRoot = getProjectRoot();
-                if (projectRoot != null) {
-                    webappSourceRoot = projectRoot + "/src/main/webapp";
-                }
+            String projectRoot = getProjectRoot();
+            if (projectRoot != null) {
+                webappSourceRoot = projectRoot + "/src/main/webapp";
             }
         } else {
             String projectRoot = getProjectRoot();

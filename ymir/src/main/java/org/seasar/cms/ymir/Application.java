@@ -8,12 +8,6 @@ import org.seasar.framework.container.S2Container;
 
 public interface Application {
 
-    /**
-     * Webアプリケーションがデプロイされているディレクトリのパスを返します。
-     * <p>nullを返すことはありません。</p>
-     *
-     * @return Webアプリケーションのトップディレクトリのパス。
-     */
     String getWebappRoot();
 
     String getWebappSourceRoot();
@@ -31,10 +25,6 @@ public interface Application {
     String getSourceDirectory();
 
     void setSourceDirectory(String sourceDirectory);
-
-    String getClassesDirectory();
-
-    void setClassesDirectory(String classesDirectory);
 
     String getResourcesDirectory();
 

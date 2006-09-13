@@ -84,29 +84,42 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 dispatcher, parameterMap, fileParameterMap, matched
                         .getPathInfo());
 
-        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
-                && getApplication().isBeingDeveloped()) {
-            for (int i = 0; i < updaters_.length; i++) {
-                Response response = updaters_[i].update(path, request
-                        .getMethod(), request);
-                if (response != null) {
-                    return response;
-                }
-            }
-        }
-
         Response response = processRequest(request, componentName, actionName);
 
         // デフォルトパスが指定されており、かつpassthroughの場合でパスに
         // 対応するリソースが存在しない場合はデフォルトパスにリダイレクトする。
+        // ただしリクエストパスがデフォルトパスと同一の場合は（ループしてしまうので）何もしない。
         if (response.getType() == Response.TYPE_PASSTHROUGH) {
             String defaultPath = matched.getDefaultPath();
-            if (defaultPath != null && !getApplication().isResourceExists(path)) {
+            if (defaultPath != null && !getApplication().isResourceExists(path)
+                    && !strip(defaultPath).equals(path)) {
                 response = new RedirectResponse(defaultPath);
             }
         }
 
+        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
+                && getApplication().isBeingDeveloped()) {
+            for (int i = 0; i < updaters_.length; i++) {
+                Response newResponse = updaters_[i].update(path, request
+                        .getMethod(), request, response);
+                if (newResponse != response) {
+                    return newResponse;
+                }
+            }
+        }
+
         return response;
+    }
+
+    String strip(String path) {
+        int question = path.indexOf('?');
+        if (question >= 0) {
+            path = path.substring(0, question);
+        }
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
     }
 
     public Object backupForInclusion() {

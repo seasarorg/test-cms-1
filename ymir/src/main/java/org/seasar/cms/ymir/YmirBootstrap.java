@@ -35,8 +35,8 @@ public class YmirBootstrap {
         }
         ComponentDef cd = getContainer().getComponentDef(
                 LocalOndemandS2Container.class);
-        Application application = new SingleApplication(getConfiguration(),
-                servletContext.getRealPath("/"), landmark, cd.getContainer(),
+        Application application = new SingleApplication(servletContext,
+                getConfiguration(), landmark, cd.getContainer(),
                 (LocalOndemandS2Container) cd.getComponent(),
                 (PathMappingProvider) getContainer().getComponent(
                         PathMappingProvider.class));
