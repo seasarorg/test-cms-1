@@ -19,7 +19,6 @@ import org.seasar.framework.mock.servlet.MockServletContextImpl;
 import net.skirnir.freyja.IllegalSyntaxException;
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.TemplateEvaluator;
-import net.skirnir.freyja.TemplateSet;
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.MetalTagEvaluator;
 import net.skirnir.freyja.zpt.tales.BeanPathResolver;
@@ -69,7 +68,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
 
     private SourceCreator sourceCreator_;
 
-    private TemplateSet templateSet_;
+    private AnalyzerTemplateSet templateSet_;
 
     private TemplatePathNormalizer templatePathNormalizer_ = new DefaultTemplatePathNormalizer();
 
@@ -77,6 +76,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
             Map<String, ClassDesc> classDescMap, InputStream inputStream,
             String encoding, String className) {
 
+        templateSet_.setPathNormalizer(templatePathNormalizer_);
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
         context.setTemplateName(path);
         context.setTemplateSet(templateSet_);

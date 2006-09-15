@@ -14,10 +14,19 @@ public class AnalyzerTemplateSet extends AbstractPathTemplateSet {
 
     private SourceCreator sourceCreator_;
 
+    private TemplatePathNormalizer pathNormalizer_;
+
     public AnalyzerTemplateSet(String pageEncoding,
             TemplateEvaluator evaluator, SourceCreator sourceCreator) {
         super(pageEncoding, evaluator);
         sourceCreator_ = sourceCreator;
+    }
+
+    @Override
+    public String getCanonicalName(String baseTemplateName, String templateName) {
+
+        return super.getCanonicalName(baseTemplateName, pathNormalizer_
+                .normalize(templateName));
     }
 
     @Override
@@ -41,5 +50,9 @@ public class AnalyzerTemplateSet extends AbstractPathTemplateSet {
 
     File getFile(String templateName) {
         return new File(sourceCreator_.getWebappSourceRoot(), templateName);
+    }
+
+    public void setPathNormalizer(TemplatePathNormalizer pathNormalizer) {
+        pathNormalizer_ = pathNormalizer;
     }
 }

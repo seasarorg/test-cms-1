@@ -324,7 +324,7 @@ public class SourceCreatorImpl implements SourceCreator {
             throw new RuntimeException(ex);
         }
 
-        ClassDesc classDesc = (ClassDesc) classDescMap.get(className);
+        ClassDesc classDesc = classDescMap.get(className);
         if (classDesc == null && method.equalsIgnoreCase(Request.METHOD_POST)) {
             // テンプレートを解析した結果対応するPageクラスを作る必要があると
             // 見なされなかった場合でも、methodがPOSTならPageクラスを作る。
@@ -646,21 +646,6 @@ public class SourceCreatorImpl implements SourceCreator {
             return null;
         } else {
             return matched.getPathMapping().getActionName(
-                    matched.getVariableResolver());
-        }
-    }
-
-    public String getDefaultPath(String path, String method) {
-
-        if (path == null) {
-            return null;
-        }
-        MatchedPathMapping matched = defaultRequestProcessor_
-                .findMatchedPathMapping(path, method);
-        if (matched == null) {
-            return null;
-        } else {
-            return matched.getPathMapping().getDefaultPath(
                     matched.getVariableResolver());
         }
     }

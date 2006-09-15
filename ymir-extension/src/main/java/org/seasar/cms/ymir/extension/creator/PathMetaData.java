@@ -16,8 +16,6 @@ public interface PathMetaData {
 
     String getActionName();
 
-    String getDefaultPath();
-
     File getBaseSourceFile();
 
     File getSourceFile();

@@ -31,10 +31,6 @@ public class CreateTemplateAction extends AbstractUpdateAction {
 
     Response actDefault(Request request, PathMetaData pathMetaData) {
 
-        if (!isOwnTemplateUsed(pathMetaData)) {
-            return null;
-        }
-
         boolean actionMethodNotFound = false;
         Class pageClass = getSourceCreator().getClass(
                 pathMetaData.getClassName());
@@ -62,25 +58,6 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         variableMap.put("actionMethodNotFound", actionMethodNotFound);
         return getSourceCreator().getResponseCreator().createResponse(
                 "createTemplate", variableMap);
-    }
-
-    boolean isOwnTemplateUsed(PathMetaData pathMetaData) {
-
-        Class pageClass = getSourceCreator().getClass(
-                pathMetaData.getClassName());
-        if (pageClass == null) {
-            return true;
-        }
-        Method actionMethod = getActionMethod(pageClass, pathMetaData
-                .getActionName());
-        if (actionMethod == null) {
-            return true;
-        }
-        if (actionMethod.getReturnType() == Void.TYPE) {
-            return (pathMetaData.getDefaultPath() == null);
-        } else {
-            return false;
-        }
     }
 
     Method getActionMethod(Class pageClass, String actionName) {

@@ -32,8 +32,6 @@ public interface SourceCreator extends Updater {
 
     String getActionName(String path, String method);
 
-    String getDefaultPath(String path, String method);
-
     String getClassName(String componentName);
 
     File getSourceFile(String className);
