@@ -5,7 +5,7 @@ import org.seasar.cms.ymir.impl.VoidResponse;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.scheme.Strategy;
 import org.seasar.cms.ymir.response.scheme.StrategySelector;
-import org.seasar.cms.ymir.response.scheme.impl.PageStrategy;
+import org.seasar.cms.ymir.response.scheme.impl.ForwardStrategy;
 
 public class StringResponseConstructor implements ResponseConstructor {
 
@@ -27,7 +27,7 @@ public class StringResponseConstructor implements ResponseConstructor {
         String path;
         int colon = string.indexOf(':');
         if (colon < 0) {
-            scheme = PageStrategy.SCHEME;
+            scheme = ForwardStrategy.SCHEME;
             path = string;
         } else {
             scheme = string.substring(0, colon);

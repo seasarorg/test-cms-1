@@ -40,7 +40,7 @@ public class RedirectStrategy implements Strategy {
             // /path(a,b)形式。
             p = new Path(path.substring(0, lparen));
             parseFunctionTypeParameters(path.substring(lparen + 1, path
-                .length() - 1), component, p);
+                    .length() - 1), component, p);
         } else {
             int question = path.indexOf('?');
             if (question >= 0) {
@@ -48,29 +48,35 @@ public class RedirectStrategy implements Strategy {
                 if (path.indexOf('=', question + 1) >= 0) {
                     // path?a=${a}&b=${b}形式。
                     parseExpressionTypeParameters(path.substring(question + 1),
-                        component, p);
+                            component, p);
                 } else {
                     // path?a&b形式。
                     parseSimpleTypeParameters(path.substring(question + 1),
-                        component, p);
+                            component, p);
                 }
             }
         }
         if (p != null) {
-            return p.toString();
+            return p.asString();
         } else {
             return path;
         }
     }
 
     void parseFunctionTypeParameters(String parameter, Object component,
-        Path path) {
+            Path path) {
 
         String[] params = parameter.split(",");
         for (int i = 0; i < params.length; i++) {
             String name = decodeURL(params[i].trim());
+            path.addParameter(name, getProperty(component, name));
+        }
+    }
+
+    String getProperty(Object component, String name) {
+        if (component != null) {
             try {
-                path.addParameter(name, BeanUtils.getProperty(component, name));
+                return BeanUtils.getProperty(component, name);
             } catch (IllegalAccessException ex) {
                 ;
             } catch (InvocationTargetException ex) {
@@ -79,10 +85,11 @@ public class RedirectStrategy implements Strategy {
                 ;
             }
         }
+        return null;
     }
 
     void parseExpressionTypeParameters(String parameter, Object component,
-        Path path) {
+            Path path) {
 
         VariableResolver resolver = new ComponentVariableResolver(component);
 
@@ -91,14 +98,15 @@ public class RedirectStrategy implements Strategy {
             int equal = params[i].indexOf('=');
             if (equal >= 0) {
                 try {
-                    path.addParameter(evaluator_.evaluateAsString(
-                        decodeURL(params[i].substring(0, equal)), resolver),
-                        evaluator_.evaluateAsString(decodeURL(params[i]
-                            .substring(equal + 1)), resolver));
+                    path.addParameter(
+                            evaluator_.evaluateAsString(decodeURL(params[i]
+                                    .substring(0, equal)), resolver),
+                            evaluator_.evaluateAsString(decodeURL(params[i]
+                                    .substring(equal + 1)), resolver));
                 } catch (EvaluationException ex) {
                     throw new RuntimeException(
-                        "Expression type parameter's format is wrong: "
-                            + parameter, ex);
+                            "Expression type parameter's format is wrong: "
+                                    + parameter, ex);
                 }
             }
         }
@@ -109,15 +117,7 @@ public class RedirectStrategy implements Strategy {
         String[] params = parameter.split("&");
         for (int i = 0; i < params.length; i++) {
             String name = decodeURL(params[i]);
-            try {
-                path.addParameter(name, BeanUtils.getProperty(component, name));
-            } catch (IllegalAccessException ex) {
-                ;
-            } catch (InvocationTargetException ex) {
-                ;
-            } catch (NoSuchMethodException ex) {
-                ;
-            }
+            path.addParameter(name, getProperty(component, name));
         }
     }
 
@@ -130,7 +130,7 @@ public class RedirectStrategy implements Strategy {
         }
     }
 
-    private static class ComponentVariableResolver implements VariableResolver {
+    private class ComponentVariableResolver implements VariableResolver {
         private Object component_;
 
         public ComponentVariableResolver(Object component) {
@@ -140,17 +140,7 @@ public class RedirectStrategy implements Strategy {
 
         public Object getValue(String name) {
 
-            Object value = null;
-            try {
-                value = BeanUtils.getProperty(component_, name);
-            } catch (IllegalAccessException ex) {
-                ;
-            } catch (InvocationTargetException ex) {
-                ;
-            } catch (NoSuchMethodException ex) {
-                ;
-            }
-            return value;
+            return getProperty(component_, name);
         }
     }
 }

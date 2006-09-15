@@ -168,75 +168,103 @@ public class DefaultRequestProcessor implements RequestProcessor {
     Response processRequest(Request request, String componentName,
             String actionName, Object defaultReturnValue) {
 
+        // dispatchがREQUESTの時は、
+        // ・pathに対応するcomponentがあればactionを実行する。actionの実行結果が
+        //   passthroughの時は、デフォルトの返り値が指定されていれば、 デフォルトの返り値
+        //   に対応するresponseに置き換える。
+        // ・pathに対応するcomponentがなければresponseの値はpassthroughとする。
+        //   デフォルトの返り値が指定されている場合はデフォルトの返り値に対応するresponseとする。
+        // ・responseがリクエストパスへのforwardである場合はpassthroughをresponseとする。
+        // ・最終的なresponseがpassthroughでかつcomponentがあれば、レンダリングのための
+        //   メソッドを呼び出す。
+        // dispatchがREQUESTでない時は、
+        // ・pathに対応するcomponentがあればレンダリングのためのメソッドを呼び出す。
+
         Response response = PassthroughResponse.INSTANCE;
 
+        Object component = null;
         if (getS2Container().hasComponentDef(componentName)) {
             ThreadContext context = getThreadContext();
-            Object component = null;
             try {
                 context.setComponent(Request.class, request);
                 component = getS2Container().getComponent(componentName);
             } finally {
                 context.setComponent(Request.class, null);
             }
+        }
 
-            HttpServletRequest httpRequest = getHttpServletRequest();
-            if (component != httpRequest.getAttribute(ATTR_PAGE)) {
-                // 同一リクエストで直前に同一コンポーネントについて処理済みの
-                // 場合はリクエストパラメータのinjectionもrenderメソッドの
-                // 呼び出しもしない。そうでない場合のみ処理を行なう。
+        if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
+            if (component != null) {
+                prepareForComponent(component, request);
 
-                // 各コンテキストが持つ属性をinjectする。
-                injectContextAttributes(component);
-
-                // リクエストパラメータをinjectする。
-                try {
-                    beanUtilsBean_.populate(component, request
-                            .getParameterMap());
-                } catch (Throwable t) {
-                    if (logger_.isDebugEnabled()) {
-                        logger_.debug("Can't populate request parameters", t);
-                    }
-                }
-
-                // FormFileのリクエストパラメータをinjectする。
-                try {
-                    beanUtilsBean_.copyProperties(component, request
-                            .getFileParameterMap());
-                } catch (Throwable t) {
-                    if (logger_.isDebugEnabled()) {
-                        logger_.debug(
-                                "Can't populate request parameters (FormFile)",
-                                t);
-                    }
-                }
-
-                if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
-                    // Actionの呼び出しはdispatcherがREQUESTの時だけ。
-                    response = invokeAction(request.getPath(), component,
-                            actionName, defaultReturnValue);
-                }
+                response = normalizeResponse(invokeAction(component,
+                        actionName, defaultReturnValue), request.getPath());
 
                 if (response.getType() == Response.TYPE_PASSTHROUGH) {
-                    // dispatcherがREQUEST以外の場合やActionの呼び出し後に処理が
-                    // スルーされてきた場合は、画面描画のためのAction呼び出しを
-                    // 行なう。
-                    invokeAction(request.getPath(), component, ACTION_RENDER,
-                            null);
+                    // 画面描画のためのAction呼び出しを行なう。
+                    invokeAction(component, ACTION_RENDER, null);
                 }
 
-                // 各コンテキストに属性をoutjectする。
-                outjectContextAttributes(component);
-
-                // コンポーネント自体をrequestにバインドしておく。
-                httpRequest.setAttribute(ATTR_PAGE, component);
+                finishForComponent(component);
             } else {
-                // FIXME このあたりが正しくない。デフォルトがあれば使うように！
-                response = PassthroughResponse.INSTANCE;
+                response = normalizeResponse(constructResponseFromReturnValue(
+                        null, defaultReturnValue), request.getPath());
+            }
+        } else {
+            if (component != null) {
+                prepareForComponent(component, request);
+
+                // 画面描画のためのAction呼び出しを行なう。
+                invokeAction(component, ACTION_RENDER, null);
+
+                finishForComponent(component);
             }
         }
 
         return response;
+    }
+
+    void prepareForComponent(Object component, Request request) {
+        // 各コンテキストが持つ属性をinjectする。
+        injectContextAttributes(component);
+
+        // リクエストパラメータをinjectする。
+        try {
+            beanUtilsBean_.populate(component, request.getParameterMap());
+        } catch (Throwable t) {
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("Can't populate request parameters", t);
+            }
+        }
+
+        // FormFileのリクエストパラメータをinjectする。
+        try {
+            beanUtilsBean_.copyProperties(component, request
+                    .getFileParameterMap());
+        } catch (Throwable t) {
+            if (logger_.isDebugEnabled()) {
+                logger_
+                        .debug("Can't populate request parameters (FormFile)",
+                                t);
+            }
+        }
+    }
+
+    void finishForComponent(Object component) {
+        // 各コンテキストに属性をoutjectする。
+        outjectContextAttributes(component);
+
+        // コンポーネント自体をrequestにバインドしておく。
+        getHttpServletRequest().setAttribute(ATTR_PAGE, component);
+    }
+
+    Response normalizeResponse(Response response, String path) {
+        if (response.getType() == Response.TYPE_FORWARD
+                && path.equals(response.getPath())) {
+            return PassthroughResponse.INSTANCE;
+        } else {
+            return response;
+        }
     }
 
     void injectContextAttributes(Object component) {
@@ -269,15 +297,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 HttpServletRequest.class);
     }
 
-    Response invokeAction(String path, Object component, String actionName,
+    Response invokeAction(Object component, String actionName,
             Object defaultReturnValue) {
 
-        Class returnType;
-        Object returnValue;
+        Response response = PassthroughResponse.INSTANCE;
 
         Method method = getActionMethod(component, actionName);
         if (method != null) {
-            returnType = method.getReturnType();
+            Object returnValue;
             try {
                 returnValue = method.invoke(component, new Object[0]);
             } catch (IllegalArgumentException ex) {
@@ -287,22 +314,26 @@ public class DefaultRequestProcessor implements RequestProcessor {
             } catch (InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
-            if (returnType == Void.TYPE) {
-                if (defaultReturnValue != null) {
-                    returnType = defaultReturnValue.getClass();
-                    returnValue = defaultReturnValue;
-                } else {
-                    return PassthroughResponse.INSTANCE;
-                }
-            }
-        } else if (defaultReturnValue != null) {
-            returnType = defaultReturnValue.getClass();
-            returnValue = defaultReturnValue;
+            response = constructResponse(component, method.getReturnType(),
+                    returnValue);
+        }
+
+        if (response == PassthroughResponse.INSTANCE) {
+            response = constructResponseFromReturnValue(component,
+                    defaultReturnValue);
+        }
+
+        return response;
+    }
+
+    Response constructResponseFromReturnValue(Object component,
+            Object returnValue) {
+        if (returnValue != null) {
+            return constructResponse(component, returnValue.getClass(),
+                    returnValue);
         } else {
             return PassthroughResponse.INSTANCE;
         }
-
-        return constructResponse(path, component, returnType, returnValue);
     }
 
     public Method getActionMethod(Object component, String actionName) {
@@ -316,39 +347,37 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
-    Response constructResponse(String path, Object component, Class type,
-            Object returnValue) {
+    Response constructResponse(Object component, Class type, Object returnValue) {
 
-        Response response = null;
-        if (type == Void.TYPE) {
-            response = PassthroughResponse.INSTANCE;
-        } else {
-            ResponseConstructor constructor = responseConstructorSelector_
-                    .getResponseConstructor(type);
-            if (constructor == null) {
-                throw new ComponentNotFoundRuntimeException(
-                        "Can't find ResponseConstructor for type '" + type
-                                + "' in ResponseConstructorSelector");
-            }
+        ResponseConstructor constructor = responseConstructorSelector_
+                .getResponseConstructor(type);
+        if (constructor == null) {
+            throw new ComponentNotFoundRuntimeException(
+                    "Can't find ResponseConstructor for type '" + type
+                            + "' in ResponseConstructorSelector");
+        }
 
-            ClassLoader oldLoader = Thread.currentThread()
-                    .getContextClassLoader();
-            try {
+        ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            if (component != null) {
                 Thread.currentThread().setContextClassLoader(
                         component.getClass().getClassLoader());
-                response = constructor
-                        .constructResponse(component, returnValue);
-            } finally {
-                Thread.currentThread().setContextClassLoader(oldLoader);
             }
+            return constructor.constructResponse(component, returnValue);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldLoader);
         }
-
-        if (response.getType() == Response.TYPE_FORWARD
-                && path.equals(response.getPath())) {
-            response = PassthroughResponse.INSTANCE;
-        }
-        return response;
     }
+
+    //
+    //
+    //
+    //        if (response.getType() == Response.TYPE_FORWARD
+    //                && path.equals(response.getPath())) {
+    //            response = PassthroughResponse.INSTANCE;
+    //        }
+    //        return response;
+    //    }
 
     public void setResponseConstructorSelector(
             ResponseConstructorSelector responseConstructorSelector) {

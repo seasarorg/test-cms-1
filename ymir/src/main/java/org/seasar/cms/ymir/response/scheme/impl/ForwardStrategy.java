@@ -6,7 +6,7 @@ import org.seasar.cms.ymir.response.scheme.Strategy;
 
 public class ForwardStrategy implements Strategy {
 
-    private static final String SCHEME = "forward";
+    public static final String SCHEME = "forward";
 
     public String getScheme() {
 

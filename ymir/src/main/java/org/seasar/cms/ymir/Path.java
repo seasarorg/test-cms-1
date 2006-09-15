@@ -147,6 +147,10 @@ public class Path {
 
     public void addParameter(String name, String value) {
 
+        if (value == null) {
+            return;
+        }
+
         String[] values = (String[]) parameterMap_.get(name);
         String[] newValues;
         if (values == null) {
