@@ -4,7 +4,7 @@
   </head>
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
-<p>リクエストされたパス<span tal:replace="request/path">PATH</span>に対応するテンプレート<span tal:replace="pathMetaData/templateFile/name">TEMPLTATE</span>が見つかりませんでした。</p>
+<p>リクエストされたパス<span tal:replace="request/path">PATH</span>に対応するテンプレート<span tal:replace="pathMetaData/templateFile/path">TEMPLTATE</span>が見つかりませんでした。</p>
 <p>テンプレートを作成する場合は「作成」ボタンを押して下さい。</p>
 <form tal:attributes="action request/absolutePath" method="post">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
