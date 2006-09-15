@@ -47,8 +47,8 @@ public class MatchedPathMapping {
 
     }
 
-    public String getDefaultPath() {
-        return pathMapping_.getDefaultPath(variableResolver_);
+    public Object getDefaultReturnValue() {
+        return pathMapping_.getDefaultReturnValue(variableResolver_);
     }
 
     public boolean isDenied() {

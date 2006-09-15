@@ -24,7 +24,9 @@ public class PathMappingImpl implements PathMapping {
 
     private String pathInfoTemplate_;
 
-    private String defaultPathTemplate_;
+    private String defaultReturnValueTemplate_;
+
+    private Object defaultReturnValue_;
 
     private boolean denied_;
 
@@ -32,22 +34,26 @@ public class PathMappingImpl implements PathMapping {
     }
 
     public PathMappingImpl(String patternString, String componentTemplate,
-        String actionNameTemplate, String pathInfoTemplate,
-        String defaultPathTemplate) {
+            String actionNameTemplate, String pathInfoTemplate,
+            Object defaultReturnValue) {
 
         this(false, patternString, componentTemplate, actionNameTemplate,
-            pathInfoTemplate, defaultPathTemplate);
+                pathInfoTemplate, defaultReturnValue);
     }
 
     public PathMappingImpl(boolean denied, String patternString,
-        String componentTemplate, String actionNameTemplate,
-        String pathInfoTemplate, String defaultPathTemplate) {
+            String componentTemplate, String actionNameTemplate,
+            String pathInfoTemplate, Object defaultReturnValue) {
 
         pattern_ = Pattern.compile(patternString);
         componentNameTemplate_ = componentTemplate;
         actionNameTemplate_ = actionNameTemplate;
         pathInfoTemplate_ = pathInfoTemplate;
-        defaultPathTemplate_ = defaultPathTemplate;
+        if (defaultReturnValue instanceof String) {
+            defaultReturnValueTemplate_ = (String) defaultReturnValue;
+        } else {
+            defaultReturnValue_ = defaultReturnValue;
+        }
     }
 
     public String getActionNameTemplate() {
@@ -79,14 +85,24 @@ public class PathMappingImpl implements PathMapping {
         pathInfoTemplate_ = pathInfoTemplate;
     }
 
-    public String getDefaultPathTemplate() {
+    public String getDefaultReturnValueTemplate() {
 
-        return defaultPathTemplate_;
+        return defaultReturnValueTemplate_;
     }
 
-    public void setDefaultPathTemplate(String defaultPathTemplate) {
+    public void setDefaultReturnValueTemplate(String defaultPathTemplate) {
 
-        defaultPathTemplate_ = defaultPathTemplate;
+        defaultReturnValueTemplate_ = defaultPathTemplate;
+    }
+
+    public Object getDefaultReturnValue() {
+
+        return defaultReturnValue_;
+    }
+
+    public void setDefaultReturnValue(Object defaultReturnValue) {
+
+        defaultReturnValue_ = defaultReturnValue;
     }
 
     public Pattern getPattern() {
@@ -160,9 +176,13 @@ public class PathMappingImpl implements PathMapping {
         return evaluate(pathInfoTemplate_, resolver);
     }
 
-    public String getDefaultPath(VariableResolver resolver) {
+    public Object getDefaultReturnValue(VariableResolver resolver) {
 
-        return evaluate(defaultPathTemplate_, resolver);
+        if (defaultReturnValueTemplate_ != null) {
+            return evaluate(defaultReturnValueTemplate_, resolver);
+        } else {
+            return defaultReturnValue_;
+        }
     }
 
     String evaluate(String template, VariableResolver resolver) {
@@ -174,7 +194,7 @@ public class PathMappingImpl implements PathMapping {
                 return evaluator_.evaluateAsString(template, resolver);
             } catch (EvaluationException ex) {
                 throw new RuntimeException("Can't evaluate template: "
-                    + template + ", resolver=" + resolver, ex);
+                        + template + ", resolver=" + resolver, ex);
             }
         }
     }

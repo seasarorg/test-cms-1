@@ -18,9 +18,13 @@ public interface PathMapping {
 
     void setPathInfoTemplate(String pathInfoTemplate);
 
-    String getDefaultPathTemplate();
+    String getDefaultReturnValueTemplate();
 
-    void setDefaultPathTemplate(String defaultPathTemplate);
+    void setDefaultReturnValueTemplate(String defaultReturnValueTemplate);
+
+    Object getDefaultReturnValue();
+
+    void setDefaultReturnValue(Object defaultReturnValue);
 
     Pattern getPattern();
 
@@ -34,7 +38,7 @@ public interface PathMapping {
 
     String getPathInfo(VariableResolver resolver);
 
-    String getDefaultPath(VariableResolver resolver);
+    Object getDefaultReturnValue(VariableResolver variableResolver_);
 
     boolean isDenied();
 }

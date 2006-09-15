@@ -26,6 +26,6 @@
     <arg>"${1}Page"</arg>
     <arg>"_${method}${2u}"</arg>
     <arg>""</arg>
-    <arg>"/${1}.html"</arg>
+    <arg>"redirect:/${1}.html"</arg>
   </component>
 </components>
