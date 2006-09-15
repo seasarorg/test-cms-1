@@ -37,7 +37,11 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     private NamingConvention namingConvention_ = new NamingConventionImpl();
 
+    private HotdeployListener[] listeners_ = new HotdeployListener[0];
+
     private File classesDirectory_;
+
+    private boolean hotdeployEnabled_ = true;
 
     private Logger logger_ = Logger.getLogger(getClass());
 
@@ -198,30 +202,52 @@ public class LocalOndemandS2Container implements HotdeployListener,
         return originalClassLoader_;
     }
 
+    public void init(boolean hotdeployEnabled) {
+        if (!hotdeployEnabled) {
+            // システムとしてhotdeployが無効なら無効にする。
+            // システムとしてhotdeployが有効なら、もともとの状態を保持する。
+            hotdeployEnabled_ = false;
+        }
+
+        if (!hotdeployEnabled_) {
+            start0();
+        }
+    }
+
+    public void destroy() {
+
+        if (!hotdeployEnabled_) {
+            stop0();
+        }
+
+        listeners_ = new HotdeployListener[0];
+        hotdeployEnabled_ = true;
+    }
+
     public void start() {
+        if (hotdeployEnabled_) {
+            start0();
+        }
+    }
+
+    void start0() {
         if (logger_.isDebugEnabled()) {
-            logger_.debug("OndemandContainer's start() method called");
+            logger_
+                    .debug("LocalOndemandS2Container's start0() method called: classesDirectory="
+                            + classesDirectory_);
         }
         originalClassLoader_ = container_.getClassLoader();
-        //        if (originalClassLoader_ instanceof ProxyClassLoader) {
-        //            ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
-        //            hotdeployClassLoader_ = newHotdeployClassLoader(proxyClassLoader
-        //                    .getClassLoader());
-        //            proxyClassLoader.setClassLoader(hotdeployClassLoader_);
-        //            if (logger_.isDebugEnabled()) {
-        //                logger_
-        //                        .debug("Set HotdeployClassLoader in ProxyClassLoader: id="
-        //                                + System
-        //                                        .identityHashCode(hotdeployClassLoader_));
-        //            }
-        //        } else {
         hotdeployClassLoader_ = newHotdeployClassLoader(originalClassLoader_);
         container_.setClassLoader(hotdeployClassLoader_);
+
+        for (int i = 0; i < listeners_.length; i++) {
+            hotdeployClassLoader_.addHotdeployListener(listeners_[i]);
+        }
+
         if (logger_.isDebugEnabled()) {
             logger_.debug("Set HotdeployClassLoader: id="
                     + System.identityHashCode(hotdeployClassLoader_));
         }
-        //        }
     }
 
     HotdeployClassLoader newHotdeployClassLoader(ClassLoader originalClassLoader) {
@@ -235,28 +261,37 @@ public class LocalOndemandS2Container implements HotdeployListener,
     }
 
     public void stop() {
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("OndemandContainer's stop() method called");
+        if (hotdeployEnabled_) {
+            stop0();
         }
-        //        if (originalClassLoader_ instanceof ProxyClassLoader) {
-        //            if (logger_.isDebugEnabled()) {
-        //                logger_.debug("Unset HotdeployClassLoader in ProxyClassLoader");
-        //            }
-        //            ProxyClassLoader proxyClassLoader = (ProxyClassLoader) originalClassLoader_;
-        //            proxyClassLoader.setClassLoader(hotdeployClassLoader_.getParent());
-        //        } else {
+    }
+
+    void stop0() {
+        if (logger_.isDebugEnabled()) {
+            logger_
+                    .debug("LocalOndemandS2Container's stop0() method called: classesDirectory="
+                            + classesDirectory_);
+        }
         if (logger_.isDebugEnabled()) {
             logger_.debug("Unset HotdeployClassLoader");
         }
         container_.setClassLoader(originalClassLoader_);
-        //        }
+
         hotdeployClassLoader_ = null;
         originalClassLoader_ = null;
 
         componentDefCache_.clear();
     }
 
+    public void setHotdeployListeners(HotdeployListener[] listeners) {
+        listeners_ = listeners;
+    }
+
     public void setClassesDirectory(String classesDirectory) {
         classesDirectory_ = new File(classesDirectory);
+    }
+
+    public void setHotdeployDisabled() {
+        hotdeployEnabled_ = false;
     }
 }

@@ -361,11 +361,8 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         logger_.info("Project status is: "
                 + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
 
-        // developモード以外の時はhotdeployを無効にするために
-        // こうしている。
-        if (!Configuration.PROJECTSTATUS_DEVELOP.equals(projectStatus)) {
-            getOndemandBehavior().start();
-        }
+        getOndemandBehavior().init(
+                Configuration.PROJECTSTATUS_DEVELOP.equals(projectStatus));
     }
 
     DistributedOndemandBehavior getOndemandBehavior() {
@@ -382,11 +379,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             return;
         }
 
-        if (!getConfiguration().equalsProjectStatus(
-                Configuration.PROJECTSTATUS_DEVELOP)) {
-
-            getOndemandBehavior().stop();
-        }
+        getOndemandBehavior().destroy();
 
         rootContainer_.destroy();
         rootContainer_ = null;
