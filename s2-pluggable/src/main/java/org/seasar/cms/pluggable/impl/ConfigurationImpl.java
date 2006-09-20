@@ -98,4 +98,9 @@ public class ConfigurationImpl implements Configuration {
 
         return status.equals(getProperty(KEY_PROJECTSTATUS));
     }
+
+    public boolean isDeveloping() {
+
+        return equalsProjectStatus(PROJECTSTATUS_DEVELOP);
+    }
 }

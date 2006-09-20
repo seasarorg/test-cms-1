@@ -22,4 +22,6 @@ public interface Configuration {
     void save(OutputStream out, String header) throws IOException;
 
     boolean equalsProjectStatus(String status);
+
+    boolean isDeveloping();
 }
