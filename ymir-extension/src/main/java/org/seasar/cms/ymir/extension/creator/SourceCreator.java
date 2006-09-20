@@ -12,6 +12,8 @@ import org.seasar.cms.ymir.Updater;
 
 public interface SourceCreator extends Updater {
 
+    String getRootPackageName();
+
     String getPagePackageName();
 
     String getDtoPackageName();

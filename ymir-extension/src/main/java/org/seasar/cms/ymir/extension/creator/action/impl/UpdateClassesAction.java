@@ -118,23 +118,17 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         if (templateFile == null || !templateFile.exists()) {
             return false;
         }
-        return (templateFile.lastModified() > getLastCheckedTime(pathMetaData));
-    }
-
-    long getLastCheckedTime(PathMetaData pathMetaData) {
-
-        File sourceFile = pathMetaData.getBaseSourceFile();
-        if (sourceFile.exists()) {
-            return sourceFile.lastModified();
-        } else {
-            return getAndUpdateCheckedTime(pathMetaData.getClassName());
+        boolean shouldUpdate = (templateFile.lastModified() > getCheckedTime(templateFile));
+        if (shouldUpdate) {
+            updateCheckedTime(templateFile);
         }
+        return shouldUpdate;
     }
 
-    long getAndUpdateCheckedTime(String className) {
+    long getCheckedTime(File file) {
 
         Properties prop = getSourceCreator().getSourceCreatorProperties();
-        String key = PREFIX_CHECKEDTIME + className;
+        String key = PREFIX_CHECKEDTIME + file.getAbsolutePath();
         String timeString = prop.getProperty(key);
         long time;
         if (timeString == null) {
@@ -142,9 +136,15 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         } else {
             time = Long.parseLong(timeString);
         }
-        prop.setProperty(key, String.valueOf(System.currentTimeMillis()));
-        getSourceCreator().saveSourceCreatorProperties();
 
         return time;
+    }
+
+    void updateCheckedTime(File file) {
+
+        Properties prop = getSourceCreator().getSourceCreatorProperties();
+        String key = PREFIX_CHECKEDTIME + file.getAbsolutePath();
+        prop.setProperty(key, String.valueOf(System.currentTimeMillis()));
+        getSourceCreator().saveSourceCreatorProperties();
     }
 }

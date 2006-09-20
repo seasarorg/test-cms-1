@@ -38,10 +38,18 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private String formActionPageClassName_;
 
+    private boolean usingFreyjaRenderClasses_;
+
+    private String rootPackageName_;
+
     public AnalyzerContext() {
 
         variableResolver_ = new AnalyzerVariableResolver(super
                 .getVariableResolver());
+    }
+
+    public void setUsingFreyjaRenderClasses(boolean usingFreyjaRenderClasses) {
+        usingFreyjaRenderClasses_ = usingFreyjaRenderClasses;
     }
 
     public VariableResolver getVariableResolver() {
@@ -49,6 +57,19 @@ public class AnalyzerContext extends ZptTemplateContext {
     }
 
     public void defineVariable(int scope, String name, Object value) {
+
+        if (value != null && value instanceof DescWrapper) {
+            DescWrapper wrapper = (DescWrapper) value;
+            PropertyDesc propertyDesc = wrapper.getPropertyDesc();
+            if (propertyDesc != null) {
+                TypeDesc typeDesc = propertyDesc.getTypeDesc();
+                typeDesc.setClassDesc(getTemporaryClassDesc(name));
+            } else {
+                // PAGE/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
+                // 自動生成ではそのようなプロパティは今のところ扱わない。
+                ;
+            }
+        }
 
         super.defineVariable(scope, name, value);
     }
@@ -58,9 +79,15 @@ public class AnalyzerContext extends ZptTemplateContext {
         if (objs != null && objs.length == 1 && objs[0] instanceof DescWrapper) {
             DescWrapper wrapper = (DescWrapper) objs[0];
             PropertyDesc propertyDesc = wrapper.getPropertyDesc();
-            TypeDesc typeDesc = propertyDesc.getTypeDesc();
-            typeDesc.setArray(true);
-            typeDesc.setClassDesc(getTemporaryClassDesc(name));
+            if (propertyDesc != null) {
+                TypeDesc typeDesc = propertyDesc.getTypeDesc();
+                typeDesc.setArray(true);
+                typeDesc.setClassDesc(getTemporaryClassDesc(name));
+            } else {
+                // PAGE/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
+                // 自動生成ではそのようなプロパティは今のところ扱わない。
+                ;
+            }
         }
 
         return super.pushRepeatInfo(name, objs);
@@ -90,7 +117,23 @@ public class AnalyzerContext extends ZptTemplateContext {
 
         int dot = className.lastIndexOf('.');
         if (dot < 0) {
-            className = toClassName(className);
+            if (usingFreyjaRenderClasses_) {
+                String renderClassName = "net.skirnir.freyja.render.html."
+                        + capFirst(className) + "Tag";
+                boolean renderClassExists = false;
+                try {
+                    Class.forName(renderClassName);
+                    renderClassExists = true;
+                } catch (ClassNotFoundException ignore) {
+                }
+                if (renderClassExists) {
+                    className = renderClassName;
+                } else {
+                    className = toClassName(className);
+                }
+            } else {
+                className = toClassName(className);
+            }
         }
         ClassDesc classDesc = (ClassDesc) temporaryClassDescMap_.get(className);
         if (classDesc == null) {
@@ -165,6 +208,10 @@ public class AnalyzerContext extends ZptTemplateContext {
             Map.Entry entry = (Map.Entry) itr.next();
             String name = (String) entry.getKey();
             ClassDesc classDesc = (ClassDesc) entry.getValue();
+            if (isOuter(classDesc)) {
+                // 自動生成対象外のクラスは除外しておく。
+                continue;
+            }
             if (isEmptyDto(classDesc)) {
                 // 中身のないDTOは無視する。
                 continue;
@@ -183,6 +230,11 @@ public class AnalyzerContext extends ZptTemplateContext {
             classDesc.merge((ClassDesc) classDescMap_.get(name), true);
             classDescMap_.put(name, classDesc);
         }
+    }
+
+    boolean isOuter(ClassDesc classDesc) {
+        return !classDesc.getPackageName().startsWith(
+                sourceCreator_.getRootPackageName() + ".");
     }
 
     boolean isEmptyDto(ClassDesc classDesc) {

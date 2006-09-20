@@ -10,7 +10,6 @@ import java.util.Map;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
-import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.util.ResourceUtil;
@@ -57,37 +56,12 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
 
     public void testGetClassDesc1() throws Exception {
 
-        assertNull(target_.getClassDesc("hoge", false));
+        assertNull(target_.getClassDesc("hoge"));
     }
 
     public void testGetClassDesc2() throws Exception {
 
-        ClassDesc actual = target_.getClassDesc("com.example.web.IndexPage",
-                false);
-
-        assertNotNull(actual);
-        assertEquals("com.example.web.IndexPage", actual.getName());
-        assertNull(actual.getSuperclassName());
-        assertEquals(2, actual.getPropertyDescs().length);
-        PropertyDesc pd = actual.getPropertyDesc("param1");
-        assertNotNull(pd);
-        assertEquals("String", pd.getTypeDesc().getName());
-        assertTrue(pd.isReadable());
-        assertFalse(pd.isWritable());
-        pd = actual.getPropertyDesc("param2");
-        assertNotNull(pd);
-        assertEquals("Integer[]", pd.getTypeDesc().getName());
-        assertFalse(pd.isReadable());
-        assertTrue(pd.isWritable());
-        MethodDesc md = actual.getMethodDesc(new MethodDescImpl("_render"));
-        assertNotNull(md);
-        assertEquals("void", md.getReturnTypeDesc().getName());
-    }
-
-    public void testGetClassDesc3() throws Exception {
-
-        ClassDesc actual = target_.getClassDesc("com.example.web.IndexPage",
-                true);
+        ClassDesc actual = target_.getClassDesc("com.example.web.IndexPage");
 
         assertNotNull(actual);
         assertEquals("com.example.web.IndexPage", actual.getName());

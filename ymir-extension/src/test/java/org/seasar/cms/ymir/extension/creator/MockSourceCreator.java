@@ -124,4 +124,8 @@ public class MockSourceCreator implements SourceCreator {
     public Application getApplication() {
         return null;
     }
+
+    public String getRootPackageName() {
+        return null;
+    }
 }

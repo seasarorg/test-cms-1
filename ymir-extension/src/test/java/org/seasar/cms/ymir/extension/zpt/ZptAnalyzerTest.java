@@ -24,7 +24,12 @@ public class ZptAnalyzerTest extends TestCase {
 
     protected void setUp() throws Exception {
 
-        analyzer_ = new ZptAnalyzer();
+        analyzer_ = new ZptAnalyzer() {
+            @Override
+            boolean isUsingFreyjaRenderClasses() {
+                return false;
+            }
+        };
         SourceCreatorImpl creator = new SourceCreatorImpl() {
             public String getComponentName(String path, String method) {
                 int slash = path.lastIndexOf('/');
@@ -255,5 +260,19 @@ public class ZptAnalyzerTest extends TestCase {
 
         ClassDesc cd = getClassDesc("com.example.web.Test0Page");
         assertNotNull("page:指定のパラメータ置換が正しく行われ、その結果Pageクラスが生成されること", cd);
+    }
+
+    public void testAnalyze14() throws Exception {
+
+        act("testAnalyze14");
+
+        ClassDesc cd = getClassDesc(CLASSNAME);
+        assertNotNull(cd);
+        PropertyDesc pd = cd.getPropertyDesc("entity");
+        assertEquals("プロパティを持つ変数はDtoの配列になること", "com.example.dto.EntityDto", pd
+                .getTypeDesc().getName());
+        cd = getClassDesc("com.example.dto.EntityDto");
+        assertNotNull("プロパティを持つ変数の型が生成されていること", cd);
+        assertNotNull("Dto型がプロパティを持つこと", cd.getPropertyDesc("content"));
     }
 }

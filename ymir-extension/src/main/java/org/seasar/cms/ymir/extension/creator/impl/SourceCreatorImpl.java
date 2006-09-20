@@ -108,14 +108,14 @@ public class SourceCreatorImpl implements SourceCreator {
                     new Condition(State.ANY, State.ANY, State.FALSE,
                             Request.METHOD_GET), new CreateTemplateAction(this))
             .register(
-                    new Condition(State.TRUE, State.ANY, State.TRUE,
+                    new Condition(State.ANY, State.ANY, State.TRUE,
                             Request.METHOD_GET), new UpdateClassesAction(this))
             .register(
                     new Condition(State.ANY, State.FALSE, State.FALSE,
                             Request.METHOD_POST),
                     new CreateClassAndTemplateAction(this))
             .register(
-                    new Condition(State.TRUE, State.ANY, State.TRUE,
+                    new Condition(State.ANY, State.ANY, State.TRUE,
                             Request.METHOD_POST), new UpdateClassesAction(this))
             .register(
                     new Condition(State.TRUE, State.TRUE, State.FALSE,
@@ -344,7 +344,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
         ClassDescBag classDescBag = new ClassDescBag();
         for (int i = 0; i < classDescs.length; i++) {
-            if (getClassDesc(classDescs[i].getName(), false) == null) {
+            if (getClass(classDescs[i].getName()) == null) {
                 classDescBag.addAsCreated(classDescs[i]);
             } else {
                 classDescBag.addAsUpdated(classDescs[i]);
@@ -354,8 +354,7 @@ public class SourceCreatorImpl implements SourceCreator {
         return classDescBag;
     }
 
-    public ClassDesc getClassDesc(String className,
-            boolean onlyBaseInfoIfBaseExists) {
+    public ClassDesc getClassDesc(String className) {
 
         Class clazz = getClass(className);
         if (clazz == null) {
@@ -363,12 +362,8 @@ public class SourceCreatorImpl implements SourceCreator {
         }
 
         Class introspecedClass;
-        if (onlyBaseInfoIfBaseExists) {
-            introspecedClass = clazz.getSuperclass();
-            if (introspecedClass == null) {
-                introspecedClass = clazz;
-            }
-        } else {
+        introspecedClass = clazz.getSuperclass();
+        if (introspecedClass == null) {
             introspecedClass = clazz;
         }
 
@@ -392,10 +387,16 @@ public class SourceCreatorImpl implements SourceCreator {
 
         PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
         for (int i = 0; i < pds.length; i++) {
-            String name = pds[i].getName();
-            if ("class".equals(name)) {
+            Method readMethod = pds[i].getReadMethod();
+            Method writeMethod = pds[i].getWriteMethod();
+            if (readMethod != null
+                    && readMethod.getDeclaringClass() != introspecedClass
+                    || writeMethod != null
+                    && writeMethod.getDeclaringClass() != introspecedClass) {
                 continue;
             }
+
+            String name = pds[i].getName();
             PropertyDesc propertyDesc = new PropertyDescImpl(name);
             int mode = PropertyDesc.NONE;
             if (pds[i].getReadMethod() != null) {
@@ -424,7 +425,7 @@ public class SourceCreatorImpl implements SourceCreator {
             classDesc.setPropertyDesc(propertyDesc);
         }
 
-        Method[] methods = introspecedClass.getMethods();
+        Method[] methods = introspecedClass.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getParameterTypes().length > 0) {
                 continue;
@@ -548,7 +549,7 @@ public class SourceCreatorImpl implements SourceCreator {
         ClassDesc[] classDescs = classDescBag.getClassDescs(kind);
         for (int i = 0; i < classDescs.length; i++) {
             // 既存のクラスがあればマージする。
-            classDescs[i].merge(getClassDesc(classDescs[i].getName(), true),
+            classDescs[i].merge(getClassDesc(classDescs[i].getName()),
                     mergeMethod);
             if (!writeSourceFile(classDescs[i], classDescBag.getClassDescSet())) {
                 // ソースファイルの生成に失敗した。

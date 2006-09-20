@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.TemplateAnalyzer;
@@ -85,6 +86,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         context.setMethod(method);
         context.setClassDescMap(classDescMap);
         context.setPageClassName(className);
+        context.setUsingFreyjaRenderClasses(isUsingFreyjaRenderClasses());
         try {
             evaluator_.evaluate(context, new InputStreamReader(inputStream,
                     encoding));
@@ -105,6 +107,11 @@ public class ZptAnalyzer implements TemplateAnalyzer {
             } catch (IOException ignore) {
             }
         }
+    }
+
+    boolean isUsingFreyjaRenderClasses() {
+        return "true".equals(sourceCreator_.getApplication().getProperty(
+                Globals.APPKEY_SOURCECREATOR_USEFREYJARENDERCLASSES));
     }
 
     public void setSourceCreator(SourceCreator sourceCreator) {

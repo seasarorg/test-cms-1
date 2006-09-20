@@ -53,7 +53,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         ClassDescSet classDescSet = new ClassDescSet(classDescs);
         for (int i = classDescs.length - 1; i >= 0; i--) {
             classDescs[i].merge(getSourceCreator().getClassDesc(
-                    classDescs[i].getName(), false), true);
+                    classDescs[i].getName()), true);
             getSourceCreator().writeSourceFile(classDescs[i], classDescSet);
         }
 

@@ -2,18 +2,16 @@ package org.seasar.cms.ymir.extension.creator.impl;
 
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 
-public class ClassDescImplTest extends TestCase {
+public class ClassDescImplTest extends SourceCreatorImplTestBase {
 
     public void testGetInstanceName() throws Exception {
 
         String actual = new ClassDescImpl("com.example.dto.TestDto")
-            .getInstanceName();
+                .getInstanceName();
         assertEquals("testDto", actual);
     }
 
@@ -68,32 +66,48 @@ public class ClassDescImplTest extends TestCase {
         actual.merge(cd2, true);
 
         assertEquals("com.example.page.TestPageBase", actual
-            .getSuperclassName());
+                .getSuperclassName());
         assertEquals(6, actual.getPropertyDescs().length);
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
-            .getPropertyDesc("param1").getMode());
+                .getPropertyDesc("param1").getMode());
         assertEquals("Integer", actual.getPropertyDesc("param1").getTypeDesc()
-            .getName());
+                .getName());
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
-            .getPropertyDesc("param2").getMode());
+                .getPropertyDesc("param2").getMode());
         assertEquals("Integer", actual.getPropertyDesc("param2").getTypeDesc()
-            .getName());
+                .getName());
         assertEquals("String", actual.getPropertyDesc("param3").getTypeDesc()
-            .getName());
+                .getName());
         assertEquals(PropertyDesc.READ | PropertyDesc.WRITE, actual
-            .getPropertyDesc("param1").getMode());
+                .getPropertyDesc("param1").getMode());
         assertTrue(actual.getPropertyDesc("param4").getTypeDesc().getName()
-            .endsWith("[]"));
+                .endsWith("[]"));
         assertEquals("Integer[]", actual.getPropertyDesc("param5")
-            .getTypeDesc().getName());
+                .getTypeDesc().getName());
         assertEquals("Integer", actual.getPropertyDesc("param6").getTypeDesc()
-            .getName());
+                .getName());
         MethodDesc actualMd = actual
-            .getMethodDesc(new MethodDescImpl("method"));
+                .getMethodDesc(new MethodDescImpl("method"));
         assertNotNull(actualMd);
         assertEquals("body", ((Map) actualMd.getBodyDesc().getRoot())
-            .get("body"));
+                .get("body"));
         assertEquals("Integer", actual.getMethodDesc(
-            new MethodDescImpl("method")).getReturnTypeDesc().getName());
+                new MethodDescImpl("method")).getReturnTypeDesc().getName());
+    }
+
+    public void testMerge2() throws Exception {
+
+        ClassDesc cd = target_.getClassDesc(
+                "org.seasar.cms.ymir.extension.creator.impl.Merge3");
+        ClassDesc cd2 = new ClassDescImpl(
+                "org.seasar.cms.ymir.extension.creator.impl.Merge3");
+        MethodDesc md = new MethodDescImpl("_render");
+        md.setBodyDesc(new BodyDescImpl("//"));
+        cd2.setMethodDesc(md);
+        cd.merge(cd2, true);
+
+        MethodDesc[] mds = cd.getMethodDescs();
+        assertEquals(1, mds.length);
+        assertNull("サブクラスが持っているメソッドはマージされないこと", mds[0].getBodyDesc());
     }
 }
