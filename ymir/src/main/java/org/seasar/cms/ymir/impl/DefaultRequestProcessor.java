@@ -36,6 +36,8 @@ import org.seasar.kvasir.util.el.VariableResolver;
 
 public class DefaultRequestProcessor implements RequestProcessor {
 
+    public static final String ACTION_DEFAULT = "_default";
+
     public static final String ACTION_RENDER = "_render";
 
     public static final String ATTR_PAGE = "PAGE";
@@ -177,17 +179,20 @@ public class DefaultRequestProcessor implements RequestProcessor {
         // ・responseがリクエストパスへのforwardである場合はpassthroughをresponseとする。
         // ・最終的なresponseがpassthroughでかつcomponentがあれば、レンダリングのための
         //   メソッドを呼び出す。
+        // ・最終的なresponseがforwardでかつforward先に対応するコンポーネントが存在しない場合は
+        //   レンダリングのためのメソッドを呼び出す。
         // dispatchがREQUESTでない時は、
         // ・pathに対応するcomponentがあればレンダリングのためのメソッドを呼び出す。
 
         Response response = PassthroughResponse.INSTANCE;
 
         Object component = null;
-        if (getS2Container().hasComponentDef(componentName)) {
+        S2Container s2container = getS2Container();
+        if (s2container.hasComponentDef(componentName)) {
             ThreadContext context = getThreadContext();
             try {
                 context.setComponent(Request.class, request);
-                component = getS2Container().getComponent(componentName);
+                component = s2container.getComponent(componentName);
             } finally {
                 context.setComponent(Request.class, null);
             }
@@ -198,11 +203,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 prepareForComponent(component, request);
 
                 response = normalizeResponse(invokeAction(component,
-                        actionName, defaultReturnValue), request.getPath());
+                        actionName, ACTION_DEFAULT, defaultReturnValue),
+                        request.getPath());
 
-                if (response.getType() == Response.TYPE_PASSTHROUGH) {
+                if (shouldRender(response)) {
                     // 画面描画のためのAction呼び出しを行なう。
-                    invokeAction(component, ACTION_RENDER, null);
+                    invokeAction(component, ACTION_RENDER, null, null);
                 }
 
                 finishForComponent(component);
@@ -215,13 +221,32 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 prepareForComponent(component, request);
 
                 // 画面描画のためのAction呼び出しを行なう。
-                invokeAction(component, ACTION_RENDER, null);
+                invokeAction(component, ACTION_RENDER, null, null);
 
                 finishForComponent(component);
             }
         }
 
         return response;
+    }
+
+    boolean shouldRender(Response response) {
+
+        if (response.getType() == Response.TYPE_PASSTHROUGH) {
+            return true;
+        }
+
+        if (response.getType() == Response.TYPE_FORWARD) {
+            MatchedPathMapping matched = findMatchedPathMapping(response
+                    .getPath(), Request.METHOD_GET);
+            if (matched == null
+                    || matched.isDenied()
+                    || !getS2Container().hasComponentDef(
+                            matched.getComponentName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void prepareForComponent(Object component, Request request) {
@@ -298,11 +323,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Response invokeAction(Object component, String actionName,
-            Object defaultReturnValue) {
+            String defaultActionName, Object defaultReturnValue) {
 
         Response response = PassthroughResponse.INSTANCE;
 
         Method method = getActionMethod(component, actionName);
+        if (method == null && defaultActionName != null) {
+            method = getActionMethod(component, defaultActionName);
+        }
         if (method != null) {
             Object returnValue;
             try {
