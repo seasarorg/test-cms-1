@@ -2,6 +2,7 @@ package org.seasar.cms.ymir.mock;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.Application;
@@ -93,5 +94,9 @@ public class MockApplication implements Application {
     }
 
     public void setSourceDirectory(String sourceDirectory) {
+    }
+
+    public Enumeration propertyNames() {
+        return null;
     }
 }

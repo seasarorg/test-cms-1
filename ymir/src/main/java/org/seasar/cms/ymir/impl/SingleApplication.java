@@ -3,6 +3,7 @@ package org.seasar.cms.ymir.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 
@@ -46,6 +47,10 @@ public class SingleApplication extends AbstractApplication {
 
     public String getProperty(String key, String defaultValue) {
         return config_.getProperty(key, defaultValue);
+    }
+
+    public Enumeration propertyNames() {
+        return config_.propertyNames();
     }
 
     public void removeProperty(String key) {

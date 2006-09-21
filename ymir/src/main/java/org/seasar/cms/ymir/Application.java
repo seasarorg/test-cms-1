@@ -2,6 +2,7 @@ package org.seasar.cms.ymir;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.framework.container.S2Container;
@@ -39,6 +40,8 @@ public interface Application {
     String getProperty(String key);
 
     String getProperty(String key, String defaultValue);
+
+    Enumeration propertyNames();
 
     void setProperty(String key, String value);
 
