@@ -14,6 +14,7 @@ import org.seasar.cms.pluggable.impl.ConfigurationImpl;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.YmirTestCase;
 import org.seasar.cms.ymir.convention.YmirNamingConvention;
+import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
@@ -117,6 +118,10 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
                 .getComponent(Configuration.class);
         configuration.setProperty(AbstractApplication.KEY_ROOTPACKAGENAME,
                 "com.example");
+        configuration.setProperty(Globals.APPKEY_SOURCECREATOR_SUPERCLASS,
+                "com.example.page.TestPageBaseBase");
+        configuration.setProperty(Globals.APPKEYPREFIX_SOURCECREATOR_SUPERCLASS
+                + "IndexPage$", "com.example.web.IndexPageBaseBase");
         ApplicationManager applicationManager = (ApplicationManager) container_
                 .getComponent(ApplicationManager.class);
         PathMappingProviderImpl pathMappingProvider = new PathMappingProviderImpl();
@@ -129,7 +134,7 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
                 new File(ResourceUtil.getBuildDir(getClass()), "webapp")
                         .getAbsolutePath());
         configuration.setProperty(AbstractApplication.KEY_SOURCEDIRECTORY,
-                ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
+                getSourceDir().getCanonicalPath());
         configuration.setProperty(AbstractApplication.KEY_RESOURCESDIRECTORY,
                 ResourceUtil.getBuildDir(getClass()).getCanonicalPath());
 
@@ -141,6 +146,10 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         target_.setSourceGenerator(sourceGenerator);
 
         SingletonPluggableContainerFactory.init();
+    }
+
+    protected File getSourceDir() {
+        return ResourceUtil.getBuildDir(getClass());
     }
 
     protected void tearDown() throws Exception {

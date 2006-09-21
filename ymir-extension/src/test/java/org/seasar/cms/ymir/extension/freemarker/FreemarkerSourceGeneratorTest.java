@@ -10,6 +10,8 @@ import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.PropertyDescImpl;
 
+import com.example.page.TestPageBaseBase;
+
 public class FreemarkerSourceGeneratorTest extends YmirTestCase {
 
     private FreemarkerSourceGenerator target_;
@@ -41,7 +43,7 @@ public class FreemarkerSourceGeneratorTest extends YmirTestCase {
     private ClassDesc prepareClassDesc() {
 
         ClassDesc classDesc = new ClassDescImpl("com.example.page.TestPage");
-        classDesc.setSuperclassName("com.example.page.SuperPage");
+        classDesc.setSuperclass(TestPageBaseBase.class);
         PropertyDesc propertyDesc = new PropertyDescImpl("param1");
         propertyDesc.setTypeDesc("boolean");
         propertyDesc.setMode(PropertyDesc.READ);
@@ -68,7 +70,8 @@ public class FreemarkerSourceGeneratorTest extends YmirTestCase {
         String actual = target_.generateGapSource(classDesc);
 
         assertEquals(
-            readResource(getClass(), "testGenerateGapSource.expected"), actual);
+                readResource(getClass(), "testGenerateGapSource.expected"),
+                actual);
     }
 
     public void testGenerateBaseSource_Page() throws Exception {
@@ -77,13 +80,13 @@ public class FreemarkerSourceGeneratorTest extends YmirTestCase {
         MethodDesc methodDesc = new MethodDescImpl("_get");
         methodDesc.setReturnTypeDesc(String.class.getName());
         methodDesc.setBodyDesc(new BodyDescImpl(
-            "return \"redirect:/path/to/redirect.html\";"));
+                "return \"redirect:/path/to/redirect.html\";"));
         classDesc.setMethodDesc(methodDesc);
 
         String actual = target_.generateBaseSource(classDesc);
 
         assertEquals(readResource(getClass(),
-            "testGenerateBaseSource_Page.expected"), actual);
+                "testGenerateBaseSource_Page.expected"), actual);
     }
 
     public void testGenerateBaseSource_Dto() throws Exception {
@@ -94,7 +97,7 @@ public class FreemarkerSourceGeneratorTest extends YmirTestCase {
         String actual = target_.generateBaseSource(classDesc);
 
         assertEquals(readResource(getClass(),
-            "testGenerateBaseSource_Dto.expected"), actual);
+                "testGenerateBaseSource_Dto.expected"), actual);
     }
 
     public void testGenerateGapSource_Page() throws Exception {
@@ -103,13 +106,13 @@ public class FreemarkerSourceGeneratorTest extends YmirTestCase {
         MethodDesc methodDesc = new MethodDescImpl("_get");
         methodDesc.setReturnTypeDesc(String.class.getName());
         methodDesc.setBodyDesc(new BodyDescImpl(
-            "return \"redirect:/path/to/redirect.html\";"));
+                "return \"redirect:/path/to/redirect.html\";"));
         classDesc.setMethodDesc(methodDesc);
 
         String actual = target_.generateGapSource(classDesc);
 
         assertEquals(readResource(getClass(),
-            "testGenerateGapSource_Page.expected"), actual);
+                "testGenerateGapSource_Page.expected"), actual);
     }
 
     public void testGenerateSource_BodyDesc() throws Exception {

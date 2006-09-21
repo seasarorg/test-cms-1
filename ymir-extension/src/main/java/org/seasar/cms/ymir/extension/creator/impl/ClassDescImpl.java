@@ -15,7 +15,7 @@ public class ClassDescImpl extends AbstractClassDesc {
 
     private String name_;
 
-    private String superclassName_;
+    private Class superclass_;
 
     private Map<String, PropertyDesc> propertyDescMap_ = new LinkedHashMap<String, PropertyDesc>();
 
@@ -31,17 +31,18 @@ public class ClassDescImpl extends AbstractClassDesc {
         ClassDescImpl cloned = (ClassDescImpl) super.clone();
 
         cloned.propertyDescMap_ = new LinkedHashMap<String, PropertyDesc>();
-        for (Iterator itr = propertyDescMap_.entrySet().iterator(); itr
-            .hasNext();) {
-            Map.Entry entry = (Map.Entry) itr.next();
-            cloned.propertyDescMap_.put((String) entry.getKey(),
-                (PropertyDesc) ((PropertyDesc) entry.getValue()).clone());
+        for (Iterator<Map.Entry<String, PropertyDesc>> itr = propertyDescMap_
+                .entrySet().iterator(); itr.hasNext();) {
+            Map.Entry<String, PropertyDesc> entry = itr.next();
+            cloned.propertyDescMap_.put(entry.getKey(), (PropertyDesc) entry
+                    .getValue().clone());
         }
         cloned.methodDescMap_ = new LinkedHashMap<MethodDescKey, MethodDesc>();
-        for (Iterator itr = methodDescMap_.entrySet().iterator(); itr.hasNext();) {
-            Map.Entry entry = (Map.Entry) itr.next();
-            cloned.methodDescMap_.put((MethodDescKey) entry.getKey(),
-                (MethodDesc) ((MethodDesc) entry.getValue()).clone());
+        for (Iterator<Map.Entry<MethodDescKey, MethodDesc>> itr = methodDescMap_
+                .entrySet().iterator(); itr.hasNext();) {
+            Map.Entry<MethodDescKey, MethodDesc> entry = itr.next();
+            cloned.methodDescMap_.put(entry.getKey(), (MethodDesc) entry
+                    .getValue().clone());
         }
         return cloned;
     }
@@ -67,7 +68,7 @@ public class ClassDescImpl extends AbstractClassDesc {
 
     public PropertyDesc getPropertyDesc(String name) {
 
-        return (PropertyDesc) propertyDescMap_.get(name);
+        return propertyDescMap_.get(name);
     }
 
     public void setPropertyDesc(PropertyDesc propertyDesc) {
@@ -75,15 +76,19 @@ public class ClassDescImpl extends AbstractClassDesc {
         propertyDescMap_.put(propertyDesc.getName(), propertyDesc);
     }
 
+    public void removePropertyDesc(String name) {
+
+        propertyDescMap_.remove(name);
+    }
+
     public PropertyDesc[] getPropertyDescs() {
 
-        return (PropertyDesc[]) propertyDescMap_.values().toArray(
-            new PropertyDesc[0]);
+        return propertyDescMap_.values().toArray(new PropertyDesc[0]);
     }
 
     public MethodDesc getMethodDesc(MethodDesc methodDesc) {
 
-        return (MethodDesc) methodDescMap_.get(new MethodDescKey(methodDesc));
+        return methodDescMap_.get(new MethodDescKey(methodDesc));
     }
 
     public void setMethodDesc(MethodDesc methodDesc) {
@@ -93,62 +98,68 @@ public class ClassDescImpl extends AbstractClassDesc {
 
     public MethodDesc[] getMethodDescs() {
 
-        return (MethodDesc[]) methodDescMap_.values()
-            .toArray(new MethodDesc[0]);
+        return methodDescMap_.values().toArray(new MethodDesc[0]);
+    }
+
+    public void removeMethodDesc(MethodDesc methodDesc) {
+
+        methodDescMap_.remove(new MethodDescKey(methodDesc));
     }
 
     public String getSuperclassName() {
 
-        return superclassName_;
+        if (superclass_ != null) {
+            return superclass_.getName();
+        } else {
+            return null;
+        }
     }
 
-    public void setSuperclassName(String superclassName) {
+    public Class getSuperclass() {
 
-        superclassName_ = superclassName;
+        return superclass_;
     }
 
-    public void merge(ClassDesc classDesc, boolean mergeMethod) {
+    public void setSuperclass(Class superclass) {
+
+        superclass_ = superclass;
+    }
+
+    public void merge(ClassDesc classDesc) {
 
         if (classDesc == null) {
             return;
         }
 
-        setSuperclassName(classDesc.getSuperclassName());
+        if (superclass_ == null) {
+            setSuperclass(classDesc.getSuperclass());
+        }
 
-        PropertyDesc[] pds = classDesc.getPropertyDescs();
-        for (int i = 0; i < pds.length; i++) {
-            PropertyDesc pd = getPropertyDesc(pds[i].getName());
+        PropertyDesc[] propertyDescs = classDesc.getPropertyDescs();
+        for (int i = 0; i < propertyDescs.length; i++) {
+            PropertyDesc pd = getPropertyDesc(propertyDescs[i].getName());
             if (pd == null) {
-                if (mergeMethod) {
-                    setPropertyDesc((PropertyDesc) pds[i].clone());
-                }
+                setPropertyDesc((PropertyDesc) propertyDescs[i].clone());
             } else {
                 TypeDesc td = pd.getTypeDesc();
                 if (!td.isExplicit()) {
-                    td.transcript(pds[i].getTypeDesc());
+                    td.transcript(propertyDescs[i].getTypeDesc());
                 }
-                if (mergeMethod) {
-                    pd.addMode(pds[i].getMode());
-                }
+                pd.addMode(propertyDescs[i].getMode());
             }
         }
 
-        MethodDesc[] mds = classDesc.getMethodDescs();
-        for (int i = 0; i < mds.length; i++) {
-            MethodDesc md = getMethodDesc(mds[i]);
+        MethodDesc[] methodDescs = classDesc.getMethodDescs();
+        for (int i = 0; i < methodDescs.length; i++) {
+            MethodDesc md = getMethodDesc(methodDescs[i]);
             if (md == null) {
-                if (mergeMethod) {
-                    setMethodDesc((MethodDesc) mds[i].clone());
-                }
+                setMethodDesc((MethodDesc) methodDescs[i].clone());
             } else {
-                TypeDesc returnTypeDesc = md.getReturnTypeDesc();
-                TypeDesc returnTypeDesc2 = mds[i].getReturnTypeDesc();
-                if (!returnTypeDesc.isExplicit()
-                    && !returnTypeDesc.equals(returnTypeDesc2)) {
-                    returnTypeDesc.transcript(returnTypeDesc2);
-                    if (mergeMethod) {
-                        md.setBodyDesc(mds[i].getBodyDesc());
-                    }
+                TypeDesc returnTd = md.getReturnTypeDesc();
+                TypeDesc returnTypeDesc = methodDescs[i].getReturnTypeDesc();
+                if (!returnTd.isExplicit() && !returnTd.equals(returnTypeDesc)) {
+                    returnTd.transcript(returnTypeDesc);
+                    md.setBodyDesc(methodDescs[i].getBodyDesc());
                 }
             }
         }
@@ -157,5 +168,12 @@ public class ClassDescImpl extends AbstractClassDesc {
     public boolean isEmpty() {
 
         return (propertyDescMap_.isEmpty() && methodDescMap_.isEmpty());
+    }
+
+    public void clear() {
+
+        superclass_ = null;
+        propertyDescMap_.clear();
+        methodDescMap_.clear();
     }
 }

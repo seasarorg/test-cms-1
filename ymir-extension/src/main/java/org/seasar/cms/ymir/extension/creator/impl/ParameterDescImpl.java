@@ -14,6 +14,11 @@ public class ParameterDescImpl implements ParameterDesc {
         setTypeDesc(typeDesc);
     }
 
+    public ParameterDescImpl(Class type) {
+
+        this(new TypeDescImpl(type));
+    }
+
     public Object clone() {
 
         ParameterDescImpl cloned;

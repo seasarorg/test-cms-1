@@ -38,17 +38,30 @@ public interface ClassDesc extends Cloneable {
 
     void setPropertyDesc(PropertyDesc propertyDesc);
 
+    void removePropertyDesc(String name);
+
     PropertyDesc addProperty(String name, int mode);
 
-    void merge(ClassDesc classDesc, boolean mergeMethod);
+    /**
+     * 指定されたClassDescの内容をこのClassDescにマージします。
+     *
+     * @param classDesc マージするClassDesc。nullを指定した場合は何もしません。
+     */
+    void merge(ClassDesc classDesc);
 
     void setName(String name);
 
     void setMethodDesc(MethodDesc methodDesc);
 
-    void setSuperclassName(String superclassName);
+    void removeMethodDesc(MethodDesc methodDesc);
+
+    void setSuperclass(Class superclass);
 
     String getSuperclassName();
 
+    Class getSuperclass();
+
     boolean isEmpty();
+
+    void clear();
 }

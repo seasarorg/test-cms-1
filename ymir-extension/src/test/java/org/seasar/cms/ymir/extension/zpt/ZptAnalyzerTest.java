@@ -1,7 +1,9 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import junit.framework.TestCase;
 
@@ -12,6 +14,8 @@ import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.impl.ApplicationManagerImpl;
+import org.seasar.cms.ymir.mock.MockApplication;
 import org.seasar.framework.convention.impl.NamingConventionImpl;
 
 public class ZptAnalyzerTest extends TestCase {
@@ -63,6 +67,13 @@ public class ZptAnalyzerTest extends TestCase {
             }
         };
         creator.setNamingConvention(new NamingConventionImpl());
+        ApplicationManagerImpl applicationManager = new ApplicationManagerImpl();
+        applicationManager.setBaseApplication(new MockApplication() {
+            public Enumeration propertyNames() {
+                return new Vector().elements();
+            }
+        });
+        creator.setApplicationManager(applicationManager);
         analyzer_.setSourceCreator(creator);
     }
 

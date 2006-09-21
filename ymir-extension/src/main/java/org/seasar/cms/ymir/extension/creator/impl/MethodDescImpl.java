@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.extension.creator.impl;
 
+import java.lang.reflect.Method;
+
 import org.seasar.cms.ymir.extension.creator.BodyDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.ParameterDesc;
@@ -22,6 +24,17 @@ public class MethodDescImpl implements MethodDesc {
         name_ = name;
     }
 
+    public MethodDescImpl(Method method) {
+
+        name_ = method.getName();
+        returnTypeDesc_ = new TypeDescImpl(method.getReturnType());
+        Class[] types = method.getParameterTypes();
+        parameterDescs_ = new ParameterDesc[types.length];
+        for (int i = 0; i < types.length; i++) {
+            parameterDescs_[i] = new ParameterDescImpl(types[i]);
+        }
+    }
+
     public Object clone() {
 
         MethodDescImpl cloned;
@@ -34,7 +47,7 @@ public class MethodDescImpl implements MethodDesc {
             cloned.parameterDescs_ = new ParameterDesc[parameterDescs_.length];
             for (int i = 0; i < parameterDescs_.length; i++) {
                 cloned.parameterDescs_[i] = (ParameterDesc) parameterDescs_[i]
-                    .clone();
+                        .clone();
             }
         }
         if (returnTypeDesc_ != null) {

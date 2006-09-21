@@ -48,7 +48,7 @@ public class TypeDescImpl implements TypeDesc {
     public TypeDescImpl(String typeName, boolean explicit) {
 
         this(new SimpleClassDesc(getComponentName(typeName)),
-            isArray(typeName), explicit);
+                isArray(typeName), explicit);
     }
 
     public TypeDescImpl(ClassDesc classDesc) {
@@ -66,6 +66,11 @@ public class TypeDescImpl implements TypeDesc {
         setClassDesc(classDesc);
         setArray(array);
         setExplicit(explicit);
+    }
+
+    public TypeDescImpl(Class clazz) {
+
+        this(new SimpleClassDesc(clazz.getName()), clazz.isArray());
     }
 
     static String getComponentName(String name) {

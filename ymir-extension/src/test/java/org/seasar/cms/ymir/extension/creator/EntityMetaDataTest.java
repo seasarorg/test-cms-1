@@ -1,28 +1,35 @@
 package org.seasar.cms.ymir.extension.creator;
 
+import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
+
 import junit.framework.TestCase;
 
 public class EntityMetaDataTest extends TestCase {
 
     private EntityMetaData target_ = new EntityMetaData(
-        new MockSourceCreator() {
+            new MockSourceCreator() {
 
-            public String getPagePackageName() {
-                return "com.example.web";
-            }
+                public String getPagePackageName() {
+                    return "com.example.web";
+                }
 
-            public String getDtoPackageName() {
-                return "com.example.dto";
-            }
+                public String getDtoPackageName() {
+                    return "com.example.dto";
+                }
 
-            public String getDaoPackageName() {
-                return "com.example.dao";
-            }
+                public String getDaoPackageName() {
+                    return "com.example.dao";
+                }
 
-            public String getDxoPackageName() {
-                return "com.example.dxo";
-            }
-        }, "com.example.dto.TestDto");
+                public String getDxoPackageName() {
+                    return "com.example.dxo";
+                }
+
+                @Override
+                public ClassDesc newClassDesc(String className) {
+                    return new ClassDescImpl(className);
+                }
+            }, "com.example.dto.TestDto");
 
     public void testGetEntityName() throws Exception {
 

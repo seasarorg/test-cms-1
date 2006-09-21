@@ -9,7 +9,6 @@ import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
-import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
@@ -17,7 +16,7 @@ import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 public class CreateClassAndTemplateAction extends AbstractUpdateAction {
 
     private static final String PARAM_REDIRECTPATH = SourceCreatorImpl.PARAM_PREFIX
-        + "redirectPath";
+            + "redirectPath";
 
     public CreateClassAndTemplateAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
@@ -41,7 +40,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
         variableMap.put("request", request);
         variableMap.put("pathMetaData", pathMetaData);
         return getSourceCreator().getResponseCreator().createResponse(
-            "createClassAndTemplate", variableMap);
+                "createClassAndTemplate", variableMap);
     }
 
     Response actTemplate(Request request, PathMetaData pathMetaData) {
@@ -52,9 +51,9 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
         }
 
         String template = getSourceCreator().getSourceGenerator()
-            .generateTemplateSource(
-                getSuffix(pathMetaData.getTemplateFile().getName()),
-                new HashMap());
+                .generateTemplateSource(
+                        getSuffix(pathMetaData.getTemplateFile().getName()),
+                        new HashMap());
         if (template == null) {
             template = "";
         }
@@ -65,7 +64,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
         variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("template", template);
         return getSourceCreator().getResponseCreator().createResponse(
-            "createClassAndTemplate_template", variableMap);
+                "createClassAndTemplate_template", variableMap);
     }
 
     Response actRedirect(Request request, PathMetaData pathMetaData) {
@@ -80,15 +79,16 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
             return null;
         }
 
-        ClassDesc classDesc = new ClassDescImpl(pathMetaData.getClassName());
+        ClassDesc classDesc = getSourceCreator().newClassDesc(
+                pathMetaData.getClassName());
         MethodDesc methodDesc = new MethodDescImpl(getSourceCreator()
-            .getActionName(request.getPath(), method));
+                .getActionName(request.getPath(), method));
         methodDesc.setReturnTypeDesc(String.class.getName());
         methodDesc.setBodyDesc(new BodyDescImpl("return "
-            + quote("redirect:" + redirectPath) + ";"));
+                + quote("redirect:" + redirectPath) + ";"));
         classDesc.setMethodDesc(methodDesc);
         classDesc.setMethodDesc(new MethodDescImpl(
-            DefaultRequestProcessor.ACTION_RENDER));
+                DefaultRequestProcessor.ACTION_RENDER));
 
         getSourceCreator().writeSourceFile(classDesc, null);
 
@@ -97,6 +97,6 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
         variableMap.put("method", method);
         variableMap.put("pathMetaData", pathMetaData);
         return getSourceCreator().getResponseCreator().createResponse(
-            "createClassAndTemplate_redirect", variableMap);
+                "createClassAndTemplate_redirect", variableMap);
     }
 }

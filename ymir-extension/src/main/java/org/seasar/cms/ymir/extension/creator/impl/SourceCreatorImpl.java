@@ -1,6 +1,8 @@
 package org.seasar.cms.ymir.extension.creator.impl;
 
+import static org.seasar.cms.ymir.extension.Globals.APPKEYPREFIX_SOURCECREATOR_SUPERCLASS;
 import static org.seasar.cms.ymir.extension.Globals.APPKEY_SOURCECREATOR_ENABLE;
+import static org.seasar.cms.ymir.extension.Globals.APPKEY_SOURCECREATOR_SUPERCLASS;
 import static org.seasar.cms.ymir.extension.creator.action.UpdateAction.PARAM_METHOD;
 
 import java.beans.BeanInfo;
@@ -22,16 +24,17 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
-import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
@@ -84,8 +87,6 @@ public class SourceCreatorImpl implements SourceCreator {
     public static final String PARAM_TASK = PARAM_PREFIX + "task";
 
     private static final String SOURCECREATOR_PROPERTIES = "sourceCreator.properties";
-
-    private Configuration configuration_;
 
     private DefaultRequestProcessor defaultRequestProcessor_;
 
@@ -328,7 +329,7 @@ public class SourceCreatorImpl implements SourceCreator {
         if (classDesc == null && method.equalsIgnoreCase(Request.METHOD_POST)) {
             // テンプレートを解析した結果対応するPageクラスを作る必要があると
             // 見なされなかった場合でも、methodがPOSTならPageクラスを作る。
-            classDesc = new ClassDescImpl(className);
+            classDesc = newClassDesc(className);
             classDescMap.put(className, classDesc);
         }
         if (classDesc != null) {
@@ -354,57 +355,46 @@ public class SourceCreatorImpl implements SourceCreator {
         return classDescBag;
     }
 
-    public ClassDesc getClassDesc(String className) {
+    public ClassDesc getClassDesc(Class clazz, String className) {
 
-        Class clazz = getClass(className);
         if (clazz == null) {
             return null;
         }
 
-        Class introspecedClass;
-        introspecedClass = clazz.getSuperclass();
-        if (introspecedClass == null) {
-            introspecedClass = clazz;
-        }
-
         BeanInfo beanInfo;
         try {
-            beanInfo = Introspector.getBeanInfo(introspecedClass);
+            beanInfo = Introspector.getBeanInfo(clazz);
         } catch (IntrospectionException ex) {
             throw new RuntimeException(ex);
         }
 
-        ClassDesc classDesc = new ClassDescImpl(className);
-
-        Class superclass = clazz.getSuperclass();
-        // Generation-GapのBaseクラスを飛ばすため。
-        if (superclass != null) {
-            superclass = superclass.getSuperclass();
-        }
-        if (superclass != null && superclass != Object.class) {
-            classDesc.setSuperclassName(superclass.getName());
-        }
+        ClassDesc classDesc = newClassDesc(className);
 
         PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
         for (int i = 0; i < pds.length; i++) {
+            String name = pds[i].getName();
             Method readMethod = pds[i].getReadMethod();
             Method writeMethod = pds[i].getWriteMethod();
-            if (readMethod != null
-                    && readMethod.getDeclaringClass() != introspecedClass
-                    || writeMethod != null
-                    && writeMethod.getDeclaringClass() != introspecedClass) {
+            // このクラスで定義されているプロパティだけを対象とする。
+            if (readMethod != null && readMethod.getDeclaringClass() != clazz) {
+                readMethod = null;
+            }
+            if (writeMethod != null && writeMethod.getDeclaringClass() != clazz) {
+                writeMethod = null;
+            }
+
+            PropertyDesc propertyDesc = new PropertyDescImpl(name);
+            int mode = PropertyDesc.NONE;
+            if (readMethod != null) {
+                mode |= PropertyDesc.READ;
+            }
+            if (writeMethod != null) {
+                mode |= PropertyDesc.WRITE;
+            }
+            if (mode == PropertyDesc.NONE) {
                 continue;
             }
 
-            String name = pds[i].getName();
-            PropertyDesc propertyDesc = new PropertyDescImpl(name);
-            int mode = PropertyDesc.NONE;
-            if (pds[i].getReadMethod() != null) {
-                mode |= PropertyDesc.READ;
-            }
-            if (pds[i].getWriteMethod() != null) {
-                mode |= PropertyDesc.WRITE;
-            }
             propertyDesc.setMode(mode);
             Class propertyType = pds[i].getPropertyType();
             if (propertyType == null) {
@@ -425,11 +415,9 @@ public class SourceCreatorImpl implements SourceCreator {
             classDesc.setPropertyDesc(propertyDesc);
         }
 
-        Method[] methods = introspecedClass.getDeclaredMethods();
+        // このクラスで定義されているメソッドだけを対象とする。
+        Method[] methods = clazz.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
-            if (methods[i].getParameterTypes().length > 0) {
-                continue;
-            }
             String name = methods[i].getName();
             if (name.startsWith("get") || name.startsWith("is")
                     || name.startsWith("set")) {
@@ -438,10 +426,7 @@ public class SourceCreatorImpl implements SourceCreator {
             if (methods[i].getDeclaringClass() == Object.class) {
                 continue;
             }
-            MethodDesc methodDesc = new MethodDescImpl(name);
-            methodDesc.getReturnTypeDesc().setClassDesc(
-                    new SimpleClassDesc(methods[i].getReturnType().getName()));
-            classDesc.setMethodDesc(methodDesc);
+            classDesc.setMethodDesc(new MethodDescImpl(methods[i]));
         }
 
         return classDesc;
@@ -549,13 +534,73 @@ public class SourceCreatorImpl implements SourceCreator {
         ClassDesc[] classDescs = classDescBag.getClassDescs(kind);
         for (int i = 0; i < classDescs.length; i++) {
             // 既存のクラスがあればマージする。
-            classDescs[i].merge(getClassDesc(classDescs[i].getName()),
-                    mergeMethod);
+            mergeWithExistentClass(classDescs[i], mergeMethod);
             if (!writeSourceFile(classDescs[i], classDescBag.getClassDescSet())) {
                 // ソースファイルの生成に失敗した。
                 classDescBag.remove(classDescs[i].getName());
                 classDescBag.addAsFailed(classDescs[i]);
 
+            }
+        }
+    }
+
+    public void mergeWithExistentClass(ClassDesc desc, boolean mergeMethod) {
+
+        String className = desc.getName();
+        Class clazz = getClass(className);
+        ClassDesc gapDesc = getClassDesc(clazz, className);
+        if (gapDesc == null) {
+            gapDesc = newClassDesc(className);
+        }
+        Class baseClass = (clazz != null ? clazz.getSuperclass() : null);
+        ClassDesc baseDesc = (mergeMethod ? getClassDesc(baseClass, className)
+                : null);
+        if (baseDesc == null) {
+            baseDesc = newClassDesc(className);
+        }
+        ClassDesc superDesc = getClassDesc(getClass(desc.getSuperclassName()),
+                className);
+        if (superDesc == null) {
+            superDesc = newClassDesc(className);
+        }
+
+        // baseにあるものは必ず残す。baseになくてsuperやgapにあるものは除去する。
+        ClassDesc generated = (ClassDesc) desc.clone();
+        desc.clear();
+        desc.merge(baseDesc);
+        PropertyDesc[] pds = generated.getPropertyDescs();
+        for (int i = 0; i < pds.length; i++) {
+            PropertyDesc basePd = baseDesc.getPropertyDesc(pds[i].getName());
+            if (basePd == null || !basePd.isReadable()) {
+                removeModeFrom(pds[i], PropertyDesc.READ, gapDesc);
+                removeModeFrom(pds[i], PropertyDesc.READ, superDesc);
+            }
+            if (basePd == null || !basePd.isWritable()) {
+                removeModeFrom(pds[i], PropertyDesc.WRITE, gapDesc);
+                removeModeFrom(pds[i], PropertyDesc.WRITE, superDesc);
+            }
+            if (!pds[i].isReadable() && !pds[i].isWritable()) {
+                generated.removePropertyDesc(pds[i].getName());
+            }
+        }
+        MethodDesc[] mds = generated.getMethodDescs();
+        for (int i = 0; i < mds.length; i++) {
+            if (baseDesc.getMethodDesc(mds[i]) == null
+                    && (gapDesc.getMethodDesc(mds[i]) != null || superDesc
+                            .getMethodDesc(mds[i]) != null)) {
+                generated.removeMethodDesc(mds[i]);
+            }
+        }
+
+        desc.merge(generated);
+    }
+
+    void removeModeFrom(PropertyDesc pd, int mode, ClassDesc cd) {
+
+        PropertyDesc p = cd.getPropertyDesc(pd.getName());
+        if (p != null) {
+            if ((p.getMode() & mode) != 0) {
+                pd.setMode(pd.getMode() & ~mode);
             }
         }
     }
@@ -859,16 +904,6 @@ public class SourceCreatorImpl implements SourceCreator {
         responseCreator_ = responseCreator;
     }
 
-    public Configuration getConfiguration() {
-
-        return configuration_;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-
-        configuration_ = configuration;
-    }
-
     public Application getApplication() {
 
         return applicationManager_.getContextApplication();
@@ -898,5 +933,48 @@ public class SourceCreatorImpl implements SourceCreator {
     public void setApplicationManager(ApplicationManager applicationManager) {
 
         applicationManager_ = applicationManager;
+    }
+
+    public ClassDesc newClassDesc(String className) {
+
+        ClassDescImpl classDescImpl = new ClassDescImpl(className);
+
+        // スーパークラスをセットする。
+        Application application = getApplication();
+        for (Enumeration enm = application.propertyNames(); enm
+                .hasMoreElements();) {
+            String key = (String) enm.nextElement();
+            if (!key.startsWith(APPKEYPREFIX_SOURCECREATOR_SUPERCLASS)) {
+                continue;
+            }
+            if (!Pattern.compile(
+                    key.substring(APPKEYPREFIX_SOURCECREATOR_SUPERCLASS
+                            .length())).matcher(className).find()) {
+                continue;
+            }
+            String superclassName = application.getProperty(key);
+            Class superclass = getClass(superclassName);
+            if (superclass == null) {
+                throw new RuntimeException(
+                        "Superclass is not found: superclass key=" + key
+                                + ", value=" + superclassName);
+            }
+            classDescImpl.setSuperclass(superclass);
+            break;
+        }
+        if (classDescImpl.getSuperclassName() == null) {
+            String superclassName = application
+                    .getProperty(APPKEY_SOURCECREATOR_SUPERCLASS);
+            Class superclass = getClass(superclassName);
+            if (superclassName != null && superclass == null) {
+                throw new RuntimeException(
+                        "Superclass is not found: superclass key="
+                                + APPKEY_SOURCECREATOR_SUPERCLASS + ", value="
+                                + superclassName);
+            }
+            classDescImpl.setSuperclass(superclass);
+        }
+
+        return classDescImpl;
     }
 }

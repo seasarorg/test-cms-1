@@ -64,12 +64,17 @@ public class SimpleClassDesc extends AbstractClassDesc {
         throw new UnsupportedOperationException();
     }
 
-    public void setSuperclassName(String superclassName) {
+    public void setSuperclass(Class superclass) {
 
         throw new UnsupportedOperationException();
     }
 
     public String getSuperclassName() {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public Class getSuperclass() {
 
         throw new UnsupportedOperationException();
     }
@@ -82,5 +87,25 @@ public class SimpleClassDesc extends AbstractClassDesc {
     public PropertyDesc getPropertyDesc(String name) {
 
         return null;
+    }
+
+    public void clear() {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public void merge(ClassDesc classDesc) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeMethodDesc(MethodDesc methodDesc) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    public void removePropertyDesc(String name) {
+
+        throw new UnsupportedOperationException();
     }
 }

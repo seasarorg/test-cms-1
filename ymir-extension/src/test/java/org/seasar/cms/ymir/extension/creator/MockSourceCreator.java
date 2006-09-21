@@ -128,4 +128,11 @@ public class MockSourceCreator implements SourceCreator {
     public String getRootPackageName() {
         return null;
     }
+
+    public ClassDesc newClassDesc(String className) {
+        return null;
+    }
+
+    public void mergeWithExistentClass(ClassDesc desc, boolean mergeMethod) {
+    }
 }

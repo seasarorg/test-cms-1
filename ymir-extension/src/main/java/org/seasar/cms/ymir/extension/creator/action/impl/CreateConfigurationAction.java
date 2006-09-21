@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.seasar.cms.pluggable.Configuration;
-import org.seasar.cms.pluggable.impl.ConfigurationImpl;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
@@ -128,15 +126,5 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
         variableMap.put("parameters", getParameters(request));
         return getSourceCreator().getResponseCreator().createResponse(
                 "createConfiguration_create", variableMap);
-    }
-
-    Configuration getConfiguration() {
-
-        Configuration configuration = getSourceCreator().getConfiguration();
-        if (configuration == null) {
-            configuration = new ConfigurationImpl();
-        }
-        return configuration;
-
     }
 }

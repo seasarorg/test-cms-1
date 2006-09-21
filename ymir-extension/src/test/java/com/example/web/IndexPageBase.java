@@ -1,4 +1,4 @@
 package com.example.web;
 
-public class IndexPageBase {
+public class IndexPageBase extends IndexPageBaseBase {
 }

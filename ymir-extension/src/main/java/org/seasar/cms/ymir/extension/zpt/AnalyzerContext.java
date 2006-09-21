@@ -120,13 +120,7 @@ public class AnalyzerContext extends ZptTemplateContext {
             if (usingFreyjaRenderClasses_) {
                 String renderClassName = "net.skirnir.freyja.render.html."
                         + capFirst(className) + "Tag";
-                boolean renderClassExists = false;
-                try {
-                    Class.forName(renderClassName);
-                    renderClassExists = true;
-                } catch (ClassNotFoundException ignore) {
-                }
-                if (renderClassExists) {
+                if ((sourceCreator_.getClass(renderClassName) != null)) {
                     className = renderClassName;
                 } else {
                     className = toClassName(className);
@@ -137,7 +131,7 @@ public class AnalyzerContext extends ZptTemplateContext {
         }
         ClassDesc classDesc = (ClassDesc) temporaryClassDescMap_.get(className);
         if (classDesc == null) {
-            classDesc = new ClassDescImpl(className);
+            classDesc = sourceCreator_.newClassDesc(className);
             temporaryClassDescMap_.put(className, classDesc);
         }
         return classDesc;
@@ -203,11 +197,11 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public void close() {
 
-        for (Iterator itr = temporaryClassDescMap_.entrySet().iterator(); itr
-                .hasNext();) {
-            Map.Entry entry = (Map.Entry) itr.next();
-            String name = (String) entry.getKey();
-            ClassDesc classDesc = (ClassDesc) entry.getValue();
+        for (Iterator<Map.Entry<String, ClassDesc>> itr = temporaryClassDescMap_
+                .entrySet().iterator(); itr.hasNext();) {
+            Map.Entry<String, ClassDesc> entry = itr.next();
+            String name = entry.getKey();
+            ClassDesc classDesc = entry.getValue();
             if (isOuter(classDesc)) {
                 // 自動生成対象外のクラスは除外しておく。
                 continue;
@@ -227,7 +221,7 @@ public class AnalyzerContext extends ZptTemplateContext {
                     }
                 }
             }
-            classDesc.merge((ClassDesc) classDescMap_.get(name), true);
+            classDesc.merge(classDescMap_.get(name));
             classDescMap_.put(name, classDesc);
         }
     }

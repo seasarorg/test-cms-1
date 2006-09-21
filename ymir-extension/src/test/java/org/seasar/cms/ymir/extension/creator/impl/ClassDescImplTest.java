@@ -6,6 +6,8 @@ import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 
+import com.example.page.TestPageBase;
+
 public class ClassDescImplTest extends SourceCreatorImplTestBase {
 
     public void testGetInstanceName() throws Exception {
@@ -38,7 +40,7 @@ public class ClassDescImplTest extends SourceCreatorImplTestBase {
         actual.setMethodDesc(md);
 
         ClassDesc cd2 = new ClassDescImpl("com.example.page.TestPage");
-        cd2.setSuperclassName("com.example.page.TestPageBase");
+        cd2.setSuperclass(TestPageBase.class);
         pd = new PropertyDescImpl("param1");
         pd.setTypeDesc("java.lang.Integer");
         pd.getTypeDesc().setExplicit(true);
@@ -63,7 +65,7 @@ public class ClassDescImplTest extends SourceCreatorImplTestBase {
         md.setBodyDesc(new BodyDescImpl("body"));
         cd2.setMethodDesc(md);
 
-        actual.merge(cd2, true);
+        actual.merge(cd2);
 
         assertEquals("com.example.page.TestPageBase", actual
                 .getSuperclassName());
@@ -93,21 +95,5 @@ public class ClassDescImplTest extends SourceCreatorImplTestBase {
                 .get("body"));
         assertEquals("Integer", actual.getMethodDesc(
                 new MethodDescImpl("method")).getReturnTypeDesc().getName());
-    }
-
-    public void testMerge2() throws Exception {
-
-        ClassDesc cd = target_.getClassDesc(
-                "org.seasar.cms.ymir.extension.creator.impl.Merge3");
-        ClassDesc cd2 = new ClassDescImpl(
-                "org.seasar.cms.ymir.extension.creator.impl.Merge3");
-        MethodDesc md = new MethodDescImpl("_render");
-        md.setBodyDesc(new BodyDescImpl("//"));
-        cd2.setMethodDesc(md);
-        cd.merge(cd2, true);
-
-        MethodDesc[] mds = cd.getMethodDescs();
-        assertEquals(1, mds.length);
-        assertNull("サブクラスが持っているメソッドはマージされないこと", mds[0].getBodyDesc());
     }
 }

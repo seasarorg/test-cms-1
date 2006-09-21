@@ -10,8 +10,9 @@ import java.util.Map;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
+import org.seasar.cms.ymir.extension.creator.ParameterDesc;
+import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
-import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.util.ResourceUtil;
 import org.seasar.kvasir.util.io.IOUtils;
 
@@ -52,22 +53,6 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
     public void testGetWelcomeFile() throws Exception {
 
         assertEquals("index.html", target_.getWelcomeFile());
-    }
-
-    public void testGetClassDesc1() throws Exception {
-
-        assertNull(target_.getClassDesc("hoge"));
-    }
-
-    public void testGetClassDesc2() throws Exception {
-
-        ClassDesc actual = target_.getClassDesc("com.example.web.IndexPage");
-
-        assertNotNull(actual);
-        assertEquals("com.example.web.IndexPage", actual.getName());
-        assertNull(actual.getSuperclassName());
-        assertEquals(0, actual.getPropertyDescs().length);
-        assertEquals(0, actual.getMethodDescs().length);
     }
 
     public void testWriteSourceFile1() throws Exception {
@@ -115,12 +100,6 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
 
     public void testGatherClassDescs() throws Exception {
 
-        File sourceDir = clean(new File(ResourceUtil.getBuildDir(getClass())
-                .getParentFile(), "src"));
-        getSourceCreator().getConfiguration().setProperty(
-                SingleApplication.KEY_SOURCEDIRECTORY,
-                sourceDir.getCanonicalPath());
-
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         target_.gatherClassDescs(classDescMap, new PathMetaDataImpl(
                 "/test.html", Request.METHOD_GET, false, "testPage",
@@ -137,5 +116,91 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
         assertNotNull(md);
         assertEquals(TypeDesc.TYPE_VOID, md.getReturnTypeDesc().getName());
         assertNotNull(actual[0].getMethodDesc(new MethodDescImpl("_render")));
+    }
+
+    public void testNewClassDesc() throws Exception {
+
+        assertEquals("マッチしたパターンに関連付けられているスーパークラス名がセットされていること",
+                "com.example.web.IndexPageBaseBase", target_.newClassDesc(
+                        "com.example.web.IndexPage").getSuperclassName());
+
+        assertEquals(
+                "マッチするパターンが無くデフォルトのスーパークラス名が指定されている場合はデフォルトのスーパークラス名がセットされていること",
+                "com.example.page.TestPageBaseBase", target_.newClassDesc(
+                        "com.example.page.TestPage").getSuperclassName());
+    }
+
+    public void testMergeWithExistentClass() throws Exception {
+
+        ClassDesc cd = new ClassDescImpl(
+                "org.seasar.cms.ymir.extension.creator.impl.Merge3");
+        cd.setSuperclass(Merge3BaseBase.class);
+        PropertyDesc pd = new PropertyDescImpl("hoe");
+        pd.addMode(PropertyDesc.READ);
+        pd.addMode(PropertyDesc.WRITE);
+        cd.setPropertyDesc(pd);
+        MethodDesc addMd = new MethodDescImpl("add");
+        addMd.setReturnTypeDesc(new TypeDescImpl(Integer.TYPE));
+        addMd.setParameterDescs(new ParameterDesc[] {
+            new ParameterDescImpl(Integer.TYPE),
+            new ParameterDescImpl(Integer.TYPE) });
+        cd.setMethodDesc(addMd);
+        MethodDesc subMd = new MethodDescImpl("sub");
+        subMd.setReturnTypeDesc(new TypeDescImpl(Integer.TYPE));
+        subMd.setParameterDescs(new ParameterDesc[] {
+            new ParameterDescImpl(Integer.TYPE),
+            new ParameterDescImpl(Integer.TYPE) });
+        cd.setMethodDesc(subMd);
+        MethodDesc timesMd = new MethodDescImpl("times");
+        timesMd.setReturnTypeDesc(new TypeDescImpl(Integer.TYPE));
+        timesMd.setParameterDescs(new ParameterDesc[] {
+            new ParameterDescImpl(Integer.TYPE),
+            new ParameterDescImpl(Integer.TYPE) });
+        cd.setMethodDesc(timesMd);
+        MethodDesc divMd = new MethodDescImpl("div");
+        divMd.setReturnTypeDesc(new TypeDescImpl(Integer.TYPE));
+        divMd.setParameterDescs(new ParameterDesc[] {
+            new ParameterDescImpl(Integer.TYPE),
+            new ParameterDescImpl(Integer.TYPE) });
+        cd.setMethodDesc(divMd);
+        MethodDesc incMd = new MethodDescImpl("inc");
+        incMd.setReturnTypeDesc(new TypeDescImpl(Integer.TYPE));
+        incMd.setParameterDescs(new ParameterDesc[] {
+            new ParameterDescImpl(Integer.TYPE),
+            new ParameterDescImpl(Integer.TYPE) });
+        cd.setMethodDesc(incMd);
+
+        target_.mergeWithExistentClass(cd, true);
+
+        assertEquals(2, cd.getPropertyDescs().length);
+        assertFalse("スーパークラスだけが持っているプロパティのアクセッサは除去されること", cd.getPropertyDesc(
+                "hoe").isReadable());
+        assertTrue("スーパークラスが持っていないプロパティのアクセッサは除去されないこと", cd.getPropertyDesc(
+                "hoe").isWritable());
+        assertTrue("スーパークラスが持っている場合でも、Baseが持っていればプロパティのアクセッサは除去されないこと", cd
+                .getPropertyDesc("fuga").isWritable());
+        assertEquals(3, cd.getMethodDescs().length);
+        assertNull("スーパークラスだけが持っているメソッドは除去されること", cd.getMethodDesc(addMd));
+        assertNotNull("スーパークラスが持っている場合でも、Baseが持っていればメソッドは除去されないこと", cd
+                .getMethodDesc(incMd));
+        assertNull("サブクラスだけが持っているメソッドは除去されること", cd.getMethodDesc(subMd));
+        assertNotNull("サブクラスが持っている場合でも、Baseが持っていればメソッドは除去されないこと", cd
+                .getMethodDesc(divMd));
+    }
+
+    public void testMergeWithExistentClass2() throws Exception {
+
+        ClassDesc cd = new ClassDescImpl(
+                "org.seasar.cms.ymir.extension.creator.impl.Merge2");
+        cd.setSuperclass(Merge2BaseBase.class);
+        MethodDesc md = new MethodDescImpl("_render");
+        md.setReturnTypeDesc(new TypeDescImpl(Void.TYPE));
+        md.setParameterDescs(new ParameterDesc[0]);
+        cd.setMethodDesc(md);
+
+        target_.mergeWithExistentClass(cd, true);
+
+        assertNull("生成対象クラスがまだ存在しない場合でも、スーパークラスだけが持っているメソッドは除去されること", cd
+                .getMethodDesc(md));
     }
 }

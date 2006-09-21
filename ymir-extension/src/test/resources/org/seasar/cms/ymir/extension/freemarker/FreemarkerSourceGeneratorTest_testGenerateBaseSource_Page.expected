@@ -1,6 +1,6 @@
 package com.example.page;
 
-abstract public class TestPageBase extends com.example.page.SuperPage
+abstract public class TestPageBase extends com.example.page.TestPageBaseBase
 {
     protected boolean param1_;
 

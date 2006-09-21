@@ -1,6 +1,5 @@
 package org.seasar.cms.ymir.extension.creator;
 
-import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SimpleClassDesc;
 
 public class EntityMetaData {
@@ -27,12 +26,12 @@ public class EntityMetaData {
 
         entityName_ = new SimpleClassDesc(className).getBaseName();
         dtoClassName_ = creator_.getDtoPackageName() + "." + entityName_
-            + ClassDesc.KIND_DTO;
+                + ClassDesc.KIND_DTO;
         beanClassName_ = creator_.getDaoPackageName() + "." + entityName_;
         daoClassName_ = creator_.getDaoPackageName() + "." + entityName_
-            + ClassDesc.KIND_DAO;
+                + ClassDesc.KIND_DAO;
         dxoClassName_ = creator_.getDxoPackageName() + "." + entityName_
-            + ClassDesc.KIND_DXO;
+                + ClassDesc.KIND_DXO;
     }
 
     public String getEntityName() {
@@ -42,21 +41,21 @@ public class EntityMetaData {
 
     public ClassDesc getDtoClassDesc() {
 
-        return new ClassDescImpl(dtoClassName_);
+        return creator_.newClassDesc(dtoClassName_);
     }
 
     public ClassDesc getBeanClassDesc() {
 
-        return new ClassDescImpl(beanClassName_);
+        return creator_.newClassDesc(beanClassName_);
     }
 
     public ClassDesc getDaoClassDesc() {
 
-        return new ClassDescImpl(daoClassName_);
+        return creator_.newClassDesc(daoClassName_);
     }
 
     public ClassDesc getDxoClassDesc() {
 
-        return new ClassDescImpl(dxoClassName_);
+        return creator_.newClassDesc(dxoClassName_);
     }
 }

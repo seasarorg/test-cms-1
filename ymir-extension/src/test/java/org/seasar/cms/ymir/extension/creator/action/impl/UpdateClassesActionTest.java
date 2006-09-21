@@ -9,7 +9,6 @@ import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescSet;
 import org.seasar.cms.ymir.extension.creator.impl.PathMetaDataImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImplTestBase;
-import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.util.ResourceUtil;
 
 public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
@@ -22,13 +21,15 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         target_ = new UpdateClassesAction(getSourceCreator());
     }
 
+    @Override
+    protected File getSourceDir() {
+        return new File(ResourceUtil.getBuildDir(getClass()).getParentFile(),
+                "src");
+    }
+
     public void testShouldUpdate() throws Exception {
 
-        File sourceDir = clean(new File(ResourceUtil.getBuildDir(getClass())
-                .getParentFile(), "src"));
-        getSourceCreator().getConfiguration().setProperty(
-                SingleApplication.KEY_SOURCEDIRECTORY,
-                sourceDir.getCanonicalPath());
+        File sourceDir = clean(getSourceDir());
 
         PathMetaDataImpl pathMetaData = new PathMetaDataImpl(null, null, false,
                 null, null, null, null, getSourceCreator().getSourceFile(
@@ -52,8 +53,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
                 new ClassDesc[0]);
         ClassDescSet classDescSet = new ClassDescSet(classDescs);
         for (int i = classDescs.length - 1; i >= 0; i--) {
-            classDescs[i].merge(getSourceCreator().getClassDesc(
-                    classDescs[i].getName()), true);
+            getSourceCreator().mergeWithExistentClass(classDescs[i], true);
             getSourceCreator().writeSourceFile(classDescs[i], classDescSet);
         }
 

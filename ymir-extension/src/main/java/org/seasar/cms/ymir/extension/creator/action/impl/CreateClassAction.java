@@ -9,14 +9,13 @@ import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
-import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
 public class CreateClassAction extends AbstractUpdateAction {
 
     private static final String PARAM_TRANSITION = SourceCreatorImpl.PARAM_PREFIX
-        + "transition";
+            + "transition";
 
     public CreateClassAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
@@ -35,7 +34,7 @@ public class CreateClassAction extends AbstractUpdateAction {
     Response actDefault(Request request, PathMetaData pathMetaData) {
 
         String actionName = getSourceCreator().getActionName(request.getPath(),
-            request.getMethod());
+                request.getMethod());
 
         Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
@@ -43,7 +42,7 @@ public class CreateClassAction extends AbstractUpdateAction {
         variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("actionName", actionName);
         return getSourceCreator().getResponseCreator().createResponse(
-            "createClass", variableMap);
+                "createClass", variableMap);
     }
 
     Response actCreate(Request request, PathMetaData pathMetaData) {
@@ -55,13 +54,14 @@ public class CreateClassAction extends AbstractUpdateAction {
 
         String transition = request.getParameter(PARAM_TRANSITION);
 
-        ClassDesc classDesc = new ClassDescImpl(pathMetaData.getClassName());
+        ClassDesc classDesc = getSourceCreator().newClassDesc(
+                pathMetaData.getClassName());
         MethodDesc methodDesc = new MethodDescImpl(getSourceCreator()
-            .getActionName(request.getPath(), method));
+                .getActionName(request.getPath(), method));
         methodDesc.setReturnTypeDesc(String.class.getName());
         if (transition != null && transition.trim().length() > 0) {
             methodDesc.setBodyDesc(new BodyDescImpl("return "
-                + quote(transition.trim()) + ";"));
+                    + quote(transition.trim()) + ";"));
         }
         classDesc.setMethodDesc(methodDesc);
 
@@ -73,6 +73,6 @@ public class CreateClassAction extends AbstractUpdateAction {
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
         return getSourceCreator().getResponseCreator().createResponse(
-            "createClass_create", variableMap);
+                "createClass_create", variableMap);
     }
 }
