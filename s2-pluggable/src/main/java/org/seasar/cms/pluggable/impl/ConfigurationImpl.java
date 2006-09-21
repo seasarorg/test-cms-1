@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.seasar.cms.pluggable.Configuration;
@@ -79,6 +80,11 @@ public class ConfigurationImpl implements Configuration {
         return properties_.getProperty(key, defaultValue);
     }
 
+    public Enumeration propertyNames() {
+
+        return properties_.propertyNames();
+    }
+
     public void setProperty(String key, String value) {
 
         properties_.setProperty(key, value);
@@ -99,7 +105,7 @@ public class ConfigurationImpl implements Configuration {
         return status.equals(getProperty(KEY_PROJECTSTATUS));
     }
 
-    public boolean isDeveloping() {
+    public boolean isUnderDevelopment() {
 
         return equalsProjectStatus(PROJECTSTATUS_DEVELOP);
     }

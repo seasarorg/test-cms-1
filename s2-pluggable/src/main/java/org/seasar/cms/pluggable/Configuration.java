@@ -2,6 +2,7 @@ package org.seasar.cms.pluggable;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 
 public interface Configuration {
 
@@ -15,6 +16,8 @@ public interface Configuration {
 
     String getProperty(String key, String defaultValue);
 
+    Enumeration propertyNames();
+
     void setProperty(String key, String value);
 
     void removeProperty(String key);
@@ -23,5 +26,5 @@ public interface Configuration {
 
     boolean equalsProjectStatus(String status);
 
-    boolean isDeveloping();
+    boolean isUnderDevelopment();
 }
