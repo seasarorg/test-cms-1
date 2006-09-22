@@ -138,9 +138,13 @@ public class RedirectStrategy implements Strategy {
             component_ = component;
         }
 
-        public Object getValue(String name) {
+        public Object getValue(Object key) {
 
-            return getProperty(component_, name);
+            if (key instanceof String) {
+                return getProperty(component_, (String) key);
+            } else {
+                return null;
+            }
         }
     }
 }
