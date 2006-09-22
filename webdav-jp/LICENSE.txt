@@ -1,0 +1,22 @@
+■この配布物に含まれるプログラムのライセンスについて
+
+この配布物は以下のプログラムを含みます。
+
+(1) webdav-jp
+
+これらのプログラムはApache Software Licenceに従って配布されています。
+Apache Software Licenseについては付属のLICENSE.apacheを参照して下さい。
+またライセンスの詳細については以下のURLを参照して下さい。
+  http://www.apache.org/LICENSE
+
+This product includes software developed by the
+        Apache Software Foundation (http://www.apache.org/).
+
+
+■免責事項
+
+このプログラムは無保証です。本プログラムのバグあるいは本プログラムの実
+行等によって発生したいかなる損害についても責任を持ちません。 
+
+
+以上
