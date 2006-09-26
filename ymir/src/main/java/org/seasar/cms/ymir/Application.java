@@ -55,5 +55,5 @@ public interface Application {
 
     PathMappingProvider getPathMappingProvider();
 
-    boolean isBeingDeveloped();
+    boolean isUnderDevelopment();
 }

@@ -42,6 +42,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     public static final String ATTR_PAGE = "PAGE";
 
+    public static final String PARAM_METHOD = "__ymir__method";
+
     private ResponseConstructorSelector responseConstructorSelector_;
 
     private Updater[] updaters_ = new Updater[0];
@@ -72,6 +74,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
             String dispatcher, Map parameterMap, Map fileParameterMap)
             throws PageNotFoundException {
 
+        boolean underDevelopment = Configuration.PROJECTSTATUS_DEVELOP
+                .equals(getProjectStatus())
+                && getApplication().isUnderDevelopment();
+        if (underDevelopment) {
+            method = correctMethod(method, parameterMap);
+        }
+
         MatchedPathMapping matched = findMatchedPathMapping(path, method);
         if (matched == null) {
             return PassthroughResponse.INSTANCE;
@@ -89,11 +98,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
         Response response = processRequest(request, componentName, actionName,
                 matched.getDefaultReturnValue());
 
-        if (Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
-                && getApplication().isBeingDeveloped()) {
+        if (underDevelopment) {
             for (int i = 0; i < updaters_.length; i++) {
-                Response newResponse = updaters_[i].update(path, request
-                        .getMethod(), request, response);
+                Response newResponse = updaters_[i].update(path, method,
+                        request, response);
                 if (newResponse != response) {
                     return newResponse;
                 }
@@ -101,6 +109,15 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         return response;
+    }
+
+    String correctMethod(String method, Map parameterMap) {
+        String[] values = (String[]) parameterMap.get(PARAM_METHOD);
+        if (values != null && values.length > 0) {
+            return values[0];
+        } else {
+            return method;
+        }
     }
 
     String strip(String path) {

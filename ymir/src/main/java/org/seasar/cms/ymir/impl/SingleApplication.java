@@ -65,7 +65,7 @@ public class SingleApplication extends AbstractApplication {
         config_.setProperty(key, value);
     }
 
-    public boolean isBeingDeveloped() {
+    public boolean isUnderDevelopment() {
         return true;
     }
 

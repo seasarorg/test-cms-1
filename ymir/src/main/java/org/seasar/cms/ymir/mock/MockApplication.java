@@ -63,7 +63,7 @@ public class MockApplication implements Application {
         return null;
     }
 
-    public boolean isBeingDeveloped() {
+    public boolean isUnderDevelopment() {
         return false;
     }
 
