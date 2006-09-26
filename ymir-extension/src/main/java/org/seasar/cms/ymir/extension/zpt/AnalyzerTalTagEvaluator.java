@@ -47,14 +47,11 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             }
         } else if ("input".equals(name)) {
             String type = getAttributeValue(attrMap, "type", null);
-            if (!("button".equals(type) || "image".equals(type) || "submit"
-                    .equals(type))) {
-                PropertyDesc propertyDesc = processParameterTag(
-                        toAnalyzeContext(context), attrs, annotation);
-                if ("file".equals(type) && propertyDesc != null) {
-                    propertyDesc.getTypeDesc().setClassDesc(
-                            FormFile.class.getName());
-                }
+            PropertyDesc propertyDesc = processParameterTag(
+                    toAnalyzeContext(context), attrs, annotation);
+            if ("file".equals(type) && propertyDesc != null) {
+                propertyDesc.getTypeDesc().setClassDesc(
+                        FormFile.class.getName());
             }
         } else if ("select".equals(name) || "textarea".equals(name)) {
             processParameterTag(toAnalyzeContext(context), attrs, annotation);

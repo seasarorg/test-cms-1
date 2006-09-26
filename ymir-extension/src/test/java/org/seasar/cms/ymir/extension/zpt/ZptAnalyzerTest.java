@@ -177,9 +177,9 @@ public class ZptAnalyzerTest extends TestCase {
         pd = cd.getPropertyDesc("file");
         assertNotNull(pd);
         assertEquals(FormFile.class.getName(), pd.getTypeDesc().getName());
-        assertNull(cd.getPropertyDesc("button"));
-        assertNull(cd.getPropertyDesc("image"));
-        assertNull(cd.getPropertyDesc("submit"));
+        assertNotNull(cd.getPropertyDesc("button"));
+        assertNotNull(cd.getPropertyDesc("image"));
+        assertNotNull(cd.getPropertyDesc("submit"));
         MethodDesc md = cd.getMethodDesc(new MethodDescImpl("POST"));
         assertNotNull(md);
         assertEquals("void", md.getReturnTypeDesc().getName());
