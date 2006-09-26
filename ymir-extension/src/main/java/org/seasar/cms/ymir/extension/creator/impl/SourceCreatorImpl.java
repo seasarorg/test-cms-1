@@ -3,7 +3,7 @@ package org.seasar.cms.ymir.extension.creator.impl;
 import static org.seasar.cms.ymir.extension.Globals.APPKEYPREFIX_SOURCECREATOR_SUPERCLASS;
 import static org.seasar.cms.ymir.extension.Globals.APPKEY_SOURCECREATOR_ENABLE;
 import static org.seasar.cms.ymir.extension.Globals.APPKEY_SOURCECREATOR_SUPERCLASS;
-import static org.seasar.cms.ymir.extension.creator.action.UpdateAction.PARAM_METHOD;
+import static org.seasar.cms.ymir.impl.DefaultRequestProcessor.PARAM_METHOD;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

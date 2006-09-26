@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.extension.creator.action.impl;
 
+import static org.seasar.cms.ymir.impl.DefaultRequestProcessor.PARAM_METHOD;
+
 import java.util.HashMap;
 import java.util.Map;
 

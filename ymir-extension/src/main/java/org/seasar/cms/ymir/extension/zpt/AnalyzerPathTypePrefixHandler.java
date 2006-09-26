@@ -9,28 +9,35 @@ import net.skirnir.freyja.zpt.tales.PathTypePrefixHandler;
 
 public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
 
+    private static final String VARNAME_SLOT = "slot";
+
     public AnalyzerPathTypePrefixHandler(char pathExpDelim) {
 
         super(pathExpDelim);
     }
 
     protected Object getProperty(TemplateContext context,
-        VariableResolver varResolver, String arg) {
+            VariableResolver varResolver, String arg) {
+
+        if (VARNAME_SLOT.equals(arg)) {
+            // システムオブジェクト「slot」は無視する。
+            return null;
+        }
 
         return new DescWrapper(toAnalyzerContext(context)
-            .getTemporaryClassDesc(arg));
+                .getTemporaryClassDesc(arg));
     }
 
     protected Object resolveSegment(TemplateContext context,
-        VariableResolver varResolver, Object obj, String segment) {
+            VariableResolver varResolver, Object obj, String segment) {
 
         if (obj instanceof DescWrapper) {
             DescWrapper wrapper = (DescWrapper) obj;
             ClassDesc classDesc = wrapper.getClassDesc();
             int mode = (classDesc.isKindOf(ClassDesc.KIND_DTO) ? (PropertyDesc.READ | PropertyDesc.WRITE)
-                : PropertyDesc.READ);
+                    : PropertyDesc.READ);
             return new DescWrapper(toAnalyzerContext(context), classDesc
-                .addProperty(segment, mode));
+                    .addProperty(segment, mode));
         } else {
             return super.resolveSegment(context, varResolver, obj, segment);
         }
