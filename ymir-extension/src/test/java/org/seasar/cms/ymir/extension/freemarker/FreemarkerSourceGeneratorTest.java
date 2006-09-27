@@ -51,12 +51,14 @@ public class FreemarkerSourceGeneratorTest extends YmirTestCase {
         propertyDesc = new PropertyDescImpl("param2");
         propertyDesc.setMode(PropertyDesc.WRITE);
         classDesc.setPropertyDesc(propertyDesc);
-        propertyDesc = new PropertyDescImpl("param3");
-        propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
-        classDesc.setPropertyDesc(propertyDesc);
+        // 順番をアルファベット順でないようにしているのは、プロパティやメソッドがアルファベット順に
+        // 生成されることを検証するため。
         propertyDesc = new PropertyDescImpl("param4");
         propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
         propertyDesc.setTypeDesc("java.lang.Integer[]", true);
+        classDesc.setPropertyDesc(propertyDesc);
+        propertyDesc = new PropertyDescImpl("param3");
+        propertyDesc.setMode(PropertyDesc.READ | PropertyDesc.WRITE);
         classDesc.setPropertyDesc(propertyDesc);
 
         return classDesc;

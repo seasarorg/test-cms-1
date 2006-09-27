@@ -3,6 +3,7 @@ package org.seasar.cms.ymir.extension.creator.impl;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.seasar.cms.ymir.extension.creator.AbstractClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
@@ -17,9 +18,9 @@ public class ClassDescImpl extends AbstractClassDesc {
 
     private Class superclass_;
 
-    private Map<String, PropertyDesc> propertyDescMap_ = new LinkedHashMap<String, PropertyDesc>();
+    private Map<String, PropertyDesc> propertyDescMap_ = new TreeMap<String, PropertyDesc>();
 
-    private Map<MethodDescKey, MethodDesc> methodDescMap_ = new LinkedHashMap<MethodDescKey, MethodDesc>();
+    private Map<MethodDescKey, MethodDesc> methodDescMap_ = new TreeMap<MethodDescKey, MethodDesc>();
 
     public ClassDescImpl(String name) {
 
