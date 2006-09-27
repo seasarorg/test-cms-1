@@ -58,8 +58,7 @@ public class MockSourceCreator implements SourceCreator {
         return null;
     }
 
-    public Response update(String path, String method, Request request,
-            Response response) {
+    public Response update(Request request, Response response) {
         return null;
     }
 

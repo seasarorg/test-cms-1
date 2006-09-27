@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.Properties;
 
 import org.seasar.cms.ymir.Application;
-import org.seasar.cms.ymir.Request;
-import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
 import org.seasar.cms.ymir.Updater;
 
@@ -38,9 +36,6 @@ public interface SourceCreator extends Updater {
     File getSourceFile(String className);
 
     File getTemplateFile(String className);
-
-    Response update(String path, String method, Request request,
-            Response response);
 
     ResponseCreator getResponseCreator();
 

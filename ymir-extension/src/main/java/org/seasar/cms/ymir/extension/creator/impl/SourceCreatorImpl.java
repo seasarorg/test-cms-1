@@ -132,15 +132,15 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public Logger logger_ = Logger.getLogger(getClass());
 
-    public Response update(String path, String method, Request request,
-            Response response) {
+    public Response update(Request request, Response response) {
 
         Application application = getApplication();
         if (!shouldUpdate(application)) {
             return response;
         }
 
-        method = getOriginalMethod(request, method);
+        String path = request.getPath();
+        String method = getOriginalMethod(request);
         String forwardPath = null;
         if (response.getType() == Response.TYPE_FORWARD) {
             forwardPath = response.getPath();
@@ -188,13 +188,13 @@ public class SourceCreatorImpl implements SourceCreator {
         return response;
     }
 
-    String getOriginalMethod(Request request, String method) {
+    String getOriginalMethod(Request request) {
 
         String originalMethod = request.getParameter(PARAM_METHOD);
         if (originalMethod != null) {
             return originalMethod;
         } else {
-            return method;
+            return request.getMethod();
         }
     }
 

@@ -141,12 +141,65 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         Map attrMap = evaluate(context, attrs);
         Attribute attr = (Attribute) attrMap.get("name");
         if (attr != null) {
-            return context.getPropertyDesc(context
-                    .getTemporaryClassDesc(className), TagEvaluatorUtils
-                    .defilter(attr.getValue()), PropertyDesc.READ
-                    | PropertyDesc.WRITE);
+            String name = TagEvaluatorUtils.defilter(attr.getValue());
+            if (isValidAsPropertyName(name)) {
+                return context.getPropertyDesc(context
+                        .getTemporaryClassDesc(className), name,
+                        PropertyDesc.READ | PropertyDesc.WRITE);
+            }
         }
         return null;
+    }
+
+    boolean isValidAsPropertyName(String name) {
+        if (name == null) {
+            return false;
+        }
+
+        int pre = 0;
+        int idx;
+        while ((idx = name.indexOf('.', pre)) >= 0) {
+            if (!isValidAsSinglePropertyName(name.substring(pre, idx))) {
+                return false;
+            }
+            pre = idx + 1;
+        }
+        if (!isValidAsSinglePropertyName(name.substring(pre))) {
+            return false;
+        }
+        return true;
+    }
+
+    boolean isValidAsSinglePropertyName(String name) {
+        if (name == null) {
+            return false;
+        }
+        if (name.endsWith("]")) {
+            int lbracket = name.indexOf('[');
+            if (lbracket < 0) {
+                return false;
+            }
+            name = name.substring(0, lbracket);
+        }
+        return isValidAsSimplePropertyName(name);
+    }
+
+    boolean isValidAsSimplePropertyName(String name) {
+        if (name == null || name.length() == 0) {
+            return false;
+        }
+        char ch = name.charAt(0);
+        if (!(ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '_')) {
+            return false;
+        }
+        for (int i = 1; i < name.length(); i++) {
+            ch = name.charAt(i);
+            if (!(ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '_' || ch >= '0'
+                    && ch <= '9')) {
+                return false;
+            }
+        }
+        return true;
     }
 
     Map evaluate(ZptTemplateContext context, Attribute[] attrs) {
