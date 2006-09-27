@@ -1,8 +1,10 @@
 package org.seasar.cms.ymir.impl;
 
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.Request;
 
@@ -20,14 +22,23 @@ public class RequestImpl implements Request {
 
     private Map fileParameterMap_;
 
+    private AttributeContainer attributeContainer_;
+
     private String pathInfo_;
+
+    private String componentName_;
+
+    private String actionName_;
+
+    private Object defaultReturnValue_;
 
     public RequestImpl() {
     }
 
     public RequestImpl(String contextPath, String path, String method,
-        String dispatcher, Map parameterMap, Map fileParameterMap,
-        String pathInfo) {
+            String dispatcher, Map parameterMap, Map fileParameterMap,
+            AttributeContainer attributeContainer, String componentName,
+            String actionName, String pathInfo, Object defaultReturnValue) {
 
         contextPath_ = contextPath;
         path_ = path;
@@ -35,7 +46,11 @@ public class RequestImpl implements Request {
         dispatcher_ = dispatcher;
         parameterMap_ = parameterMap;
         fileParameterMap_ = fileParameterMap;
+        attributeContainer_ = attributeContainer;
+        componentName_ = componentName;
+        actionName_ = actionName;
         pathInfo_ = pathInfo;
+        defaultReturnValue_ = defaultReturnValue;
     }
 
     public String getDispatcher() {
@@ -167,6 +182,36 @@ public class RequestImpl implements Request {
         fileParameterMap_ = fileParameterMap;
     }
 
+    public AttributeContainer getAttributeContainer() {
+
+        return attributeContainer_;
+    }
+
+    public void setAttributeContainer(AttributeContainer attributeContainer) {
+
+        attributeContainer_ = attributeContainer;
+    }
+
+    public String getComponentName() {
+
+        return componentName_;
+    }
+
+    public void setComponentName(String componentName) {
+
+        componentName_ = componentName;
+    }
+
+    public String getActionName() {
+
+        return actionName_;
+    }
+
+    public void setActionName(String actionName) {
+
+        actionName_ = actionName;
+    }
+
     public String getPathInfo() {
 
         return pathInfo_;
@@ -175,5 +220,31 @@ public class RequestImpl implements Request {
     public void setPathInfo(String pathInfo) {
 
         pathInfo_ = pathInfo;
+    }
+
+    public Object getDefaultReturnValue() {
+
+        return defaultReturnValue_;
+    }
+
+    public void setDefaultReturnValue(Object defaultReturnValue) {
+
+        defaultReturnValue_ = defaultReturnValue;
+    }
+
+    public Object getAttribute(String name) {
+        return attributeContainer_.getAttribute(name);
+    }
+
+    public Enumeration getAttributeNames() {
+        return attributeContainer_.getAttributeNames();
+    }
+
+    public void removeAttribute(String name) {
+        attributeContainer_.removeAttribute(name);
+    }
+
+    public void setAttribute(String name, Object value) {
+        attributeContainer_.setAttribute(name, value);
     }
 }

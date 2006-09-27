@@ -1,24 +1,23 @@
 package org.seasar.cms.ymir.impl;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.ResponsePathNormalizer;
-import org.seasar.cms.ymir.util.ServletUtils;
 
 public class DefaultResponsePathNormalizer implements ResponsePathNormalizer {
 
-    public String normalize(String path, boolean redirect,
-            HttpServletRequest request) {
+    public String normalize(String path, Request request) {
+        return path;
+    }
+
+    public String normalizeForRedirection(String path, Request request) {
         if (path == null) {
             return null;
         }
 
-        if (redirect) {
-            if (path.startsWith("/") || path.length() == 0) {
-                path = ServletUtils.getContextPath(request) + path;
-                if ("".equals(path)) {
-                    path = "/";
-                }
+        if (path.startsWith("/") || path.length() == 0) {
+            path = request.getContextPath() + path;
+            if ("".equals(path)) {
+                path = "/";
             }
         }
 

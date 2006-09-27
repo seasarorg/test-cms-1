@@ -10,6 +10,11 @@ public class ForwardResponse extends TransitionResponse {
         super(path);
     }
 
+    public String toString() {
+
+        return "forward:" + getPath();
+    }
+
     public int getType() {
 
         return TYPE_FORWARD;

@@ -11,10 +11,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponsePathNormalizer;
 import org.seasar.cms.ymir.ResponseProcessor;
-import org.seasar.cms.ymir.util.ServletUtils;
 
 public class DefaultResponseProcessor implements ResponseProcessor {
 
@@ -24,7 +24,8 @@ public class DefaultResponseProcessor implements ResponseProcessor {
 
     public boolean process(ServletContext context,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-            Response response) throws IOException, ServletException {
+            Request request, Response response) throws IOException,
+            ServletException {
 
         if (response.getStatus() != Response.STATUS_UNDEFINED) {
             httpResponse.setStatus(response.getStatus());
@@ -38,22 +39,13 @@ public class DefaultResponseProcessor implements ResponseProcessor {
             return true;
 
         case Response.TYPE_FORWARD:
-            context.getRequestDispatcher(
-                    responsePathNormalizer_.normalize(response.getPath(),
-                            false, httpRequest)).forward(httpRequest,
-                    httpResponse);
+            context.getRequestDispatcher(response.getPath()).forward(
+                    httpRequest, httpResponse);
             return false;
 
         case Response.TYPE_REDIRECT:
-            String path = response.getPath();
-            if (path.startsWith("/")) {
-                path = ServletUtils.getContextPath(httpRequest) + path;
-                if ("".equals(path)) {
-                    path = "/";
-                }
-            }
-            httpResponse.sendRedirect(responsePathNormalizer_.normalize(
-                    response.getPath(), true, httpRequest));
+            httpResponse.sendRedirect(responsePathNormalizer_
+                    .normalizeForRedirection(response.getPath(), request));
             return false;
 
         case Response.TYPE_SELF_CONTAINED:

@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
@@ -15,6 +14,7 @@ import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
+import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.AttributeHandler;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.MatchedPathMapping;
@@ -23,6 +23,7 @@ import org.seasar.cms.ymir.PathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.ResponsePathNormalizer;
 import org.seasar.cms.ymir.Updater;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
@@ -54,6 +55,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private AnnotationHandler annotationHandler_ = new DefaultAnnotationHandler();
 
+    private ResponsePathNormalizer responsePathNormalizer_ = new DefaultResponsePathNormalizer();
+
     private final BeanUtilsBean beanUtilsBean_;
 
     private ThreadContext threadContext_;
@@ -70,8 +73,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 new PropertyUtilsBean());
     }
 
-    public Response process(String contextPath, String path, String method,
-            String dispatcher, Map parameterMap, Map fileParameterMap)
+    public Request prepareForProcessing(String contextPath, String path,
+            String method, String dispatcher, Map parameterMap,
+            Map fileParameterMap, AttributeContainer attributeContainer)
             throws PageNotFoundException {
 
         boolean underDevelopment = Configuration.PROJECTSTATUS_DEVELOP
@@ -83,32 +87,16 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         MatchedPathMapping matched = findMatchedPathMapping(path, method);
         if (matched == null) {
-            return PassthroughResponse.INSTANCE;
+            return null;
         }
         if (matched.isDenied() && Request.DISPATCHER_REQUEST.equals(dispatcher)) {
             throw new PageNotFoundException(path);
         }
 
-        String componentName = matched.getComponentName();
-        String actionName = matched.getActionName();
-        Request request = new RequestImpl(contextPath, path, method,
-                dispatcher, parameterMap, fileParameterMap, matched
-                        .getPathInfo());
-
-        Response response = processRequest(request, componentName, actionName,
-                matched.getDefaultReturnValue());
-
-        if (underDevelopment) {
-            for (int i = 0; i < updaters_.length; i++) {
-                Response newResponse = updaters_[i].update(path, method,
-                        request, response);
-                if (newResponse != response) {
-                    return newResponse;
-                }
-            }
-        }
-
-        return response;
+        return new RequestImpl(contextPath, path, method, dispatcher,
+                parameterMap, fileParameterMap, attributeContainer, matched
+                        .getComponentName(), matched.getActionName(), matched
+                        .getPathInfo(), matched.getDefaultReturnValue());
     }
 
     String correctMethod(String method, Map parameterMap) {
@@ -131,12 +119,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return path;
     }
 
-    public Object backupForInclusion() {
-        return getHttpServletRequest().getAttribute(ATTR_PAGE);
+    public Object backupForInclusion(AttributeContainer attributeContainer) {
+        return attributeContainer.getAttribute(ATTR_PAGE);
     }
 
-    public void restoreForInclusion(Object backupped) {
-        getHttpServletRequest().setAttribute(ATTR_PAGE, backupped);
+    public void restoreForInclusion(AttributeContainer attributeContainer,
+            Object backupped) {
+        attributeContainer.setAttribute(ATTR_PAGE, backupped);
     }
 
     Application getApplication() {
@@ -184,8 +173,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return null;
     }
 
-    Response processRequest(Request request, String componentName,
-            String actionName, Object defaultReturnValue) {
+    public Response process(Request request) {
 
         // dispatchがREQUESTの時は、
         // ・pathに対応するcomponentがあればactionを実行する。actionの実行結果が
@@ -196,58 +184,85 @@ public class DefaultRequestProcessor implements RequestProcessor {
         // ・responseがリクエストパスへのforwardである場合はpassthroughをresponseとする。
         // ・最終的なresponseがpassthroughでかつcomponentがあれば、レンダリングのための
         //   メソッドを呼び出す。
-        // ・最終的なresponseがforwardでかつforward先に対応するコンポーネントが存在しない場合は
+        // ・最終的なresponseがforwardである場合、forward先に対応するコンポーネント名がないか
+        //   対応するコンポーネント名が元々のcomponentの名前と一致するならば
         //   レンダリングのためのメソッドを呼び出す。
         // dispatchがREQUESTでない時は、
-        // ・pathに対応するcomponentがあればレンダリングのためのメソッドを呼び出す。
+        // ・pathに対応するcomponentがあって、それがリクエスト時のcomponentと一致しないならば
+        //   レンダリングのためのメソッドを呼び出す。
 
-        Response response = PassthroughResponse.INSTANCE;
+        if (request == null) {
+            return PassthroughResponse.INSTANCE;
+        }
 
         Object component = null;
         S2Container s2container = getS2Container();
-        if (s2container.hasComponentDef(componentName)) {
+        if (s2container.hasComponentDef(request.getComponentName())) {
             ThreadContext context = getThreadContext();
             try {
                 context.setComponent(Request.class, request);
-                component = s2container.getComponent(componentName);
+                component = s2container
+                        .getComponent(request.getComponentName());
             } finally {
                 context.setComponent(Request.class, null);
             }
         }
 
-        if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
-            if (component != null) {
+        Response response = null;
+        boolean rendered = false;
+        if (component != null) {
+            if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
                 prepareForComponent(component, request);
 
-                response = normalizeResponse(invokeAction(component,
-                        actionName, ACTION_DEFAULT, defaultReturnValue),
-                        request.getPath());
+                response = normalizeResponse(invokeAction(component, request
+                        .getActionName(), ACTION_DEFAULT, request
+                        .getDefaultReturnValue()), request);
 
-                if (shouldRender(response)) {
+                if (shouldRender(response, request.getComponentName())) {
                     // 画面描画のためのAction呼び出しを行なう。
                     invokeAction(component, ACTION_RENDER, null, null);
+                    rendered = true;
                 }
 
-                finishForComponent(component);
+                finishForComponent(component, request);
             } else {
-                response = normalizeResponse(constructResponseFromReturnValue(
-                        null, defaultReturnValue), request.getPath());
-            }
-        } else {
-            if (component != null) {
-                prepareForComponent(component, request);
+                if (component != getRequestComponent(request)) {
+                    // 画面描画のためのAction呼び出しをまだ行なっていないので行なう。
 
-                // 画面描画のためのAction呼び出しを行なう。
-                invokeAction(component, ACTION_RENDER, null, null);
+                    prepareForComponent(component, request);
 
-                finishForComponent(component);
+                    invokeAction(component, ACTION_RENDER, null, null);
+                    rendered = true;
+
+                    finishForComponent(component, request);
+                }
             }
         }
+        if (response == null) {
+            response = normalizeResponse(constructResponseFromReturnValue(
+                    component, request.getDefaultReturnValue()), request);
+        }
 
+        boolean underDevelopment = Configuration.PROJECTSTATUS_DEVELOP
+                .equals(getProjectStatus())
+                && getApplication().isUnderDevelopment();
+        if (underDevelopment && rendered) {
+            for (int i = 0; i < updaters_.length; i++) {
+                Response newResponse = updaters_[i].update(request, response);
+                if (newResponse != response) {
+                    return newResponse;
+                }
+            }
+        }
+        System.out.println("RESPONSE=" + response);
         return response;
     }
 
-    boolean shouldRender(Response response) {
+    Object getRequestComponent(Request request) {
+        return request.getAttribute(ATTR_PAGE);
+    }
+
+    boolean shouldRender(Response response, String componentName) {
 
         if (response.getType() == Response.TYPE_PASSTHROUGH) {
             return true;
@@ -256,10 +271,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (response.getType() == Response.TYPE_FORWARD) {
             MatchedPathMapping matched = findMatchedPathMapping(response
                     .getPath(), Request.METHOD_GET);
-            if (matched == null
-                    || matched.isDenied()
-                    || !getS2Container().hasComponentDef(
-                            matched.getComponentName())) {
+            if (matched == null || matched.getComponentName() == componentName) {
                 return true;
             }
         }
@@ -292,21 +304,28 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
-    void finishForComponent(Object component) {
+    void finishForComponent(Object component, Request request) {
         // 各コンテキストに属性をoutjectする。
         outjectContextAttributes(component);
 
-        // コンポーネント自体をrequestにバインドしておく。
-        getHttpServletRequest().setAttribute(ATTR_PAGE, component);
+        // コンポーネント自体をattributeとしてバインドしておく。
+        request.setAttribute(ATTR_PAGE, component);
     }
 
-    Response normalizeResponse(Response response, String path) {
-        if (response.getType() == Response.TYPE_FORWARD
-                && path.equals(response.getPath())) {
-            return PassthroughResponse.INSTANCE;
-        } else {
-            return response;
+    Response normalizeResponse(Response response, Request request) {
+
+        int type = response.getType();
+        if (type == Response.TYPE_FORWARD || type == Response.TYPE_REDIRECT) {
+            String normalized = responsePathNormalizer_.normalize(response
+                    .getPath(), request);
+            if (type == Response.TYPE_FORWARD
+                    && request.getPath().equals(normalized)) {
+                return PassthroughResponse.INSTANCE;
+            }
+            response.setPath(normalized);
         }
+
+        return response;
     }
 
     void injectContextAttributes(Object component) {
@@ -331,12 +350,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     ThreadContext.class);
         }
         return threadContext_;
-    }
-
-    HttpServletRequest getHttpServletRequest() {
-
-        return (HttpServletRequest) getRootS2Container().getComponent(
-                HttpServletRequest.class);
     }
 
     Response invokeAction(Object component, String actionName,
@@ -448,5 +461,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public void setAnnotationHandler(AnnotationHandler annotationHandler) {
 
         annotationHandler_ = annotationHandler;
+    }
+
+    public void setResponsePathNormalizer(
+            ResponsePathNormalizer responsePathNormalizer) {
+        responsePathNormalizer_ = responsePathNormalizer;
     }
 }

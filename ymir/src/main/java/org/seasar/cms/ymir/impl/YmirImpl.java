@@ -8,8 +8,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.PageNotFoundException;
+import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseProcessor;
@@ -42,20 +44,28 @@ public class YmirImpl implements Ymir {
         }
     }
 
-    public Response processRequest(String contextPath, String path,
+    public Request prepareForProcessing(String contextPath, String path,
             String method, String dispatcher, Map parameterMap,
-            Map fileParameterMap) throws PageNotFoundException {
+            Map fileParameterMap, AttributeContainer attributeContainer)
+            throws PageNotFoundException {
 
-        return requestProcessor_.process(contextPath, path, method, dispatcher,
-                parameterMap, fileParameterMap);
+        return requestProcessor_.prepareForProcessing(contextPath, path,
+                method, dispatcher, parameterMap, fileParameterMap,
+                attributeContainer);
+    }
+
+    public Response processRequest(Request request) {
+
+        return requestProcessor_.process(request);
     }
 
     public boolean processResponse(ServletContext servletContext,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-            Response response) throws IOException, ServletException {
+            Request request, Response response) throws IOException,
+            ServletException {
 
         return responseProcessor_.process(servletContext, httpRequest,
-                httpResponse, response);
+                httpResponse, request, response);
     }
 
     public void destroy() {
@@ -83,14 +93,15 @@ public class YmirImpl implements Ymir {
         }
     }
 
-    public Object backupForInclusion() {
+    public Object backupForInclusion(AttributeContainer attributeContainer) {
 
-        return requestProcessor_.backupForInclusion();
+        return requestProcessor_.backupForInclusion(attributeContainer);
     }
 
-    public void restoreForInclusion(Object backupped) {
+    public void restoreForInclusion(AttributeContainer attributeContainer,
+            Object backupped) {
 
-        requestProcessor_.restoreForInclusion(backupped);
+        requestProcessor_.restoreForInclusion(attributeContainer, backupped);
     }
 
     public void setLifecycleListeners(LifecycleListener[] lifecycleListeners) {

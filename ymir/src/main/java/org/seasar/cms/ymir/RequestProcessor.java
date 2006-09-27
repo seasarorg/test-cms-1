@@ -4,11 +4,15 @@ import java.util.Map;
 
 public interface RequestProcessor {
 
-    Response process(String contextPath, String path, String method,
-            String dispatcher, Map parameterMap, Map fileParameterMap)
+    Request prepareForProcessing(String contextPath, String path,
+            String method, String dispatcher, Map parameterMap,
+            Map fileParameterMap, AttributeContainer attributeContainer)
             throws PageNotFoundException;
 
-    Object backupForInclusion();
+    Response process(Request request);
 
-    void restoreForInclusion(Object backupped);
+    Object backupForInclusion(AttributeContainer attributeContainer);
+
+    void restoreForInclusion(AttributeContainer attributeContainer,
+            Object backupped);
 }

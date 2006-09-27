@@ -1,8 +1,8 @@
 package org.seasar.cms.ymir;
 
-import javax.servlet.http.HttpServletRequest;
-
 public interface ResponsePathNormalizer {
 
-    String normalize(String path, boolean redirect, HttpServletRequest request);
+    String normalize(String path, Request request);
+
+    String normalizeForRedirection(String path, Request request);
 }

@@ -31,12 +31,17 @@ public class SelfContainedResponse extends ResponseBase {
         if (content != null) {
             try {
                 setInputStream(new ByteArrayInputStream(content
-                    .getBytes("UTF-8")));
+                        .getBytes("UTF-8")));
             } catch (UnsupportedEncodingException ex) {
                 throw new RuntimeException("Can't happen!");
             }
             setContentType("text/html; charset=UTF-8");
         }
+    }
+
+    public String toString() {
+
+        return "(self-contained)";
     }
 
     public int getType() {

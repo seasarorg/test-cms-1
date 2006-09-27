@@ -19,6 +19,7 @@ import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Ymir;
+import org.seasar.cms.ymir.impl.HttpServletRequestAttributeContainer;
 import org.seasar.cms.ymir.util.ServletUtils;
 
 public class YmirFilter implements Filter {
@@ -63,27 +64,30 @@ public class YmirFilter implements Filter {
         } else {
             fileParameterMap = new HashMap();
         }
+        HttpServletRequestAttributeContainer attributeContainer = new HttpServletRequestAttributeContainer(
+                httpRequest);
 
         Object backupped = null;
         if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
-            backupped = ymir_.backupForInclusion();
+            backupped = ymir_.backupForInclusion(attributeContainer);
         }
         try {
-            Response response = ymir_.processRequest(ServletUtils
+            Request request = ymir_.prepareForProcessing(ServletUtils
                     .getContextPath(httpRequest), ServletUtils
                     .getPath(httpRequest), httpRequest.getMethod()
                     .toUpperCase(), dispatcher_, httpRequest.getParameterMap(),
-                    fileParameterMap);
+                    fileParameterMap, attributeContainer);
+            Response response = ymir_.processRequest(request);
 
             if (ymir_.processResponse(context_, httpRequest, httpResponse,
-                    response)) {
+                    request, response)) {
                 chain.doFilter(httpRequest, httpResponse);
             }
         } catch (PageNotFoundException ex) {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
         } finally {
             if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
-                ymir_.restoreForInclusion(backupped);
+                ymir_.restoreForInclusion(attributeContainer, backupped);
             }
         }
     }

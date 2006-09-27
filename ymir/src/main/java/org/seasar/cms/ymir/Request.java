@@ -3,7 +3,7 @@ package org.seasar.cms.ymir;
 import java.util.Iterator;
 import java.util.Map;
 
-public interface Request {
+public interface Request extends AttributeContainer {
 
     String METHOD_CONNECT = "CONNECT";
 
@@ -77,7 +77,23 @@ public interface Request {
 
     void setFileParameterMap(Map parameterMap);
 
+    AttributeContainer getAttributeContainer();
+
+    void setAttributeContainer(AttributeContainer attributeContainer);
+
+    String getComponentName();
+
+    void setComponentName(String componentName);
+
+    String getActionName();
+
+    void setActionName(String actionName);
+
     String getPathInfo();
 
     void setPathInfo(String pathInfo);
+
+    Object getDefaultReturnValue();
+
+    void setDefaultReturnValue(Object defaultReturnValue);
 }

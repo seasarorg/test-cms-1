@@ -1,6 +1,5 @@
 package org.seasar.cms.ymir.impl;
 
-
 abstract public class TransitionResponse extends ResponseBase {
 
     protected String path_;
