@@ -254,7 +254,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 }
             }
         }
-        System.out.println("RESPONSE=" + response);
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("RESPONSE=" + response);
+        }
         return response;
     }
 
@@ -355,11 +357,19 @@ public class DefaultRequestProcessor implements RequestProcessor {
     Response invokeAction(Object component, String actionName,
             String defaultActionName, Object defaultReturnValue) {
 
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("[1]INVOKE: " + component.getClass().getName() + "#"
+                    + actionName);
+        }
         Response response = PassthroughResponse.INSTANCE;
 
         Method method = getActionMethod(component, actionName);
         if (method == null && defaultActionName != null) {
             method = getActionMethod(component, defaultActionName);
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("[2]INVOKE: " + component.getClass().getName()
+                        + "#" + defaultActionName);
+            }
         }
         if (method != null) {
             Object returnValue;
@@ -379,6 +389,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (response == PassthroughResponse.INSTANCE) {
             response = constructResponseFromReturnValue(component,
                     defaultReturnValue);
+        }
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("[3]RESPONSE: " + response);
         }
 
         return response;

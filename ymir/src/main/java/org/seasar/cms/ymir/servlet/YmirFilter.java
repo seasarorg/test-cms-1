@@ -74,8 +74,8 @@ public class YmirFilter implements Filter {
         try {
             Request request = ymir_.prepareForProcessing(ServletUtils
                     .getContextPath(httpRequest), ServletUtils
-                    .getPath(httpRequest), httpRequest.getMethod()
-                    .toUpperCase(), dispatcher_, httpRequest.getParameterMap(),
+                    .getPath(httpRequest), httpRequest.getMethod(),
+                    dispatcher_, httpRequest.getParameterMap(),
                     fileParameterMap, attributeContainer);
             Response response = ymir_.processRequest(request);
 

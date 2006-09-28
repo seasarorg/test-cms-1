@@ -49,8 +49,8 @@ public class YmirImpl implements Ymir {
             Map fileParameterMap, AttributeContainer attributeContainer)
             throws PageNotFoundException {
 
-        return requestProcessor_.prepareForProcessing(contextPath, path,
-                method, dispatcher, parameterMap, fileParameterMap,
+        return requestProcessor_.prepareForProcessing(contextPath, path, method
+                .toUpperCase(), dispatcher, parameterMap, fileParameterMap,
                 attributeContainer);
     }
 
