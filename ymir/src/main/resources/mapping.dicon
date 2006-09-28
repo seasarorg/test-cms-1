@@ -9,22 +9,22 @@
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
     <arg>"^$"</arg>
-    <arg>"DefaultPage"</arg>
+    <arg>"_RootPage"</arg>
     <arg>"_${method}"</arg>
     <arg>""</arg>
     <arg>null</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
-    <arg>"^/([^/]+)\\.(.+)$"</arg>
+    <arg>"^/([a-zA-Z][^/]*)\\.(.+)$"</arg>
     <arg>"${1}Page"</arg>
     <arg>"_${method}"</arg>
     <arg>""</arg>
     <arg>"/${1}.html"</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
-    <arg>"^/([^/]+)/([^/]+)\\.(.+)$"</arg>
+    <arg>"^/([a-zA-Z][^/]*)/([a-zA-Z][^/]*)\\.(.+)$"</arg>
     <arg>"${1}Page"</arg>
-    <arg>"_${method}${2u}"</arg>
+    <arg>"_${2l}By${Method}"</arg>
     <arg>""</arg>
     <arg>"redirect:/${1}.html"</arg>
   </component>

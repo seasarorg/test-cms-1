@@ -130,8 +130,9 @@ public class PathMappingImpl implements PathMapping {
             prop.put("`", path.substring(0, matcher.start()));
             prop.put("&", path.substring(matcher.start(), matcher.end()));
             prop.put("'", path.substring(matcher.end()));
-            prop.put("method", method.toLowerCase());
-            prop.put("Method", upper(method));
+            String lmethod = method.toLowerCase();
+            prop.put("method", lmethod);
+            prop.put("Method", upper(lmethod));
 
             return new MapVariableResolver(prop);
         } else {
