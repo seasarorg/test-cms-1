@@ -22,13 +22,8 @@
       </arg>
     </initMethod>
   </component>
-  <component
-    class="org.seasar.framework.container.hotdeploy.creator.PageOndemandCreator">
-    <property name="autoBindingDef">
-      @org.seasar.framework.container.assembler.AutoBindingDefFactory@AUTO
-    </property>
-    <property name="externalBinding">false</property>
-  </component>
+  <component class="org.seasar.cms.ymir.creator.PageCreator" />
+  <component class="org.seasar.cms.ymir.creator.DtoCreator" />
   <component name="daoOndemandCreatorInterceptor"
     class="org.seasar.framework.aop.interceptors.InterceptorChain"
     instance="prototype">
@@ -39,8 +34,7 @@
       <arg>dao.interceptor</arg>
     </initMethod>
   </component>
-  <component
-    class="org.seasar.framework.container.hotdeploy.creator.DaoOndemandCreator">
+  <component class="org.seasar.cms.ymir.creator.DaoCreator">
     <initMethod name="setDaoCustomizer">
       <arg>
         <component
@@ -53,8 +47,7 @@
       </arg>
     </initMethod>
   </component>
-  <component
-    class="org.seasar.framework.container.hotdeploy.creator.DxoOndemandCreator">
+  <component class="org.seasar.cms.ymir.creator.DxoCreator">
     <initMethod name="setDxoCustomizer">
       <arg>
         <component

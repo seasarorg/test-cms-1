@@ -15,14 +15,14 @@
     <arg>null</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
-    <arg>"^/([a-zA-Z][^/]*)\\.(.+)$"</arg>
+    <arg>"^/([a-zA-Z][a-zA-Z0-9]*)\\.(.+)$"</arg>
     <arg>"${1}Page"</arg>
     <arg>"_${method}"</arg>
     <arg>""</arg>
     <arg>"/${1}.html"</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
-    <arg>"^/([a-zA-Z][^/]*)/([a-zA-Z][^/]*)\\.(.+)$"</arg>
+    <arg>"^/([a-zA-Z][a-zA-Z0-9]*)/([a-zA-Z][a-zA-Z0-9]*)\\.(.+)$"</arg>
     <arg>"${1}Page"</arg>
     <arg>"_${2l}By${Method}"</arg>
     <arg>""</arg>
