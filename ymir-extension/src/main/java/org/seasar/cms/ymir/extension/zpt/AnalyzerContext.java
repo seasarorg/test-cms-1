@@ -100,21 +100,30 @@ public class AnalyzerContext extends ZptTemplateContext {
         classDescMap_ = classDescMap;
     }
 
-    public ClassDesc getTemporaryClassDesc(String className) {
+    public ClassDesc getTemporaryClassDesc(String name) {
 
-        int dot = className.lastIndexOf('.');
+        String className;
+        int dot = name.lastIndexOf('.');
         if (dot < 0) {
             if (usingFreyjaRenderClasses_) {
-                String renderClassName = "net.skirnir.freyja.render.html."
-                        + capFirst(className) + "Tag";
-                if ((sourceCreator_.getClass(renderClassName) != null)) {
+                String renderClassName = "net.skirnir.freyja.render."
+                        + capFirst(name);
+                if (isAvailable(renderClassName)) {
                     className = renderClassName;
                 } else {
-                    className = toClassName(className);
+                    renderClassName = "net.skirnir.freyja.render.html."
+                            + capFirst(name) + "Tag";
+                    if (isAvailable(renderClassName)) {
+                        className = renderClassName;
+                    } else {
+                        className = toClassName(name);
+                    }
                 }
             } else {
-                className = toClassName(className);
+                className = toClassName(name);
             }
+        } else {
+            className = name;
         }
         ClassDesc classDesc = (ClassDesc) temporaryClassDescMap_.get(className);
         if (classDesc == null) {
@@ -122,6 +131,11 @@ public class AnalyzerContext extends ZptTemplateContext {
             temporaryClassDescMap_.put(className, classDesc);
         }
         return classDesc;
+    }
+
+    boolean isAvailable(String className) {
+
+        return (sourceCreator_.getClass(className) != null);
     }
 
     public String toClassName(String componentName) {
