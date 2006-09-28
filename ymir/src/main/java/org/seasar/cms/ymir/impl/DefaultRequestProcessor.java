@@ -243,6 +243,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     component, request.getDefaultReturnValue()), request);
         }
 
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("FINAL RESPONSE: " + response);
+        }
+
         boolean underDevelopment = Configuration.PROJECTSTATUS_DEVELOP
                 .equals(getProjectStatus())
                 && getApplication().isUnderDevelopment();
@@ -254,9 +258,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 }
             }
         }
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("RESPONSE=" + response);
-        }
+
         return response;
     }
 
@@ -273,8 +275,23 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (response.getType() == Response.TYPE_FORWARD) {
             MatchedPathMapping matched = findMatchedPathMapping(response
                     .getPath(), Request.METHOD_GET);
-            if (matched == null || matched.getComponentName() == componentName) {
+            if (matched == null
+                    || componentName.equals(matched.getComponentName())) {
                 return true;
+            } else {
+                if (logger_.isDebugEnabled()) {
+                    logger_
+                            .debug("NOT RENDER because component is different: target component="
+                                    + componentName
+                                    + ", next component="
+                                    + matched.getComponentName());
+                }
+            }
+        } else {
+            if (logger_.isDebugEnabled()) {
+                logger_
+                        .debug("NOT RENDER because response directs to transit to different page: response="
+                                + response);
             }
         }
         return false;
