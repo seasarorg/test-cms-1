@@ -24,6 +24,14 @@ import net.skirnir.freyja.zpt.ZptTemplateContext;
 
 public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 
+    public String[] getSpecialTagPatternStrings() {
+        return new String[] { "form", "input", "select", "textarea" };
+    }
+
+    public TemplateContext newContext() {
+        return new AnalyzerContext();
+    }
+
     public String evaluate(TemplateContext context, String name,
             Attribute[] attrs, Element[] body) {
 

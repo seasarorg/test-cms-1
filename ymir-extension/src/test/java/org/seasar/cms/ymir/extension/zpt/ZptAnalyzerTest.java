@@ -18,6 +18,10 @@ import org.seasar.cms.ymir.impl.ApplicationManagerImpl;
 import org.seasar.cms.ymir.mock.MockApplication;
 import org.seasar.framework.convention.impl.NamingConventionImpl;
 
+import com.example.dto.SaruDto;
+
+import net.skirnir.freyja.TemplateContext;
+
 public class ZptAnalyzerTest extends TestCase {
 
     private static final String CLASSNAME = "com.example.web.IndexPage";
@@ -32,6 +36,19 @@ public class ZptAnalyzerTest extends TestCase {
             @Override
             boolean isUsingFreyjaRenderClasses() {
                 return false;
+            }
+
+            @Override
+            AnalyzerTalTagEvaluator newAnalyzerTalTagEvaluator() {
+                return new AnalyzerTalTagEvaluator() {
+                    @Override
+                    public TemplateContext newContext() {
+                        TemplateContext context = super.newContext();
+                        context.getVariableResolver().setVariable("saru",
+                                new SaruDto());
+                        return context;
+                    }
+                };
             }
         };
         SourceCreatorImpl creator = new SourceCreatorImpl() {
@@ -285,5 +302,23 @@ public class ZptAnalyzerTest extends TestCase {
         cd = getClassDesc("com.example.dto.EntityDto");
         assertNotNull("プロパティを持つ変数の型が生成されていること", cd);
         assertNotNull("Dto型がプロパティを持つこと", cd.getPropertyDesc("content"));
+    }
+
+    public void testAnalyze15() throws Exception {
+
+        act("testAnalyze15");
+
+        assertNull(
+                "組み込み変数など、VariableResolverから元々取得可能な変数に対応するClassDescは生成されないこと",
+                getClassDesc("com.example.dto.RepeatDto"));
+    }
+
+    public void testAnalyze16() throws Exception {
+
+        act("testAnalyze16");
+
+        assertNotNull(
+                "VariableResolverから取得可能であっても、クラスの属するパッケージが自動生成対象である場合はClassDescが生成されること",
+                getClassDesc("com.example.dto.SaruDto"));
     }
 }

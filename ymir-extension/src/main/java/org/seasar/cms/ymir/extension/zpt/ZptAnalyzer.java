@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,61 +18,52 @@ import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
 
+import net.skirnir.freyja.ExpressionEvaluator;
 import net.skirnir.freyja.IllegalSyntaxException;
-import net.skirnir.freyja.TemplateContext;
+import net.skirnir.freyja.TagEvaluator;
+import net.skirnir.freyja.TagEvaluatorWrapper;
 import net.skirnir.freyja.TemplateEvaluator;
-import net.skirnir.freyja.VariableResolver;
+import net.skirnir.freyja.webapp.ServletVariableResolverFactory;
+import net.skirnir.freyja.webapp.VariableResolverFactory;
 import net.skirnir.freyja.zpt.MetalTagEvaluator;
+import net.skirnir.freyja.zpt.TalTagEvaluator;
 import net.skirnir.freyja.zpt.tales.BeanPathResolver;
+import net.skirnir.freyja.zpt.tales.TalesExpressionEvaluator;
 import net.skirnir.freyja.zpt.webapp.ServletTalesExpressionEvaluator;
 
 public class ZptAnalyzer implements TemplateAnalyzer {
 
-    private TemplateEvaluator evaluator_ = new TemplateEvaluator(
-            new MetalTagEvaluator(new AnalyzerTalTagEvaluator()) {
-                public String[] getSpecialTagPatternStrings() {
-                    return new String[] { "form", "input", "select", "textarea" };
-                }
+    private static final ServletContext MOCK_SERVLETCONTEXT = new MockServletContextImpl(
+            "/") {
+        private static final long serialVersionUID = 0;
 
-                public TemplateContext newContext() {
-                    return new AnalyzerContext();
-                }
-            }, new ServletTalesExpressionEvaluator() {
-                public HttpServletRequest getRequest(
-                        VariableResolver varResolver) {
-                    return new MockHttpServletRequestImpl(
-                            new MockServletContextImpl("/") {
-                                private static final long serialVersionUID = -4251298552610359164L;
+        public String getServletContextName() {
+            return "";
+        }
+    };
 
-                                public String getServletContextName() {
-                                    return "";
-                                }
-                            }, "/");
-                }
+    private static final HttpServletRequest MOCK_REQUEST = new MockHttpServletRequestImpl(
+            MOCK_SERVLETCONTEXT, "/");
 
-                public HttpServletResponse getResponse(
-                        VariableResolver varResolver) {
-                    return new MockHttpServletResponseImpl(
-                            new MockHttpServletRequestImpl(
-                                    new MockServletContextImpl("/"), "/"));
-                }
+    private static final HttpServletResponse MOCK_RESPONSE = new MockHttpServletResponseImpl(
+            MOCK_REQUEST);
 
-                public String getResponseEncoding() {
-                    return "UTF-8";
-                }
+    private TemplateEvaluator evaluator_;
 
-            }.addTypePrefix("not", new AnalyzerNotTypePrefixHandler())
-                    .addTypePrefix(
-                            "path",
-                            new AnalyzerPathTypePrefixHandler('/')
-                                    .addPathResolver(new BeanPathResolver()),
-                            true));
+    private VariableResolverFactory vrf_;
 
     private SourceCreator sourceCreator_;
 
     private AnalyzerTemplateSet templateSet_;
 
     private TemplatePathNormalizer templatePathNormalizer_ = new DefaultTemplatePathNormalizer();
+
+    public ZptAnalyzer() {
+
+        setTemplateEvaluator(new TemplateEvaluator(new MetalTagEvaluator(
+                new TalTagEvaluator()), new ServletTalesExpressionEvaluator()));
+        setVariableResolverFactory(new ServletVariableResolverFactory());
+    }
 
     public void analyze(String path, String method,
             Map<String, ClassDesc> classDescMap, InputStream inputStream,
@@ -87,6 +79,9 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         context.setClassDescMap(classDescMap);
         context.setPageClassName(className);
         context.setUsingFreyjaRenderClasses(isUsingFreyjaRenderClasses());
+        context.setVariableResolver(vrf_.newResolver(MOCK_REQUEST,
+                MOCK_RESPONSE, MOCK_SERVLETCONTEXT, null));
+
         try {
             evaluator_.evaluate(context, new InputStreamReader(inputStream,
                     encoding));
@@ -110,6 +105,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
     }
 
     boolean isUsingFreyjaRenderClasses() {
+
         return "true".equals(sourceCreator_.getApplication().getProperty(
                 Globals.APPKEY_SOURCECREATOR_USEFREYJARENDERCLASSES));
     }
@@ -123,6 +119,48 @@ public class ZptAnalyzer implements TemplateAnalyzer {
 
     public void setTemplatePathNormalizer(
             TemplatePathNormalizer templatePathNormalizer) {
+
         templatePathNormalizer_ = templatePathNormalizer;
+    }
+
+    /**
+     * テンプレートの解析に用いるTemplateEvaluatorを設定します。
+     * <p>指定されたTemplateEvaluatorオブジェクトは状態を変更されますので、
+     * 外部で共用することは避けるべきです。
+     * 必ず実際に使うTemplateEvaluatorオブジェクトの複製を渡すようにして下さい。
+     * </p>
+     *
+     * @param templateEvaluator TemplateEvaluatorオブジェクト。
+     * nullを指定することはできません。
+     */
+    public void setTemplateEvaluator(TemplateEvaluator templateEvaluator) {
+
+        TagEvaluator tagEvaluator = templateEvaluator.getTagEvaluator();
+        if (tagEvaluator instanceof TagEvaluatorWrapper) {
+            ((TagEvaluatorWrapper) tagEvaluator)
+                    .setTagEvaluator(newAnalyzerTalTagEvaluator());
+        } else {
+            tagEvaluator = newAnalyzerTalTagEvaluator();
+        }
+        ExpressionEvaluator expressionEvaluator = templateEvaluator
+                .getExpressionEvaluator();
+        if (expressionEvaluator instanceof TalesExpressionEvaluator) {
+            ((TalesExpressionEvaluator) expressionEvaluator).addTypePrefix(
+                    "not", new AnalyzerNotTypePrefixHandler()).addTypePrefix(
+                    "path",
+                    new AnalyzerPathTypePrefixHandler('/')
+                            .addPathResolver(new BeanPathResolver()), true);
+        }
+        evaluator_ = new TemplateEvaluator(tagEvaluator, expressionEvaluator);
+    }
+
+    AnalyzerTalTagEvaluator newAnalyzerTalTagEvaluator() {
+
+        return new AnalyzerTalTagEvaluator();
+    }
+
+    public void setVariableResolverFactory(VariableResolverFactory vrf) {
+
+        vrf_ = vrf;
     }
 }

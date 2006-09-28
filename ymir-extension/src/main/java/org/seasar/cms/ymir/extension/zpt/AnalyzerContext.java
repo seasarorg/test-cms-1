@@ -11,7 +11,6 @@ import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
-import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
 
 public class AnalyzerContext extends ZptTemplateContext {
@@ -21,8 +20,6 @@ public class AnalyzerContext extends ZptTemplateContext {
     private static final char STR_ARRAY_LPAREN = '[';
 
     private static final char CHAR_ARRAY_RPAREN = ']';
-
-    private VariableResolver variableResolver_;
 
     private SourceCreator sourceCreator_;
 
@@ -42,18 +39,8 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private String rootPackageName_;
 
-    public AnalyzerContext() {
-
-        variableResolver_ = new AnalyzerVariableResolver(super
-                .getVariableResolver());
-    }
-
     public void setUsingFreyjaRenderClasses(boolean usingFreyjaRenderClasses) {
         usingFreyjaRenderClasses_ = usingFreyjaRenderClasses;
-    }
-
-    public VariableResolver getVariableResolver() {
-        return variableResolver_;
     }
 
     public void defineVariable(int scope, String name, Object value) {

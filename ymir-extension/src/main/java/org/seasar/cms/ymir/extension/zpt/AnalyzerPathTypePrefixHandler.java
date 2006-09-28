@@ -5,11 +5,10 @@ import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
+import net.skirnir.freyja.VariableResolverUtils;
 import net.skirnir.freyja.zpt.tales.PathTypePrefixHandler;
 
 public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
-
-    private static final String VARNAME_SLOT = "slot";
 
     public AnalyzerPathTypePrefixHandler(char pathExpDelim) {
 
@@ -19,13 +18,27 @@ public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
     protected Object getProperty(TemplateContext context,
             VariableResolver varResolver, String arg) {
 
-        if (VARNAME_SLOT.equals(arg)) {
-            // システムオブジェクト「slot」は無視する。
-            return null;
-        }
+        AnalyzerContext analyzerContext = toAnalyzerContext(context);
 
-        return new DescWrapper(toAnalyzerContext(context)
-                .getTemporaryClassDesc(arg));
+        Object value = super.getProperty(context, varResolver, arg);
+        if (shouldGenerateClassOf(value, analyzerContext, varResolver, arg)) {
+            return new DescWrapper(analyzerContext.getTemporaryClassDesc(arg));
+        } else {
+            return value;
+        }
+    }
+
+    boolean shouldGenerateClassOf(Object value,
+            AnalyzerContext analyzerContext, VariableResolver varResolver,
+            String arg) {
+
+        Class type = varResolver.getVariableType(analyzerContext, arg);
+        if (type == null) {
+            type = VariableResolverUtils.toType(varResolver.getVariable(
+                    analyzerContext, arg));
+        }
+        return (type == Object.class || type.getName().startsWith(
+                analyzerContext.getSourceCreator().getRootPackageName() + "."));
     }
 
     protected Object resolveSegment(TemplateContext context,
