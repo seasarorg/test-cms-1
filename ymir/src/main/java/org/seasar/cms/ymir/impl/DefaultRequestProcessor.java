@@ -41,7 +41,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     public static final String ACTION_RENDER = "_render";
 
-    public static final String ATTR_PAGE = "PAGE";
+    public static final String ATTR_SELF = "self";
 
     public static final String PARAM_METHOD = "__ymir__method";
 
@@ -120,12 +120,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     public Object backupForInclusion(AttributeContainer attributeContainer) {
-        return attributeContainer.getAttribute(ATTR_PAGE);
+        return attributeContainer.getAttribute(ATTR_SELF);
     }
 
     public void restoreForInclusion(AttributeContainer attributeContainer,
             Object backupped) {
-        attributeContainer.setAttribute(ATTR_PAGE, backupped);
+        attributeContainer.setAttribute(ATTR_SELF, backupped);
     }
 
     Application getApplication() {
@@ -263,7 +263,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Object getRequestComponent(Request request) {
-        return request.getAttribute(ATTR_PAGE);
+        return request.getAttribute(ATTR_SELF);
     }
 
     boolean shouldRender(Response response, String componentName) {
@@ -328,7 +328,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         outjectContextAttributes(component);
 
         // コンポーネント自体をattributeとしてバインドしておく。
-        request.setAttribute(ATTR_PAGE, component);
+        request.setAttribute(ATTR_SELF, component);
     }
 
     Response normalizeResponse(Response response, Request request) {
