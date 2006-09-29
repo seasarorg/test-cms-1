@@ -7,8 +7,10 @@ import java.util.List;
 
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeHandler;
+import org.seasar.cms.ymir.Authorizer;
 import org.seasar.cms.ymir.extension.annotation.In;
 import org.seasar.cms.ymir.extension.annotation.Out;
+import org.seasar.cms.ymir.extension.annotation.ShouldBeAuthorizedBy;
 import org.seasar.cms.ymir.scope.Scope;
 import org.seasar.cms.ymir.scope.impl.RequestScope;
 import org.seasar.framework.container.S2Container;
@@ -135,5 +137,56 @@ public class TigerAnnotationHandler implements AnnotationHandler {
 
     public void setS2Container(S2Container container) {
         container_ = container;
+    }
+
+    public Authorizer[] getAuthorizers(Object component) {
+        return getAuthorizers(component.getClass());
+    }
+
+    Authorizer[] getAuthorizers(Class<?> clazz) {
+        List<Authorizer> list = new ArrayList<Authorizer>();
+
+//        ShouldBeAuthorizedBy annotation = clazz
+//                .getAnnotation(ShouldBeAuthorizedBy.class);
+//        list.add(getComponent(annotation));
+//
+//        Method[] methods = clazz.getMethods();
+//        List<AttributeHandler> handlerList = new ArrayList<AttributeHandler>();
+//        for (int i = 0; i < methods.length; i++) {
+//            Method method = methods[i];
+//            In in = method.getAnnotation(In.class);
+//            if (in == null) {
+//                continue;
+//            }
+//
+//            int modifiers = method.getModifiers();
+//            if (Modifier.isStatic(modifiers)) {
+//                throw new RuntimeException(
+//                        "Logic error: @In can't annotate static method: class="
+//                                + clazz.getName() + ", method=" + method);
+//            } else if (!Modifier.isPublic(modifiers)) {
+//                throw new RuntimeException(
+//                        "Logic error: @In can annotate only public method: class="
+//                                + clazz.getName() + ", method=" + method);
+//            } else if (method.getParameterTypes().length != 1) {
+//                throw new RuntimeException(
+//                        "Logic error: @In can't annotate this method: class="
+//                                + clazz.getName() + ", method=" + method);
+//            }
+//
+//            handlerList.add(new AttributeHandler(toAttributeName(method
+//                    .getName(), in.name()), getScope(in), method, null));
+//        }
+//
+//        return handlerList.toArray(new AttributeHandler[0]);
+        // TODO ここから。
+        return null;
+    }
+
+    Authorizer getComponent(ShouldBeAuthorizedBy annotation) {
+        if (annotation == null) {
+            return null;
+        }
+        return (Authorizer) container_.getComponent(annotation.value());
     }
 }
