@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
+  "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <!-- mapping.dicon -->
+  <component class="org.seasar.cms.ymir.impl.PathMappingProviderImpl">
+    <property name="pathMappings">
+      container.findLocalComponents(@org.seasar.cms.ymir.PathMapping@class)
+    </property>
+  </component>
+  <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
+    <arg>"^/article\\.done$"</arg>
+    <arg>"articlePage"</arg>
+    <arg>"_${method}"</arg>
+    <arg>""</arg>
+    <arg>"/article.do"</arg>
+  </component>
+  <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
+    <arg>"^/article\\.do$"</arg>
+    <arg>"articlePage"</arg>
+    <arg>"_${method}"</arg>
+    <arg>""</arg>
+    <arg>"/article.html"</arg>
+  </component>
+  <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
+    <arg>"^/article\\.html$"</arg>
+    <arg>"articlePage"</arg>
+    <arg>"_${method}"</arg>
+    <arg>""</arg>
+    <arg>"/article.html"</arg>
+  </component>
+  <component name="articlePage" class="org.seasar.cms.ymir.impl.ArticlePage" />
+
+  <!-- ymir.dicon -->
+  <component
+    class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
+    <initMethod name="addReferenceClass">
+      <arg>@org.seasar.cms.ymir.Ymir@class</arg>
+    </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.ymir.response.constructor.impl"</arg>
+      <arg>".*ResponseConstructor"</arg>
+    </initMethod>
+    <initMethod name="addIgnoreClassPattern">
+      <arg>"org.seasar.cms.ymir.response.constructor.impl"</arg>
+      <arg>"Abstract.*"</arg>
+    </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.ymir.response.scheme.impl"</arg>
+      <arg>".*Strategy"</arg>
+    </initMethod>
+    <initMethod name="addIgnoreClassPattern">
+      <arg>"org.seasar.cms.ymir.response.scheme.impl"</arg>
+      <arg>"Abstract.*"</arg>
+    </initMethod>
+    <initMethod name="registerAll" />
+  </component>
+  <component
+    class="org.seasar.cms.ymir.container.RequestComponentDefFactory" />
+  <component class="org.seasar.cms.ymir.impl.YmirImpl">
+    <property name="lifecycleListeners" bindingType="none">
+      <meta name="delayed">
+        @org.seasar.cms.pluggable.util.PluggableUtils@findAscendantComponents(container,
+        @org.seasar.cms.ymir.LifecycleListener@class)
+      </meta>
+    </property>
+  </component>
+  <component class="org.seasar.cms.ymir.impl.DefaultRequestProcessor">
+    <property name="updaters" bindingType="none">
+      <meta name="delayed">
+        @org.seasar.cms.pluggable.util.PluggableUtils@findAscendantComponents(container,
+        @org.seasar.cms.ymir.Updater@class)
+      </meta>
+    </property>
+  </component>
+  <component class="org.seasar.cms.ymir.impl.DefaultResponseProcessor" />
+  <component
+    class="org.seasar.cms.ymir.response.constructor.impl.ResponseConstructorSelectorImpl" />
+  <component
+    class="org.seasar.cms.ymir.response.scheme.impl.StrategySelectorImpl" />
+  <component class="org.seasar.cms.ymir.impl.ApplicationManagerImpl" />
+  <component name="sessionScope"
+    class="org.seasar.cms.ymir.scope.impl.SessionScope" />
+  <component name="requestScope"
+    class="org.seasar.cms.ymir.scope.impl.RequestScope" />
+</components>

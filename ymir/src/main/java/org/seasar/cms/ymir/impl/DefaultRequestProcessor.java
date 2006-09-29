@@ -208,19 +208,20 @@ public class DefaultRequestProcessor implements RequestProcessor {
             }
         }
 
-        Response response = null;
+        Response response = PassthroughResponse.INSTANCE;
         boolean rendered = false;
         if (component != null) {
             if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
                 prepareForComponent(component, request);
 
-                response = normalizeResponse(invokeAction(component, request
-                        .getActionName(), ACTION_DEFAULT, request
-                        .getDefaultReturnValue()), request);
+                response = normalizeResponse(constructResponse(invokeAction(
+                        component, request.getActionName(), ACTION_DEFAULT),
+                        component, request.getDefaultReturnValue()), request,
+                        component);
 
                 if (shouldRender(response, request.getComponentName())) {
                     // 画面描画のためのAction呼び出しを行なう。
-                    invokeAction(component, ACTION_RENDER, null, null);
+                    invokeAction(component, ACTION_RENDER, null);
                     rendered = true;
                 }
 
@@ -231,16 +232,15 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
                     prepareForComponent(component, request);
 
-                    invokeAction(component, ACTION_RENDER, null, null);
+                    invokeAction(component, ACTION_RENDER, null);
                     rendered = true;
 
                     finishForComponent(component, request);
                 }
+                response = normalizeResponse(constructResponseFromReturnValue(
+                        component, request.getDefaultReturnValue()), request,
+                        component);
             }
-        }
-        if (response == null) {
-            response = normalizeResponse(constructResponseFromReturnValue(
-                    component, request.getDefaultReturnValue()), request);
         }
 
         if (logger_.isDebugEnabled()) {
@@ -275,8 +275,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (response.getType() == Response.TYPE_FORWARD) {
             MatchedPathMapping matched = findMatchedPathMapping(response
                     .getPath(), Request.METHOD_GET);
-            if (matched == null
-                    || componentName.equals(matched.getComponentName())) {
+            if (matched == null) {
                 return true;
             } else {
                 if (logger_.isDebugEnabled()) {
@@ -331,15 +330,49 @@ public class DefaultRequestProcessor implements RequestProcessor {
         request.setAttribute(ATTR_SELF, component);
     }
 
-    Response normalizeResponse(Response response, Request request) {
+    Response normalizeResponse(Response response, Request request,
+            Object component) {
+
+        return normalizeResponse(response, request, component, request
+                .getPath(), request.getComponentName());
+    }
+
+    Response normalizeResponse(Response response, Request request,
+            Object component, String path, String componentName) {
 
         int type = response.getType();
         if (type == Response.TYPE_FORWARD || type == Response.TYPE_REDIRECT) {
             String normalized = responsePathNormalizer_.normalize(response
                     .getPath(), request);
-            if (type == Response.TYPE_FORWARD
-                    && request.getPath().equals(normalized)) {
-                return PassthroughResponse.INSTANCE;
+            if (type == Response.TYPE_FORWARD) {
+                if (path.equals(normalized)) {
+                    return PassthroughResponse.INSTANCE;
+                } else {
+                    // フォワード先のコンポーネントが現在のコンポーネントと同じ場合、
+                    // フォワード前にrenderingを行なうことになる。
+                    // ということは、フォワード後には
+                    // （フォワード時にはアクションは呼ばれないしrenderingも行なわれないので）
+                    // デフォルトの返り値に従って再度フォワードされるだけになる。
+                    // デフォルトの返り値が同じコンポーネントへのforwardである限り、
+                    // 同様にフォワード後には何の処理も行なわれないので、
+                    // 結局「フォワードでかつフォワード先のコンポーネントが同じ限り
+                    // フォワード処理をスキップしてよい」ということになる。
+                    MatchedPathMapping matched = findMatchedPathMapping(
+                            normalized, Request.METHOD_GET);
+                    if (matched != null
+                            && componentName.equals(matched.getComponentName())) {
+                        Response constructed = constructResponseFromReturnValue(
+                                component, matched.getDefaultReturnValue());
+                        Response finalResponse = normalizeResponse(constructed,
+                                request, component, normalized, componentName);
+                        if (finalResponse.getType() == Response.TYPE_PASSTHROUGH) {
+                            constructed.setPath(normalized);
+                            return constructed;
+                        } else {
+                            return finalResponse;
+                        }
+                    }
+                }
             }
             response.setPath(normalized);
         }
@@ -372,7 +405,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Response invokeAction(Object component, String actionName,
-            String defaultActionName, Object defaultReturnValue) {
+            String defaultActionName) {
 
         if (logger_.isDebugEnabled()) {
             logger_.debug("[1]INVOKE: " + component.getClass().getName() + "#"
@@ -403,12 +436,21 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     returnValue);
         }
 
-        if (response == PassthroughResponse.INSTANCE) {
-            response = constructResponseFromReturnValue(component,
-                    defaultReturnValue);
-        }
         if (logger_.isDebugEnabled()) {
             logger_.debug("[3]RESPONSE: " + response);
+        }
+
+        return response;
+    }
+
+    Response constructResponse(Response response, Object component,
+            Object returnValue) {
+        if (response.getType() == Response.TYPE_PASSTHROUGH) {
+            response = constructResponseFromReturnValue(component, returnValue);
+        }
+
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("[4]RESPONSE: " + response);
         }
 
         return response;
