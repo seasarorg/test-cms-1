@@ -60,7 +60,7 @@
         </executions>
       </plugin>
       <!--
-      <plugin>
+        <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
@@ -76,7 +76,7 @@
           </execution>
         </executions>
       </plugin>
-       -->
+      -->
     </plugins>
   </build>
   <repositories>
@@ -115,9 +115,19 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.seasar.container</groupId>
+      <artifactId>s2-extension</artifactId>
+      <version>2.4.0-rc-1</version>
+    </dependency>
+    <dependency>
       <groupId>org.seasar.cms.s2-pluggable</groupId>
       <artifactId>s2-pluggable</artifactId>
       <version>0.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seasar.dao</groupId>
+      <artifactId>s2-dao</artifactId>
+      <version>1.0.35</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.dxo</groupId>
