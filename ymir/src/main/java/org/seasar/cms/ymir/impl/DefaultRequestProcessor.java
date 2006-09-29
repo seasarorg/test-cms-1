@@ -16,6 +16,7 @@ import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.AttributeHandler;
+import org.seasar.cms.ymir.Authorizer;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.PageNotFoundException;
@@ -24,6 +25,7 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponsePathNormalizer;
+import org.seasar.cms.ymir.PermissionDeniedExeption;
 import org.seasar.cms.ymir.Updater;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
@@ -173,7 +175,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return null;
     }
 
-    public Response process(Request request) {
+    public Response process(Request request) throws PermissionDeniedExeption {
 
         // dispatchがREQUESTの時は、
         // ・pathに対応するcomponentがあればactionを実行する。actionの実行結果が
@@ -213,6 +215,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (component != null) {
             if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
                 prepareForComponent(component, request);
+                authorize(component, request);
 
                 response = normalizeResponse(constructResponse(invokeAction(
                         component, request.getActionName(), ACTION_DEFAULT),
@@ -262,7 +265,20 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return response;
     }
 
+    void authorize(Object component, Request request)
+            throws PermissionDeniedExeption {
+
+        // TODO このへんから。
+        Authorizer[] authorizers = annotationHandler_.getAuthorizers(component);
+        for (int i = 0; i < authorizers.length; i++) {
+            if (!authorizers[i].authorize(component, request)) {
+                throw new PermissionDeniedExeption(request.getPath());
+            }
+        }
+    }
+
     Object getRequestComponent(Request request) {
+
         return request.getAttribute(ATTR_SELF);
     }
 

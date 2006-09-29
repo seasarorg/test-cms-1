@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.ymir.MultipartServletRequest;
 import org.seasar.cms.ymir.PageNotFoundException;
+import org.seasar.cms.ymir.PermissionDeniedExeption;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Ymir;
@@ -85,6 +86,8 @@ public class YmirFilter implements Filter {
             }
         } catch (PageNotFoundException ex) {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } catch (PermissionDeniedExeption ex) {
+            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
         } finally {
             if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
                 ymir_.restoreForInclusion(attributeContainer, backupped);

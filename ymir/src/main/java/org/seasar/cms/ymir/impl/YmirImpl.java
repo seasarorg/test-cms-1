@@ -15,6 +15,7 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseProcessor;
+import org.seasar.cms.ymir.PermissionDeniedExeption;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.framework.log.Logger;
 
@@ -54,7 +55,7 @@ public class YmirImpl implements Ymir {
                 attributeContainer);
     }
 
-    public Response processRequest(Request request) {
+    public Response processRequest(Request request) throws PermissionDeniedExeption {
 
         return requestProcessor_.process(request);
     }

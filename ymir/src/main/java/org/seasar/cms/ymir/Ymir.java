@@ -17,7 +17,7 @@ public interface Ymir {
             Map fileParameterMap, AttributeContainer attributeContainer)
             throws PageNotFoundException;
 
-    Response processRequest(Request request);
+    Response processRequest(Request request) throws PermissionDeniedExeption;
 
     boolean processResponse(ServletContext context_,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,
