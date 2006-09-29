@@ -4,8 +4,8 @@
   </head>
   <body>
     <form tal:attributes="action page:/action.html">
-      <input type="text" name="test.name" tal:attributes="value PAGE/test/name" />
-      <input type="text" name="test.body" tal:attributes="value PAGE/test/body" />
+      <input type="text" name="test.name" tal:attributes="value self/test/name" />
+      <input type="text" name="test.body" tal:attributes="value self/test/body" />
     </form>
   </body>
 </html>

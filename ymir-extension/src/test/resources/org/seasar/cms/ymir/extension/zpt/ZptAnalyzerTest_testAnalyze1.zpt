@@ -3,7 +3,7 @@
     <title>TEST</title>
   </head>
   <body>
-    <p tal:content="PAGE/body">BODY</p>
+    <p tal:content="self/body">BODY</p>
   </body>
 </html>
   

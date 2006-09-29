@@ -52,7 +52,7 @@ public class AnalyzerContext extends ZptTemplateContext {
                 TypeDesc typeDesc = propertyDesc.getTypeDesc();
                 typeDesc.setClassDesc(getTemporaryClassDesc(name));
             } else {
-                // PAGE/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
+                // self/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
                 // 自動生成ではそのようなプロパティは今のところ扱わない。
                 ;
             }
@@ -71,7 +71,7 @@ public class AnalyzerContext extends ZptTemplateContext {
                 typeDesc.setArray(true);
                 typeDesc.setClassDesc(getTemporaryClassDesc(name));
             } else {
-                // PAGE/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
+                // self/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
                 // 自動生成ではそのようなプロパティは今のところ扱わない。
                 ;
             }
@@ -140,7 +140,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public String toClassName(String componentName) {
 
-        if (DefaultRequestProcessor.ATTR_PAGE.equals(componentName)) {
+        if (DefaultRequestProcessor.ATTR_SELF.equals(componentName)) {
             return getPageClassName();
         } else {
             String className = sourceCreator_.getClassName(componentName);

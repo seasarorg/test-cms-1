@@ -4,7 +4,7 @@
   </head>
   <body>
   <ul>
-    <li tal:define="entity PAGE/entity" tal:content="entity/content">CONTENT</li>
+    <li tal:define="entity self/entity" tal:content="entity/content">CONTENT</li>
   </ul>
   </body>
 </html>
