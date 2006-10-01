@@ -1,5 +1,11 @@
 package org.seasar.cms.ymir.extension.impl;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -7,10 +13,11 @@ import java.util.List;
 
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeHandler;
-import org.seasar.cms.ymir.Authorizer;
+import org.seasar.cms.ymir.Constraint;
+import org.seasar.cms.ymir.extension.annotation.ConstraintAnnotation;
 import org.seasar.cms.ymir.extension.annotation.In;
 import org.seasar.cms.ymir.extension.annotation.Out;
-import org.seasar.cms.ymir.extension.annotation.ShouldBeAuthorizedBy;
+import org.seasar.cms.ymir.extension.constraint.ConstraintFactory;
 import org.seasar.cms.ymir.scope.Scope;
 import org.seasar.cms.ymir.scope.impl.RequestScope;
 import org.seasar.framework.container.S2Container;
@@ -139,54 +146,67 @@ public class TigerAnnotationHandler implements AnnotationHandler {
         container_ = container;
     }
 
-    public Authorizer[] getAuthorizers(Object component) {
-        return getAuthorizers(component.getClass());
+    public Constraint[] getConstraints(Object component, Method action,
+            boolean includeCommonConstraints) {
+        return getConstraints(component.getClass(), action,
+                includeCommonConstraints);
     }
 
-    Authorizer[] getAuthorizers(Class<?> clazz) {
-        List<Authorizer> list = new ArrayList<Authorizer>();
+    // PropertyDescriptorのreadMethodは対象外。fieldも対象外。
+    Constraint[] getConstraints(Class<?> clazz, Method action,
+            boolean includeCommonConstraints) {
+        List<Constraint> list = new ArrayList<Constraint>();
 
-//        ShouldBeAuthorizedBy annotation = clazz
-//                .getAnnotation(ShouldBeAuthorizedBy.class);
-//        list.add(getComponent(annotation));
-//
-//        Method[] methods = clazz.getMethods();
-//        List<AttributeHandler> handlerList = new ArrayList<AttributeHandler>();
-//        for (int i = 0; i < methods.length; i++) {
-//            Method method = methods[i];
-//            In in = method.getAnnotation(In.class);
-//            if (in == null) {
-//                continue;
-//            }
-//
-//            int modifiers = method.getModifiers();
-//            if (Modifier.isStatic(modifiers)) {
-//                throw new RuntimeException(
-//                        "Logic error: @In can't annotate static method: class="
-//                                + clazz.getName() + ", method=" + method);
-//            } else if (!Modifier.isPublic(modifiers)) {
-//                throw new RuntimeException(
-//                        "Logic error: @In can annotate only public method: class="
-//                                + clazz.getName() + ", method=" + method);
-//            } else if (method.getParameterTypes().length != 1) {
-//                throw new RuntimeException(
-//                        "Logic error: @In can't annotate this method: class="
-//                                + clazz.getName() + ", method=" + method);
-//            }
-//
-//            handlerList.add(new AttributeHandler(toAttributeName(method
-//                    .getName(), in.name()), getScope(in), method, null));
-//        }
-//
-//        return handlerList.toArray(new AttributeHandler[0]);
-        // TODO ここから。
-        return null;
+        if (includeCommonConstraints) {
+            getConstraint(clazz, list);
+            BeanInfo beanInfo;
+            try {
+                beanInfo = Introspector.getBeanInfo(clazz);
+            } catch (IntrospectionException ex) {
+                throw new RuntimeException(ex);
+            }
+            PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
+            for (int i = 0; i < pds.length; i++) {
+                getConstraint(pds[i].getWriteMethod(), list);
+            }
+        }
+        getConstraint(action, list);
+
+        return list.toArray(new Constraint[0]);
     }
 
-    Authorizer getComponent(ShouldBeAuthorizedBy annotation) {
-        if (annotation == null) {
+    @SuppressWarnings("unchecked")
+    void getConstraint(AnnotatedElement element, List<Constraint> list) {
+        if (element == null) {
+            return;
+        }
+        Annotation[] annotations = element.getAnnotations();
+        for (int i = 0; i < annotations.length; i++) {
+            ConstraintAnnotation constraintAnnotation = annotations[i]
+                    .annotationType().getAnnotation(ConstraintAnnotation.class);
+            if (constraintAnnotation == null) {
+                continue;
+            }
+            ConstraintFactory factory;
+            try {
+                factory = (ConstraintFactory) constraintAnnotation.value()
+                        .newInstance();
+            } catch (InstantiationException ex) {
+                throw new RuntimeException(ex);
+            } catch (IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            }
+            list.add(factory.getConstraint(annotations[i], element));
+        }
+    }
+
+    Method getMethod(Class clazz, String name) {
+        try {
+            return clazz.getMethod(name, new Class[0]);
+        } catch (SecurityException ex) {
+            return null;
+        } catch (NoSuchMethodException ex) {
             return null;
         }
-        return (Authorizer) container_.getComponent(annotation.value());
     }
 }
