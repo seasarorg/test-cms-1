@@ -9,13 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.ymir.AttributeContainer;
+import org.seasar.cms.ymir.ConstraintViolationException;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseProcessor;
-import org.seasar.cms.ymir.PermissionDeniedExeption;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.framework.log.Logger;
 
@@ -55,7 +55,8 @@ public class YmirImpl implements Ymir {
                 attributeContainer);
     }
 
-    public Response processRequest(Request request) throws PermissionDeniedExeption {
+    public Response processRequest(Request request)
+            throws ConstraintViolationException {
 
         return requestProcessor_.process(request);
     }

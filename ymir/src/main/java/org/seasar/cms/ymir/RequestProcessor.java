@@ -9,7 +9,7 @@ public interface RequestProcessor {
             Map fileParameterMap, AttributeContainer attributeContainer)
             throws PageNotFoundException;
 
-    Response process(Request request) throws PermissionDeniedExeption;
+    Response process(Request request) throws ConstraintViolationException;
 
     Object backupForInclusion(AttributeContainer attributeContainer);
 

@@ -1,8 +1,10 @@
 package org.seasar.cms.ymir.impl;
 
+import java.lang.reflect.Method;
+
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeHandler;
-import org.seasar.cms.ymir.Authorizer;
+import org.seasar.cms.ymir.Constraint;
 
 public class DefaultAnnotationHandler implements AnnotationHandler {
 
@@ -14,7 +16,8 @@ public class DefaultAnnotationHandler implements AnnotationHandler {
         return new AttributeHandler[0];
     }
 
-    public Authorizer[] getAuthorizers(Object component) {
-        return new Authorizer[0];
+    public Constraint[] getConstraints(Object component, Method action,
+            boolean includeCommonConstraints) {
+        return new Constraint[0];
     }
 }

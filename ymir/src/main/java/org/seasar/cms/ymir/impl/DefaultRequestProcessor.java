@@ -16,16 +16,17 @@ import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.AttributeHandler;
-import org.seasar.cms.ymir.Authorizer;
+import org.seasar.cms.ymir.Constraint;
+import org.seasar.cms.ymir.ConstraintViolationException;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.PathMapping;
+import org.seasar.cms.ymir.PermissionDeniedException;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponsePathNormalizer;
-import org.seasar.cms.ymir.PermissionDeniedExeption;
 import org.seasar.cms.ymir.Updater;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
@@ -37,6 +38,9 @@ import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.log.Logger;
 import org.seasar.kvasir.util.el.VariableResolver;
 
+import net.skirnir.freyja.render.Note;
+import net.skirnir.freyja.render.Notes;
+
 public class DefaultRequestProcessor implements RequestProcessor {
 
     public static final String ACTION_DEFAULT = "_default";
@@ -46,6 +50,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public static final String ATTR_SELF = "self";
 
     public static final String PARAM_METHOD = "__ymir__method";
+
+    private static final String ATTR_NOTES = "notes";
 
     private ResponseConstructorSelector responseConstructorSelector_;
 
@@ -175,7 +181,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return null;
     }
 
-    public Response process(Request request) throws PermissionDeniedExeption {
+    public Response process(Request request)
+            throws ConstraintViolationException {
 
         // dispatchがREQUESTの時は、
         // ・pathに対応するcomponentがあればactionを実行する。actionの実行結果が
@@ -215,16 +222,15 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (component != null) {
             if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
                 prepareForComponent(component, request);
-                authorize(component, request);
 
                 response = normalizeResponse(constructResponse(invokeAction(
-                        component, request.getActionName(), ACTION_DEFAULT),
-                        component, request.getDefaultReturnValue()), request,
-                        component);
+                        component, request.getActionName(), ACTION_DEFAULT,
+                        request, true), component, request
+                        .getDefaultReturnValue()), request, component);
 
                 if (shouldRender(response, request.getComponentName())) {
                     // 画面描画のためのAction呼び出しを行なう。
-                    invokeAction(component, ACTION_RENDER, null);
+                    invokeAction(component, ACTION_RENDER, null, request, false);
                     rendered = true;
                 }
 
@@ -235,7 +241,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
                     prepareForComponent(component, request);
 
-                    invokeAction(component, ACTION_RENDER, null);
+                    invokeAction(component, ACTION_RENDER, null, request, true);
                     rendered = true;
 
                     finishForComponent(component, request);
@@ -265,15 +271,35 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return response;
     }
 
-    void authorize(Object component, Request request)
-            throws PermissionDeniedExeption {
+    Notes confirmConstraint(Object component, Method action, Request request,
+            boolean alsoConfirmCommonConstraints)
+            throws ConstraintViolationException {
 
-        // TODO このへんから。
-        Authorizer[] authorizers = annotationHandler_.getAuthorizers(component);
-        for (int i = 0; i < authorizers.length; i++) {
-            if (!authorizers[i].authorize(component, request)) {
-                throw new PermissionDeniedExeption(request.getPath());
+        Notes notes = new Notes();
+        Constraint[] constraint = annotationHandler_.getConstraints(component,
+                action, alsoConfirmCommonConstraints);
+        for (int i = 0; i < constraint.length; i++) {
+            try {
+                constraint[i].confirm(component, request);
+            } catch (PermissionDeniedException ex) {
+                throw ex;
+            } catch (ConstraintViolationException ex) {
+                if (ex.hasMessage()) {
+                    ConstraintViolationException.Message[] messages = ex
+                            .getMessages();
+                    for (int j = 0; j < messages.length; j++) {
+                        notes.add(new Note(messages[i].getKey(), messages[i]
+                                .getParameters()));
+                    }
+                } else {
+                    throw ex;
+                }
             }
+        }
+        if (notes.size() > 0) {
+            return notes;
+        } else {
+            return null;
         }
     }
 
@@ -421,7 +447,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Response invokeAction(Object component, String actionName,
-            String defaultActionName) {
+            String defaultActionName, Request request,
+            boolean alsoConfirmCommonConstraints)
+            throws ConstraintViolationException {
 
         if (logger_.isDebugEnabled()) {
             logger_.debug("[1]INVOKE: " + component.getClass().getName() + "#"
@@ -438,18 +466,24 @@ public class DefaultRequestProcessor implements RequestProcessor {
             }
         }
         if (method != null) {
-            Object returnValue;
-            try {
-                returnValue = method.invoke(component, new Object[0]);
-            } catch (IllegalArgumentException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            } catch (InvocationTargetException ex) {
-                throw new RuntimeException(ex);
+            Notes notes = confirmConstraint(component, method, request,
+                    alsoConfirmCommonConstraints);
+            if (notes != null) {
+                Object returnValue;
+                try {
+                    returnValue = method.invoke(component, new Object[0]);
+                } catch (IllegalArgumentException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IllegalAccessException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InvocationTargetException ex) {
+                    throw new RuntimeException(ex);
+                }
+                response = constructResponse(component, method.getReturnType(),
+                        returnValue);
+            } else {
+                request.setAttribute(ATTR_NOTES, notes);
             }
-            response = constructResponse(component, method.getReturnType(),
-                    returnValue);
         }
 
         if (logger_.isDebugEnabled()) {
