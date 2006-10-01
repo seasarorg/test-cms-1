@@ -10,6 +10,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.seasar.cms.ymir.YmirVariableResolver;
 import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
@@ -80,7 +81,8 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         context.setPageClassName(className);
         context.setUsingFreyjaRenderClasses(isUsingFreyjaRenderClasses());
         context.setVariableResolver(vrf_.newResolver(MOCK_REQUEST,
-                MOCK_RESPONSE, MOCK_SERVLETCONTEXT, null));
+                MOCK_RESPONSE, MOCK_SERVLETCONTEXT, new YmirVariableResolver(
+                        MOCK_REQUEST)));
 
         try {
             evaluator_.evaluate(context, new InputStreamReader(inputStream,

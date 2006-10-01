@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
-import org.seasar.cms.ymir.impl.SelfContainedResponse;
+import org.seasar.cms.ymir.response.SelfContainedResponse;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.TemplateEvaluator;
