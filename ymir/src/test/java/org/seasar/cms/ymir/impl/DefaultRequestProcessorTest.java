@@ -7,6 +7,7 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.mock.MockApplication;
 import org.seasar.cms.ymir.mock.MockRequest;
+import org.seasar.cms.ymir.response.ForwardResponse;
 import org.seasar.extension.unit.S2TestCase;
 
 public class DefaultRequestProcessorTest extends S2TestCase {

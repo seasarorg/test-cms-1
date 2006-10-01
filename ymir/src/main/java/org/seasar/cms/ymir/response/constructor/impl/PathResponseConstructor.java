@@ -2,8 +2,8 @@ package org.seasar.cms.ymir.response.constructor.impl;
 
 import org.seasar.cms.ymir.Path;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.impl.RedirectResponse;
-import org.seasar.cms.ymir.impl.VoidResponse;
+import org.seasar.cms.ymir.response.RedirectResponse;
+import org.seasar.cms.ymir.response.VoidResponse;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 
 public class PathResponseConstructor implements ResponseConstructor {

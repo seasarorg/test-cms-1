@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.ConstraintViolationException;
 import org.seasar.cms.ymir.LifecycleListener;
@@ -18,6 +19,8 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseProcessor;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.framework.log.Logger;
+import org.seasar.framework.util.Disposable;
+import org.seasar.framework.util.DisposableUtil;
 
 public class YmirImpl implements Ymir {
 
@@ -34,6 +37,12 @@ public class YmirImpl implements Ymir {
         logger_.debug("Ymir initialize start");
 
         initializeListeners();
+
+        DisposableUtil.add(new Disposable() {
+            public void dispose() {
+                PropertyUtils.clearDescriptors();
+            }
+        });
 
         logger_.debug("Ymir initialize end");
     }

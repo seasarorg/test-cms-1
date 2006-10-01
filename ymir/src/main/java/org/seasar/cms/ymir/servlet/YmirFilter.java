@@ -20,8 +20,11 @@ import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Ymir;
+import org.seasar.cms.ymir.YmirVariableResolver;
 import org.seasar.cms.ymir.impl.HttpServletRequestAttributeContainer;
 import org.seasar.cms.ymir.util.ServletUtils;
+
+import net.skirnir.freyja.webapp.FreyjaServlet;
 
 public class YmirFilter implements Filter {
 
@@ -67,6 +70,11 @@ public class YmirFilter implements Filter {
         }
         HttpServletRequestAttributeContainer attributeContainer = new HttpServletRequestAttributeContainer(
                 httpRequest);
+
+        if (Request.DISPATCHER_REQUEST.equals(dispatcher_)) {
+            httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,
+                    new YmirVariableResolver(httpRequest));
+        }
 
         Object backupped = null;
         if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {

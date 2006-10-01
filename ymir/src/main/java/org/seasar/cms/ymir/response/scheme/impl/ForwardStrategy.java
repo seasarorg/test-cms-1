@@ -1,7 +1,7 @@
 package org.seasar.cms.ymir.response.scheme.impl;
 
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.impl.ForwardResponse;
+import org.seasar.cms.ymir.response.ForwardResponse;
 import org.seasar.cms.ymir.response.scheme.Strategy;
 
 public class ForwardStrategy implements Strategy {

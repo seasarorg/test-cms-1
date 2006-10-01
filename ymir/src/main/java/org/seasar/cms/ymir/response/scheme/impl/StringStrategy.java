@@ -1,7 +1,7 @@
 package org.seasar.cms.ymir.response.scheme.impl;
 
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.impl.SelfContainedResponse;
+import org.seasar.cms.ymir.response.SelfContainedResponse;
 import org.seasar.cms.ymir.response.scheme.Strategy;
 
 public class StringStrategy implements Strategy {

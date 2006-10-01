@@ -3,7 +3,7 @@ package org.seasar.cms.ymir.response.scheme.impl;
 import java.io.InputStream;
 
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.impl.SelfContainedResponse;
+import org.seasar.cms.ymir.response.SelfContainedResponse;
 import org.seasar.cms.ymir.response.scheme.Strategy;
 
 public class ResourceStrategy implements Strategy {

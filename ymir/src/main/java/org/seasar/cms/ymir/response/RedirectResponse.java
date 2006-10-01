@@ -1,4 +1,5 @@
-package org.seasar.cms.ymir.impl;
+package org.seasar.cms.ymir.response;
+
 
 public class RedirectResponse extends TransitionResponse {
 

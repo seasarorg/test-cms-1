@@ -1,7 +1,7 @@
 package org.seasar.cms.ymir.response.constructor.impl;
 
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.impl.VoidResponse;
+import org.seasar.cms.ymir.response.VoidResponse;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.scheme.Strategy;
 import org.seasar.cms.ymir.response.scheme.StrategySelector;

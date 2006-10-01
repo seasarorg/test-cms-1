@@ -7,7 +7,7 @@ import java.net.URLDecoder;
 import org.apache.commons.beanutils.BeanUtils;
 import org.seasar.cms.ymir.Path;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.impl.RedirectResponse;
+import org.seasar.cms.ymir.response.RedirectResponse;
 import org.seasar.cms.ymir.response.scheme.Strategy;
 import org.seasar.kvasir.util.el.EvaluationException;
 import org.seasar.kvasir.util.el.TextTemplateEvaluator;

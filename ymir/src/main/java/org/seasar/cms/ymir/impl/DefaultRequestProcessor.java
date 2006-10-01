@@ -30,12 +30,15 @@ import org.seasar.cms.ymir.ResponsePathNormalizer;
 import org.seasar.cms.ymir.Updater;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
+import org.seasar.cms.ymir.response.PassthroughResponse;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructorSelector;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.log.Logger;
+import org.seasar.framework.util.Disposable;
+import org.seasar.framework.util.DisposableUtil;
 import org.seasar.kvasir.util.el.VariableResolver;
 
 import net.skirnir.freyja.render.Note;
@@ -65,6 +68,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private ResponsePathNormalizer responsePathNormalizer_ = new DefaultResponsePathNormalizer();
 
+    private final PropertyUtilsBean propertyUtilsBean_ = new PropertyUtilsBean();
+
     private final BeanUtilsBean beanUtilsBean_;
 
     private ThreadContext threadContext_;
@@ -77,8 +82,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
         convertUtilsBean.register(new FormFileConverter(), FormFile.class);
         convertUtilsBean.register(new FormFileArrayConverter(),
                 FormFile[].class);
-        beanUtilsBean_ = new BeanUtilsBean(convertUtilsBean,
-                new PropertyUtilsBean());
+        beanUtilsBean_ = new BeanUtilsBean(convertUtilsBean, propertyUtilsBean_);
+        DisposableUtil.add(new Disposable() {
+            public void dispose() {
+                propertyUtilsBean_.clearDescriptors();
+            }
+        });
     }
 
     public Request prepareForProcessing(String contextPath, String path,

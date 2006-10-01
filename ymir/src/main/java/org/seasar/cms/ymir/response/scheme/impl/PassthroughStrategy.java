@@ -1,7 +1,7 @@
 package org.seasar.cms.ymir.response.scheme.impl;
 
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.impl.PassthroughResponse;
+import org.seasar.cms.ymir.response.PassthroughResponse;
 import org.seasar.cms.ymir.response.scheme.Strategy;
 
 public class PassthroughStrategy implements Strategy {
