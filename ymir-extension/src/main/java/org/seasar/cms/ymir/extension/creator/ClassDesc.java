@@ -1,6 +1,6 @@
 package org.seasar.cms.ymir.extension.creator;
 
-public interface ClassDesc extends Cloneable {
+public interface ClassDesc extends AnnotatedDesc, Cloneable {
 
     String KIND_PAGE = "Page";
 

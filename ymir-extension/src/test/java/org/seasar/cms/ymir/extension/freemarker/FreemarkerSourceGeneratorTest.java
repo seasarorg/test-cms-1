@@ -9,6 +9,7 @@ import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.PropertyDescImpl;
+import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
 import com.example.page.TestPageBaseBase;
 
@@ -89,6 +90,22 @@ public class FreemarkerSourceGeneratorTest extends YmirTestCase {
 
         assertEquals(readResource(getClass(),
                 "testGenerateBaseSource_Page.expected"), actual);
+    }
+
+    public void testGenerateBaseSource_Page2() throws Exception {
+
+        ClassDesc classDesc = new SourceCreatorImpl() {
+            @Override
+            public ClassDesc newClassDesc(String className) {
+                return new ClassDescImpl(className);
+            }
+        }.getClassDesc(HoePageBase.class,
+                "org.seasar.cms.ymir.extension.freemarker.HoePage");
+
+        String actual = target_.generateBaseSource(classDesc);
+
+        assertEquals(readResource(getClass(),
+                "testGenerateBaseSource_Page2.expected"), actual);
     }
 
     public void testGenerateBaseSource_Dto() throws Exception {

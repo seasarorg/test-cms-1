@@ -1,0 +1,26 @@
+package org.seasar.cms.ymir.extension.freemarker;
+
+@org.seasar.cms.ymir.extension.constraint.Required("test")
+abstract public class HoePageBase
+{
+    protected String hoe_;
+
+
+    public String getHoe()
+    {
+        return hoe_;
+    }
+
+    @org.seasar.cms.ymir.extension.annotation.SuppressConstraints
+    @org.seasar.cms.ymir.extension.constraint.Required("set")
+    public void setHoe(String hoe)
+    {
+        hoe_ = hoe;
+    }
+
+    @org.seasar.cms.ymir.extension.constraint.Required("method")
+    public void _get()
+    {
+
+    }
+}

@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.extension.creator;
 
-abstract public class AbstractClassDesc implements ClassDesc {
+abstract public class AbstractClassDesc extends AbstractAnnotatedDesc implements
+        ClassDesc {
 
     private static final String[] AUTODETECTED_KINDS = new String[] {
         KIND_PAGE, KIND_DTO, KIND_DAO, KIND_DXO };
@@ -67,7 +68,7 @@ abstract public class AbstractClassDesc implements ClassDesc {
         for (int i = 0; i < AUTODETECTED_KINDS.length; i++) {
             if (name.endsWith(AUTODETECTED_KINDS[i])) {
                 return name.substring(0, name.length()
-                    - AUTODETECTED_KINDS[i].length());
+                        - AUTODETECTED_KINDS[i].length());
             }
         }
         return name;
@@ -104,7 +105,7 @@ abstract public class AbstractClassDesc implements ClassDesc {
             return string;
         } else {
             return Character.toLowerCase(string.charAt(0))
-                + string.substring(1);
+                    + string.substring(1);
         }
     }
 }

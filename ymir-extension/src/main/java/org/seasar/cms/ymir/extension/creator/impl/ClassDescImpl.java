@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.seasar.cms.ymir.extension.creator.AbstractClassDesc;
+import org.seasar.cms.ymir.extension.creator.AnnotationDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDescKey;
@@ -162,6 +163,14 @@ public class ClassDescImpl extends AbstractClassDesc {
                     returnTd.transcript(returnTypeDesc);
                     md.setBodyDesc(methodDescs[i].getBodyDesc());
                 }
+            }
+        }
+
+        AnnotationDesc[] annotationDescs = classDesc.getAnnotationDescs();
+        for (int i = 0; i < annotationDescs.length; i++) {
+            AnnotationDesc ad = getAnnotationDesc(annotationDescs[i].getName());
+            if (ad == null) {
+                setAnnotationDesc((AnnotationDesc) annotationDescs[i].clone());
             }
         }
     }

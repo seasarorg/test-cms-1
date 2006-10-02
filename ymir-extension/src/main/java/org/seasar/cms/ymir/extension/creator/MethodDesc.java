@@ -1,6 +1,6 @@
 package org.seasar.cms.ymir.extension.creator;
 
-public interface MethodDesc extends Cloneable {
+public interface MethodDesc extends AnnotatedDesc, Cloneable {
 
     Object clone();
 

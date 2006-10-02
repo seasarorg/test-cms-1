@@ -1,9 +1,11 @@
 package org.seasar.cms.ymir.extension.creator.impl;
 
+import org.seasar.cms.ymir.extension.creator.AbstractAnnotatedDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 
-public class PropertyDescImpl implements PropertyDesc, Cloneable {
+public class PropertyDescImpl extends AbstractAnnotatedDesc implements
+        PropertyDesc, Cloneable {
 
     public static final int NONE = 0;
 

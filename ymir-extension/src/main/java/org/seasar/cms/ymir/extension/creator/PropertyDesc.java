@@ -1,6 +1,6 @@
 package org.seasar.cms.ymir.extension.creator;
 
-public interface PropertyDesc extends Cloneable {
+public interface PropertyDesc extends AnnotatedDesc, Cloneable {
 
     int NONE = 0;
 

@@ -21,6 +21,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +45,7 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
+import org.seasar.cms.ymir.extension.creator.AnnotationDesc;
 import org.seasar.cms.ymir.extension.creator.BodyDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
@@ -370,6 +373,11 @@ public class SourceCreatorImpl implements SourceCreator {
 
         ClassDesc classDesc = newClassDesc(className);
 
+        AnnotationDesc[] ads = createAnnotationDescs(clazz);
+        for (int i = 0; i < ads.length; i++) {
+            classDesc.setAnnotationDesc(ads[i]);
+        }
+
         PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
         for (int i = 0; i < pds.length; i++) {
             String name = pds[i].getName();
@@ -412,6 +420,16 @@ public class SourceCreatorImpl implements SourceCreator {
             }
             propertyTypeDesc.setClassDesc(new SimpleClassDesc(componentType));
             propertyDesc.setMode(mode);
+
+            ads = createAnnotationDescs(readMethod);
+            for (int j = 0; j < ads.length; j++) {
+                propertyDesc.setAnnotationDesc(ads[j]);
+            }
+            ads = createAnnotationDescs(writeMethod);
+            for (int j = 0; j < ads.length; j++) {
+                propertyDesc.setAnnotationDesc(ads[j]);
+            }
+
             classDesc.setPropertyDesc(propertyDesc);
         }
 
@@ -423,13 +441,27 @@ public class SourceCreatorImpl implements SourceCreator {
                     || name.startsWith("set")) {
                 continue;
             }
-            if (methods[i].getDeclaringClass() == Object.class) {
-                continue;
+            MethodDesc md = new MethodDescImpl(methods[i]);
+            ads = createAnnotationDescs(methods[i]);
+            for (int j = 0; j < ads.length; j++) {
+                md.setAnnotationDesc(ads[j]);
             }
-            classDesc.setMethodDesc(new MethodDescImpl(methods[i]));
+            classDesc.setMethodDesc(md);
         }
 
         return classDesc;
+    }
+
+    AnnotationDesc[] createAnnotationDescs(AnnotatedElement element) {
+        if (element == null) {
+            return new AnnotationDesc[0];
+        }
+        Annotation[] annotations = element.getAnnotations();
+        AnnotationDesc[] ads = new AnnotationDesc[annotations.length];
+        for (int i = 0; i < annotations.length; i++) {
+            ads[i] = new AnnotationDescImpl(annotations[i]);
+        }
+        return ads;
     }
 
     ClassDesc[] addRelativeClassDescs(ClassDesc[] classDescs) {
