@@ -477,7 +477,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (method != null) {
             Notes notes = confirmConstraint(component, method, request,
                     alsoConfirmCommonConstraints);
-            if (notes != null) {
+            if (notes == null) {
                 Object returnValue;
                 try {
                     returnValue = method.invoke(component, new Object[0]);
