@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.FormDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
@@ -33,7 +34,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private String pageClassName_;
 
-    private String formActionPageClassName_;
+    private FormDesc formDesc_;
 
     private boolean usingFreyjaRenderClasses_;
 
@@ -186,14 +187,14 @@ public class AnalyzerContext extends ZptTemplateContext {
         return getTemporaryClassDesc(pageClassName_);
     }
 
-    public String getFormActionPageClassName() {
+    public FormDesc getFormDesc() {
 
-        return formActionPageClassName_;
+        return formDesc_;
     }
 
-    public void setFormActionPageClassName(String formActionPageClassName) {
+    public void setFormDesc(FormDesc formDesc) {
 
-        formActionPageClassName_ = formActionPageClassName;
+        formDesc_ = formDesc;
     }
 
     public void close() {

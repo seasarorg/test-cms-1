@@ -4,7 +4,8 @@ import java.lang.reflect.AnnotatedElement;
 
 import org.seasar.cms.ymir.Constraint;
 
-public class NumericConstraintFactory extends ConstraintFactoryBase implements ConstraintFactory<Numeric> {
+public class NumericConstraintFactory extends ConstraintFactoryBase implements
+        ConstraintFactory<Numeric> {
 
     public Constraint getConstraint(Numeric annotation, AnnotatedElement element) {
 
@@ -35,7 +36,7 @@ public class NumericConstraintFactory extends ConstraintFactoryBase implements C
             }
         }
 
-        return new NumericConstraint(names, greaterEdge, greaterIncludeEqual,
-                lessEdge, lessIncludeEqual);
+        return new NumericConstraint(names, annotation.integer(), greaterEdge,
+                greaterIncludeEqual, lessEdge, lessIncludeEqual);
     }
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Properties;
 
 import org.seasar.cms.ymir.Application;
+import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.ResponseCreator;
 import org.seasar.cms.ymir.Updater;
 
@@ -24,6 +25,8 @@ public interface SourceCreator extends Updater {
     File getSourceDirectory();
 
     File getResourcesDirectory();
+
+    MatchedPathMapping findMatchedPathMapping(String path, String method);
 
     boolean isDenied(String path, String method);
 

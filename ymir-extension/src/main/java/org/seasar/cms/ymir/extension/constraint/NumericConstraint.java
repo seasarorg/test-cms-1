@@ -12,6 +12,8 @@ public class NumericConstraint implements Constraint {
 
     private String[] names_;
 
+    private boolean integer_;
+
     private Double greaterEdge_;
 
     private boolean greaterIncludeEqual_;
@@ -20,10 +22,11 @@ public class NumericConstraint implements Constraint {
 
     private boolean lessIncludeEqual_;
 
-    public NumericConstraint(String[] names, double greaterEdge,
-            boolean greaterIncludeEqual, double lessEdge,
+    public NumericConstraint(String[] names, boolean integer,
+            Double greaterEdge, boolean greaterIncludeEqual, Double lessEdge,
             boolean lessIncludeEqual) {
         names_ = names;
+        integer_ = integer;
         greaterEdge_ = greaterEdge;
         greaterIncludeEqual_ = greaterIncludeEqual;
         lessEdge_ = lessEdge;
@@ -46,10 +49,15 @@ public class NumericConstraint implements Constraint {
         String key = PREFIX_MESSAGEKEY + "numeric";
         String[] values = request.getParameterValues(name);
         if (values == null) {
-            messageList.add(new Message(key, new Object[] { name }));
             return;
         }
         for (int i = 0; i < values.length; i++) {
+            if (values[i].length() == 0) {
+                continue;
+            }
+            if (integer_ && values[i].indexOf('.') >= 0) {
+                messageList.add(new Message(key, new Object[] { name }));
+            }
             double value;
             try {
                 value = Double.parseDouble(values[i]);

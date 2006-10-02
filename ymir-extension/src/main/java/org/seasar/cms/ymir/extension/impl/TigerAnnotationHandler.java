@@ -159,7 +159,8 @@ public class TigerAnnotationHandler implements AnnotationHandler {
         List<Constraint> list = new ArrayList<Constraint>();
 
         if (includeCommonConstraints
-                && !clazz.isAnnotationPresent(SuppressConstraints.class)) {
+                && !(action != null && action
+                        .isAnnotationPresent(SuppressConstraints.class))) {
             getConstraint(clazz, list);
             BeanInfo beanInfo;
             try {

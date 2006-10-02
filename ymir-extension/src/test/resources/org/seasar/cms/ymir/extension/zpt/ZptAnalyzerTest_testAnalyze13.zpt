@@ -3,6 +3,6 @@
     <title>TEST</title>
   </head>
   <body>
-    <img tal:attributes="src page:/image/test${comment/id}" />
+    <img tal:attributes="src page:/image${comment/id}.img" />
   </body>
 </html>

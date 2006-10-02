@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.Application;
+import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
@@ -27,6 +28,10 @@ public class MockSourceCreator implements SourceCreator {
     }
 
     public String getDxoPackageName() {
+        return null;
+    }
+
+    public MatchedPathMapping findMatchedPathMapping(String path, String method) {
         return null;
     }
 

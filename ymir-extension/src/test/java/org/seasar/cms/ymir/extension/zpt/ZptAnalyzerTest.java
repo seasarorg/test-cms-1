@@ -8,6 +8,8 @@ import java.util.Vector;
 import junit.framework.TestCase;
 
 import org.seasar.cms.ymir.FormFile;
+import org.seasar.cms.ymir.MatchedPathMapping;
+import org.seasar.cms.ymir.PathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
@@ -15,8 +17,10 @@ import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.ymir.impl.ApplicationManagerImpl;
+import org.seasar.cms.ymir.impl.PathMappingImpl;
 import org.seasar.cms.ymir.mock.MockApplication;
 import org.seasar.framework.convention.impl.NamingConventionImpl;
+import org.seasar.kvasir.util.el.VariableResolver;
 
 import com.example.dto.SaruDto;
 
@@ -26,13 +30,18 @@ public class ZptAnalyzerTest extends TestCase {
 
     private static final String CLASSNAME = "com.example.web.IndexPage";
 
-    private ZptAnalyzer analyzer_ = new ZptAnalyzer();
+    private PathMapping[] mappings_ = new PathMapping[] {
+        new PathMappingImpl("^/([^/]+)\\.(.+)$", "${1}Page", "${METHOD}", "", null),
+        new PathMappingImpl("^/[^/]+/(.+)\\.(.+)$", "${1}Page", "${METHOD}",
+                "", null, true), };
+
+    private ZptAnalyzer target_ = new ZptAnalyzer();
 
     private Map<String, ClassDesc> classDescMap_ = new HashMap<String, ClassDesc>();
 
     protected void setUp() throws Exception {
 
-        analyzer_ = new ZptAnalyzer() {
+        target_ = new ZptAnalyzer() {
             @Override
             boolean isUsingFreyjaRenderClasses() {
                 return false;
@@ -52,18 +61,32 @@ public class ZptAnalyzerTest extends TestCase {
             }
         };
         SourceCreatorImpl creator = new SourceCreatorImpl() {
-            public String getComponentName(String path, String method) {
-                int slash = path.lastIndexOf('/');
-                if (slash >= 0) {
-                    path = path.substring(slash + 1);
+
+            @Override
+            public MatchedPathMapping findMatchedPathMapping(String path,
+                    String method) {
+                for (int i = 0; i < mappings_.length; i++) {
+                    VariableResolver resolver = mappings_[i]
+                            .match(path, method);
+                    if (resolver != null) {
+                        return new MatchedPathMapping(mappings_[i], resolver);
+                    }
                 }
-                int dot = path.lastIndexOf('.');
-                if (dot >= 0) {
-                    path = path.substring(0, dot);
-                }
-                return path + "Page";
+                return null;
             }
 
+            @Override
+            public String getComponentName(String path, String method) {
+                MatchedPathMapping matched = findMatchedPathMapping(path,
+                        method);
+                if (matched == null) {
+                    return null;
+                } else {
+                    return matched.getComponentName();
+                }
+            }
+
+            @Override
             public String getClassName(String componentName) {
                 if (componentName.endsWith("Page")) {
                     return "com.example.web."
@@ -74,8 +97,15 @@ public class ZptAnalyzerTest extends TestCase {
                 }
             }
 
+            @Override
             public String getActionName(String path, String method) {
-                return method;
+                MatchedPathMapping matched = findMatchedPathMapping(path,
+                        method);
+                if (matched == null) {
+                    return null;
+                } else {
+                    return matched.getActionName();
+                }
             }
 
             @Override
@@ -91,12 +121,12 @@ public class ZptAnalyzerTest extends TestCase {
             }
         });
         creator.setApplicationManager(applicationManager);
-        analyzer_.setSourceCreator(creator);
+        target_.setSourceCreator(creator);
     }
 
     private void act(String methodName) {
 
-        analyzer_.analyze("/hoe", Request.METHOD_GET, classDescMap_, getClass()
+        target_.analyze("/hoe", Request.METHOD_GET, classDescMap_, getClass()
                 .getResourceAsStream("ZptAnalyzerTest_" + methodName + ".zpt"),
                 "UTF-8", CLASSNAME);
     }
@@ -286,7 +316,7 @@ public class ZptAnalyzerTest extends TestCase {
 
         act("testAnalyze13");
 
-        ClassDesc cd = getClassDesc("com.example.web.Test0Page");
+        ClassDesc cd = getClassDesc("com.example.web.Image0Page");
         assertNotNull("page:指定のパラメータ置換が正しく行われ、その結果Pageクラスが生成されること", cd);
     }
 
@@ -321,4 +351,34 @@ public class ZptAnalyzerTest extends TestCase {
                 "VariableResolverから取得可能であっても、クラスの属するパッケージが自動生成対象である場合はClassDescが生成されること",
                 getClassDesc("com.example.dto.SaruDto"));
     }
+
+    public void testAnalyze17() throws Exception {
+
+        act("testAnalyze17");
+
+        ClassDesc cd = getClassDesc("com.example.web.UpdatePage");
+        assertNotNull(cd);
+        assertNull(
+                "dispatchingByRequestParameterがtrueであるようなPathMappingにactionのパスがマッチする場合はbuttonのnameに対応するプロパティのgetter/setterは生成されないこと",
+                cd.getPropertyDesc("button"));
+        assertNull(
+                "dispatchingByRequestParameterがtrueであるようなPathMappingにactionのパスがマッチする場合はimageのnameに対応するプロパティのgetter/setterは生成されないこと",
+                cd.getPropertyDesc("image"));
+        assertNull(
+                "dispatchingByRequestParameterがtrueであるようなPathMappingにactionのパスがマッチする場合はsubmitのnameに対応するプロパティのgetter/setterは生成されないこと",
+                cd.getPropertyDesc("submit"));
+        assertNotNull(
+                "dispatchingByRequestParameterがtrueである場合でも、デフォルトのアクションメソッドは生成されること",
+                cd.getMethodDesc(new MethodDescImpl("POST")));
+        assertNotNull(
+                "dispatchingByRequestParameterがtrueであるようなPathMappingにactionのパスがマッチする場合はbuttonのnameに対応するアクションメソッドが生成されること",
+                cd.getMethodDesc(new MethodDescImpl("POST_button")));
+        assertNotNull(
+                "dispatchingByRequestParameterがtrueであるようなPathMappingにactionのパスがマッチする場合はimageのnameに対応するアクションメソッドが生成されること",
+                cd.getMethodDesc(new MethodDescImpl("POST_image")));
+        assertNotNull(
+                "dispatchingByRequestParameterがtrueであるようなPathMappingにactionのパスがマッチする場合はsubmitのnameに対応するアクションメソッドが生成されること",
+                cd.getMethodDesc(new MethodDescImpl("POST_submit")));
+    }
+
 }

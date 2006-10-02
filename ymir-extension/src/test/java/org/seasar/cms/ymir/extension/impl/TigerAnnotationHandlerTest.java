@@ -86,4 +86,17 @@ public class TigerAnnotationHandlerTest extends TestCase {
         assertEquals("fuga", ((FugaConstraint) actual[1]).getName());
         assertEquals("render", ((FugaConstraint) actual[2]).getName());
     }
+
+    /*
+     * SuppressConstraintアノテーションが付与されている場合は共通制約を含まないこと。
+     */
+    public void testGetConstraints5() throws Exception {
+
+        Hoe hoe = new Hoe();
+        Constraint[] actual = target_.getConstraints(hoe, Hoe.class.getMethod(
+                "_get", new Class[0]), true);
+
+        assertEquals(1, actual.length);
+        assertEquals("get", ((FugaConstraint) actual[0]).getName());
+    }
 }

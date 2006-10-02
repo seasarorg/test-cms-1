@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.cms.ymir.FormFile;
+import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Path;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.FormDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.impl.FormDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 
 import net.skirnir.freyja.Attribute;
@@ -38,41 +41,47 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         AnnotationResult result = findAnnotation(context, name, attrs);
         String annotation = result.getAnnotation();
         attrs = result.getTheOtherAttributes();
-        AnalyzerContext analyzeContext = toAnalyzeContext(context);
-        Map attrMap = evaluate(analyzeContext, attrs);
+        AnalyzerContext analyzerContext = toAnalyzerContext(context);
+        Map attrMap = evaluate(analyzerContext, attrs);
 
         if ("form".equals(name)) {
-            ClassDesc classDesc = registerClassDesc(analyzeContext, attrMap,
-                    "action", getAttributeValue(attrMap, "method", "GET")
-                            .toUpperCase());
-            analyzeContext
-                    .setFormActionPageClassName((classDesc != null ? classDesc
-                            .getName() : null));
+            analyzerContext.setFormDesc(registerTransitionClassDesc(
+                    analyzerContext, attrMap, "action", getAttributeValue(
+                            attrMap, "method", "GET").toUpperCase()));
             try {
                 return super.evaluate(context, name, attrs, body);
             } finally {
-                analyzeContext.setFormActionPageClassName(null);
+                analyzerContext.setFormDesc(null);
             }
         } else if ("input".equals(name)) {
             String type = getAttributeValue(attrMap, "type", null);
-            PropertyDesc propertyDesc = processParameterTag(
-                    toAnalyzeContext(context), attrs, annotation);
-            if ("file".equals(type) && propertyDesc != null) {
-                propertyDesc.getTypeDesc().setClassDesc(
-                        FormFile.class.getName());
+            FormDesc formDesc = analyzerContext.getFormDesc();
+            if (formDesc != null
+                    && formDesc.isDispatchingByRequestParameter()
+                    && ("submit".equals(type) || "button".equals(type) || "image"
+                            .equals(type))) {
+                formDesc.setActionMethodDesc(getAttributeValue(attrMap, "name",
+                        null));
+            } else {
+                PropertyDesc propertyDesc = processParameterTag(
+                        analyzerContext, attrMap, annotation);
+                if ("file".equals(type) && propertyDesc != null) {
+                    propertyDesc.getTypeDesc().setClassDesc(
+                            FormFile.class.getName());
+                }
             }
         } else if ("select".equals(name) || "textarea".equals(name)) {
-            processParameterTag(toAnalyzeContext(context), attrs, annotation);
+            processParameterTag(analyzerContext, attrMap, annotation);
         } else {
-            registerClassDesc(analyzeContext, attrMap, "href", "GET");
-            registerClassDesc(analyzeContext, attrMap, "src", "GET");
+            registerTransitionClassDesc(analyzerContext, attrMap, "href", "GET");
+            registerTransitionClassDesc(analyzerContext, attrMap, "src", "GET");
         }
 
         return super.evaluate(context, name, attrs, body);
     }
 
-    ClassDesc registerClassDesc(AnalyzerContext analyzerContext, Map attrMap,
-            String attrName, String method) {
+    FormDesc registerTransitionClassDesc(AnalyzerContext analyzerContext,
+            Map attrMap, String attrName, String method) {
 
         SourceCreator creator = analyzerContext.getSourceCreator();
         Path path = constructPath(analyzerContext.getPathNormalizer()
@@ -80,23 +89,27 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         if (path == null) {
             return null;
         }
-        String className = creator.getClassName(creator.getComponentName(path
-                .getTrunk(), method));
+        MatchedPathMapping matched = creator.findMatchedPathMapping(path
+                .getTrunk(), method);
+        if (matched == null) {
+            return null;
+        }
+        String className = creator.getClassName(matched.getComponentName());
         if (className == null) {
             return null;
         }
-        String actionName = creator.getActionName(path.getTrunk(), method);
-        if (actionName == null) {
-            return null;
-        }
+        String actionName = matched.getActionName();
         ClassDesc classDesc = analyzerContext.getTemporaryClassDesc(className);
+        boolean dispatchingByRequestParameter = matched
+                .isDispatchingByRequestParameter();
         classDesc.setMethodDesc(new MethodDescImpl(actionName));
         for (Iterator itr = path.getParameterMap().keySet().iterator(); itr
                 .hasNext();) {
             classDesc.addProperty((String) itr.next(), PropertyDesc.WRITE
                     | PropertyDesc.READ);
         }
-        return classDesc;
+        return new FormDescImpl(classDesc, actionName,
+                dispatchingByRequestParameter);
     }
 
     Path constructPath(String pathWithParameters) {
@@ -138,24 +151,20 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
                 .toArray(new Attribute[0]));
     }
 
-    PropertyDesc processParameterTag(AnalyzerContext context,
-            Attribute[] attrs, String annotation) {
+    PropertyDesc processParameterTag(AnalyzerContext context, Map attrMap,
+            String annotation) {
 
-        String className = context.getFormActionPageClassName();
-        if (className == null) {
+        FormDesc formDesc = context.getFormDesc();
+        if (formDesc == null) {
             return null;
         }
 
-        Map attrMap = evaluate(context, attrs);
-        Attribute attr = (Attribute) attrMap.get("name");
-        if (attr != null) {
-            String name = TagEvaluatorUtils.defilter(attr.getValue());
-            if (isValidAsPropertyName(name)) {
-                return context.getPropertyDesc(context
-                        .getTemporaryClassDesc(className), name,
-                        PropertyDesc.READ | PropertyDesc.WRITE);
-            }
+        String name = getAttributeValue(attrMap, "name", null);
+        if (name != null && isValidAsPropertyName(name)) {
+            return context.getPropertyDesc(formDesc.getClassDesc(), name,
+                    PropertyDesc.READ | PropertyDesc.WRITE);
         }
+
         return null;
     }
 
@@ -233,7 +242,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         return TagEvaluatorUtils.toMap(attrs);
     }
 
-    AnalyzerContext toAnalyzeContext(TemplateContext context) {
+    AnalyzerContext toAnalyzerContext(TemplateContext context) {
 
         return (AnalyzerContext) context;
     }
@@ -242,7 +251,6 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
 
         Attribute attr = (Attribute) attrMap.get(name);
         if (attr != null) {
-
             return TagEvaluatorUtils.defilter(attr.getValue());
         } else {
             return defaultValue;

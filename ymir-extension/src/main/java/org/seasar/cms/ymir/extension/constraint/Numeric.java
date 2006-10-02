@@ -16,6 +16,8 @@ public @interface Numeric {
 
     String[] property() default {};
 
+    boolean integer() default true;
+
     double greaterThan() default Double.MIN_VALUE;
 
     double greaterEqual() default Double.MIN_VALUE;

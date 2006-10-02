@@ -37,6 +37,20 @@ public class PropertyDescImpl implements PropertyDesc, Cloneable {
         return cloned;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(typeDesc_).append(" ").append(name_).append("(");
+        if ((mode_ & READ) != 0) {
+            sb.append("r");
+        }
+        if ((mode_ & WRITE) != 0) {
+            sb.append("w");
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
     public String getName() {
 
         return name_;
