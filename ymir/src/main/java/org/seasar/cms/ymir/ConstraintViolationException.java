@@ -83,6 +83,16 @@ public class ConstraintViolationException extends Exception {
             parameters_ = parameters;
         }
 
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("key=").append(key_).append(", parameters={");
+            for (int i = 0; i < parameters_.length; i++) {
+                sb.append(parameters_[i]);
+            }
+            sb.append("}");
+            return sb.toString();
+        }
+
         public String getKey() {
             return key_;
         }
