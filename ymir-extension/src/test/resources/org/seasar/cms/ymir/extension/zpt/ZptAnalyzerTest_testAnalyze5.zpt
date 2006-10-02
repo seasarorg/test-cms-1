@@ -15,6 +15,18 @@
       <input type="button" name="button" value="BUTTON" />
       <input type="image" name="image" src="image.jpg" />
       <input type="submit" name="submit" value="SUBMIT" />
+
+      <input tal:attributes="name text2" type="text" name="text2" value="" />
+      <select tal:attributes="name select2" name="select2">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+      <textarea tal:attributes="name textarea2" name="textarea2"></textarea>
+      <input tal:attributes="name file2" type="file" name="file2" />
+      <input tal:attributes="name button2" type="button" name="button2" value="BUTTON" />
+      <input tal:attributes="name image2" type="image" name="image2" src="image.jpg" />
+      <input tal:attributes="name submit2" type="submit" name="submit2" value="SUBMIT" />
     </form>
   </body>
 </html>

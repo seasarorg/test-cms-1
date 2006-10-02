@@ -31,7 +31,8 @@ public class ZptAnalyzerTest extends TestCase {
     private static final String CLASSNAME = "com.example.web.IndexPage";
 
     private PathMapping[] mappings_ = new PathMapping[] {
-        new PathMappingImpl("^/([^/]+)\\.(.+)$", "${1}Page", "${METHOD}", "", null),
+        new PathMappingImpl("^/([^/]+)\\.(.+)$", "${1}Page", "${METHOD}", "",
+                null),
         new PathMappingImpl("^/[^/]+/(.+)\\.(.+)$", "${1}Page", "${METHOD}",
                 "", null, true), };
 
@@ -227,6 +228,15 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(cd.getPropertyDesc("button"));
         assertNotNull(cd.getPropertyDesc("image"));
         assertNotNull(cd.getPropertyDesc("submit"));
+
+        assertNull(cd.getPropertyDesc("text2"));
+        assertNull(cd.getPropertyDesc("select2"));
+        assertNull(cd.getPropertyDesc("textarea2"));
+        assertNull(cd.getPropertyDesc("file2"));
+        assertNull(cd.getPropertyDesc("button2"));
+        assertNull(cd.getPropertyDesc("image2"));
+        assertNull(cd.getPropertyDesc("submit2"));
+
         MethodDesc md = cd.getMethodDesc(new MethodDescImpl("POST"));
         assertNotNull(md);
         assertEquals("void", md.getReturnTypeDesc().getName());
@@ -379,6 +389,7 @@ public class ZptAnalyzerTest extends TestCase {
         assertNotNull(
                 "dispatchingByRequestParameterがtrueであるようなPathMappingにactionのパスがマッチする場合はsubmitのnameに対応するアクションメソッドが生成されること",
                 cd.getMethodDesc(new MethodDescImpl("POST_submit")));
+        assertNull("nameが実行時に決まるようなタグは無視されること", cd
+                .getMethodDesc(new MethodDescImpl("POST_submit2")));
     }
-
 }

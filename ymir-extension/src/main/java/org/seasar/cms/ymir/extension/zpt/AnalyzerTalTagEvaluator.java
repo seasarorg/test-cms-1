@@ -1,9 +1,11 @@
 package org.seasar.cms.ymir.extension.zpt;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.MatchedPathMapping;
@@ -43,6 +45,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         attrs = result.getTheOtherAttributes();
         AnalyzerContext analyzerContext = toAnalyzerContext(context);
         Map attrMap = evaluate(analyzerContext, attrs);
+        Set<String> runtimeAttributeNameSet = getRuntimeAttributeNameSet(attrs);
 
         if ("form".equals(name)) {
             analyzerContext.setFormDesc(registerTransitionClassDesc(
@@ -53,7 +56,10 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             } finally {
                 analyzerContext.setFormDesc(null);
             }
-        } else if ("input".equals(name)) {
+        } else if ("input".equals(name)
+                && !runtimeAttributeNameSet.contains("name")) {
+            // nameの値が実行時に決まる場合は正しくプロパティやメソッドを生成できないので、
+            // nameの値が定数である場合のみ処理を行なうようにしている。
             String type = getAttributeValue(attrMap, "type", null);
             FormDesc formDesc = analyzerContext.getFormDesc();
             if (formDesc != null
@@ -70,7 +76,10 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
                             FormFile.class.getName());
                 }
             }
-        } else if ("select".equals(name) || "textarea".equals(name)) {
+        } else if (("select".equals(name) || "textarea".equals(name))
+                && !runtimeAttributeNameSet.contains("name")) {
+            // nameの値が実行時に決まる場合は正しくプロパティやメソッドを生成できないので、
+            // nameの値が定数である場合のみ処理を行なうようにしている。
             processParameterTag(analyzerContext, attrMap, annotation);
         } else {
             registerTransitionClassDesc(analyzerContext, attrMap, "href", "GET");
@@ -78,6 +87,24 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         }
 
         return super.evaluate(context, name, attrs, body);
+    }
+
+    Set<String> getRuntimeAttributeNameSet(Attribute[] attrs) {
+
+        Set<String> set = new HashSet<String>();
+        for (int i = 0; i < attrs.length; i++) {
+            if ("tal:attributes".equals(attrs[i].getName())) {
+                String[] statements = parseStatements(TagEvaluatorUtils
+                        .defilter(attrs[i].getValue()));
+                for (int j = 0; j < statements.length; j++) {
+                    String statement = statements[j];
+                    set.add(statement.substring(0, statement.indexOf(' '))
+                            .trim());
+                }
+                break;
+            }
+        }
+        return set;
     }
 
     FormDesc registerTransitionClassDesc(AnalyzerContext analyzerContext,
