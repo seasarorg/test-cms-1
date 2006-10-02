@@ -239,6 +239,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
                 if (shouldRender(response, request.getComponentName())) {
                     // 画面描画のためのAction呼び出しを行なう。
+                    // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
+                    // 制約チェックを行なわない。）
                     invokeAction(component, ACTION_RENDER, null, request, false);
                     rendered = true;
                 }
@@ -250,7 +252,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
                     prepareForComponent(component, request);
 
-                    invokeAction(component, ACTION_RENDER, null, request, true);
+                    // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
+                    // 制約チェックを行なわない。）
+                    invokeAction(component, ACTION_RENDER, null, request, false);
                     rendered = true;
 
                     finishForComponent(component, request);
@@ -297,7 +301,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     ConstraintViolationException.Message[] messages = ex
                             .getMessages();
                     for (int j = 0; j < messages.length; j++) {
-                        notes.add(new Note(messages[i].getKey(), messages[i]
+                        notes.add(new Note(messages[j].getKey(), messages[j]
                                 .getParameters()));
                     }
                 } else {
