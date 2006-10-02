@@ -41,4 +41,10 @@ public interface PathMapping {
     Object getDefaultReturnValue(VariableResolver variableResolver_);
 
     boolean isDenied();
+
+    void setDenied(boolean denied);
+
+    boolean isDispatchingByRequestParameter();
+
+    void setDispatchingByRequestParameter(boolean dispatchingByRequestParameter);
 }

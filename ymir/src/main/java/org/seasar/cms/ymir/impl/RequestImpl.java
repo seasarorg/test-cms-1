@@ -32,13 +32,16 @@ public class RequestImpl implements Request {
 
     private Object defaultReturnValue_;
 
+    private boolean dispatchingByRequestParameter_;
+
     public RequestImpl() {
     }
 
     public RequestImpl(String contextPath, String path, String method,
             String dispatcher, Map parameterMap, Map fileParameterMap,
             AttributeContainer attributeContainer, String componentName,
-            String actionName, String pathInfo, Object defaultReturnValue) {
+            String actionName, String pathInfo, Object defaultReturnValue,
+            boolean dispatchingByRequestParameter) {
 
         contextPath_ = contextPath;
         path_ = path;
@@ -51,6 +54,7 @@ public class RequestImpl implements Request {
         actionName_ = actionName;
         pathInfo_ = pathInfo;
         defaultReturnValue_ = defaultReturnValue;
+        dispatchingByRequestParameter_ = dispatchingByRequestParameter;
     }
 
     public String getDispatcher() {
@@ -230,6 +234,17 @@ public class RequestImpl implements Request {
     public void setDefaultReturnValue(Object defaultReturnValue) {
 
         defaultReturnValue_ = defaultReturnValue;
+    }
+
+    public boolean isDispatchingByRequestParameter() {
+
+        return dispatchingByRequestParameter_;
+    }
+
+    public void setDispatchingByRequestParameter(
+            boolean dispatchingByRequestParameter) {
+
+        dispatchingByRequestParameter_ = dispatchingByRequestParameter;
     }
 
     public Object getAttribute(String name) {

@@ -2,6 +2,9 @@ package org.seasar.cms.ymir.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -113,7 +116,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return new RequestImpl(contextPath, path, method, dispatcher,
                 parameterMap, fileParameterMap, attributeContainer, matched
                         .getComponentName(), matched.getActionName(), matched
-                        .getPathInfo(), matched.getDefaultReturnValue());
+                        .getPathInfo(), matched.getDefaultReturnValue(),
+                matched.isDispatchingByRequestParameter());
     }
 
     String correctMethod(String method, Map parameterMap) {
@@ -233,7 +237,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 prepareForComponent(component, request);
 
                 response = normalizeResponse(constructResponse(invokeAction(
-                        component, request.getActionName(), ACTION_DEFAULT,
+                        component, getActionMethod(component, request
+                                .getActionName(), ACTION_DEFAULT, request
+                                .isDispatchingByRequestParameter(), request),
                         request, true), component, request
                         .getDefaultReturnValue()), request, component);
 
@@ -241,7 +247,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     // 画面描画のためのAction呼び出しを行なう。
                     // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
                     // 制約チェックを行なわない。）
-                    invokeAction(component, ACTION_RENDER, null, request, false);
+                    invokeAction(component, getActionMethod(component,
+                            ACTION_RENDER, null, false, request), request,
+                            false);
                     rendered = true;
                 }
 
@@ -254,7 +262,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
                     // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
                     // 制約チェックを行なわない。）
-                    invokeAction(component, ACTION_RENDER, null, request, false);
+                    invokeAction(component, getActionMethod(component,
+                            ACTION_RENDER, null, false, request), request,
+                            false);
                     rendered = true;
 
                     finishForComponent(component, request);
@@ -459,32 +469,24 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return threadContext_;
     }
 
-    Response invokeAction(Object component, String actionName,
-            String defaultActionName, Request request,
+    Response invokeAction(Object component, Method action, Request request,
             boolean alsoConfirmCommonConstraints)
             throws ConstraintViolationException {
 
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("[1]INVOKE: " + component.getClass().getName() + "#"
-                    + actionName);
-        }
         Response response = PassthroughResponse.INSTANCE;
 
-        Method method = getActionMethod(component, actionName);
-        if (method == null && defaultActionName != null) {
-            method = getActionMethod(component, defaultActionName);
+        if (action != null) {
             if (logger_.isDebugEnabled()) {
-                logger_.debug("[2]INVOKE: " + component.getClass().getName()
-                        + "#" + defaultActionName);
+                logger_.debug("INVOKE: " + component.getClass().getName() + "#"
+                        + action);
             }
-        }
-        if (method != null) {
-            Notes notes = confirmConstraint(component, method, request,
+
+            Notes notes = confirmConstraint(component, action, request,
                     alsoConfirmCommonConstraints);
             if (notes == null) {
                 Object returnValue;
                 try {
-                    returnValue = method.invoke(component, new Object[0]);
+                    returnValue = action.invoke(component, new Object[0]);
                 } catch (IllegalArgumentException ex) {
                     throw new RuntimeException(ex);
                 } catch (IllegalAccessException ex) {
@@ -492,18 +494,83 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 } catch (InvocationTargetException ex) {
                     throw new RuntimeException(ex);
                 }
-                response = constructResponse(component, method.getReturnType(),
+                response = constructResponse(component, action.getReturnType(),
                         returnValue);
             } else {
                 request.setAttribute(ATTR_NOTES, notes);
             }
-        }
 
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("[3]RESPONSE: " + response);
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("RESPONSE: " + response);
+            }
         }
 
         return response;
+    }
+
+    Method getActionMethod(Object component, String actionName,
+            String defaultActionName, boolean dispatchingByRequestParamter,
+            Request request) {
+        if (dispatchingByRequestParamter) {
+            Method[] methods = component.getClass().getMethods();
+            String prefix = actionName + "_";
+            if (logger_.isDebugEnabled()) {
+                logger_
+                        .debug("getActionMethod: dispatchingByRequestParameter=true. search "
+                                + component.getClass()
+                                + " for "
+                                + prefix
+                                + "XXXX method...");
+            }
+            List list = new ArrayList();
+            for (int i = 0; i < methods.length; i++) {
+                if (methods[i].getParameterTypes().length > 0) {
+                    continue;
+                }
+                String name = methods[i].getName();
+                if (name.startsWith(prefix)) {
+                    if (request.getParameter(name.substring(prefix.length())) != null) {
+                        if (logger_.isDebugEnabled()) {
+                            logger_.debug("getActionMethod: Found: "
+                                    + methods[i]);
+                        }
+                        return methods[i];
+                    }
+                } else {
+                    list.add(methods[i]);
+                }
+            }
+            if (defaultActionName != null) {
+                prefix = defaultActionName + "_";
+                if (logger_.isDebugEnabled()) {
+                    logger_.debug("getActionMethod: search "
+                            + component.getClass() + " for " + prefix
+                            + "XXXX method...");
+                }
+                for (Iterator itr = list.iterator(); itr.hasNext();) {
+                    Method method = (Method) itr.next();
+                    String name = method.getName();
+                    if (name.startsWith(prefix)
+                            && request.getParameter(name.substring(prefix
+                                    .length())) != null) {
+                        if (logger_.isDebugEnabled()) {
+                            logger_.debug("getActionMethod: Found: " + method);
+                        }
+                        return method;
+                    }
+                }
+            }
+        }
+
+        Method method = getActionMethod(component, actionName);
+        if (method == null && defaultActionName != null) {
+            method = getActionMethod(component, defaultActionName);
+        }
+
+        if (logger_.isDebugEnabled()) {
+            logger_.debug("getActionMethod: Found: " + method);
+        }
+        return method;
     }
 
     Response constructResponse(Response response, Object component,

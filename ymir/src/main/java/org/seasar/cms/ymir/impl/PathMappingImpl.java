@@ -30,6 +30,8 @@ public class PathMappingImpl implements PathMapping {
 
     private boolean denied_;
 
+    private boolean dispatchingByRequestParameter_;
+
     public PathMappingImpl() {
     }
 
@@ -38,12 +40,30 @@ public class PathMappingImpl implements PathMapping {
             Object defaultReturnValue) {
 
         this(false, patternString, componentTemplate, actionNameTemplate,
-                pathInfoTemplate, defaultReturnValue);
+                pathInfoTemplate, defaultReturnValue, false);
+    }
+
+    public PathMappingImpl(String patternString, String componentTemplate,
+            String actionNameTemplate, String pathInfoTemplate,
+            Object defaultReturnValue, boolean dispatchingByRequestParameter) {
+
+        this(false, patternString, componentTemplate, actionNameTemplate,
+                pathInfoTemplate, defaultReturnValue,
+                dispatchingByRequestParameter);
     }
 
     public PathMappingImpl(boolean denied, String patternString,
             String componentTemplate, String actionNameTemplate,
             String pathInfoTemplate, Object defaultReturnValue) {
+
+        this(denied, patternString, componentTemplate, actionNameTemplate,
+                pathInfoTemplate, defaultReturnValue, false);
+    }
+
+    public PathMappingImpl(boolean denied, String patternString,
+            String componentTemplate, String actionNameTemplate,
+            String pathInfoTemplate, Object defaultReturnValue,
+            boolean dispatchingByRequestParameter) {
 
         pattern_ = Pattern.compile(patternString);
         componentNameTemplate_ = componentTemplate;
@@ -54,6 +74,7 @@ public class PathMappingImpl implements PathMapping {
         } else {
             defaultReturnValue_ = defaultReturnValue;
         }
+        dispatchingByRequestParameter_ = dispatchingByRequestParameter;
     }
 
     public String getActionNameTemplate() {
@@ -130,6 +151,7 @@ public class PathMappingImpl implements PathMapping {
             prop.put("`", path.substring(0, matcher.start()));
             prop.put("&", path.substring(matcher.start(), matcher.end()));
             prop.put("'", path.substring(matcher.end()));
+            prop.put("METHOD", method);
             String lmethod = method.toLowerCase();
             prop.put("method", lmethod);
             prop.put("Method", upper(lmethod));
@@ -203,5 +225,21 @@ public class PathMappingImpl implements PathMapping {
     public boolean isDenied() {
 
         return denied_;
+    }
+
+    public void setDenied(boolean denied) {
+
+        denied_ = denied;
+    }
+
+    public boolean isDispatchingByRequestParameter() {
+
+        return dispatchingByRequestParameter_;
+    }
+
+    public void setDispatchingByRequestParameter(
+            boolean dispatchingByRequestParameter) {
+
+        dispatchingByRequestParameter_ = dispatchingByRequestParameter;
     }
 }

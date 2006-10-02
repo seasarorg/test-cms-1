@@ -54,4 +54,8 @@ public class MatchedPathMapping {
     public boolean isDenied() {
         return pathMapping_.isDenied();
     }
+
+    public boolean isDispatchingByRequestParameter() {
+        return pathMapping_.isDispatchingByRequestParameter();
+    }
 }

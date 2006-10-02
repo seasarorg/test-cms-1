@@ -136,4 +136,12 @@ public class MockRequest implements Request {
 
     public void setAttribute(String name, Object value) {
     }
+
+    public boolean isDispatchingByRequestParameter() {
+        return false;
+    }
+
+    public void setDispatchingByRequestParameter(
+            boolean dispatchingByRequestParameter) {
+    }
 }
