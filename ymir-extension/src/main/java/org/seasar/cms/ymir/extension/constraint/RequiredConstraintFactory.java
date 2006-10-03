@@ -12,7 +12,7 @@ public class RequiredConstraintFactory extends ConstraintFactoryBase implements 
         String[] names = add(annotation.value(), getPropertyName(element));
         if (names.length == 0) {
             throw new IllegalArgumentException(
-                    "Spease specify at least one property: " + element);
+                    "Please specify at least one property: " + element);
         }
         return new RequiredConstraint(names);
     }

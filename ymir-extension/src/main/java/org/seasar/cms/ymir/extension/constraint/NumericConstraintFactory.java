@@ -13,7 +13,7 @@ public class NumericConstraintFactory extends ConstraintFactoryBase implements
                 getPropertyName(element));
         if (names.length == 0) {
             throw new IllegalArgumentException(
-                    "Spease specify at least one property: " + element);
+                    "Please specify at least one property: " + element);
         }
 
         boolean greaterIncludeEqual = false;
