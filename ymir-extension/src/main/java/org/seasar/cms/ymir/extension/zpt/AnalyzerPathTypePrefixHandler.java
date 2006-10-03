@@ -5,7 +5,7 @@ import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
-import net.skirnir.freyja.VariableResolverUtils;
+import net.skirnir.freyja.VariableResolver.Entry;
 import net.skirnir.freyja.zpt.tales.PathTypePrefixHandler;
 
 public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
@@ -32,10 +32,10 @@ public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
             AnalyzerContext analyzerContext, VariableResolver varResolver,
             String arg) {
 
-        Class type = varResolver.getVariableType(analyzerContext, arg);
-        if (type == null) {
-            type = VariableResolverUtils.toType(varResolver.getVariable(
-                    analyzerContext, arg));
+        Class type = Object.class;
+        Entry entry = varResolver.getVariableEntry(analyzerContext, arg);
+        if (entry != null) {
+            type = entry.getType();
         }
         return (type == Object.class || type.getName().startsWith(
                 analyzerContext.getSourceCreator().getRootPackageName() + "."));
