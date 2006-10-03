@@ -3,24 +3,20 @@ package org.seasar.cms.ymir;
 import java.beans.PropertyDescriptor;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.VariableResolverUtils;
+import net.skirnir.freyja.impl.VariableResolverImpl;
 
-public class YmirVariableResolver implements VariableResolver {
-    private Map vars_ = new HashMap();
-
+public class YmirVariableResolver extends VariableResolverImpl {
     private HttpServletRequest request_;
 
     private VariableResolver parent_;
@@ -36,24 +32,24 @@ public class YmirVariableResolver implements VariableResolver {
     }
 
     public Object getVariable(TemplateContext context, String name) {
-        if (vars_.containsKey(name)) {
-            return vars_.get(name);
+        Object value = super.getVariable(context, name);
+        if (value != null) {
+            return value;
         }
-
         if (parent_ != null) {
-            Object value = parent_.getVariable(context, name);
+            value = parent_.getVariable(context, name);
             if (value != null) {
                 return value;
             }
         }
 
-        Object value = request_.getParameter(name);
+        value = request_.getParameter(name);
         if (value == null) {
             Object component = request_
                     .getAttribute(DefaultRequestProcessor.ATTR_SELF);
             if (component != null) {
                 try {
-                    value = BeanUtils.getProperty(component, name);
+                    value = PropertyUtils.getProperty(component, name);
                 } catch (Throwable ignore) {
                 }
             }
@@ -63,7 +59,7 @@ public class YmirVariableResolver implements VariableResolver {
 
     public String[] getVariableNames() {
         Set nameSet = new HashSet();
-        nameSet.addAll(vars_.keySet());
+        nameSet.addAll(Arrays.asList(super.getVariableNames()));
         if (parent_ != null) {
             nameSet.addAll(Arrays.asList(parent_.getVariableNames()));
         }
@@ -88,9 +84,5 @@ public class YmirVariableResolver implements VariableResolver {
 
     public Class getVariableType(TemplateContext context, String name) {
         return VariableResolverUtils.toType(getVariable(context, name));
-    }
-
-    public void setVariable(String name, Object value) {
-        vars_.put(name, value);
     }
 }
