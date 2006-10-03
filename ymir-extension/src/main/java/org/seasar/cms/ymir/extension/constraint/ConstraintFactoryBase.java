@@ -18,7 +18,7 @@ abstract public class ConstraintFactoryBase {
         return toPropertyName(((Method) element).getName());
     }
 
-    String toPropertyName(String methodName) {
+    protected String toPropertyName(String methodName) {
 
         String name;
         if (methodName == null) {
@@ -41,7 +41,7 @@ abstract public class ConstraintFactoryBase {
         }
     }
 
-    String[] add(String[] strings, String string) {
+    protected String[] add(String[] strings, String string) {
 
         if (string != null) {
             String[] newStrings = new String[strings.length + 1];
@@ -53,7 +53,7 @@ abstract public class ConstraintFactoryBase {
         }
     }
 
-    String[] add(String[] strings, String[] strings2, String string) {
+    protected String[] add(String[] strings, String[] strings2, String string) {
 
         String[] newStrings = new String[strings.length + strings2.length
                 + (string != null ? 1 : 0)];
