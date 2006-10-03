@@ -11,7 +11,7 @@ abstract public class HoePageBase
         return hoe_;
     }
 
-    @org.seasar.cms.ymir.extension.annotation.SuppressConstraints
+    @org.seasar.cms.ymir.extension.annotation.SuppressConstraints({org.seasar.cms.ymir.extension.ConstraintType.VALIDATION,org.seasar.cms.ymir.extension.ConstraintType.PERMISSION})
     @org.seasar.cms.ymir.extension.constraint.Required("set")
     public void setHoe(String hoe)
     {

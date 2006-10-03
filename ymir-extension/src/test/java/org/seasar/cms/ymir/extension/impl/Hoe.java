@@ -1,8 +1,10 @@
 package org.seasar.cms.ymir.extension.impl;
 
+import org.seasar.cms.ymir.extension.ConstraintType;
 import org.seasar.cms.ymir.extension.annotation.SuppressConstraints;
 
 @Fuga("saru")
+@Fufu("tora")
 public class Hoe {
 
     private String fuga_;
@@ -28,5 +30,10 @@ public class Hoe {
     @SuppressConstraints
     @Fuga("get")
     public void _get() {
+    }
+
+    @SuppressConstraints(ConstraintType.VALIDATION)
+    @Fuga("head")
+    public void _head() {
     }
 }

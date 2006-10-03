@@ -9,11 +9,14 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeHandler;
 import org.seasar.cms.ymir.Constraint;
+import org.seasar.cms.ymir.extension.ConstraintType;
 import org.seasar.cms.ymir.extension.annotation.ConstraintAnnotation;
 import org.seasar.cms.ymir.extension.annotation.In;
 import org.seasar.cms.ymir.extension.annotation.Out;
@@ -24,6 +27,9 @@ import org.seasar.cms.ymir.scope.impl.RequestScope;
 import org.seasar.framework.container.S2Container;
 
 public class TigerAnnotationHandler implements AnnotationHandler {
+
+    static final Set<ConstraintType> EMPTY_SUPPRESSTYPESET = EnumSet
+            .noneOf(ConstraintType.class);
 
     private S2Container container_;
 
@@ -158,10 +164,20 @@ public class TigerAnnotationHandler implements AnnotationHandler {
             boolean includeCommonConstraints) {
         List<Constraint> list = new ArrayList<Constraint>();
 
-        if (includeCommonConstraints
-                && !(action != null && action
-                        .isAnnotationPresent(SuppressConstraints.class))) {
-            getConstraint(clazz, list);
+        if (includeCommonConstraints) {
+            Set<ConstraintType> suppressTypeSet = EnumSet
+                    .noneOf(ConstraintType.class);
+            if (action != null) {
+                SuppressConstraints suppress = action
+                        .getAnnotation(SuppressConstraints.class);
+                if (suppress != null) {
+                    ConstraintType[] types = suppress.value();
+                    for (int i = 0; i < types.length; i++) {
+                        suppressTypeSet.add(types[i]);
+                    }
+                }
+            }
+            getConstraint(clazz, list, suppressTypeSet);
             BeanInfo beanInfo;
             try {
                 beanInfo = Introspector.getBeanInfo(clazz);
@@ -170,16 +186,17 @@ public class TigerAnnotationHandler implements AnnotationHandler {
             }
             PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
             for (int i = 0; i < pds.length; i++) {
-                getConstraint(pds[i].getWriteMethod(), list);
+                getConstraint(pds[i].getWriteMethod(), list, suppressTypeSet);
             }
         }
-        getConstraint(action, list);
+        getConstraint(action, list, EMPTY_SUPPRESSTYPESET);
 
         return list.toArray(new Constraint[0]);
     }
 
     @SuppressWarnings("unchecked")
-    void getConstraint(AnnotatedElement element, List<Constraint> list) {
+    void getConstraint(AnnotatedElement element, List<Constraint> list,
+            Set<ConstraintType> suppressTypeSet) {
         if (element == null) {
             return;
         }
@@ -187,12 +204,13 @@ public class TigerAnnotationHandler implements AnnotationHandler {
         for (int i = 0; i < annotations.length; i++) {
             ConstraintAnnotation constraintAnnotation = annotations[i]
                     .annotationType().getAnnotation(ConstraintAnnotation.class);
-            if (constraintAnnotation == null) {
+            if (constraintAnnotation == null
+                    || suppressTypeSet.contains(constraintAnnotation.type())) {
                 continue;
             }
             ConstraintFactory factory;
             try {
-                factory = (ConstraintFactory) constraintAnnotation.value()
+                factory = (ConstraintFactory) constraintAnnotation.factory()
                         .newInstance();
             } catch (InstantiationException ex) {
                 throw new RuntimeException(ex);

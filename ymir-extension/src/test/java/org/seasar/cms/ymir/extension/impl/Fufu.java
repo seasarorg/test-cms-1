@@ -1,4 +1,4 @@
-package org.seasar.cms.ymir.extension.constraint;
+package org.seasar.cms.ymir.extension.impl;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,8 +10,8 @@ import org.seasar.cms.ymir.extension.annotation.ConstraintAnnotation;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.TYPE, ElementType.METHOD })
-@ConstraintAnnotation(type = ConstraintType.VALIDATION, factory = RequiredConstraintFactory.class)
-public @interface Required {
+@ConstraintAnnotation(type = ConstraintType.PERMISSION, factory = FufuConstraintFactory.class)
+public @interface Fufu {
 
-    String[] value() default {};
+    String value();
 }

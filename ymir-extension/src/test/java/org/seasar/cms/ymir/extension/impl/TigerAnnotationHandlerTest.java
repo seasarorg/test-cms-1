@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.extension.impl;
 
+import static org.seasar.cms.ymir.extension.impl.TigerAnnotationHandler.EMPTY_SUPPRESSTYPESET;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +28,11 @@ public class TigerAnnotationHandlerTest extends TestCase {
     public void testGetConstraints() throws Exception {
 
         List<Constraint> actual = new ArrayList<Constraint>();
-        target_.getConstraint(Hoe.class, actual);
+        target_.getConstraint(Hoe.class, actual, EMPTY_SUPPRESSTYPESET);
 
-        assertEquals(1, actual.size());
+        assertEquals(2, actual.size());
         assertEquals("saru", ((FugaConstraint) actual.get(0)).getName());
+        assertEquals("tora", ((FufuConstraint) actual.get(1)).getName());
     }
 
     /*
@@ -52,9 +55,10 @@ public class TigerAnnotationHandlerTest extends TestCase {
         Hoe hoe = new Hoe();
         Constraint[] actual = target_.getConstraints(hoe, null, true);
 
-        assertEquals(2, actual.length);
+        assertEquals(3, actual.length);
         assertEquals("saru", ((FugaConstraint) actual[0]).getName());
-        assertEquals("fuga", ((FugaConstraint) actual[1]).getName());
+        assertEquals("tora", ((FufuConstraint) actual[1]).getName());
+        assertEquals("fuga", ((FugaConstraint) actual[2]).getName());
     }
 
     /*
@@ -81,10 +85,11 @@ public class TigerAnnotationHandlerTest extends TestCase {
         Constraint[] actual = target_.getConstraints(hoe, Hoe.class.getMethod(
                 "_render", new Class[0]), true);
 
-        assertEquals(3, actual.length);
+        assertEquals(4, actual.length);
         assertEquals("saru", ((FugaConstraint) actual[0]).getName());
-        assertEquals("fuga", ((FugaConstraint) actual[1]).getName());
-        assertEquals("render", ((FugaConstraint) actual[2]).getName());
+        assertEquals("tora", ((FufuConstraint) actual[1]).getName());
+        assertEquals("fuga", ((FugaConstraint) actual[2]).getName());
+        assertEquals("render", ((FugaConstraint) actual[3]).getName());
     }
 
     /*
@@ -98,5 +103,20 @@ public class TigerAnnotationHandlerTest extends TestCase {
 
         assertEquals(1, actual.length);
         assertEquals("get", ((FugaConstraint) actual[0]).getName());
+    }
+
+    /*
+     * SuppressConstraintアノテーションがConstraintTypeつきで付与されている場合は、
+     * 指定されたタイプの共通制約を含まないこと。
+     */
+    public void testGetConstraints6() throws Exception {
+
+        Hoe hoe = new Hoe();
+        Constraint[] actual = target_.getConstraints(hoe, Hoe.class.getMethod(
+                "_head", new Class[0]), true);
+
+        assertEquals(2, actual.length);
+        assertEquals("tora", ((FufuConstraint) actual[0]).getName());
+        assertEquals("head", ((FugaConstraint) actual[1]).getName());
     }
 }
