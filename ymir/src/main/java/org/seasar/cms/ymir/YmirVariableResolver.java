@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -13,7 +14,6 @@ import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
-import net.skirnir.freyja.VariableResolverUtils;
 import net.skirnir.freyja.impl.VariableResolverImpl;
 
 public class YmirVariableResolver extends VariableResolverImpl {
@@ -32,29 +32,30 @@ public class YmirVariableResolver extends VariableResolverImpl {
     }
 
     public Object getVariable(TemplateContext context, String name) {
-        Object value = super.getVariable(context, name);
-        if (value != null) {
-            return value;
-        }
-        if (parent_ != null) {
-            value = parent_.getVariable(context, name);
-            if (value != null) {
-                return value;
+        if (super.containsVariable(name)) {
+            return super.getVariable(context, name);
+        } else if (parent_ != null) {
+            Entry entry = parent_.getVariableEntry(context, name);
+            if (entry != null) {
+                return entry.getValue();
             }
         }
 
-        value = request_.getParameter(name);
-        if (value == null) {
-            Object component = request_
-                    .getAttribute(DefaultRequestProcessor.ATTR_SELF);
-            if (component != null) {
-                try {
-                    value = PropertyUtils.getProperty(component, name);
-                } catch (Throwable ignore) {
-                }
+        Object value = request_.getParameter(name);
+        if (value != null) {
+            return value;
+        }
+
+        Object component = request_
+                .getAttribute(DefaultRequestProcessor.ATTR_SELF);
+        if (component != null) {
+            try {
+                return PropertyUtils.getProperty(component, name);
+            } catch (Throwable ignore) {
             }
         }
-        return value;
+
+        return null;
     }
 
     public String[] getVariableNames() {
@@ -82,7 +83,62 @@ public class YmirVariableResolver extends VariableResolverImpl {
         return (String[]) nameSet.toArray(new String[0]);
     }
 
-    public Class getVariableType(TemplateContext context, String name) {
-        return VariableResolverUtils.toType(getVariable(context, name));
+    public boolean containsVariable(String name) {
+        if (super.containsVariable(name)) {
+            return true;
+        } else if (parent_ != null && parent_.containsVariable(name)) {
+            return true;
+        } else if (request_.getParameter(name) != null) {
+            return true;
+        }
+
+        Object component = request_
+                .getAttribute(DefaultRequestProcessor.ATTR_SELF);
+        if (component != null) {
+            try {
+                if (PropertyUtils.getPropertyDescriptor(component, name) != null) {
+                    return true;
+                }
+            } catch (Throwable ignore) {
+            }
+        }
+
+        return false;
+    }
+
+    public Entry getVariableEntry(TemplateContext context, String name) {
+        Entry entry = super.getVariableEntry(context, name);
+        if (entry != null) {
+            return entry;
+        } else if (parent_ != null) {
+            entry = parent_.getVariableEntry(context, name);
+            if (entry != null) {
+                return entry;
+            }
+        }
+
+        Object value = request_.getParameter(name);
+        if (value != null) {
+            return new EntryImpl(name, String.class, value);
+        }
+
+        Object component = request_
+                .getAttribute(DefaultRequestProcessor.ATTR_SELF);
+        if (component != null) {
+            try {
+                PropertyDescriptor pd = PropertyUtils.getPropertyDescriptor(
+                        component, name);
+                if (pd != null) {
+                    Method readMethod = pd.getReadMethod();
+                    if (readMethod != null) {
+                        return new EntryImpl(name, readMethod.getReturnType(),
+                                readMethod.invoke(component, new Object[0]));
+                    }
+                }
+            } catch (Throwable ignore) {
+            }
+        }
+
+        return null;
     }
 }
