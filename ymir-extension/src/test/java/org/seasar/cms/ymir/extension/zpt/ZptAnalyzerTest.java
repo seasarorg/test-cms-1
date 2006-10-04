@@ -1,5 +1,9 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import static org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl.MOCK_REQUEST;
+import static org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl.MOCK_RESPONSE;
+import static org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl.MOCK_SERVLETCONTEXT;
+
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,8 +131,10 @@ public class ZptAnalyzerTest extends TestCase {
 
     private void act(String methodName) {
 
-        target_.analyze("/hoe", Request.METHOD_GET, classDescMap_, getClass()
-                .getResourceAsStream("ZptAnalyzerTest_" + methodName + ".zpt"),
+        target_.analyze(MOCK_SERVLETCONTEXT, MOCK_REQUEST, MOCK_RESPONSE,
+                "/hoe", Request.METHOD_GET, classDescMap_, getClass()
+                        .getResourceAsStream(
+                                "ZptAnalyzerTest_" + methodName + ".zpt"),
                 "UTF-8", CLASSNAME);
     }
 

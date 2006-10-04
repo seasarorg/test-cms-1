@@ -36,6 +36,8 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.ymir.Application;
@@ -76,6 +78,9 @@ import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.convention.NamingConvention;
 import org.seasar.framework.log.Logger;
+import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
+import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
+import org.seasar.framework.mock.servlet.MockServletContextImpl;
 
 import net.skirnir.xom.IllegalSyntaxException;
 import net.skirnir.xom.ValidationException;
@@ -90,6 +95,21 @@ public class SourceCreatorImpl implements SourceCreator {
     public static final String PARAM_TASK = PARAM_PREFIX + "task";
 
     private static final String SOURCECREATOR_PROPERTIES = "sourceCreator.properties";
+
+    public static final ServletContext MOCK_SERVLETCONTEXT = new MockServletContextImpl(
+            "/") {
+        private static final long serialVersionUID = 0;
+
+        public String getServletContextName() {
+            return "";
+        }
+    };
+
+    public static final HttpServletRequest MOCK_REQUEST = new MockHttpServletRequestImpl(
+            MOCK_SERVLETCONTEXT, "/");
+
+    public static final HttpServletResponse MOCK_RESPONSE = new MockHttpServletResponseImpl(
+            MOCK_REQUEST);
 
     private DefaultRequestProcessor defaultRequestProcessor_;
 
@@ -322,8 +342,10 @@ public class SourceCreatorImpl implements SourceCreator {
         String method = pathMetaData.getMethod();
         String className = pathMetaData.getClassName();
         try {
-            analyzer_.analyze(path, method, classDescMap, new FileInputStream(
-                    pathMetaData.getTemplateFile()), encoding_, className);
+            analyzer_.analyze(getServletContext(), getHttpServletRequest(),
+                    getHttpServletResponse(), path, method, classDescMap,
+                    new FileInputStream(pathMetaData.getTemplateFile()),
+                    encoding_, className);
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
@@ -952,6 +974,18 @@ public class SourceCreatorImpl implements SourceCreator {
 
         return (ServletContext) getRootS2Container().getComponent(
                 ServletContext.class);
+    }
+
+    HttpServletRequest getHttpServletRequest() {
+
+        return (HttpServletRequest) getRootS2Container().getComponent(
+                HttpServletRequest.class);
+    }
+
+    HttpServletResponse getHttpServletResponse() {
+
+        return (HttpServletResponse) getRootS2Container().getComponent(
+                HttpServletResponse.class);
     }
 
     S2Container getS2Container() {

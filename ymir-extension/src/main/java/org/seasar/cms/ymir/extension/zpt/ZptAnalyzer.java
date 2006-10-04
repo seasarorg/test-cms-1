@@ -15,9 +15,6 @@ import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.TemplateAnalyzer;
-import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
-import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
-import org.seasar.framework.mock.servlet.MockServletContextImpl;
 
 import net.skirnir.freyja.ExpressionEvaluator;
 import net.skirnir.freyja.IllegalSyntaxException;
@@ -28,26 +25,10 @@ import net.skirnir.freyja.webapp.ServletVariableResolverFactory;
 import net.skirnir.freyja.webapp.VariableResolverFactory;
 import net.skirnir.freyja.zpt.MetalTagEvaluator;
 import net.skirnir.freyja.zpt.TalTagEvaluator;
-import net.skirnir.freyja.zpt.tales.BeanPathResolver;
 import net.skirnir.freyja.zpt.tales.TalesExpressionEvaluator;
 import net.skirnir.freyja.zpt.webapp.ServletTalesExpressionEvaluator;
 
 public class ZptAnalyzer implements TemplateAnalyzer {
-
-    private static final ServletContext MOCK_SERVLETCONTEXT = new MockServletContextImpl(
-            "/") {
-        private static final long serialVersionUID = 0;
-
-        public String getServletContextName() {
-            return "";
-        }
-    };
-
-    private static final HttpServletRequest MOCK_REQUEST = new MockHttpServletRequestImpl(
-            MOCK_SERVLETCONTEXT, "/");
-
-    private static final HttpServletResponse MOCK_RESPONSE = new MockHttpServletResponseImpl(
-            MOCK_REQUEST);
 
     private TemplateEvaluator evaluator_;
 
@@ -66,9 +47,10 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         setVariableResolverFactory(new ServletVariableResolverFactory());
     }
 
-    public void analyze(String path, String method,
-            Map<String, ClassDesc> classDescMap, InputStream inputStream,
-            String encoding, String className) {
+    public void analyze(ServletContext servletContext,
+            HttpServletRequest request, HttpServletResponse response,
+            String path, String method, Map<String, ClassDesc> classDescMap,
+            InputStream inputStream, String encoding, String className) {
 
         templateSet_.setPathNormalizer(templatePathNormalizer_);
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
@@ -80,9 +62,9 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         context.setClassDescMap(classDescMap);
         context.setPageClassName(className);
         context.setUsingFreyjaRenderClasses(isUsingFreyjaRenderClasses());
-        context.setVariableResolver(vrf_.newResolver(MOCK_REQUEST,
-                MOCK_RESPONSE, MOCK_SERVLETCONTEXT, new YmirVariableResolver(
-                        MOCK_REQUEST)));
+        context.setVariableResolver(new AnalyzerVariableResolver(vrf_
+                .newResolver(request, response, servletContext,
+                        new YmirVariableResolver(request))));
 
         try {
             evaluator_.evaluate(context, new InputStreamReader(inputStream,
@@ -147,11 +129,9 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         ExpressionEvaluator expressionEvaluator = templateEvaluator
                 .getExpressionEvaluator();
         if (expressionEvaluator instanceof TalesExpressionEvaluator) {
-            ((TalesExpressionEvaluator) expressionEvaluator).addTypePrefix(
-                    "not", new AnalyzerNotTypePrefixHandler()).addTypePrefix(
-                    "path",
-                    new AnalyzerPathTypePrefixHandler('/')
-                            .addPathResolver(new BeanPathResolver()), true);
+            TalesExpressionEvaluator evaluator = ((TalesExpressionEvaluator) expressionEvaluator);
+            evaluator.addTypePrefix("not", new AnalyzerNotTypePrefixHandler());
+            evaluator.addPathResolver(new AnalyzerPathResolver());
         }
         evaluator_ = new TemplateEvaluator(tagEvaluator, expressionEvaluator);
     }

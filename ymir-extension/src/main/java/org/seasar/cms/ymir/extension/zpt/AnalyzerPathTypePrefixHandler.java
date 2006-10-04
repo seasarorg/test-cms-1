@@ -6,13 +6,31 @@ import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.VariableResolver.Entry;
+import net.skirnir.freyja.zpt.tales.PathResolver;
 import net.skirnir.freyja.zpt.tales.PathTypePrefixHandler;
+import net.skirnir.freyja.zpt.tales.TalesExpressionEvaluator;
 
 public class AnalyzerPathTypePrefixHandler extends PathTypePrefixHandler {
 
-    public AnalyzerPathTypePrefixHandler(char pathExpDelim) {
+    private PathTypePrefixHandler delegated_;
 
-        super(pathExpDelim);
+    public AnalyzerPathTypePrefixHandler(PathTypePrefixHandler delegated) {
+        delegated_ = delegated;
+        delegated.addPathResolver(new AnalyzerPathResolver());
+    }
+
+    public PathTypePrefixHandler addPathResolver(PathResolver resolver) {
+        // AnalyzerPathResolverを常に有効にするため、このメソッドの呼び出しは許可しない。
+        throw new UnsupportedOperationException();
+    }
+
+    public Object handle(TemplateContext context, VariableResolver varResolver,
+            String expr) {
+        return delegated_.handle(context, varResolver, expr);
+    }
+
+    public void setTalesExpressionEvaluator(TalesExpressionEvaluator evaluator) {
+        delegated_.setTalesExpressionEvaluator(evaluator);
     }
 
     protected Object getProperty(TemplateContext context,
