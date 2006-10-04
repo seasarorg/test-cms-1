@@ -26,10 +26,10 @@ import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.PathMapping;
 import org.seasar.cms.ymir.PermissionDeniedException;
+import org.seasar.cms.ymir.RedirectionPathResolver;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.ResponsePathNormalizer;
 import org.seasar.cms.ymir.Updater;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
@@ -69,7 +69,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private AnnotationHandler annotationHandler_ = new DefaultAnnotationHandler();
 
-    private ResponsePathNormalizer responsePathNormalizer_ = new DefaultResponsePathNormalizer();
+    private RedirectionPathResolver redirectionPathResolver_ = new DefaultRedirectionPathResolver();
 
     private final PropertyUtilsBean propertyUtilsBean_ = new PropertyUtilsBean();
 
@@ -98,10 +98,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
             Map fileParameterMap, AttributeContainer attributeContainer)
             throws PageNotFoundException {
 
-        boolean underDevelopment = Configuration.PROJECTSTATUS_DEVELOP
-                .equals(getProjectStatus())
-                && getApplication().isUnderDevelopment();
-        if (underDevelopment) {
+        if (isUnderDevelopment()) {
             method = correctMethod(method, parameterMap);
         }
 
@@ -197,22 +194,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public Response process(Request request)
             throws ConstraintViolationException {
 
-        // dispatchがREQUESTの時は、
-        // ・pathに対応するcomponentがあればactionを実行する。actionの実行結果が
-        //   passthroughの時は、デフォルトの返り値が指定されていれば、 デフォルトの返り値
-        //   に対応するresponseに置き換える。
-        // ・pathに対応するcomponentがなければresponseの値はpassthroughとする。
-        //   デフォルトの返り値が指定されている場合はデフォルトの返り値に対応するresponseとする。
-        // ・responseがリクエストパスへのforwardである場合はpassthroughをresponseとする。
-        // ・最終的なresponseがpassthroughでかつcomponentがあれば、レンダリングのための
-        //   メソッドを呼び出す。
-        // ・最終的なresponseがforwardである場合、forward先に対応するコンポーネント名がないか
-        //   対応するコンポーネント名が元々のcomponentの名前と一致するならば
-        //   レンダリングのためのメソッドを呼び出す。
-        // dispatchがREQUESTでない時は、
-        // ・pathに対応するcomponentがあって、それがリクエスト時のcomponentと一致しないならば
-        //   レンダリングのためのメソッドを呼び出す。
-
         if (request == null) {
             return PassthroughResponse.INSTANCE;
         }
@@ -231,67 +212,69 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         Response response = PassthroughResponse.INSTANCE;
-        boolean rendered = false;
         if (component != null) {
-            if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
-                prepareForComponent(component, request);
+            prepareForComponent(component, request);
 
-                response = normalizeResponse(constructResponse(invokeAction(
-                        component, getActionMethod(component, request
-                                .getActionName(), ACTION_DEFAULT, request
-                                .isDispatchingByRequestParameter(), request),
-                        request, true), component, request
-                        .getDefaultReturnValue()), request, component);
+            // リクエストに対応するアクションの呼び出しを行なう。
+            response = normalizeResponse(
+                    constructResponse(invokeAction(component,
+                            getActionMethod(component, request.getActionName(),
+                                    ACTION_DEFAULT, request
+                                            .isDispatchingByRequestParameter(),
+                                    request), request, true), component,
+                            request.getDefaultReturnValue()), request.getPath());
 
-                if (shouldRender(response, request.getComponentName())) {
-                    // 画面描画のためのAction呼び出しを行なう。
-                    // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
-                    // 制約チェックを行なわない。）
-                    invokeAction(component, getActionMethod(component,
-                            ACTION_RENDER, null, false, request), request,
-                            false);
-                    rendered = true;
-                }
+            // 画面描画のためのAction呼び出しを行なう。
+            // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
+            // 制約チェックを行なわない。）
+            invokeAction(component, getActionMethod(component, ACTION_RENDER,
+                    null, false, request), request, false);
 
-                finishForComponent(component, request);
-            } else {
-                if (component != getRequestComponent(request)) {
-                    // 画面描画のためのAction呼び出しをまだ行なっていないので行なう。
-
-                    prepareForComponent(component, request);
-
-                    // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
-                    // 制約チェックを行なわない。）
-                    invokeAction(component, getActionMethod(component,
-                            ACTION_RENDER, null, false, request), request,
-                            false);
-                    rendered = true;
-
-                    finishForComponent(component, request);
-                }
-                response = normalizeResponse(constructResponseFromReturnValue(
-                        component, request.getDefaultReturnValue()), request,
-                        component);
-            }
+            finishForComponent(component, request);
+        } else {
+            // componentがnullになるのは、component名が割り当てられているのにまだ
+            // 対応するcomponentクラスが作成されていない場合。
+            // その場合自動生成機能でクラスやテンプレートの自動生成が適切にできるように、
+            // デフォルト値からResponseを作るようにしている。
+            // （例えば、リクエストパス名がテンプレートパス名ではない場合に、リクエストパス名で
+            // テンプレートが作られてしまうとうれしくない。）
+            response = normalizeResponse(constructResponseFromReturnValue(
+                    component, request.getDefaultReturnValue()), request
+                    .getPath());
         }
 
         if (logger_.isDebugEnabled()) {
             logger_.debug("FINAL RESPONSE: " + response);
         }
 
-        boolean underDevelopment = Configuration.PROJECTSTATUS_DEVELOP
-                .equals(getProjectStatus())
-                && getApplication().isUnderDevelopment();
-        if (underDevelopment && rendered) {
-            for (int i = 0; i < updaters_.length; i++) {
-                Response newResponse = updaters_[i].update(request, response);
-                if (newResponse != response) {
-                    return newResponse;
+        if (isUnderDevelopment()) {
+            if (response.getType() == Response.TYPE_PASSTHROUGH
+                    || response.getType() == Response.TYPE_FORWARD) {
+                for (int i = 0; i < updaters_.length; i++) {
+                    Response newResponse = updaters_[i].update(request,
+                            response);
+                    if (newResponse != response) {
+                        return newResponse;
+                    }
                 }
             }
         }
 
         return response;
+    }
+
+    Response normalizeResponse(Response response, String path) {
+        if (response.getType() == Response.TYPE_FORWARD
+                && response.getPath().equals(path)) {
+            return PassthroughResponse.INSTANCE;
+        } else {
+            return response;
+        }
+    }
+
+    boolean isUnderDevelopment() {
+        return Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
+                && getApplication().isUnderDevelopment();
     }
 
     Notes confirmConstraint(Object component, Method action, Request request,
@@ -335,30 +318,30 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         if (response.getType() == Response.TYPE_PASSTHROUGH) {
             return true;
-        }
-
-        if (response.getType() == Response.TYPE_FORWARD) {
-            MatchedPathMapping matched = findMatchedPathMapping(response
-                    .getPath(), Request.METHOD_GET);
-            if (matched == null) {
-                return true;
-            } else {
-                if (logger_.isDebugEnabled()) {
-                    logger_
-                            .debug("NOT RENDER because component is different: target component="
-                                    + componentName
-                                    + ", next component="
-                                    + matched.getComponentName());
-                }
-            }
-        } else {
+        } else if (response.getType() != Response.TYPE_FORWARD) {
             if (logger_.isDebugEnabled()) {
                 logger_
                         .debug("NOT RENDER because response directs to transit to different page: response="
                                 + response);
             }
+            return false;
         }
-        return false;
+
+        MatchedPathMapping matched = findMatchedPathMapping(response.getPath(),
+                Request.METHOD_GET);
+        if (matched != null && !matched.isDenied()
+                && !matched.getComponentName().equals(componentName)) {
+            if (logger_.isDebugEnabled()) {
+                logger_
+                        .debug("NOT RENDER because component is different: target component="
+                                + componentName
+                                + ", next component="
+                                + matched.getComponentName());
+            }
+            return false;
+        }
+
+        return true;
     }
 
     void prepareForComponent(Object component, Request request) {
@@ -393,56 +376,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         // コンポーネント自体をattributeとしてバインドしておく。
         request.setAttribute(ATTR_SELF, component);
-    }
-
-    Response normalizeResponse(Response response, Request request,
-            Object component) {
-
-        return normalizeResponse(response, request, component, request
-                .getPath(), request.getComponentName());
-    }
-
-    Response normalizeResponse(Response response, Request request,
-            Object component, String path, String componentName) {
-
-        int type = response.getType();
-        if (type == Response.TYPE_FORWARD || type == Response.TYPE_REDIRECT) {
-            String normalized = responsePathNormalizer_.normalize(response
-                    .getPath(), request);
-            if (type == Response.TYPE_FORWARD) {
-                if (path.equals(normalized)) {
-                    return PassthroughResponse.INSTANCE;
-                } else {
-                    // フォワード先のコンポーネントが現在のコンポーネントと同じ場合、
-                    // フォワード前にrenderingを行なうことになる。
-                    // ということは、フォワード後には
-                    // （フォワード時にはアクションは呼ばれないしrenderingも行なわれないので）
-                    // デフォルトの返り値に従って再度フォワードされるだけになる。
-                    // デフォルトの返り値が同じコンポーネントへのforwardである限り、
-                    // 同様にフォワード後には何の処理も行なわれないので、
-                    // 結局「フォワードでかつフォワード先のコンポーネントが同じ限り
-                    // フォワード処理をスキップしてよい」ということになる。
-                    MatchedPathMapping matched = findMatchedPathMapping(
-                            normalized, Request.METHOD_GET);
-                    if (matched != null
-                            && componentName.equals(matched.getComponentName())) {
-                        Response constructed = constructResponseFromReturnValue(
-                                component, matched.getDefaultReturnValue());
-                        Response finalResponse = normalizeResponse(constructed,
-                                request, component, normalized, componentName);
-                        if (finalResponse.getType() == Response.TYPE_PASSTHROUGH) {
-                            constructed.setPath(normalized);
-                            return constructed;
-                        } else {
-                            return finalResponse;
-                        }
-                    }
-                }
-            }
-            response.setPath(normalized);
-        }
-
-        return response;
     }
 
     void injectContextAttributes(Object component) {
@@ -629,16 +562,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
-    //
-    //
-    //
-    //        if (response.getType() == Response.TYPE_FORWARD
-    //                && path.equals(response.getPath())) {
-    //            response = PassthroughResponse.INSTANCE;
-    //        }
-    //        return response;
-    //    }
-
     public void setResponseConstructorSelector(
             ResponseConstructorSelector responseConstructorSelector) {
 
@@ -665,8 +588,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
         annotationHandler_ = annotationHandler;
     }
 
-    public void setResponsePathNormalizer(
-            ResponsePathNormalizer responsePathNormalizer) {
-        responsePathNormalizer_ = responsePathNormalizer;
+    public void setRedirectionPathResolver(
+            RedirectionPathResolver redirectionPathResolver) {
+
+        redirectionPathResolver_ = redirectionPathResolver;
     }
 }

@@ -13,14 +13,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.ResponsePathNormalizer;
+import org.seasar.cms.ymir.RedirectionPathResolver;
 import org.seasar.cms.ymir.ResponseProcessor;
 
 public class DefaultResponseProcessor implements ResponseProcessor {
 
     private static final int BUF_SIZE = 4096;
 
-    private ResponsePathNormalizer responsePathNormalizer_ = new DefaultResponsePathNormalizer();
+    private RedirectionPathResolver redirectionPathResolver_ = new DefaultRedirectionPathResolver();
 
     public boolean process(ServletContext context,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,
@@ -44,8 +44,8 @@ public class DefaultResponseProcessor implements ResponseProcessor {
             return false;
 
         case Response.TYPE_REDIRECT:
-            httpResponse.sendRedirect(responsePathNormalizer_
-                    .normalizeForRedirection(response.getPath(), request));
+            httpResponse.sendRedirect(redirectionPathResolver_
+                    .resolve(response.getPath(), request));
             return false;
 
         case Response.TYPE_SELF_CONTAINED:
@@ -85,8 +85,8 @@ public class DefaultResponseProcessor implements ResponseProcessor {
         }
     }
 
-    public void setResponsePathNormalizer(
-            ResponsePathNormalizer responsePathNormalizer) {
-        responsePathNormalizer_ = responsePathNormalizer;
+    public void setRedirectionPathResolver(
+            RedirectionPathResolver responsePathNormalizer) {
+        redirectionPathResolver_ = responsePathNormalizer;
     }
 }

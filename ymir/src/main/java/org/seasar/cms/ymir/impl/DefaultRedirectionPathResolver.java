@@ -1,15 +1,11 @@
 package org.seasar.cms.ymir.impl;
 
 import org.seasar.cms.ymir.Request;
-import org.seasar.cms.ymir.ResponsePathNormalizer;
+import org.seasar.cms.ymir.RedirectionPathResolver;
 
-public class DefaultResponsePathNormalizer implements ResponsePathNormalizer {
+public class DefaultRedirectionPathResolver implements RedirectionPathResolver {
 
-    public String normalize(String path, Request request) {
-        return path;
-    }
-
-    public String normalizeForRedirection(String path, Request request) {
+    public String resolve(String path, Request request) {
         if (path == null) {
             return null;
         }

@@ -38,62 +38,19 @@ public class DefaultRequestProcessorTest extends S2TestCase {
 
         Request request = new MockRequest() {
             public String getPath() {
-                return "/article/update.do";
+                return "/article/update.zpt";
             }
 
             public String getComponentName() {
                 return "articlePage";
             }
         };
-        Response response = new ForwardResponse("/article.done");
+        Response response = new ForwardResponse("/article/update.zpt");
 
-        Response actual = target_.normalizeResponse(response, request, null);
+        Response actual = target_
+                .normalizeResponse(response, request.getPath());
 
-        assertEquals("同一のコンポーネントに対応するパスへのフォワードについては、そうでなくなるまで遷移先を読み飛ばすこと",
-                Response.TYPE_FORWARD, actual.getType());
-        assertEquals("同一のコンポーネントに対応するパスへのフォワードについては、そうでなくなるまで遷移先を読み飛ばすこと",
-                "/article.html", actual.getPath());
-    }
-
-    public void testNormlizeResponse2() throws Exception {
-
-        Request request = new MockRequest() {
-            public String getPath() {
-                return "/article.do";
-            }
-
-            public String getComponentName() {
-                return "articlePage";
-            }
-        };
-        Response response = new ForwardResponse("/article.html");
-
-        Response actual = target_.normalizeResponse(response, request, null);
-
-        assertEquals("同一のコンポーネントに対応するパスへのフォワードについては、そうでなくなるまで遷移先を読み飛ばすこと",
-                Response.TYPE_FORWARD, actual.getType());
-        assertEquals("同一のコンポーネントに対応するパスへのフォワードについては、そうでなくなるまで遷移先を読み飛ばすこと",
-                "/article.html", actual.getPath());
-    }
-
-    public void testNormlizeResponse3() throws Exception {
-
-        Request request = new MockRequest() {
-            public String getPath() {
-                return "/article.html";
-            }
-
-            public String getComponentName() {
-                return "articlePage";
-            }
-        };
-        Response response = new ForwardResponse("/article.html");
-
-        Response actual = target_.normalizeResponse(response, request, null);
-
-        assertEquals("同一のコンポーネントに対応するパスへのフォワードについて、"
-                + "そうでなくなるまで遷移先を読み飛ばした結果がリクエストパスと同じ場合は"
-                + "レスポンスがpassthroughになること", Response.TYPE_PASSTHROUGH, actual
-                .getType());
+        assertEquals("リクエストパスと同じパスへのフォワードはPASSTHROUGHに正規化されること",
+                Response.TYPE_PASSTHROUGH, actual.getType());
     }
 }
