@@ -12,6 +12,7 @@ import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.LifecycleListener;
+import org.seasar.cms.ymir.extension.ClassTraverserBag;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.hotdeploy.HotdeployListener;
 import org.seasar.framework.log.Logger;
@@ -27,7 +28,7 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
 
     private ClassHandler beantableClassHandler_;
 
-    private ClassTraverser[] traversers_;
+    private ClassTraverserBag[] traverserBags_;
 
     private Logger logger_ = Logger.getLogger(getClass());
 
@@ -37,26 +38,37 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
 
     public void init() {
 
-        List<ClassTraverser> traverserList = new ArrayList<ClassTraverser>();
+        List<ClassTraverserBag> bagList = new ArrayList<ClassTraverserBag>();
+
         Application[] applications = applicationManager_.getApplications();
         for (int i = 0; i < applications.length; i++) {
             if (isEnabled(applications[i])) {
-                ClassTraverser traverser = newClassTraverser(applications[i]);
-                traverserList.add(traverser);
+                ClassTraverserBag bag = newClassTraverserBag(applications[i]);
+                bagList.add(bag);
             }
         }
-        traversers_ = traverserList.toArray(new ClassTraverser[0]);
+        traverserBags_ = bagList.toArray(new ClassTraverserBag[0]);
 
         traserse();
     }
 
     void traserse() {
-        for (int i = 0; i < traversers_.length; i++) {
-            traversers_[i].traverse();
+
+        for (int i = 0; i < traverserBags_.length; i++) {
+            ClassLoader old = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(
+                        traverserBags_[i].getApplication().getS2Container()
+                                .getClassLoader());
+                traverserBags_[i].getClassTraverser().traverse();
+            } finally {
+                Thread.currentThread().setContextClassLoader(old);
+            }
         }
     }
 
-    ClassTraverser newClassTraverser(Application application) {
+    ClassTraverserBag newClassTraverserBag(Application application) {
+
         ClassTraverser traverser = new ClassTraverser();
         traverser.setClassHandler(beantableClassHandler_);
         String targetPackageName = application.getRootPackageName() + ".dao";
@@ -64,7 +76,7 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
         traverser.addIgnoreClassPattern(targetPackageName,
                 "(Abstract)?.*(Base|Dao)");
         traverser.addReferenceClass(application.getReferenceClass());
-        return traverser;
+        return new ClassTraverserBag(traverser, application);
     }
 
     boolean isEnabled(Application application) {
@@ -87,15 +99,15 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
             return;
         }
 
-        Application application = getApplication(clazz);
-        if (application == null) {
+        ClassTraverserBag bag = getClassTraverserBag(clazz);
+        if (bag == null) {
             return;
         }
 
-        if (!isEnabled(application)) {
+        if (!isEnabled(bag.getApplication())) {
             return;
         }
-        if (!isBeanClass(clazz)) {
+        if (!isBeanClass(clazz, bag.getClassTraverser())) {
             return;
         }
 
@@ -112,18 +124,17 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
         }
     }
 
-    Application getApplication(Class clazz) {
+    ClassTraverserBag getClassTraverserBag(Class clazz) {
 
-        Application[] applications = applicationManager_.getApplications();
-        for (int i = 0; i < applications.length; i++) {
-            if (applications[i].isCapable(clazz)) {
-                return applications[i];
+        for (int i = 0; i < traverserBags_.length; i++) {
+            if (traverserBags_[i].getApplication().isCapable(clazz)) {
+                return traverserBags_[i];
             }
         }
         return null;
     }
 
-    boolean isBeanClass(Class clazz) {
+    boolean isBeanClass(Class clazz, ClassTraverser traverser) {
 
         String packageName;
         String shortClassName;
@@ -136,16 +147,7 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
             packageName = className.substring(0, dot);
             shortClassName = className.substring(dot + 1);
         }
-        return isMatched(packageName, shortClassName);
-    }
-
-    boolean isMatched(String packageName, String shortClassName) {
-        for (int i = 0; i < traversers_.length; i++) {
-            if (traversers_[i].isMatched(packageName, shortClassName)) {
-                return true;
-            }
-        }
-        return false;
+        return traverser.isMatched(packageName, shortClassName);
     }
 
     Beantable newBeantable(Class beanClass) {
