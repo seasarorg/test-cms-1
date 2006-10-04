@@ -155,6 +155,12 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public Logger logger_ = Logger.getLogger(getClass());
 
+    // TODO forwardPathをテンプレートのパスに変換するTemplateProviderを導入する。
+    // これは差し替え可能にしておいて、Kvasirと組み合わせる場合はKvasirTemplateSet
+    // からテンプレートを取るようなTemplateResolverを使うようにする。
+    // TODO ZptAnalyzerで、本物のTemplateContext構築手順をAnalyzerContext
+    // に対して行なうようにする。
+    // TODO 上記改修によってTemplatePathNormalizerは不要となるはず。
     public Response update(Request request, Response response) {
 
         Application application = getApplication();

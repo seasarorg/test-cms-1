@@ -39,14 +39,6 @@
     </init-param>
   </filter>
   <filter>
-    <filter-name>ymir.forward</filter-name>
-    <filter-class>org.seasar.cms.ymir.servlet.YmirFilter</filter-class>
-    <init-param>
-      <param-name>dispatcher</param-name>
-      <param-value>FORWARD</param-value>
-    </init-param>
-  </filter>
-  <filter>
     <filter-name>ymir.include</filter-name>
     <filter-class>org.seasar.cms.ymir.servlet.YmirFilter</filter-class>
     <init-param>
