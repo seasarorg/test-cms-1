@@ -1,10 +1,9 @@
 package org.seasar.cms.ymir.extension.impl;
 
-import org.seasar.cms.ymir.Constraint;
 import org.seasar.cms.ymir.ConstraintViolationException;
 import org.seasar.cms.ymir.Request;
 
-public class FufuConstraint implements Constraint {
+public class FufuConstraint implements NamedConstraint {
 
     private String name_;
 
