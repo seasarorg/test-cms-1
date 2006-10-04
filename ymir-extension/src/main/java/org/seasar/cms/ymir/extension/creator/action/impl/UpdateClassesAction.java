@@ -17,6 +17,7 @@ import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
+import org.seasar.kvasir.util.PropertyUtils;
 
 public class UpdateClassesAction extends AbstractUpdateAction {
 
@@ -27,6 +28,8 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             + "replace";
 
     private static final String PREFIX_CHECKEDTIME = "updateClassesAction.checkedTime.";
+
+    private static final String PREFIX_CLASSCHECKED = "updateClassesAction.class.checked.";
 
     public UpdateClassesAction(SourceCreatorImpl sourceCreator) {
         super(sourceCreator);
@@ -59,9 +62,29 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         variableMap.put("templateFile", pathMetaData.getTemplateFile());
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
-        variableMap.put("classDescBag", classDescBag);
+        variableMap.put("createdClassDescs", createClassDescDtos(classDescBag
+                .getCreatedClassDescs()));
+        variableMap.put("updatedClassDescs", createClassDescDtos(classDescBag
+                .getUpdatedClassDescs()));
         return getSourceCreator().getResponseCreator().createResponse(
                 "updateClasses", variableMap);
+    }
+
+    ClassDescDto[] createClassDescDtos(ClassDesc[] classDescs) {
+
+        Properties prop = getSourceCreator().getSourceCreatorProperties();
+
+        ClassDescDto[] dtos = new ClassDescDto[classDescs.length];
+        for (int i = 0; i < classDescs.length; i++) {
+            String name = classDescs[i].getName();
+            String kind = classDescs[i].getKind();
+            dtos[i] = new ClassDescDto(name, PropertyUtils.valueOf(prop
+                    .getProperty(PREFIX_CLASSCHECKED + name),
+                    !(ClassDesc.KIND_DAO.equals(kind) || ClassDesc.KIND_BEAN
+                            .equals(kind))));
+        }
+
+        return dtos;
     }
 
     Response actUpdate(Request request, PathMetaData pathMetaData) {
@@ -79,13 +102,20 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         if (appliedClassNames != null) {
             appliedClassNameSet.addAll(Arrays.asList(appliedClassNames));
         }
+        Properties prop = getSourceCreator().getSourceCreatorProperties();
         ClassDesc[] classDescs = classDescBag.getClassDescs();
         for (int i = 0; i < classDescs.length; i++) {
             String name = classDescs[i].getName();
-            if (!appliedClassNameSet.contains(name)) {
+            String checked;
+            if (appliedClassNameSet.contains(name)) {
+                checked = String.valueOf(true);
+            } else {
+                checked = String.valueOf(false);
                 classDescBag.remove(name);
             }
+            prop.setProperty(PREFIX_CLASSCHECKED + name, checked);
         }
+        getSourceCreator().saveSourceCreatorProperties();
 
         boolean mergeMethod = !"true".equals(request
                 .getParameter(PARAM_REPLACE));
