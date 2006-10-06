@@ -8,27 +8,15 @@ public interface PathMapping {
 
     String getActionNameTemplate();
 
-    void setActionNameTemplate(String actionNameTemplate);
-
     String getComponentNameTemplate();
-
-    void setComponentNameTemplate(String componentTemplate);
 
     String getPathInfoTemplate();
 
-    void setPathInfoTemplate(String pathInfoTemplate);
-
     String getDefaultReturnValueTemplate();
-
-    void setDefaultReturnValueTemplate(String defaultReturnValueTemplate);
 
     Object getDefaultReturnValue();
 
-    void setDefaultReturnValue(Object defaultReturnValue);
-
     Pattern getPattern();
-
-    void setPattern(Pattern pattern);
 
     VariableResolver match(String path, String method);
 
@@ -42,9 +30,7 @@ public interface PathMapping {
 
     boolean isDenied();
 
-    void setDenied(boolean denied);
+    String extractParameterName(String name);
 
-    boolean isDispatchingByRequestParameter();
-
-    void setDispatchingByRequestParameter(boolean dispatchingByRequestParameter);
+    boolean isDispatchingByParameter();
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.FormFile;
+import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
 
 public class RequestImpl implements Request {
@@ -24,24 +25,14 @@ public class RequestImpl implements Request {
 
     private AttributeContainer attributeContainer_;
 
-    private String pathInfo_;
-
-    private String componentName_;
-
-    private String actionName_;
-
-    private Object defaultReturnValue_;
-
-    private boolean dispatchingByRequestParameter_;
+    private MatchedPathMapping matched_;
 
     public RequestImpl() {
     }
 
     public RequestImpl(String contextPath, String path, String method,
             String dispatcher, Map parameterMap, Map fileParameterMap,
-            AttributeContainer attributeContainer, String componentName,
-            String actionName, String pathInfo, Object defaultReturnValue,
-            boolean dispatchingByRequestParameter) {
+            AttributeContainer attributeContainer, MatchedPathMapping matched) {
 
         contextPath_ = contextPath;
         path_ = path;
@@ -50,11 +41,7 @@ public class RequestImpl implements Request {
         parameterMap_ = parameterMap;
         fileParameterMap_ = fileParameterMap;
         attributeContainer_ = attributeContainer;
-        componentName_ = componentName;
-        actionName_ = actionName;
-        pathInfo_ = pathInfo;
-        defaultReturnValue_ = defaultReturnValue;
-        dispatchingByRequestParameter_ = dispatchingByRequestParameter;
+        matched_ = matched;
     }
 
     public String getDispatcher() {
@@ -198,53 +185,32 @@ public class RequestImpl implements Request {
 
     public String getComponentName() {
 
-        return componentName_;
-    }
-
-    public void setComponentName(String componentName) {
-
-        componentName_ = componentName;
+        return matched_.getComponentName();
     }
 
     public String getActionName() {
 
-        return actionName_;
-    }
-
-    public void setActionName(String actionName) {
-
-        actionName_ = actionName;
+        return matched_.getActionName();
     }
 
     public String getPathInfo() {
 
-        return pathInfo_;
-    }
-
-    public void setPathInfo(String pathInfo) {
-
-        pathInfo_ = pathInfo;
+        return matched_.getPathInfo();
     }
 
     public Object getDefaultReturnValue() {
 
-        return defaultReturnValue_;
+        return matched_.getDefaultReturnValue();
     }
 
-    public void setDefaultReturnValue(Object defaultReturnValue) {
+    public String extractParameterName(String name) {
 
-        defaultReturnValue_ = defaultReturnValue;
+        return matched_.extractParameterName(name);
     }
 
-    public boolean isDispatchingByRequestParameter() {
+    public boolean isDispatchingByParameter() {
 
-        return dispatchingByRequestParameter_;
-    }
-
-    public void setDispatchingByRequestParameter(
-            boolean dispatchingByRequestParameter) {
-
-        dispatchingByRequestParameter_ = dispatchingByRequestParameter;
+        return matched_.isDispatchingByParameter();
     }
 
     public Object getAttribute(String name) {

@@ -144,4 +144,12 @@ public class MockRequest implements Request {
     public void setDispatchingByRequestParameter(
             boolean dispatchingByRequestParameter) {
     }
+
+    public String extractParameterName(String name) {
+        return null;
+    }
+
+    public boolean isDispatchingByParameter() {
+        return false;
+    }
 }

@@ -14,6 +14,7 @@
     <arg>"_${method}"</arg>
     <arg>""</arg>
     <arg>"/article.do"</arg>
+    <arg>null</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
     <arg>"^/article\\.do$"</arg>
@@ -21,6 +22,7 @@
     <arg>"_${method}"</arg>
     <arg>""</arg>
     <arg>"/article.html"</arg>
+    <arg>null</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
     <arg>"^/article\\.html$"</arg>
@@ -28,6 +30,7 @@
     <arg>"_${method}"</arg>
     <arg>""</arg>
     <arg>"/article.html"</arg>
+    <arg>null</arg>
   </component>
   <component name="articlePage" class="org.seasar.cms.ymir.impl.ArticlePage" />
 

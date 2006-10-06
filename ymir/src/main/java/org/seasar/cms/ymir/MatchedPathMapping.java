@@ -55,7 +55,11 @@ public class MatchedPathMapping {
         return pathMapping_.isDenied();
     }
 
-    public boolean isDispatchingByRequestParameter() {
-        return pathMapping_.isDispatchingByRequestParameter();
+    public String extractParameterName(String name) {
+        return pathMapping_.extractParameterName(name);
+    }
+
+    public boolean isDispatchingByParameter() {
+        return pathMapping_.isDispatchingByParameter();
     }
 }

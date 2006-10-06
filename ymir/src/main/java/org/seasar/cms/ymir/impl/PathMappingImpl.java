@@ -28,42 +28,26 @@ public class PathMappingImpl implements PathMapping {
 
     private Object defaultReturnValue_;
 
+    private Pattern parameterNamePatternForDispatching_;
+
+    private String parameterNamePatternStringForDispatching_;
+
     private boolean denied_;
 
-    private boolean dispatchingByRequestParameter_;
-
-    public PathMappingImpl() {
-    }
-
     public PathMappingImpl(String patternString, String componentTemplate,
             String actionNameTemplate, String pathInfoTemplate,
-            Object defaultReturnValue) {
-
-        this(false, patternString, componentTemplate, actionNameTemplate,
-                pathInfoTemplate, defaultReturnValue, false);
-    }
-
-    public PathMappingImpl(String patternString, String componentTemplate,
-            String actionNameTemplate, String pathInfoTemplate,
-            Object defaultReturnValue, boolean dispatchingByRequestParameter) {
+            Object defaultReturnValue,
+            String parameterNamePatternStringForDispatching) {
 
         this(false, patternString, componentTemplate, actionNameTemplate,
                 pathInfoTemplate, defaultReturnValue,
-                dispatchingByRequestParameter);
-    }
-
-    public PathMappingImpl(boolean denied, String patternString,
-            String componentTemplate, String actionNameTemplate,
-            String pathInfoTemplate, Object defaultReturnValue) {
-
-        this(denied, patternString, componentTemplate, actionNameTemplate,
-                pathInfoTemplate, defaultReturnValue, false);
+                parameterNamePatternStringForDispatching);
     }
 
     public PathMappingImpl(boolean denied, String patternString,
             String componentTemplate, String actionNameTemplate,
             String pathInfoTemplate, Object defaultReturnValue,
-            boolean dispatchingByRequestParameter) {
+            String parameterNamePatternStringForDispatching) {
 
         pattern_ = Pattern.compile(patternString);
         componentNameTemplate_ = componentTemplate;
@@ -74,7 +58,11 @@ public class PathMappingImpl implements PathMapping {
         } else {
             defaultReturnValue_ = defaultReturnValue;
         }
-        dispatchingByRequestParameter_ = dispatchingByRequestParameter;
+        if (parameterNamePatternStringForDispatching != null) {
+            parameterNamePatternStringForDispatching_ = parameterNamePatternStringForDispatching;
+            parameterNamePatternForDispatching_ = Pattern
+                    .compile(parameterNamePatternStringForDispatching);
+        }
     }
 
     public String getActionNameTemplate() {
@@ -82,18 +70,8 @@ public class PathMappingImpl implements PathMapping {
         return actionNameTemplate_;
     }
 
-    public void setActionNameTemplate(String actionNameTemplate) {
-
-        actionNameTemplate_ = actionNameTemplate;
-    }
-
     public String getComponentNameTemplate() {
         return componentNameTemplate_;
-    }
-
-    public void setComponentNameTemplate(String componentTemplate) {
-
-        componentNameTemplate_ = componentTemplate;
     }
 
     public String getPathInfoTemplate() {
@@ -101,19 +79,9 @@ public class PathMappingImpl implements PathMapping {
         return pathInfoTemplate_;
     }
 
-    public void setPathInfoTemplate(String pathInfoTemplate) {
-
-        pathInfoTemplate_ = pathInfoTemplate;
-    }
-
     public String getDefaultReturnValueTemplate() {
 
         return defaultReturnValueTemplate_;
-    }
-
-    public void setDefaultReturnValueTemplate(String defaultPathTemplate) {
-
-        defaultReturnValueTemplate_ = defaultPathTemplate;
     }
 
     public Object getDefaultReturnValue() {
@@ -121,19 +89,9 @@ public class PathMappingImpl implements PathMapping {
         return defaultReturnValue_;
     }
 
-    public void setDefaultReturnValue(Object defaultReturnValue) {
-
-        defaultReturnValue_ = defaultReturnValue;
-    }
-
     public Pattern getPattern() {
 
         return pattern_;
-    }
-
-    public void setPattern(Pattern pattern) {
-
-        pattern_ = pattern;
     }
 
     public VariableResolver match(String path, String method) {
@@ -227,19 +185,26 @@ public class PathMappingImpl implements PathMapping {
         return denied_;
     }
 
-    public void setDenied(boolean denied) {
+    public String extractParameterName(String name) {
 
-        denied_ = denied;
+        if (parameterNamePatternForDispatching_ != null) {
+            Matcher matcher = parameterNamePatternForDispatching_.matcher(name);
+            if (matcher.find()) {
+                if (matcher.groupCount() > 0) {
+                    return matcher.group(1);
+                } else {
+                    // 「()」が指定されていない。
+                    throw new IllegalArgumentException(
+                            "parameter pattern must have ( ) specification: "
+                                    + parameterNamePatternStringForDispatching_);
+                }
+            }
+        }
+        return null;
     }
 
-    public boolean isDispatchingByRequestParameter() {
+    public boolean isDispatchingByParameter() {
 
-        return dispatchingByRequestParameter_;
-    }
-
-    public void setDispatchingByRequestParameter(
-            boolean dispatchingByRequestParameter) {
-
-        dispatchingByRequestParameter_ = dispatchingByRequestParameter;
+        return (parameterNamePatternForDispatching_ != null);
     }
 }

@@ -13,6 +13,7 @@
     <arg>"_${method}"</arg>
     <arg>""</arg>
     <arg>null</arg>
+    <arg>null</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
     <arg>"^/([a-zA-Z][a-zA-Z0-9]*)\\.(.+)$"</arg>
@@ -20,7 +21,7 @@
     <arg>"_${method}"</arg>
     <arg>""</arg>
     <arg>"/${1}.html"</arg>
-    <arg>true</arg>
+    <arg>"^_([a-zA-Z][a-zA-Z0-9]*)$"</arg>
   </component>
   <component class="org.seasar.cms.ymir.impl.PathMappingImpl">
     <arg>"^/([a-zA-Z][a-zA-Z0-9]*)/([a-zA-Z][a-zA-Z0-9]*)\\.(.+)$"</arg>
@@ -28,5 +29,6 @@
     <arg>"_${2l}By${Method}"</arg>
     <arg>""</arg>
     <arg>"/${1}.html"</arg>
+    <arg>null</arg>
   </component>
 </components>

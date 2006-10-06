@@ -42,8 +42,6 @@ public interface Request extends AttributeContainer {
      */
     String getContextPath();
 
-    void setContextPath(String contextPath);
-
     /**
      * パスを返します。
      * <p>返されるパスはコンテキストパス相対です。</p>
@@ -51,8 +49,6 @@ public interface Request extends AttributeContainer {
      * @return パス。
      */
     String getPath();
-
-    void setPath(String path);
 
     /**
      * 絶対パスを返します。
@@ -70,8 +66,6 @@ public interface Request extends AttributeContainer {
      */
     String getMethod();
 
-    void setMethod(String method);
-
     /**
      * ディスパッチャ名を返します。
      * <p>返されるディスパッチャ名は{@link Request#DISPATCHER_REQUEST}、
@@ -83,8 +77,6 @@ public interface Request extends AttributeContainer {
      * @return ディスパッチャ名。
      */
     String getDispatcher();
-
-    void setDispatcher(String dispatcher);
 
     /**
      * 指定された名前のリクエストパラメータの値を返します。
@@ -152,8 +144,6 @@ public interface Request extends AttributeContainer {
      */
     Map getParameterMap();
 
-    void setParameterMap(Map parameterMap);
-
     /**
      * &lt;input type="file" /&gt;タグで指定されたファイルパラメータのうち、
      * 指定された名前を持つものを返します。
@@ -192,16 +182,12 @@ public interface Request extends AttributeContainer {
      */
     Map getFileParameterMap();
 
-    void setFileParameterMap(Map parameterMap);
-
     /**
      * リクエストスコープのオブジェクトを保持するためのAttributeContainerを返します。
      *
      * @return AttributeContainerオブジェクト。
      */
     AttributeContainer getAttributeContainer();
-
-    void setAttributeContainer(AttributeContainer attributeContainer);
 
     /**
      * リクエストパスに対応するコンポーネントの名前を返します。
@@ -210,8 +196,6 @@ public interface Request extends AttributeContainer {
      * @return コンポーネント名。
      */
     String getComponentName();
-
-    void setComponentName(String componentName);
 
     /**
      * リクエストパスとHTTPメソッドに対応するアクションの名前を返します。
@@ -222,16 +206,12 @@ public interface Request extends AttributeContainer {
      */
     String getActionName();
 
-    void setActionName(String actionName);
-
     /**
      * リクエストパスに連結されているpathInfo情報を返します。
      *
      * @return pathInfo情報。PathMappingルールによってはnullが返されることもあります。
      */
     String getPathInfo();
-
-    void setPathInfo(String pathInfo);
 
     /**
      * アクションのデフォルトの返り値を返します。
@@ -247,8 +227,6 @@ public interface Request extends AttributeContainer {
      * @return デフォルトの返り値。
      */
     Object getDefaultReturnValue();
-
-    void setDefaultReturnValue(Object defaultReturnValue);
 
     /**
      * リクエストパラメータによるディスパッチを行なうかどうかを返します。
@@ -267,7 +245,7 @@ public interface Request extends AttributeContainer {
      *
      * @return リクエストパラメータによるディスパッチを行なうかどうか。
      */
-    boolean isDispatchingByRequestParameter();
+    boolean isDispatchingByParameter();
 
-    void setDispatchingByRequestParameter(boolean dispatchingByRequestParameter);
+    String extractParameterName(String name);
 }

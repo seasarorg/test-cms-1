@@ -106,15 +106,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
         if (matched == null) {
             return null;
         }
-        if (matched.isDenied() && Request.DISPATCHER_REQUEST.equals(dispatcher)) {
+        if (matched.isDenied()) {
             throw new PageNotFoundException(path);
         }
 
         return new RequestImpl(contextPath, path, method, dispatcher,
-                parameterMap, fileParameterMap, attributeContainer, matched
-                        .getComponentName(), matched.getActionName(), matched
-                        .getPathInfo(), matched.getDefaultReturnValue(),
-                matched.isDispatchingByRequestParameter());
+                parameterMap, fileParameterMap, attributeContainer, matched);
     }
 
     String correctMethod(String method, Map parameterMap) {
@@ -216,13 +213,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
             prepareForComponent(component, request);
 
             // リクエストに対応するアクションの呼び出しを行なう。
-            response = normalizeResponse(
-                    constructResponse(invokeAction(component,
-                            getActionMethod(component, request.getActionName(),
-                                    ACTION_DEFAULT, request
-                                            .isDispatchingByRequestParameter(),
-                                    request), request, true), component,
-                            request.getDefaultReturnValue()), request.getPath());
+            response = normalizeResponse(constructResponse(invokeAction(
+                    component, getActionMethod(component, request
+                            .getActionName(), ACTION_DEFAULT, request
+                            .isDispatchingByParameter(), request), request,
+                    true), component, request.getDefaultReturnValue()), request
+                    .getPath());
 
             // 画面描画のためのAction呼び出しを行なう。
             // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
@@ -312,36 +308,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
     Object getRequestComponent(Request request) {
 
         return request.getAttribute(ATTR_SELF);
-    }
-
-    boolean shouldRender(Response response, String componentName) {
-
-        if (response.getType() == Response.TYPE_PASSTHROUGH) {
-            return true;
-        } else if (response.getType() != Response.TYPE_FORWARD) {
-            if (logger_.isDebugEnabled()) {
-                logger_
-                        .debug("NOT RENDER because response directs to transit to different page: response="
-                                + response);
-            }
-            return false;
-        }
-
-        MatchedPathMapping matched = findMatchedPathMapping(response.getPath(),
-                Request.METHOD_GET);
-        if (matched != null && !matched.isDenied()
-                && !matched.getComponentName().equals(componentName)) {
-            if (logger_.isDebugEnabled()) {
-                logger_
-                        .debug("NOT RENDER because component is different: target component="
-                                + componentName
-                                + ", next component="
-                                + matched.getComponentName());
-            }
-            return false;
-        }
-
-        return true;
     }
 
     void prepareForComponent(Object component, Request request) {
@@ -442,18 +408,17 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Method getActionMethod(Object component, String actionName,
-            String defaultActionName, boolean dispatchingByRequestParamter,
+            String defaultActionName, boolean dispatchingByParamter,
             Request request) {
-        if (dispatchingByRequestParamter) {
+        if (dispatchingByParamter) {
             Method[] methods = component.getClass().getMethods();
-            String prefix = actionName + "_";
             if (logger_.isDebugEnabled()) {
                 logger_
                         .debug("getActionMethod: dispatchingByRequestParameter=true. search "
                                 + component.getClass()
                                 + " for "
-                                + prefix
-                                + "XXXX method...");
+                                + actionName
+                                + " method...");
             }
             List list = new ArrayList();
             for (int i = 0; i < methods.length; i++) {
@@ -461,35 +426,41 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     continue;
                 }
                 String name = methods[i].getName();
-                if (name.startsWith(prefix)) {
-                    if (request.getParameter(name.substring(prefix.length())) != null) {
+                if (name.startsWith(actionName)) {
+                    String parameterName = request.extractParameterName(name
+                            .substring(actionName.length()));
+                    if (parameterName != null
+                            && request.getParameter(parameterName) != null) {
                         if (logger_.isDebugEnabled()) {
                             logger_.debug("getActionMethod: Found: "
                                     + methods[i]);
                         }
                         return methods[i];
                     }
-                } else {
-                    list.add(methods[i]);
                 }
+                list.add(methods[i]);
             }
             if (defaultActionName != null) {
-                prefix = defaultActionName + "_";
                 if (logger_.isDebugEnabled()) {
                     logger_.debug("getActionMethod: search "
-                            + component.getClass() + " for " + prefix
-                            + "XXXX method...");
+                            + component.getClass() + " for "
+                            + defaultActionName + " method...");
                 }
                 for (Iterator itr = list.iterator(); itr.hasNext();) {
                     Method method = (Method) itr.next();
                     String name = method.getName();
-                    if (name.startsWith(prefix)
-                            && request.getParameter(name.substring(prefix
-                                    .length())) != null) {
-                        if (logger_.isDebugEnabled()) {
-                            logger_.debug("getActionMethod: Found: " + method);
+                    if (name.startsWith(defaultActionName)) {
+                        String parameterName = request
+                                .extractParameterName(name
+                                        .substring(defaultActionName.length()));
+                        if (parameterName != null
+                                && request.getParameter(parameterName) != null) {
+                            if (logger_.isDebugEnabled()) {
+                                logger_.debug("getActionMethod: Found: "
+                                        + method);
+                            }
+                            return method;
                         }
-                        return method;
                     }
                 }
             }
