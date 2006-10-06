@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.extension.creator;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import org.seasar.cms.pluggable.Configuration;
@@ -138,5 +139,20 @@ public class MockSourceCreator implements SourceCreator {
     }
 
     public void mergeWithExistentClass(ClassDesc desc, boolean mergeMethod) {
+    }
+
+    public Template getTemplate(String path) {
+        return null;
+    }
+
+    public void writeString(String string, OutputStream os) {
+    }
+
+    public TemplateProvider getTemplateProvider() {
+        return null;
+    }
+
+    public String getEncoding() {
+        return "UTF-8";
     }
 }

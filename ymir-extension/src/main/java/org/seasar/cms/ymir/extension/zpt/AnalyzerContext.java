@@ -12,6 +12,7 @@ import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
+import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
 
 public class AnalyzerContext extends ZptTemplateContext {
@@ -23,8 +24,6 @@ public class AnalyzerContext extends ZptTemplateContext {
     private static final char CHAR_ARRAY_RPAREN = ']';
 
     private SourceCreator sourceCreator_;
-
-    private TemplatePathNormalizer pathNormalizer_;
 
     private String method_;
 
@@ -39,6 +38,23 @@ public class AnalyzerContext extends ZptTemplateContext {
     private boolean usingFreyjaRenderClasses_;
 
     private String rootPackageName_;
+
+    private VariableResolver variableResolver_;
+
+    @Override
+    public VariableResolver getVariableResolver() {
+        if (variableResolver_ == null) {
+            variableResolver_ = new AnalyzerVariableResolver(super
+                    .getVariableResolver());
+        }
+        return variableResolver_;
+    }
+
+    @Override
+    public void setVariableResolver(VariableResolver varResolver) {
+        super.setVariableResolver(varResolver);
+        variableResolver_ = null;
+    }
 
     public void setUsingFreyjaRenderClasses(boolean usingFreyjaRenderClasses) {
         usingFreyjaRenderClasses_ = usingFreyjaRenderClasses;
@@ -170,16 +186,6 @@ public class AnalyzerContext extends ZptTemplateContext {
     public void setSourceCreator(SourceCreator sourceCreator) {
 
         sourceCreator_ = sourceCreator;
-    }
-
-    public TemplatePathNormalizer getPathNormalizer() {
-
-        return pathNormalizer_;
-    }
-
-    public void setPathNormalizer(TemplatePathNormalizer pathNormalizer) {
-
-        pathNormalizer_ = pathNormalizer;
     }
 
     public ClassDesc getPageClassDescriptor() {

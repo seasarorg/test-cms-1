@@ -60,7 +60,9 @@ import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.SourceGenerator;
+import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.extension.creator.TemplateAnalyzer;
+import org.seasar.cms.ymir.extension.creator.TemplateProvider;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.action.Condition;
 import org.seasar.cms.ymir.extension.creator.action.State;
@@ -127,6 +129,9 @@ public class SourceCreatorImpl implements SourceCreator {
 
     private ApplicationManager applicationManager_;
 
+    private TemplateProvider templateProvider_ = new DefaultTemplateProvider(
+            this);
+
     private UpdateActionSelector actionSelector_ = new UpdateActionSelector()
             .register(
                     new Condition(State.ANY, State.ANY, State.FALSE,
@@ -155,12 +160,6 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public Logger logger_ = Logger.getLogger(getClass());
 
-    // TODO forwardPathをテンプレートのパスに変換するTemplateProviderを導入する。
-    // これは差し替え可能にしておいて、Kvasirと組み合わせる場合はKvasirTemplateSet
-    // からテンプレートを取るようなTemplateResolverを使うようにする。
-    // TODO ZptAnalyzerで、本物のTemplateContext構築手順をAnalyzerContext
-    // に対して行なうようにする。
-    // TODO 上記改修によってTemplatePathNormalizerは不要となるはず。
     public Response update(Request request, Response response) {
 
         Application application = getApplication();
@@ -188,7 +187,7 @@ public class SourceCreatorImpl implements SourceCreator {
         } else {
             String className = pathMetaData.getClassName();
             File sourceFile = pathMetaData.getSourceFile();
-            File templateFile = pathMetaData.getTemplateFile();
+            Template template = pathMetaData.getTemplate();
 
             if ("".equals(forwardPath)) {
                 String welcomeFile = getWelcomeFile();
@@ -202,8 +201,7 @@ public class SourceCreatorImpl implements SourceCreator {
             } else {
                 condition = new Condition(State.valueOf(className != null),
                         State.valueOf(sourceFile.exists()), State
-                                .valueOf(templateFile != null ? templateFile
-                                        .exists() : true), method);
+                                .valueOf(template.exists()), method);
             }
         }
 
@@ -347,14 +345,9 @@ public class SourceCreatorImpl implements SourceCreator {
         String path = pathMetaData.getPath();
         String method = pathMetaData.getMethod();
         String className = pathMetaData.getClassName();
-        try {
-            analyzer_.analyze(getServletContext(), getHttpServletRequest(),
-                    getHttpServletResponse(), path, method, classDescMap,
-                    new FileInputStream(pathMetaData.getTemplateFile()),
-                    encoding_, className);
-        } catch (FileNotFoundException ex) {
-            throw new RuntimeException(ex);
-        }
+        analyzer_.analyze(getServletContext(), getHttpServletRequest(),
+                getHttpServletResponse(), path, method, classDescMap,
+                pathMetaData.getTemplate(), className);
 
         ClassDesc classDesc = classDescMap.get(className);
         if (classDesc == null && method.equalsIgnoreCase(Request.METHOD_POST)) {
@@ -690,12 +683,20 @@ public class SourceCreatorImpl implements SourceCreator {
         if (string == null) {
             return;
         }
-
         file.getParentFile().mkdirs();
-
-        OutputStream os = null;
         try {
-            os = new FileOutputStream(file);
+            writeString(string, new FileOutputStream(file));
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void writeString(String string, OutputStream os) {
+
+        try {
+            if (string == null) {
+                return;
+            }
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
                     os, encoding_));
             writer.write(string);
@@ -796,9 +797,9 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    public File getTemplateFile(String path) {
+    public Template getTemplate(String path) {
 
-        return new File(getWebappSourceRoot(), path);
+        return templateProvider_.getTemplate(path);
     }
 
     public File getSourceFile(String className) {
@@ -1055,5 +1056,10 @@ public class SourceCreatorImpl implements SourceCreator {
         }
 
         return classDescImpl;
+    }
+
+    public TemplateProvider getTemplateProvider() {
+
+        return templateProvider_;
     }
 }

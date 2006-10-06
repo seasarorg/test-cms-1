@@ -12,6 +12,7 @@ import org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior;
 import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
 import org.seasar.cms.pluggable.impl.ConfigurationImpl;
 import org.seasar.cms.ymir.ApplicationManager;
+import org.seasar.cms.ymir.PathMapping;
 import org.seasar.cms.ymir.YmirTestCase;
 import org.seasar.cms.ymir.convention.YmirNamingConvention;
 import org.seasar.cms.ymir.extension.Globals;
@@ -23,6 +24,7 @@ import org.seasar.cms.ymir.extension.zpt.ZptAnalyzer;
 import org.seasar.cms.ymir.impl.AbstractApplication;
 import org.seasar.cms.ymir.impl.ApplicationManagerImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
+import org.seasar.cms.ymir.impl.PathMappingImpl;
 import org.seasar.cms.ymir.impl.PathMappingProviderImpl;
 import org.seasar.cms.ymir.impl.SingleApplication;
 import org.seasar.framework.container.S2Container;
@@ -87,10 +89,6 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
                 .setExternalContextComponentDefRegister(new HttpServletExternalContextComponentDefRegister());
         MockHttpServletRequestImpl request = new MockHttpServletRequestImpl(
                 context, "/servlet");
-        container_.getExternalContext().setRequest(request);
-        container_.getExternalContext().setResponse(
-                new MockHttpServletResponseImpl(request));
-        container_.getExternalContext().setApplication(context);
         container_.register(SourceCreatorImpl.class);
         container_.register(DefaultRequestProcessor.class);
         container_.register(LocalOndemandS2Container.class);
@@ -99,6 +97,12 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         container_.register(ZptAnalyzer.class);
         container_.register(ConfigurationImpl.class);
         container_.register(ApplicationManagerImpl.class);
+        container_.init();
+
+        container_.getRoot().getExternalContext().setRequest(request);
+        container_.getRoot().getExternalContext().setResponse(
+                new MockHttpServletResponseImpl(request));
+        container_.getRoot().getExternalContext().setApplication(context);
 
         ondemandBehavior_ = (DistributedOndemandBehavior) S2ContainerBehavior
                 .getProvider();
@@ -125,8 +129,10 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         ApplicationManager applicationManager = (ApplicationManager) container_
                 .getComponent(ApplicationManager.class);
         PathMappingProviderImpl pathMappingProvider = new PathMappingProviderImpl();
-        pathMappingProvider.addPathMapping("^/([^/]+)\\.(.+)$", "${1}Page",
-                "_${method}", "", null);
+        pathMappingProvider
+                .setPathMappings(new PathMapping[] { new PathMappingImpl(
+                        "^/([^/]+)\\.(.+)$", "${1}Page", "_${method}", "",
+                        null, null) });
         applicationManager.setBaseApplication(new SingleApplication(context,
                 configuration, null, container_, ondemandContainer,
                 pathMappingProvider));

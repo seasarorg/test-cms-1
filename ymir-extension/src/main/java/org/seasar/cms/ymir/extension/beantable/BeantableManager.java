@@ -14,6 +14,8 @@ import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.extension.ClassTraverserBag;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.annotation.tiger.Binding;
+import org.seasar.framework.container.annotation.tiger.BindingType;
 import org.seasar.framework.container.hotdeploy.HotdeployListener;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.ClassTraversal.ClassHandler;
@@ -173,6 +175,7 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
         applicationManager_ = applicationManager;
     }
 
+    @Binding(bindingType=BindingType.MUST, value="beantableClassHandler")
     public void setBeantableClassHandler(
             BeantableClassHandler beantableClassHandler) {
 

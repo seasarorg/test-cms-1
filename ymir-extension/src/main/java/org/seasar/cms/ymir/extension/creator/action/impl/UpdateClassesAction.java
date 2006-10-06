@@ -2,7 +2,6 @@ package org.seasar.cms.ymir.extension.creator.action.impl;
 
 import static org.seasar.cms.ymir.impl.DefaultRequestProcessor.PARAM_METHOD;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +14,7 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.kvasir.util.PropertyUtils;
@@ -59,7 +59,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
         Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
-        variableMap.put("templateFile", pathMetaData.getTemplateFile());
+        variableMap.put("template", pathMetaData.getTemplate());
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
         variableMap.put("createdClassDescs", createClassDescDtos(classDescBag
@@ -146,21 +146,21 @@ public class UpdateClassesAction extends AbstractUpdateAction {
 
     boolean shouldUpdate(PathMetaData pathMetaData) {
 
-        File templateFile = pathMetaData.getTemplateFile();
-        if (templateFile == null || !templateFile.exists()) {
+        Template template = pathMetaData.getTemplate();
+        if (template == null || !template.exists()) {
             return false;
         }
-        boolean shouldUpdate = (templateFile.lastModified() > getCheckedTime(templateFile));
+        boolean shouldUpdate = (template.lastModified() > getCheckedTime(template));
         if (shouldUpdate) {
-            updateCheckedTime(templateFile);
+            updateCheckedTime(template);
         }
         return shouldUpdate;
     }
 
-    long getCheckedTime(File file) {
+    long getCheckedTime(Template template) {
 
         Properties prop = getSourceCreator().getSourceCreatorProperties();
-        String key = PREFIX_CHECKEDTIME + file.getAbsolutePath();
+        String key = PREFIX_CHECKEDTIME + template.getPath();
         String timeString = prop.getProperty(key);
         long time;
         if (timeString == null) {
@@ -172,10 +172,10 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         return time;
     }
 
-    void updateCheckedTime(File file) {
+    void updateCheckedTime(Template template) {
 
         Properties prop = getSourceCreator().getSourceCreatorProperties();
-        String key = PREFIX_CHECKEDTIME + file.getAbsolutePath();
+        String key = PREFIX_CHECKEDTIME + template.getPath();
         prop.setProperty(key, String.valueOf(System.currentTimeMillis()));
         getSourceCreator().saveSourceCreatorProperties();
     }

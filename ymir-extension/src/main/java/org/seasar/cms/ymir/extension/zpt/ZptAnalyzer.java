@@ -1,74 +1,69 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import static net.skirnir.freyja.zpt.tales.TalesExpressionEvaluator.TYPE_NOT;
+import static net.skirnir.freyja.zpt.webapp.ServletTalesExpressionEvaluator.TYPE_PAGE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.ymir.YmirVariableResolver;
 import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.extension.creator.TemplateAnalyzer;
+import org.seasar.framework.container.annotation.tiger.Binding;
+import org.seasar.framework.container.annotation.tiger.BindingType;
 
 import net.skirnir.freyja.ExpressionEvaluator;
 import net.skirnir.freyja.IllegalSyntaxException;
 import net.skirnir.freyja.TagEvaluator;
 import net.skirnir.freyja.TagEvaluatorWrapper;
 import net.skirnir.freyja.TemplateEvaluator;
-import net.skirnir.freyja.webapp.ServletVariableResolverFactory;
-import net.skirnir.freyja.webapp.VariableResolverFactory;
-import net.skirnir.freyja.zpt.MetalTagEvaluator;
-import net.skirnir.freyja.zpt.TalTagEvaluator;
 import net.skirnir.freyja.zpt.tales.TalesExpressionEvaluator;
-import net.skirnir.freyja.zpt.webapp.ServletTalesExpressionEvaluator;
+import net.skirnir.freyja.zpt.webapp.PageTypePrefixHandler;
 
 public class ZptAnalyzer implements TemplateAnalyzer {
 
     private TemplateEvaluator evaluator_;
 
-    private VariableResolverFactory vrf_;
-
     private SourceCreator sourceCreator_;
 
-    private AnalyzerTemplateSet templateSet_;
-
-    private TemplatePathNormalizer templatePathNormalizer_ = new DefaultTemplatePathNormalizer();
+    private Zpt zpt_;
 
     public ZptAnalyzer() {
 
-        setTemplateEvaluator(new TemplateEvaluator(new MetalTagEvaluator(
-                new TalTagEvaluator()), new ServletTalesExpressionEvaluator()));
-        setVariableResolverFactory(new ServletVariableResolverFactory());
+        setZpt(new DefaultZpt());
     }
 
     public void analyze(ServletContext servletContext,
             HttpServletRequest request, HttpServletResponse response,
             String path, String method, Map<String, ClassDesc> classDescMap,
-            InputStream inputStream, String encoding, String className) {
+            Template template, String className) {
 
-        templateSet_.setPathNormalizer(templatePathNormalizer_);
+        path = zpt_.getTemplatePathResolver().resolve(path, request);
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
-        context.setTemplateName(path);
-        context.setTemplateSet(templateSet_);
+        zpt_.buildTemplateContext(context, servletContext, request, response,
+                path);
+        context.setTemplateSet(new AnalyzerTemplateSet(evaluator_, context
+                .getTemplateSet(), sourceCreator_, zpt_
+                .getTemplatePathResolver()));
         context.setSourceCreator(sourceCreator_);
-        context.setPathNormalizer(templatePathNormalizer_);
         context.setMethod(method);
         context.setClassDescMap(classDescMap);
         context.setPageClassName(className);
         context.setUsingFreyjaRenderClasses(isUsingFreyjaRenderClasses());
-        context.setVariableResolver(new AnalyzerVariableResolver(vrf_
-                .newResolver(request, response, servletContext,
-                        new YmirVariableResolver(request))));
 
+        InputStream inputStream = null;
         try {
+            inputStream = template.getInputStream();
             evaluator_.evaluate(context, new InputStreamReader(inputStream,
-                    encoding));
+                    sourceCreator_.getEncoding()));
             context.close();
         } catch (RuntimeException ex) {
             if (ex.getCause() instanceof IllegalSyntaxException) {
@@ -78,12 +73,14 @@ public class ZptAnalyzer implements TemplateAnalyzer {
             } else {
                 throw ex;
             }
-        } catch (UnsupportedEncodingException ex) {
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
-            try {
-                inputStream.close();
-            } catch (IOException ignore) {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ignore) {
+                }
             }
         }
     }
@@ -97,14 +94,6 @@ public class ZptAnalyzer implements TemplateAnalyzer {
     public void setSourceCreator(SourceCreator sourceCreator) {
 
         sourceCreator_ = sourceCreator;
-        templateSet_ = new AnalyzerTemplateSet("UTF-8", evaluator_,
-                sourceCreator);
-    }
-
-    public void setTemplatePathNormalizer(
-            TemplatePathNormalizer templatePathNormalizer) {
-
-        templatePathNormalizer_ = templatePathNormalizer;
     }
 
     /**
@@ -117,6 +106,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
      * @param templateEvaluator TemplateEvaluatorオブジェクト。
      * nullを指定することはできません。
      */
+    @Binding(bindingType = BindingType.NONE)
     public void setTemplateEvaluator(TemplateEvaluator templateEvaluator) {
 
         TagEvaluator tagEvaluator = templateEvaluator.getTagEvaluator();
@@ -130,7 +120,12 @@ public class ZptAnalyzer implements TemplateAnalyzer {
                 .getExpressionEvaluator();
         if (expressionEvaluator instanceof TalesExpressionEvaluator) {
             TalesExpressionEvaluator evaluator = ((TalesExpressionEvaluator) expressionEvaluator);
-            evaluator.addTypePrefix("not", new AnalyzerNotTypePrefixHandler());
+            evaluator.addTypePrefix(TYPE_NOT,
+                    new AnalyzerNotTypePrefixHandler()).addTypePrefix(
+                    TYPE_PAGE,
+                    new AnalyzerPageTypePrefixHandler(
+                            (PageTypePrefixHandler) evaluator
+                                    .getTypePrefixHandler(TYPE_PAGE)));
             evaluator.addPathResolver(new AnalyzerPathResolver());
         }
         evaluator_ = new TemplateEvaluator(tagEvaluator, expressionEvaluator);
@@ -141,8 +136,8 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         return new AnalyzerTalTagEvaluator();
     }
 
-    public void setVariableResolverFactory(VariableResolverFactory vrf) {
-
-        vrf_ = vrf;
+    public void setZpt(Zpt zpt) {
+        zpt_ = zpt;
+        setTemplateEvaluator(zpt_.getTemplateEvaluator());
     }
 }

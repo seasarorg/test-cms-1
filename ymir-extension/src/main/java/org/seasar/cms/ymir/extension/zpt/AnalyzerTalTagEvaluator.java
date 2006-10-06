@@ -111,14 +111,13 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             Map attrMap, String attrName, String method) {
 
         SourceCreator creator = analyzerContext.getSourceCreator();
-        Path path = constructPath(analyzerContext.getPathNormalizer()
-                .normalize(getAttributeValue(attrMap, attrName, null)));
+        Path path = constructPath(getAttributeValue(attrMap, attrName, null));
         if (path == null) {
             return null;
         }
         MatchedPathMapping matched = creator.findMatchedPathMapping(path
                 .getTrunk(), method);
-        if (matched == null) {
+        if (matched == null || matched.isDenied()) {
             return null;
         }
         String className = creator.getClassName(matched.getComponentName());
@@ -127,16 +126,14 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         }
         String actionName = matched.getActionName();
         ClassDesc classDesc = analyzerContext.getTemporaryClassDesc(className);
-        boolean dispatchingByRequestParameter = matched
-                .isDispatchingByRequestParameter();
+        boolean dispatchingByParameter = matched.isDispatchingByParameter();
         classDesc.setMethodDesc(new MethodDescImpl(actionName));
         for (Iterator itr = path.getParameterMap().keySet().iterator(); itr
                 .hasNext();) {
             classDesc.addProperty((String) itr.next(), PropertyDesc.WRITE
                     | PropertyDesc.READ);
         }
-        return new FormDescImpl(classDesc, actionName,
-                dispatchingByRequestParameter);
+        return new FormDescImpl(classDesc, actionName, dispatchingByParameter);
     }
 
     Path constructPath(String pathWithParameters) {

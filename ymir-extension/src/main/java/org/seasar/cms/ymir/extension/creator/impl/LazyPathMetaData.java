@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 public class LazyPathMetaData implements PathMetaData {
@@ -44,9 +45,9 @@ public class LazyPathMetaData implements PathMetaData {
 
     private boolean baseSourceFileLoaded_;
 
-    private File templateFile_;
+    private Template template_;
 
-    private boolean templateFileLoaded_;
+    private boolean templateLoaded_;
 
     public LazyPathMetaData(SourceCreator sourceCreator, String path,
             String method, String forwardPath) {
@@ -153,16 +154,16 @@ public class LazyPathMetaData implements PathMetaData {
         return sourceFile_;
     }
 
-    public File getTemplateFile() {
+    public Template getTemplate() {
 
-        if (!templateFileLoaded_) {
+        if (!templateLoaded_) {
             if (forwardPath_ != null) {
-                templateFile_ = sourceCreator_.getTemplateFile(forwardPath_);
+                template_ = sourceCreator_.getTemplate(forwardPath_);
             } else {
-                templateFile_ = null;
+                template_ = null;
             }
-            templateFileLoaded_ = true;
+            templateLoaded_ = true;
         }
-        return templateFile_;
+        return template_;
     }
 }

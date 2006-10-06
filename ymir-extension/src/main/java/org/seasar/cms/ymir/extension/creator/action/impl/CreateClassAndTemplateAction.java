@@ -54,7 +54,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
 
         String template = getSourceCreator().getSourceGenerator()
                 .generateTemplateSource(
-                        getSuffix(pathMetaData.getTemplateFile().getName()),
+                        getSuffix(pathMetaData.getTemplate().getName()),
                         new HashMap());
         if (template == null) {
             template = "";

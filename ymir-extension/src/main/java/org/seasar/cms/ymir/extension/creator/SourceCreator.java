@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.extension.creator;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import org.seasar.cms.ymir.Application;
@@ -38,7 +39,7 @@ public interface SourceCreator extends Updater {
 
     File getSourceFile(String className);
 
-    File getTemplateFile(String className);
+    Template getTemplate(String path);
 
     ResponseCreator getResponseCreator();
 
@@ -47,6 +48,8 @@ public interface SourceCreator extends Updater {
     SourceGenerator getSourceGenerator();
 
     void writeString(String string, File file);
+
+    void writeString(String string, OutputStream os);
 
     Class getClass(String className);
 
@@ -63,4 +66,8 @@ public interface SourceCreator extends Updater {
     ClassDesc newClassDesc(String className);
 
     void mergeWithExistentClass(ClassDesc desc, boolean mergeMethod);
+
+    TemplateProvider getTemplateProvider();
+
+    String getEncoding();
 }

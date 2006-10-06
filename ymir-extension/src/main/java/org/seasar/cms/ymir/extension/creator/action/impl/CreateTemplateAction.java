@@ -2,7 +2,7 @@ package org.seasar.cms.ymir.extension.creator.action.impl;
 
 import static org.seasar.cms.ymir.impl.DefaultRequestProcessor.PARAM_METHOD;
 
-import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +10,7 @@ import java.util.Map;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
 public class CreateTemplateAction extends AbstractUpdateAction {
@@ -46,7 +47,7 @@ public class CreateTemplateAction extends AbstractUpdateAction {
 
         String template = getSourceCreator().getSourceGenerator()
                 .generateTemplateSource(
-                        getSuffix(pathMetaData.getTemplateFile().getName()),
+                        getSuffix(pathMetaData.getTemplate().getName()),
                         new HashMap());
         if (template == null) {
             template = "";
@@ -79,14 +80,18 @@ public class CreateTemplateAction extends AbstractUpdateAction {
             return null;
         }
 
-        String template = request.getParameter(PARAM_TEMPLATE);
-        if (template == null) {
+        String templateString = request.getParameter(PARAM_TEMPLATE);
+        if (templateString == null) {
             return null;
         }
 
-        File templateFile = pathMetaData.getTemplateFile();
-        templateFile.getParentFile().mkdirs();
-        getSourceCreator().writeString(template, templateFile);
+        Template template = pathMetaData.getTemplate();
+        try {
+            getSourceCreator().writeString(templateString,
+                    template.getOutputStream());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
         Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);

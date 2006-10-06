@@ -18,7 +18,7 @@ public class AnalyzerVariableResolver implements VariableResolver {
     public Object getVariable(TemplateContext context, String name) {
         AnalyzerContext analyzerContext = (AnalyzerContext) context;
 
-        if (shouldGenerateClassOf(analyzerContext, name)) {
+        if (context != null && shouldGenerateClassOf(analyzerContext, name)) {
             return new DescWrapper(analyzerContext.getTemporaryClassDesc(name));
         } else {
             return delegated_.getVariable(context, name);

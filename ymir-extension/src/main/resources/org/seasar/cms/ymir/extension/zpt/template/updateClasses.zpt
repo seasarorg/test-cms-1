@@ -5,7 +5,7 @@
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
 <form tal:attributes="action request/absolutePath" method="post">
-<p>テンプレート<span tal:replace="pathMetaData/templateFile/name">TEMPLATE</span>の変更を検出しました。テンプレートに関連する以下のクラスを追加・更新します。
+<p>テンプレート<span tal:replace="pathMetaData/template/path">TEMPLATE</span>の変更を検出しました。テンプレートに関連する以下のクラスを追加・更新します。
 追加・更新したくないものについてはチェックを外して下さい。</p>
   <p tal:condition="createdClassDescs"><strong>追加されるクラス：</strong>
   <ul>

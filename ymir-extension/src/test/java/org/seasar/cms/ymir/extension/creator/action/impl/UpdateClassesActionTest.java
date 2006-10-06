@@ -34,7 +34,7 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
         PathMetaDataImpl pathMetaData = new PathMetaDataImpl(null, null, false,
                 null, null, null, null, getSourceCreator().getSourceFile(
                         "com.example.web.TestPage"), getSourceCreator()
-                        .getTemplateFile("/test.html"));
+                        .getTemplate("/test.html"));
         getSourceCreator().getSourceCreatorProperties().clear();
         assertTrue("ソースファイルが存在しない場合は最初だけtrueになること", target_
                 .shouldUpdate(pathMetaData));
@@ -42,13 +42,11 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
                 .shouldUpdate(pathMetaData));
 
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
-        getSourceCreator()
-                .gatherClassDescs(
-                        classDescMap,
-                        new PathMetaDataImpl("/test.html", Request.METHOD_GET,
-                                false, "testPage", "com.example.web.TestPage",
-                                null, null, null, getSourceCreator()
-                                        .getTemplateFile("/test.html")));
+        getSourceCreator().gatherClassDescs(
+                classDescMap,
+                new PathMetaDataImpl("/test.html", Request.METHOD_GET, false,
+                        "testPage", "com.example.web.TestPage", null, null,
+                        null, getSourceCreator().getTemplate("/test.html")));
         ClassDesc[] classDescs = (ClassDesc[]) classDescMap.values().toArray(
                 new ClassDesc[0]);
         ClassDescSet classDescSet = new ClassDescSet(classDescs);

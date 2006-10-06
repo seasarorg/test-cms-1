@@ -20,5 +20,5 @@ public interface PathMetaData {
 
     File getSourceFile();
 
-    File getTemplateFile();
+    Template getTemplate();
 }

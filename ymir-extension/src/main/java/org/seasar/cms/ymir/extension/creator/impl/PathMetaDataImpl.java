@@ -3,6 +3,7 @@ package org.seasar.cms.ymir.extension.creator.impl;
 import java.io.File;
 
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.Template;
 
 public class PathMetaDataImpl implements PathMetaData {
 
@@ -24,11 +25,11 @@ public class PathMetaDataImpl implements PathMetaData {
 
     private File baseSourceFile_;
 
-    private File templateFile_;
+    private Template template_;
 
     public PathMetaDataImpl(String path, String method, boolean denied,
             String componentName, String className, String actionName,
-            String defaultPath, File sourceFile, File templateFile) {
+            String defaultPath, File sourceFile, Template template) {
 
         path_ = path;
         method_ = method;
@@ -39,7 +40,7 @@ public class PathMetaDataImpl implements PathMetaData {
         defaultPath_ = defaultPath;
         sourceFile_ = sourceFile;
         baseSourceFile_ = toBaseSourceFile(sourceFile);
-        templateFile_ = templateFile;
+        template_ = template;
     }
 
     File toBaseSourceFile(File sourceFile) {
@@ -101,8 +102,8 @@ public class PathMetaDataImpl implements PathMetaData {
         return baseSourceFile_;
     }
 
-    public File getTemplateFile() {
+    public Template getTemplate() {
 
-        return templateFile_;
+        return template_;
     }
 }

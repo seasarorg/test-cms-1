@@ -4,6 +4,9 @@ import static org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl.MOCK_
 import static org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl.MOCK_RESPONSE;
 import static org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl.MOCK_SERVLETCONTEXT;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +21,7 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
+import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.ymir.impl.ApplicationManagerImpl;
@@ -36,9 +40,9 @@ public class ZptAnalyzerTest extends TestCase {
 
     private PathMapping[] mappings_ = new PathMapping[] {
         new PathMappingImpl("^/([^/]+)\\.(.+)$", "${1}Page", "${METHOD}", "",
-                null),
+                null, null),
         new PathMappingImpl("^/[^/]+/(.+)\\.(.+)$", "${1}Page", "${METHOD}",
-                "", null, true), };
+                "", null, "_(.+)$"), };
 
     private ZptAnalyzer target_ = new ZptAnalyzer();
 
@@ -129,13 +133,35 @@ public class ZptAnalyzerTest extends TestCase {
         target_.setSourceCreator(creator);
     }
 
-    private void act(String methodName) {
+    private void act(final String methodName) {
 
         target_.analyze(MOCK_SERVLETCONTEXT, MOCK_REQUEST, MOCK_RESPONSE,
-                "/hoe", Request.METHOD_GET, classDescMap_, getClass()
-                        .getResourceAsStream(
-                                "ZptAnalyzerTest_" + methodName + ".zpt"),
-                "UTF-8", CLASSNAME);
+                "/hoe", Request.METHOD_GET, classDescMap_, new Template() {
+                    public InputStream getInputStream() throws IOException {
+                        return getClass().getResourceAsStream(
+                                "ZptAnalyzerTest_" + methodName + ".zpt");
+                    }
+
+                    public boolean exists() {
+                        return true;
+                    }
+
+                    public String getName() {
+                        return "ZptAnalyzerTest_" + methodName + ".zpt";
+                    }
+
+                    public OutputStream getOutputStream() throws IOException {
+                        return null;
+                    }
+
+                    public String getPath() {
+                        return "/hoe";
+                    }
+
+                    public long lastModified() {
+                        return 0;
+                    }
+                }, CLASSNAME);
     }
 
     private ClassDesc getClassDesc(String name) {
