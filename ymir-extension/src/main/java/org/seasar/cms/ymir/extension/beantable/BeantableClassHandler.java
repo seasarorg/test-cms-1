@@ -4,6 +4,8 @@ import java.sql.SQLException;
 
 import org.seasar.cms.beantable.Beantable;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.annotation.tiger.Binding;
+import org.seasar.framework.container.annotation.tiger.BindingType;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
@@ -12,6 +14,8 @@ public class BeantableClassHandler implements ClassHandler {
     private Logger logger_ = Logger.getLogger(getClass());
 
     private S2Container container_;
+
+    private BeantableManager manager_;
 
     public void processClass(String packageName, String shortClassName) {
 
@@ -30,23 +34,28 @@ public class BeantableClassHandler implements ClassHandler {
             return;
         }
 
+        if (!manager_.isManaged(beanClass)) {
+            return;
+        }
+
         if (logger_.isInfoEnabled()) {
             logger_.info("UPDATE TABLE FOR class: " + className);
         }
 
-        Beantable beanTable = newBeantable(beanClass);
+        Beantable beanTable = manager_.newBeantable(beanClass);
         try {
             beanTable.activate();
         } catch (SQLException ex) {
             logger_.error("[SKIP] Can't activate Beantable for: " + className,
-                ex);
+                    ex);
             return;
         }
         try {
             beanTable.update(false);
         } catch (SQLException ex) {
             logger_
-                .error("[SKIP] Can't update Beantable for: " + className, ex);
+                    .error("[SKIP] Can't update Beantable for: " + className,
+                            ex);
             return;
         }
 
@@ -55,16 +64,14 @@ public class BeantableClassHandler implements ClassHandler {
         }
     }
 
-    Beantable newBeantable(Class beanClass) {
-
-        Beantable beanTable = (Beantable) container_
-            .getComponent(Beantable.class);
-        beanTable.setBeanClass(beanClass);
-        return beanTable;
-    }
-
     public void setContainer(S2Container container) {
 
         container_ = container;
+    }
+
+    @Binding(bindingType = BindingType.MUST, value = "beantableManager")
+    public void setBeantableManager(BeantableManager manager) {
+
+        manager_ = manager;
     }
 }

@@ -112,6 +112,9 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
         if (!isBeanClass(clazz, bag.getClassTraverser())) {
             return;
         }
+        if (!isManaged(clazz)) {
+            return;
+        }
 
         Beantable beantable = newBeantable(clazz);
         try {
@@ -160,6 +163,12 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
         return beanTable;
     }
 
+    boolean isManaged(Class<?> beanClass) {
+
+        Managed managed = beanClass.getAnnotation(Managed.class);
+        return (managed == null || managed.value());
+    }
+
     public void setConfiguration(Configuration configuration) {
 
         configuration_ = configuration;
@@ -175,7 +184,7 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
         applicationManager_ = applicationManager;
     }
 
-    @Binding(bindingType=BindingType.MUST, value="beantableClassHandler")
+    @Binding(bindingType = BindingType.MUST, value = "beantableClassHandler")
     public void setBeantableClassHandler(
             BeantableClassHandler beantableClassHandler) {
 
