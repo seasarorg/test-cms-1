@@ -20,6 +20,8 @@ import java.sql.Struct;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,7 +53,7 @@ import org.seasar.framework.log.Logger;
  * <p>
  * <b>同期化：</b> このクラスはスレッドセーフではありません。
  * </p>
- * 
+ *
  * @author YOKOTA Takehiko
  */
 public class BeantableImpl implements Beantable {
@@ -91,11 +93,11 @@ public class BeantableImpl implements Beantable {
         JDBCTYPES_MAP.put(String.class.getName(), new JDBCType[] {
             JDBCType.LONGVARCHAR, JDBCType.VARCHAR });
         JDBCTYPES_MAP.put(BigDecimal.class.getName(),
-            new JDBCType[] { JDBCType.NUMERIC });
+                new JDBCType[] { JDBCType.NUMERIC });
         JDBCTYPES_MAP.put(Boolean.TYPE.getName(),
-            new JDBCType[] { JDBCType.BIT });
+                new JDBCType[] { JDBCType.BIT });
         JDBCTYPES_MAP.put(Boolean.class.getName(),
-            new JDBCType[] { JDBCType.BIT });
+                new JDBCType[] { JDBCType.BIT });
         JDBCTYPES_MAP.put(Byte.TYPE.getName(), new JDBCType[] {
             JDBCType.TINYINT, JDBCType.SMALLINT, JDBCType.INTEGER });
         JDBCTYPES_MAP.put(Byte.class.getName(), new JDBCType[] {
@@ -105,40 +107,40 @@ public class BeantableImpl implements Beantable {
         JDBCTYPES_MAP.put(Short.class.getName(), new JDBCType[] {
             JDBCType.SMALLINT, JDBCType.INTEGER });
         JDBCTYPES_MAP.put(Integer.TYPE.getName(),
-            new JDBCType[] { JDBCType.INTEGER });
+                new JDBCType[] { JDBCType.INTEGER });
         JDBCTYPES_MAP.put(Integer.class.getName(),
-            new JDBCType[] { JDBCType.INTEGER });
+                new JDBCType[] { JDBCType.INTEGER });
         JDBCTYPES_MAP.put(Long.TYPE.getName(), new JDBCType[] {
             JDBCType.BIGINT, JDBCType.INTEGER });
         JDBCTYPES_MAP.put(Long.class.getName(), new JDBCType[] {
             JDBCType.BIGINT, JDBCType.INTEGER });
         JDBCTYPES_MAP.put(Float.TYPE.getName(),
-            new JDBCType[] { JDBCType.REAL });
+                new JDBCType[] { JDBCType.REAL });
         JDBCTYPES_MAP.put(Float.class.getName(),
-            new JDBCType[] { JDBCType.REAL });
+                new JDBCType[] { JDBCType.REAL });
         JDBCTYPES_MAP.put(Double.TYPE.getName(),
-            new JDBCType[] { JDBCType.DOUBLE });
+                new JDBCType[] { JDBCType.DOUBLE });
         JDBCTYPES_MAP.put(Double.class.getName(),
-            new JDBCType[] { JDBCType.DOUBLE });
+                new JDBCType[] { JDBCType.DOUBLE });
         JDBCTYPES_MAP.put(byte[].class.getName(),
-            new JDBCType[] { JDBCType.LONGVARBINARY });
+                new JDBCType[] { JDBCType.LONGVARBINARY });
         JDBCTYPES_MAP.put(Date.class.getName(),
-            new JDBCType[] { JDBCType.DATE });
+                new JDBCType[] { JDBCType.DATE });
         JDBCTYPES_MAP.put(Time.class.getName(),
-            new JDBCType[] { JDBCType.TIME });
+                new JDBCType[] { JDBCType.TIME });
         JDBCTYPES_MAP.put(Timestamp.class.getName(),
-            new JDBCType[] { JDBCType.TIMESTAMP });
+                new JDBCType[] { JDBCType.TIMESTAMP });
         JDBCTYPES_MAP.put(Clob.class.getName(),
-            new JDBCType[] { JDBCType.CLOB });
+                new JDBCType[] { JDBCType.CLOB });
         JDBCTYPES_MAP.put(Blob.class.getName(),
-            new JDBCType[] { JDBCType.BLOB });
+                new JDBCType[] { JDBCType.BLOB });
         JDBCTYPES_MAP.put(Array.class.getName(),
-            new JDBCType[] { JDBCType.ARRAY });
+                new JDBCType[] { JDBCType.ARRAY });
         JDBCTYPES_MAP.put(Struct.class.getName(),
-            new JDBCType[] { JDBCType.STRUCT });
+                new JDBCType[] { JDBCType.STRUCT });
         JDBCTYPES_MAP.put(Ref.class.getName(), new JDBCType[] { JDBCType.REF });
         JDBCTYPES_MAP.put(Object.class.getName(),
-            new JDBCType[] { JDBCType.JAVA_OBJECT });
+                new JDBCType[] { JDBCType.JAVA_OBJECT });
 
         JDBCTYPES_MAP.put(java.util.Date.class.getName(), new JDBCType[] {
             JDBCType.DATETIME, JDBCType.DATE });
@@ -185,7 +187,7 @@ public class BeantableImpl implements Beantable {
             while (rs.next()) {
                 String typeName = rs.getString("TYPE_NAME");
                 JDBCType jdbcType = JDBCType
-                    .getInstance(rs.getInt("DATA_TYPE"));
+                        .getInstance(rs.getInt("DATA_TYPE"));
                 actualJdbcTypeNameSet_.add(typeName);
                 if (!actualJdbcTypeNameByTypeMap_.containsKey(jdbcType)) {
                     actualJdbcTypeNameByTypeMap_.put(jdbcType, typeName);
@@ -263,8 +265,13 @@ public class BeantableImpl implements Beantable {
     ColumnMetaData[] gatherColumnMetaData(Set<String> noPersistentPropertySet) {
 
         PropertyDescriptor[] descriptors = beanInfo_.getPropertyDescriptors();
+        Arrays.sort(descriptors, new Comparator<PropertyDescriptor>() {
+            public int compare(PropertyDescriptor o1, PropertyDescriptor o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
         List<ColumnMetaData> columnMetaDataList = new ArrayList<ColumnMetaData>(
-            descriptors.length);
+                descriptors.length);
         for (int i = 0; i < descriptors.length; i++) {
             String propertyName = descriptors[i].getName().toUpperCase();
             if (noPersistentPropertySet.contains(propertyName)) {
@@ -275,7 +282,7 @@ public class BeantableImpl implements Beantable {
             columnMetaData.setPropertyDescriptor(descriptors[i]);
             columnMetaData.setName(propertyName);
             String jdbcTypeName = getSuitableJDBCTypeName(descriptors[i]
-                .getPropertyType().getName());
+                    .getPropertyType().getName());
             if (jdbcTypeName != null) {
                 columnMetaData.setJdbcTypeName(jdbcTypeName);
             }
@@ -330,7 +337,7 @@ public class BeantableImpl implements Beantable {
                     columnMetaData.setNotNull(true);
                 } else {
                     throw new RuntimeException("Unsupported constraint: "
-                        + constraint[i]);
+                            + constraint[i]);
                 }
             }
 
@@ -355,8 +362,8 @@ public class BeantableImpl implements Beantable {
                 String sequenceName = id.sequenceName();
                 if (sequenceName == null) {
                     throw new IllegalStateException(
-                        "IdType is specified as SEQUENCE but sequenceName is not specified: method="
-                            + method);
+                            "IdType is specified as SEQUENCE but sequenceName is not specified: method="
+                                    + method);
                 }
                 columnMetaData.setSequenceName(sequenceName);
                 break;
@@ -364,7 +371,7 @@ public class BeantableImpl implements Beantable {
             default:
                 if (logger_.isInfoEnabled()) {
                     logger_.info("[SKIP] Unsupported Id annotation value: "
-                        + id.value() + ": method=" + method);
+                            + id.value() + ": method=" + method);
                 }
             }
         }
@@ -375,7 +382,7 @@ public class BeantableImpl implements Beantable {
         ColumnDetail column = method.getAnnotation(ColumnDetail.class);
         if (column == null) {
             final org.seasar.dao.annotation.tiger.Column s2DaoColumn = method
-                .getAnnotation(org.seasar.dao.annotation.tiger.Column.class);
+                    .getAnnotation(org.seasar.dao.annotation.tiger.Column.class);
             if (s2DaoColumn != null) {
                 column = new ColumnDetail() {
                     public String name() {
@@ -405,7 +412,7 @@ public class BeantableImpl implements Beantable {
             }
         } else if (column.name() == null) {
             final org.seasar.dao.annotation.tiger.Column s2DaoColumn = method
-                .getAnnotation(org.seasar.dao.annotation.tiger.Column.class);
+                    .getAnnotation(org.seasar.dao.annotation.tiger.Column.class);
             if (s2DaoColumn != null) {
                 final ColumnDetail origColumn = column;
                 column = new ColumnDetail() {
@@ -578,7 +585,7 @@ public class BeantableImpl implements Beantable {
                 return typeName;
             } else {
                 typeName = (String) actualJdbcTypeNameByTypeMap_
-                    .get(new Integer(jdbcTypes[i].getType()));
+                        .get(new Integer(jdbcTypes[i].getType()));
                 if (typeName != null) {
                     return typeName;
                 }
