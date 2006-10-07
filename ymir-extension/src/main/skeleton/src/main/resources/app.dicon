@@ -2,4 +2,6 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
+  <component
+    class="org.seasar.dao.annotation.tiger.impl.AnnotationReaderFactoryImpl" />
 </components>
