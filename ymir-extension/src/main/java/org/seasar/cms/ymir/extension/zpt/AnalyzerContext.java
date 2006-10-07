@@ -1,8 +1,10 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.FormDesc;
@@ -41,6 +43,10 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private VariableResolver variableResolver_;
 
+    private Set<String> usedWithVariableSet_ = new HashSet<String>();
+
+    private Set<String> usedWithLocalVariableSet_ = new HashSet<String>();
+
     @Override
     public VariableResolver getVariableResolver() {
         if (variableResolver_ == null) {
@@ -67,7 +73,9 @@ public class AnalyzerContext extends ZptTemplateContext {
             PropertyDesc propertyDesc = wrapper.getPropertyDesc();
             if (propertyDesc != null) {
                 TypeDesc typeDesc = propertyDesc.getTypeDesc();
-                typeDesc.setClassDesc(getTemporaryClassDesc(name));
+                ClassDesc classDescOfdefinedVariable = getTemporaryClassDesc(name);
+                setUsedWithLocalVariable(classDescOfdefinedVariable);
+                typeDesc.setClassDesc(classDescOfdefinedVariable);
             } else {
                 // self/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
                 // 自動生成ではそのようなプロパティは今のところ扱わない。
@@ -86,7 +94,9 @@ public class AnalyzerContext extends ZptTemplateContext {
             if (propertyDesc != null) {
                 TypeDesc typeDesc = propertyDesc.getTypeDesc();
                 typeDesc.setArray(true);
-                typeDesc.setClassDesc(getTemporaryClassDesc(name));
+                ClassDesc classDescOfDefinedVariable = getTemporaryClassDesc(name);
+                setUsedWithLocalVariable(classDescOfDefinedVariable);
+                typeDesc.setClassDesc(classDescOfDefinedVariable);
             } else {
                 // self/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
                 // 自動生成ではそのようなプロパティは今のところ扱わない。
@@ -205,33 +215,68 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public void close() {
 
+        for (Iterator<ClassDesc> itr = temporaryClassDescMap_.values()
+                .iterator(); itr.hasNext();) {
+            ClassDesc classDesc = itr.next();
+            if (isOuter(classDesc) || isEmptyDto(classDesc)) {
+                // 自動生成対象外のクラスと中身のないDTOは除外しておく。
+                itr.remove();
+            }
+        }
+
         for (Iterator<Map.Entry<String, ClassDesc>> itr = temporaryClassDescMap_
                 .entrySet().iterator(); itr.hasNext();) {
             Map.Entry<String, ClassDesc> entry = itr.next();
             String name = entry.getKey();
             ClassDesc classDesc = entry.getValue();
-            if (isOuter(classDesc)) {
-                // 自動生成対象外のクラスは除外しておく。
-                continue;
-            }
-            if (isEmptyDto(classDesc)) {
-                // 中身のないDTOは無視する。
-                continue;
-            } else {
-                // 中身のないDTOを型にもつプロパティについては、
-                // 型をデフォルトクラスに差し替える。（DTOかもしれないと考えて
-                // 解析を進めたが結局DTOであることが確定しなかったので。）
-                PropertyDesc[] pds = classDesc.getPropertyDescs();
-                for (int i = 0; i < pds.length; i++) {
-                    if (isEmptyDto(pds[i].getTypeDesc().getClassDesc())) {
-                        pds[i].getTypeDesc().setClassDesc(
-                                TypeDesc.DEFAULT_CLASSDESC);
-                    }
+
+            // プロパティの型に対応するDTOがMapに存在しない場合は、
+            // そのDTOは上のフェーズで除外された、すなわちDTOかもしれないと考えて
+            // 解析を進めたが結局DTOであることが確定しなかったので、
+            // 型をデフォルトクラスに差し替える。
+            PropertyDesc[] pds = classDesc.getPropertyDescs();
+            for (int i = 0; i < pds.length; i++) {
+                ClassDesc typeClassDesc = pds[i].getTypeDesc().getClassDesc();
+                if (isDto(typeClassDesc)
+                        && !temporaryClassDescMap_.containsKey(typeClassDesc
+                                .getName())) {
+                    pds[i].getTypeDesc().setClassDesc(
+                            TypeDesc.DEFAULT_CLASSDESC);
                 }
             }
             classDesc.merge(classDescMap_.get(name));
-            classDescMap_.put(name, classDesc);
         }
+
+        for (Iterator<ClassDesc> itr = temporaryClassDescMap_.values()
+                .iterator(); itr.hasNext();) {
+            ClassDesc classDesc = itr.next();
+
+            // PageクラスとPageクラスから利用されているDTOと、外部で定義されている変数の型クラス
+            // 以外は無視する。
+            if (isPage(classDesc)) {
+                registerAvailablePagesAndDtos(classDesc);
+            } else if (isUsedWithVariable(classDesc)
+                    && !isUsedWithLocalVariable(classDesc)) {
+                register(classDesc);
+            }
+        }
+    }
+
+    void registerAvailablePagesAndDtos(ClassDesc classDesc) {
+
+        register(classDesc);
+        PropertyDesc[] pds = classDesc.getPropertyDescs();
+        for (int i = 0; i < pds.length; i++) {
+            ClassDesc typeClassDesc = pds[i].getTypeDesc().getClassDesc();
+            if (isDto(typeClassDesc)) {
+                registerAvailablePagesAndDtos(typeClassDesc);
+            }
+        }
+    }
+
+    void register(ClassDesc classDesc) {
+
+        classDescMap_.put(classDesc.getName(), classDesc);
     }
 
     boolean isOuter(ClassDesc classDesc) {
@@ -239,10 +284,19 @@ public class AnalyzerContext extends ZptTemplateContext {
                 sourceCreator_.getRootPackageName() + ".");
     }
 
+    boolean isPage(ClassDesc classDesc) {
+
+        return ClassDesc.KIND_PAGE.equals(classDesc.getKind());
+    }
+
+    boolean isDto(ClassDesc classDesc) {
+
+        return ClassDesc.KIND_DTO.equals(classDesc.getKind());
+    }
+
     boolean isEmptyDto(ClassDesc classDesc) {
 
-        return (ClassDesc.KIND_DTO.equals(classDesc.getKind()) && classDesc
-                .isEmpty());
+        return (isDto(classDesc) && classDesc.isEmpty());
     }
 
     public String getDtoClassName(String baseName) {
@@ -318,5 +372,25 @@ public class AnalyzerContext extends ZptTemplateContext {
             returned = cd;
         }
         return returned;
+    }
+
+    public boolean isUsedWithVariable(ClassDesc classDesc) {
+
+        return usedWithVariableSet_.contains(classDesc.getName());
+    }
+
+    public void setUsedWithVariable(ClassDesc classDesc) {
+
+        usedWithVariableSet_.add(classDesc.getName());
+    }
+
+    public boolean isUsedWithLocalVariable(ClassDesc classDesc) {
+
+        return usedWithLocalVariableSet_.contains(classDesc.getName());
+    }
+
+    public void setUsedWithLocalVariable(ClassDesc classDesc) {
+
+        usedWithLocalVariableSet_.add(classDesc.getName());
     }
 }

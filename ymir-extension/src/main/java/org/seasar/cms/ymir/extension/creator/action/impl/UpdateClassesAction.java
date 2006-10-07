@@ -78,10 +78,13 @@ public class UpdateClassesAction extends AbstractUpdateAction {
         for (int i = 0; i < classDescs.length; i++) {
             String name = classDescs[i].getName();
             String kind = classDescs[i].getKind();
-            dtos[i] = new ClassDescDto(name, PropertyUtils.valueOf(prop
-                    .getProperty(PREFIX_CLASSCHECKED + name),
-                    !(ClassDesc.KIND_DAO.equals(kind) || ClassDesc.KIND_BEAN
-                            .equals(kind))));
+            if (ClassDesc.KIND_DAO.equals(kind)
+                    || ClassDesc.KIND_BEAN.equals(kind)) {
+                dtos[i] = new ClassDescDto(name, false);
+            } else {
+                dtos[i] = new ClassDescDto(name, PropertyUtils.valueOf(prop
+                        .getProperty(PREFIX_CLASSCHECKED + name), true));
+            }
         }
 
         return dtos;

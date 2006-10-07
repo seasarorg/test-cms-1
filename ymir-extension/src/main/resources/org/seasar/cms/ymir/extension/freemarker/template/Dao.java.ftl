@@ -1,6 +1,5 @@
 <#if classDesc.packageName != "">package ${classDesc.packageName};</#if>
 
-import java.util.List;
 
 public interface ${classDesc.shortName}
 {

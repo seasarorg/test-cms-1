@@ -1,0 +1,9 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <p tal:content="self/comments/length">10</p>
+    <p tal:repeat="comment self/comments" tal:content="comment/body">BODY</p>
+  </body>
+</html>

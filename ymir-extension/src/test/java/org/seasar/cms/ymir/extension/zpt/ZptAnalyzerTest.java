@@ -424,4 +424,23 @@ public class ZptAnalyzerTest extends TestCase {
         assertNull("nameが実行時に決まるようなタグは無視されること", cd
                 .getMethodDesc(new MethodDescImpl("POST_submit2")));
     }
+
+    public void testAnalyze18() throws Exception {
+
+        act("testAnalyze18");
+
+        ClassDesc cd = getClassDesc(CLASSNAME).getPropertyDesc("entry")
+                .getTypeDesc().getClassDesc();
+        assertEquals("パスが3段以上でも正しくClassDescを生成できること",
+                "com.example.dto.BodyDto", cd.getPropertyDesc("body")
+                        .getTypeDesc().getClassDesc().getName());
+    }
+
+    public void testAnalyze19() throws Exception {
+
+        act("testAnalyze19");
+
+        assertNull("余計なDtoが生成されないこと",
+                getClassDesc("com.example.dto.CommentsDto"));
+    }
 }

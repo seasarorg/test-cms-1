@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import org.seasar.cms.ymir.extension.creator.ClassDesc;
+
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
 
@@ -19,7 +21,9 @@ public class AnalyzerVariableResolver implements VariableResolver {
         AnalyzerContext analyzerContext = (AnalyzerContext) context;
 
         if (context != null && shouldGenerateClassOf(analyzerContext, name)) {
-            return new DescWrapper(analyzerContext.getTemporaryClassDesc(name));
+            ClassDesc classDesc = analyzerContext.getTemporaryClassDesc(name);
+            analyzerContext.setUsedWithVariable(classDesc);
+            return new DescWrapper(classDesc);
         } else {
             return delegated_.getVariable(context, name);
         }
