@@ -19,6 +19,7 @@ import org.seasar.framework.convention.NamingConvention;
 import org.seasar.framework.convention.impl.NamingConventionImpl;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 import org.seasar.framework.log.Logger;
+import org.seasar.framework.util.ArrayUtil;
 
 public class LocalOndemandS2Container implements HotdeployListener,
         OndemandS2Container {
@@ -283,15 +284,15 @@ public class LocalOndemandS2Container implements HotdeployListener,
         componentDefCache_.clear();
     }
 
-    public void setHotdeployListeners(HotdeployListener[] listeners) {
-        listeners_ = listeners;
-    }
-
     public void setClassesDirectory(String classesDirectory) {
         classesDirectory_ = new File(classesDirectory);
     }
 
     public void setHotdeployDisabled() {
         hotdeployEnabled_ = false;
+    }
+
+    public void addHotdeployListener(HotdeployListener listener) {
+        listeners_ = (HotdeployListener[]) ArrayUtil.add(listeners_, listener);
     }
 }

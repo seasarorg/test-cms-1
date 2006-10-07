@@ -24,7 +24,7 @@ public class OndemandDaoMetaDataFactory implements DaoMetaDataFactory {
     protected ResultSetFactory resultSetFactory_;
 
     protected AnnotationReaderFactory readerFactory_;
-    
+
     private ValueTypeFactory valueTypeFactory;
 
     private String sqlFileEncoding;

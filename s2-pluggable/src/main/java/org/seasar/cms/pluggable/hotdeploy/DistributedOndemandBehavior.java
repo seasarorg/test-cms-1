@@ -1,10 +1,5 @@
 package org.seasar.cms.pluggable.hotdeploy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
@@ -34,35 +29,31 @@ public class DistributedOndemandBehavior extends DefaultProvider {
     void initializeLocalOndemandS2Containers() {
         S2Container container = getContainer();
 
-        // 所属コンテナのクラスローダ毎にHotdeployListenerを分類しておく。
-        ComponentDef[] componentDefs = container
-                .findAllComponentDefs(HotdeployListener.class);
-        Map listenerMap = new HashMap();
-        for (int i = 0; i < componentDefs.length; i++) {
-            ClassLoader key = componentDefs[i].getContainer().getClassLoader();
-            List list = (List) listenerMap.get(key);
-            if (list == null) {
-                list = new ArrayList();
-                listenerMap.put(key, list);
-            }
-            list.add(componentDefs[i].getComponent());
-        }
-
         // LocalOndemandS2Containerを集める。
-        ondemandContainers_ = (LocalOndemandS2Container[]) container
-                .findAllComponents(LocalOndemandS2Container.class);
+        ComponentDef[] componentDefs = container
+                .findAllComponentDefs(LocalOndemandS2Container.class);
+        ondemandContainers_ = new LocalOndemandS2Container[componentDefs.length];
+        for (int i = 0; i < componentDefs.length; i++) {
+            ComponentDef cd = componentDefs[i];
+            LocalOndemandS2Container ondemandContainer = (LocalOndemandS2Container) cd
+                    .getComponent();
 
-        for (int i = 0; i < ondemandContainers_.length; i++) {
-            Object key = ondemandContainers_[i].getContainer().getClassLoader();
-            List list = (List) listenerMap.get(key);
-            if (list != null) {
-                // 自分と同じ世界（クラスローダがkey）に属するListenerだけをaddする。
-                ondemandContainers_[i]
-                        .setHotdeployListeners((HotdeployListener[]) list
-                                .toArray(new HotdeployListener[0]));
+            // このLocalOndemandS2Containerが登録されているコンテナから見える
+            // HotdeployListenerを登録する。
+            HotdeployListener[] listeners = (HotdeployListener[]) cd
+                    .getContainer().findAllComponents(HotdeployListener.class);
+            for (int j = 0; j < listeners.length; j++) {
+                HotdeployListener listener = listeners[j];
+                if (listener instanceof LocalOndemandS2Container
+                        && listener != ondemandContainer) {
+                    // このLocalOndemandS2Containerが登録されているコンテナから見えても、
+                    // 自分以外のLocalOndemandS2Containerは登録しない。
+                    continue;
+                }
+                ondemandContainer.addHotdeployListener(listener);
             }
-
-            ondemandContainers_[i].init(hotdeployEnabled_);
+            ondemandContainer.init(hotdeployEnabled_);
+            ondemandContainers_[i] = ondemandContainer;
         }
     }
 
