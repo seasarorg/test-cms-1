@@ -1,13 +1,13 @@
 package org.seasar.cms.database.identity;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TableMetaData {
 
     private String name_;
 
-    private Map<String, ColumnMetaData> columnMap_ = new HashMap<String, ColumnMetaData>();
+    private Map<String, ColumnMetaData> columnMap_ = new LinkedHashMap<String, ColumnMetaData>();
 
     private ConstraintMetaData[] constraints_;
 
