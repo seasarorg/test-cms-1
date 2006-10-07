@@ -3,7 +3,7 @@
   "http://www.seasar.org/dtd/components23.dtd">
 <components namespace="dao">
   <include path="jdbc.dicon" />
-  <component class="org.seasar.dao.impl.FieldAnnotationReaderFactory" />
+  <include path="app.dicon" />
   <component class="org.seasar.cms.pluggable.dao.OndemandDaoMetaDataFactory">
     <property name="daoSuffixes">new String[]{"Dao","Page"}</property>
     <property name="sqlFileEncoding">"UTF-8"</property>
