@@ -2,7 +2,9 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.3//EN"
   "http://www.seasar.org/dtd/components23.dtd">
 <components>
-  <component class="org.seasar.cms.beantable.impl.BeantableImpl" instance="prototype">
+  <component name="beantable"
+    class="org.seasar.cms.beantable.impl.BeantableImpl"
+    instance="prototype">
     <property name="identity">identitySelector.getIdentity()</property>
   </component>
 </components>

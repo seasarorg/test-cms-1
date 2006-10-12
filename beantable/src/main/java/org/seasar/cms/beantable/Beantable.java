@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.seasar.cms.database.identity.ColumnMetaData;
 import org.seasar.cms.database.identity.Identity;
 import org.seasar.cms.database.identity.TableMetaData;
 
@@ -11,10 +12,10 @@ import org.seasar.cms.database.identity.TableMetaData;
  * <p>
  * <b>同期化：</b> このインタフェースの実装クラスはスレッドセーフである必要があります。
  * </p>
- * 
+ *
  * @author YOKOTA Takehiko
  */
-public interface Beantable {
+public interface Beantable<T> {
 
     void activate() throws SQLException;
 
@@ -32,11 +33,39 @@ public interface Beantable {
 
     boolean correctTableSchema() throws SQLException;
 
-    Class getBeanClass();
+    Class<T> getBeanClass();
 
-    void setBeanClass(Class<?> beanClass);
+    void setBeanClass(Class<T> beanClass);
 
     TableMetaData getTableMetaData();
+
+    T selectColumn(Formula formula) throws SQLException;
+
+    T[] selectColumns(Formula formula) throws SQLException;
+
+    void insertColumn(T bean) throws SQLException;
+
+    int updateColumns(T bean, Formula formula) throws SQLException;
+
+    int deleteColumns(Formula formula) throws SQLException;
+
+    T newBeanInstance();
+
+    Object getValue(T bean, String columnName);
+
+    Object getValue(T bean, ColumnMetaData column);
+
+    void setValue(T bean, String columnName, Object value);
+
+    /**
+     * Beanの持つ、指定されたカラムに対応するプロパティに値を設定します。
+     * <p>値がnullの場合や型が合わない場合は何もしません。</p>
+     *
+     * @param bean 値を設定する対象であるBean。
+     * @param column カラム。
+     * @param value 値。
+     */
+    void setValue(T bean, ColumnMetaData column, Object value);
 
     /*
      * for framework
