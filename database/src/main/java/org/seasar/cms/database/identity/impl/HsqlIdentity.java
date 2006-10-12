@@ -7,12 +7,14 @@ import java.sql.Statement;
 import org.apache.commons.dbutils.DbUtils;
 import org.hsqldb.DatabaseManager;
 import org.hsqldb.lib.HsqlTimer;
+import org.seasar.cms.database.identity.ColumnMetaData;
+import org.seasar.cms.database.identity.TableMetaData;
 
 /**
  * <p>
  * <b>同期化：</b> このクラスはスレッドセーフです。
  * </p>
- * 
+ *
  * @author YOKOTA Takehiko
  */
 public class HsqlIdentity extends AbstractIdentity {
@@ -29,22 +31,36 @@ public class HsqlIdentity extends AbstractIdentity {
         return false;
     }
 
+    @Override
     public boolean existsTable(String tableName) throws SQLException {
         return super.existsTable(tableName.toUpperCase());
     }
 
+    @Override
     public String[] getColumns(String tableName) throws SQLException {
         return super.getColumns(tableName.toUpperCase());
     }
 
-    public IdColumnDefinitionSQL getIdColumnDefinitionSQL(String tableName,
+    @Override
+    public SQLToDefineIdColumn getSQLToDefineIdColumn(String tableName,
         String columnName, String sequenceName) {
         if (sequenceName == null) {
-            return new IdColumnDefinitionSQL("INTEGER NOT NULL IDENTITY",
+            return new SQLToDefineIdColumn("INTEGER NOT NULL IDENTITY",
                 new String[0]);
         } else {
-            return new IdColumnDefinitionSQL("INTEGER NOT NULL PRIMARY KEY",
+            return new SQLToDefineIdColumn("INTEGER NOT NULL PRIMARY KEY",
                 new String[] { "CREATE SEQUENCE " + sequenceName });
+        }
+    }
+
+    @Override
+    public SQLToDeleteIdColumn getSQLToDeleteIdColumn(String tableName,
+        String columnName, String sequenceName) {
+        if (sequenceName == null) {
+            return new SQLToDeleteIdColumn(new String[0]);
+        } else {
+            return super.getSQLToDeleteIdColumn(tableName, columnName,
+                sequenceName);
         }
     }
 
@@ -84,6 +100,27 @@ public class HsqlIdentity extends AbstractIdentity {
         HsqlTimer timer = DatabaseManager.getTimer();
         if (timer != null) {
             timer.shutDown();
+        }
+    }
+
+    @Override
+    public String getSQLToGetGeneratedId(String tableName, String columnName,
+        String sequenceName) {
+        if (sequenceName == null) {
+            return "CALL IDENTITY()";
+        } else {
+            return super.getSQLToGetGeneratedId(tableName, columnName,
+                sequenceName);
+        }
+    }
+
+    @Override
+    public String getSQLToGenerateNextId(TableMetaData table,
+        ColumnMetaData column) {
+        if (column.isId() && column.getSequenceName() != null) {
+            return "NEXT VALUE FOR " + column.getSequenceName();
+        } else {
+            return null;
         }
     }
 }

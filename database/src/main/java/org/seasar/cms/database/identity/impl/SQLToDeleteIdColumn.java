@@ -1,10 +1,10 @@
 package org.seasar.cms.database.identity.impl;
 
-public class IdColumnDeletionSQL {
+public class SQLToDeleteIdColumn {
 
     private String[] deletionSQLs_;
 
-    public IdColumnDeletionSQL(String[] deletionSQLs) {
+    public SQLToDeleteIdColumn(String[] deletionSQLs) {
         deletionSQLs_ = deletionSQLs;
     }
 

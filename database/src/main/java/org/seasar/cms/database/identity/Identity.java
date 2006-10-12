@@ -8,7 +8,7 @@ import javax.sql.DataSource;
  * <p>
  * <b>同期化：</b> このインタフェースの実装クラスはスレッドセーフである必要があります。
  * </p>
- * 
+ *
  * @author YOKOTA Takehiko
  */
 public interface Identity {
@@ -22,7 +22,7 @@ public interface Identity {
 
     /**
      * 指定されたテーブルが存在するかどうかを返します。
-     * 
+     *
      * @param tableName
      *            テーブル名。
      * @return テーブルが存在するかどうか。
@@ -31,7 +31,7 @@ public interface Identity {
 
     /**
      * 指定された式を数値に変換するような式を返します。
-     * 
+     *
      * @param expr 式。
      * @return 数値として扱える式。
      */
@@ -52,11 +52,15 @@ public interface Identity {
 
     /**
      * 指定されたテーブルが持つ全てのカラム名を返します。
-     * 
+     *
      * @param tableName テーブル名。
      * @return カラム名の配列。nullを返すことはありません。
      */
     String[] getColumns(String tableName) throws SQLException;
 
+    Integer getGeneratedId(TableMetaData table) throws SQLException;
+
     void setDataSource(DataSource ds);
+
+    String getSQLToGenerateNextId(TableMetaData table, ColumnMetaData column);
 }

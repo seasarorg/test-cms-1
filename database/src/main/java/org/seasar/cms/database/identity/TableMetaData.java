@@ -9,6 +9,8 @@ public class TableMetaData {
 
     private Map<String, ColumnMetaData> columnMap_ = new LinkedHashMap<String, ColumnMetaData>();
 
+    private ColumnMetaData idColumn_;
+
     private ConstraintMetaData[] constraints_;
 
     private IndexMetaData[] indexes_;
@@ -36,12 +38,33 @@ public class TableMetaData {
     public void setColumns(ColumnMetaData[] columns) {
         columnMap_.clear();
         for (int i = 0; i < columns.length; i++) {
-            columnMap_.put(columns[i].getName(), columns[i]);
+            columnMap_.put(columns[i].getName().toUpperCase(), columns[i]);
+            if (columns[i].isId()) {
+                if (idColumn_ == null) {
+                    idColumn_ = columns[i];
+                } else {
+                    throw new IllegalArgumentException(
+                        "'Id' column must be one: " + idColumn_ + ", "
+                            + columns[i]);
+                }
+            }
         }
     }
 
+    /**
+     * 指定された名前を持つカラムに関するColumnMetaDataを返します。
+     * <p>名前の大文字小文字は無視されます。</p>
+     * <p>見つからなかった場合はnullを返します。</p>
+     *
+     * @param columnName カラム名。
+     * @return ColumnMetaData。
+     */
     public ColumnMetaData getColumn(String columnName) {
-        return columnMap_.get(columnName);
+        return columnMap_.get(columnName.toUpperCase());
+    }
+
+    public ColumnMetaData getIdColumn() {
+        return idColumn_;
     }
 
     public ConstraintMetaData[] getConstraints() {

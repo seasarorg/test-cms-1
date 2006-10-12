@@ -16,16 +16,16 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.seasar.cms.database.identity.ColumnMetaData;
+import org.seasar.cms.database.identity.ConstraintMetaData;
 import org.seasar.cms.database.identity.Identity;
 import org.seasar.cms.database.identity.IndexMetaData;
-import org.seasar.cms.database.identity.ConstraintMetaData;
 import org.seasar.cms.database.identity.TableMetaData;
 
 /**
  * <p>
  * <b>同期化：</b> このクラスはスレッドセーフです。
  * </p>
- * 
+ *
  * @author YOKOTA Takehiko
  */
 abstract public class AbstractIdentity implements Identity {
@@ -42,14 +42,21 @@ abstract public class AbstractIdentity implements Identity {
      * 部分SQLを返します。
      * シーケンス名としてnullを指定した場合はDBMSの実装に依存します。
      * </p>
-     * 
+     *
      * @param tableName テーブル名。
      * @param columnName カラム名。
      * @param sequenceName シーケンス名。nullを指定することもできます。
      * @return 自動採番されるカラムを定義するための部分SQL。
      */
-    abstract public IdColumnDefinitionSQL getIdColumnDefinitionSQL(
-        String tableName, String columnName, String sequenceName);
+    public SQLToDefineIdColumn getSQLToDefineIdColumn(String tableName,
+        String columnName, String sequenceName) {
+        if (sequenceName == null) {
+            sequenceName = getSequenceName(tableName, columnName);
+        }
+        return new SQLToDefineIdColumn("INTEGER DEFAULT NEXTVAL('"
+            + sequenceName + "') NOT NULL PRIMARY KEY",
+            new String[] { "CREATE SEQUENCE " + sequenceName });
+    }
 
     public boolean startUsingDatabase() {
         return true;
@@ -109,10 +116,10 @@ abstract public class AbstractIdentity implements Identity {
         Set<String> currentColumnSet = new HashSet<String>();
         String[] columnNames = getColumns(tableName);
         for (int i = 0; i < columnNames.length; i++) {
-            currentColumnSet.add(columnNames[i].toUpperCase());
+            currentColumnSet.add(columnNames[i]);
         }
         for (int i = 0; i < columns.length; i++) {
-            String columnName = columns[i].getName().toUpperCase();
+            String columnName = columns[i].getName();
             if (currentColumnSet.contains(columnName)) {
                 currentColumnSet.remove(columnName);
             } else {
@@ -147,12 +154,13 @@ abstract public class AbstractIdentity implements Identity {
 
     void addColumn(String tableName, ColumnMetaData column, boolean force)
         throws SQLException {
-        executeUpdate(getAlterTableAddColumnSQL(tableName, column), force);
+        executeUpdate(getSQLToAlterTableAddColumn(tableName, column), force);
     }
 
     void dropColumn(String tableName, String columnName, boolean force)
         throws SQLException {
-        executeUpdate(getAlterTableDropColumnSQL(tableName, columnName), force);
+        executeUpdate(getSQLToAlterTableDropColumn(tableName, columnName),
+            force);
     }
 
     protected String[] constructCreateTableSQLs(TableMetaData table) {
@@ -299,12 +307,12 @@ abstract public class AbstractIdentity implements Identity {
 
     /**
      * 指定されたテーブルに指定されたカラムを追加するようなSQLを返します。
-     * 
+     *
      * @param tableName テーブル名。
      * @param column 追加するカラムの情報。
      * @return カラムを追加するためのSQL。
      */
-    protected String getAlterTableAddColumnSQL(String tableName,
+    protected String getSQLToAlterTableAddColumn(String tableName,
         ColumnMetaData column) {
         return "ALTER TABLE " + tableName + " ADD COLUMN " + column.getName()
             + " " + getDefinitionSQL(tableName, column);
@@ -312,12 +320,12 @@ abstract public class AbstractIdentity implements Identity {
 
     /**
      * 指定されたテーブルから指定されたカラムを削除するようなSQLを返します。
-     * 
+     *
      * @param tableName テーブル名。
      * @param columnName 削除するカラム名。
      * @return カラムを削除するためのSQL。
      */
-    protected String getAlterTableDropColumnSQL(String tableName,
+    protected String getSQLToAlterTableDropColumn(String tableName,
         String columnName) {
         return "ALTER TABLE " + tableName + " DROP COLUMN " + columnName;
     }
@@ -345,20 +353,19 @@ abstract public class AbstractIdentity implements Identity {
      * <p>シーケンス名を明示的に指定した場合はシーケンスを利用して自動採番するような
      * カラムとみなし、対応するシーケンスも削除するような部分SQLを返します。
      * </p>
-     * 
+     *
      * @param tableName テーブル名。
      * @param columnName カラム名。
      * @param sequenceName シーケンス名。nullを指定することもできます。
      * @return 自動採番されるカラムを削除するための部分SQL。
      */
-    protected IdColumnDeletionSQL getIdColumnDeletionSQL(String tableName,
+    public SQLToDeleteIdColumn getSQLToDeleteIdColumn(String tableName,
         String columnName, String sequenceName) {
         if (sequenceName == null) {
-            return new IdColumnDeletionSQL(new String[0]);
-        } else {
-            return new IdColumnDeletionSQL(new String[] { "DROP SEQUENCE "
-                + sequenceName });
+            sequenceName = getSequenceName(tableName, columnName);
         }
+        return new SQLToDeleteIdColumn(new String[] { "DROP SEQUENCE "
+            + sequenceName });
     }
 
     protected String getSequenceName(String tableName, String columnName) {
@@ -368,7 +375,7 @@ abstract public class AbstractIdentity implements Identity {
     protected String getDefinitionSQL(String tableName, ColumnMetaData column) {
 
         if (column.isId()) {
-            return getIdColumnDefinitionSQL(tableName, column.getName(),
+            return getSQLToDefineIdColumn(tableName, column.getName(),
                 column.getSequenceName()).getColumnDefinitionSQL();
         }
 
@@ -393,7 +400,7 @@ abstract public class AbstractIdentity implements Identity {
     protected String[] getAdditionalDefinitionSQLs(String tableName,
         ColumnMetaData column) {
         if (column.isId()) {
-            return getIdColumnDefinitionSQL(tableName, column.getName(),
+            return getSQLToDefineIdColumn(tableName, column.getName(),
                 column.getSequenceName()).getAdditionalCreationSQLs();
         } else {
             return new String[0];
@@ -402,7 +409,7 @@ abstract public class AbstractIdentity implements Identity {
 
     protected String[] getDeletionSQLs(String tableName, ColumnMetaData column) {
         if (column.isId()) {
-            return getIdColumnDeletionSQL(tableName, column.getName(),
+            return getSQLToDeleteIdColumn(tableName, column.getName(),
                 column.getSequenceName()).getDeletionSQLs();
         } else {
             return new String[0];
@@ -440,6 +447,41 @@ abstract public class AbstractIdentity implements Identity {
         } finally {
             DbUtils.closeQuietly(con);
         }
+    }
+
+    public Integer getGeneratedId(TableMetaData table) throws SQLException {
+
+        ColumnMetaData idColumn = table.getIdColumn();
+        if (idColumn == null) {
+            return null;
+        }
+
+        Connection con = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            con = ds_.getConnection();
+            st = con.createStatement();
+            rs = st.executeQuery(getSQLToGetGeneratedId(table.getName(),
+                idColumn.getName(), idColumn.getSequenceName()));
+            rs.next();
+            return new Integer(rs.getInt(1));
+        } finally {
+            DbUtils.closeQuietly(null, st, rs);
+        }
+    }
+
+    public String getSQLToGetGeneratedId(String tableName, String columnName,
+        String sequenceName) {
+        if (sequenceName == null) {
+            sequenceName = getSequenceName(tableName, columnName);
+        }
+        return "SELECT CURRVAL('" + sequenceName + "')";
+    }
+
+    public String getSQLToGenerateNextId(TableMetaData table,
+        ColumnMetaData column) {
+        return null;
     }
 
     /*

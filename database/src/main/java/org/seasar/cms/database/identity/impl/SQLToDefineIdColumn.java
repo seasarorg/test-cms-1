@@ -6,12 +6,12 @@ package org.seasar.cms.database.identity.impl;
  * 
  * @author YOKOTA Takehiko
  */
-public class IdColumnDefinitionSQL {
+public class SQLToDefineIdColumn {
     private String columnDefinitionSQL_;
 
     private String[] additionalCreationSQLs_;
 
-    public IdColumnDefinitionSQL(String columnDefinitionSQL,
+    public SQLToDefineIdColumn(String columnDefinitionSQL,
         String[] additionalCreationSQLs) {
         columnDefinitionSQL_ = columnDefinitionSQL;
         additionalCreationSQLs_ = additionalCreationSQLs;
