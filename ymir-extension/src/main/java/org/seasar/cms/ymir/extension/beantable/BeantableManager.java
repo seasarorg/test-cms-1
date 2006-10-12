@@ -155,6 +155,7 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
         return traverser.isMatched(packageName, shortClassName);
     }
 
+    @SuppressWarnings("unchecked")
     Beantable newBeantable(Class beanClass) {
 
         Beantable beanTable = (Beantable) container_
