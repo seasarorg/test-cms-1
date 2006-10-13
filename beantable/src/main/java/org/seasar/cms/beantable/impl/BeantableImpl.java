@@ -628,7 +628,7 @@ public class BeantableImpl<T> implements Beantable<T> {
 
             ColumnMetaData idColumn = table_.getIdColumn();
             if (idColumn != null) {
-                setValue(bean, idColumn, identity_.getGeneratedId(con, table_));
+                setValue(bean, idColumn, identity_.getGeneratedId(table_));
             }
         } finally {
             DbUtils.closeQuietly(con, pst, null);
