@@ -25,7 +25,12 @@ public class ApplicationManagerImpl implements ApplicationManager {
 
     public Application getContextApplication() {
 
-        Application application = (Application) application_.get();
+        return (Application) application_.get();
+    }
+
+    public Application findContextApplication() {
+
+        Application application = getContextApplication();
         if (application == null) {
             application = baseApplication_;
         }

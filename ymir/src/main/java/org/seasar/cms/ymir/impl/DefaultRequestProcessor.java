@@ -144,7 +144,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Application getApplication() {
-        return applicationManager_.getContextApplication();
+        return applicationManager_.findContextApplication();
     }
 
     PathMapping[] getPathMappings() {

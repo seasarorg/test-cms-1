@@ -10,5 +10,7 @@ public interface ApplicationManager {
 
     Application getContextApplication();
 
+    Application findContextApplication();
+
     void setBaseApplication(Application application);
 }
