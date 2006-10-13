@@ -6,6 +6,8 @@ public interface ThreadContext {
 
     Object getComponent(Object key);
 
+    Object findComponent(Object key);
+
     void setComponent(Object key, Object component);
 
     void destroy();

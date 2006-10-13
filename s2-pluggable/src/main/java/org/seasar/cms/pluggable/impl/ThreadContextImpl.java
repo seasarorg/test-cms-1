@@ -17,9 +17,14 @@ public class ThreadContextImpl implements ThreadContext {
         return container_.getComponent(key);
     }
 
+    public Object findComponent(Object key) {
+        return ((ThreadLocalComponentDef) container_.getComponentDef(key))
+                .getComponent();
+    }
+
     public void setComponent(Object key, Object component) {
         ((ThreadLocalComponentDef) container_.getComponentDef(key))
-            .setComponent(component);
+                .setComponent(component);
     }
 
     public void destroy() {
