@@ -974,7 +974,7 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public Application getApplication() {
 
-        return applicationManager_.getContextApplication();
+        return applicationManager_.findContextApplication();
     }
 
     ServletContext getServletContext() {
