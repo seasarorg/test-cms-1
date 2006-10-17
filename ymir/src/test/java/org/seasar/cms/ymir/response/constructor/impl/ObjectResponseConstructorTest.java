@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.response.constructor.impl;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Date;
 
 import org.seasar.cms.ymir.Path;
@@ -30,6 +32,8 @@ public class ObjectResponseConstructorTest extends TestCase {
                 return null;
             }
         });
+        selector.add(new InputStreamResponseConstructor());
+
         target_ = new ObjectResponseConstructor();
         target_.setResponseConstructorSelector(selector);
     }
@@ -45,5 +49,22 @@ public class ObjectResponseConstructorTest extends TestCase {
         target_.constructResponse(null, new Date());
         assertSame("登録されていないクラスのオブジェクトを渡した場合はStringに変換されて処理されること",
                 String.class, calledClass_);
+    }
+
+    public void testFindResponseConstructor() throws Exception {
+
+        assertNull("Objectクラスに対してはnullを返すこと", target_
+                .findResponseConstructor(Object.class));
+
+        assertEquals("指定したクラスに対するResponseConstructorがあればそれを返すこと", Path.class,
+                target_.findResponseConstructor(Path.class).getTargetClass());
+
+        assertEquals("スーパークラスのResponseConstructorがあればそれを返すこと", Path.class,
+                target_.findResponseConstructor(new Path() {
+                }.getClass()).getTargetClass());
+
+        assertEquals("実装しているインタフェースのResponseConstructorがあればそれを返すこと",
+                InputStream.class, target_.findResponseConstructor(
+                        FileInputStream.class).getTargetClass());
     }
 }
