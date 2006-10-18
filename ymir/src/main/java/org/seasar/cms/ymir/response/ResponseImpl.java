@@ -2,9 +2,7 @@ package org.seasar.cms.ymir.response;
 
 import java.io.InputStream;
 
-import org.seasar.cms.ymir.Response;
-
-public class ResponseImpl implements Response {
+public class ResponseImpl extends ResponseBase {
 
     private int type_ = TYPE_VOID;
 
@@ -13,8 +11,6 @@ public class ResponseImpl implements Response {
     private String contentType_;
 
     private InputStream inputStream_;
-
-    private int status_ = STATUS_UNDEFINED;
 
     public String getContentType() {
 
@@ -54,15 +50,5 @@ public class ResponseImpl implements Response {
     public void setType(int type) {
 
         type_ = type;
-    }
-
-    public int getStatus() {
-
-        return status_;
-    }
-
-    public void setStatus(int status) {
-
-        status_ = status;
     }
 }

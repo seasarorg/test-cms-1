@@ -32,6 +32,8 @@ public interface Response {
 
     void setContentType(String contentType);
 
+    String getCharacterEncoding();
+
     int getStatus();
 
     void setStatus(int status);

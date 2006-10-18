@@ -40,4 +40,8 @@ public class MockResponse implements Response {
 
     public void setType(int type) {
     }
+
+    public String getCharacterEncoding() {
+        return null;
+    }
 }

@@ -4,9 +4,9 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.response.SelfContainedResponse;
 import org.seasar.cms.ymir.response.scheme.Strategy;
 
-public class StringStrategy implements Strategy {
+public class HtmlStrategy implements Strategy {
 
-    public static final String SCHEME = "string";
+    public static final String SCHEME = "html";
 
     public String getScheme() {
 
