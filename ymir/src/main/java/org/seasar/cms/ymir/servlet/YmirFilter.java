@@ -77,8 +77,11 @@ public class YmirFilter implements Filter {
         }
 
         Object backupped = null;
+        Object responseContentType = null;
         if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
             backupped = ymir_.backupForInclusion(attributeContainer);
+            responseContentType = httpRequest
+                    .getAttribute(FreyjaServlet.ATTR_RESPONSECONTENTTYPE);
         }
         try {
             Request request = ymir_.prepareForProcessing(ServletUtils
@@ -90,6 +93,9 @@ public class YmirFilter implements Filter {
 
             if (ymir_.processResponse(context_, httpRequest, httpResponse,
                     request, response)) {
+                httpRequest.setAttribute(
+                        FreyjaServlet.ATTR_RESPONSECONTENTTYPE, response
+                                .getContentType());
                 chain.doFilter(httpRequest, httpResponse);
             }
         } catch (PageNotFoundException ex) {
@@ -98,6 +104,9 @@ public class YmirFilter implements Filter {
             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
         } finally {
             if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
+                httpRequest.setAttribute(
+                        FreyjaServlet.ATTR_RESPONSECONTENTTYPE,
+                        responseContentType);
                 ymir_.restoreForInclusion(attributeContainer, backupped);
             }
         }
