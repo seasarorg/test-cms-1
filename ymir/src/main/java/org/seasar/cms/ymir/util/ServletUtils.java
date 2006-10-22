@@ -21,12 +21,37 @@ public class ServletUtils {
     private ServletUtils() {
     }
 
-    public static String getContextPath(HttpServletRequest request) {
+    public static String getRequestContextPath(HttpServletRequest request) {
         String contextPath = getIncludeContextPath(request);
         if (contextPath == null) {
             contextPath = request.getContextPath();
         }
         return contextPath;
+    }
+
+    public static String getRequestPath(HttpServletRequest request) {
+        String path = getNativeRequestPath(request);
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
+    }
+
+    public static String getNativeRequestPath(HttpServletRequest request) {
+        StringBuffer sb = new StringBuffer();
+        String servletPath = getIncludeServletPath(request);
+        String pathInfo;
+        if (servletPath != null) {
+            pathInfo = getIncludePathInfo(request);
+        } else {
+            servletPath = request.getServletPath();
+            pathInfo = request.getPathInfo();
+        }
+        sb.append(servletPath);
+        if (pathInfo != null) {
+            sb.append(pathInfo);
+        }
+        return sb.toString();
     }
 
     public static String getPath(HttpServletRequest request) {
@@ -38,17 +63,13 @@ public class ServletUtils {
     }
 
     public static String getNativePath(HttpServletRequest request) {
-        String path = getIncludePathInfo(request);
-        if (path == null) {
-            path = getIncludeServletPath(request);
-            if (path == null) {
-                path = request.getPathInfo();
-                if (path == null) {
-                    path = request.getServletPath();
-                }
-            }
+        StringBuffer sb = new StringBuffer();
+        sb.append(request.getServletPath());
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null) {
+            sb.append(pathInfo);
         }
-        return path;
+        return sb.toString();
     }
 
     public static String getIncludeContextPath(HttpServletRequest request) {
@@ -64,7 +85,7 @@ public class ServletUtils {
     }
 
     public static String constructURI(String path, Map paramMap, String encoding)
-        throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
         if (paramMap == null) {
             return path;
         }
@@ -104,7 +125,7 @@ public class ServletUtils {
     public static boolean isIncluded(HttpServletRequest request) {
 
         return (request.getAttribute(ATTR_INCLUDE_PATH_INFO) != null || request
-            .getAttribute(ATTR_INCLUDE_SERVLET_PATH) != null);
+                .getAttribute(ATTR_INCLUDE_SERVLET_PATH) != null);
     }
 
     public static void setNoCache(HttpServletResponse response) {
@@ -112,7 +133,7 @@ public class ServletUtils {
         if (!response.containsHeader("Cache-Control")) {
             response.setHeader("Pragma", "No-cache");
             response.setHeader("Cache-Control",
-                "no-cache,no-store,must-revalidate");
+                    "no-cache,no-store,must-revalidate");
             response.setDateHeader("Expires", 1);
         }
     }
