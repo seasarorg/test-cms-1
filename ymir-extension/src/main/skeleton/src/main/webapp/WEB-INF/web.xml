@@ -64,11 +64,6 @@
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>ymir.forward</filter-name>
-    <url-pattern>/*</url-pattern>
-    <dispatcher>FORWARD</dispatcher>
-  </filter-mapping>
-  <filter-mapping>
     <filter-name>ymir.include</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>INCLUDE</dispatcher>
