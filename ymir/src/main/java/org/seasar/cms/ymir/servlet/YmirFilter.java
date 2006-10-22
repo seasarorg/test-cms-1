@@ -84,11 +84,11 @@ public class YmirFilter implements Filter {
                     .getAttribute(FreyjaServlet.ATTR_RESPONSECONTENTTYPE);
         }
         try {
-            Request request = ymir_.prepareForProcessing(httpRequest
-                    .getContextPath(), ServletUtils.getPath(httpRequest),
-                    httpRequest.getMethod(), dispatcher_, httpRequest
-                            .getParameterMap(), fileParameterMap,
-                    attributeContainer);
+            Request request = ymir_.prepareForProcessing(ServletUtils
+                    .getContextPath(httpRequest), ServletUtils
+                    .getPath(httpRequest), httpRequest.getMethod(),
+                    dispatcher_, httpRequest.getParameterMap(),
+                    fileParameterMap, attributeContainer);
             Response response = ymir_.processRequest(request);
 
             if (ymir_.processResponse(context_, httpRequest, httpResponse,

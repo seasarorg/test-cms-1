@@ -22,11 +22,7 @@ public class ServletUtils {
     }
 
     public static String getRequestContextPath(HttpServletRequest request) {
-        String contextPath = getIncludeContextPath(request);
-        if (contextPath == null) {
-            contextPath = request.getContextPath();
-        }
-        return contextPath;
+        return request.getContextPath();
     }
 
     public static String getRequestPath(HttpServletRequest request) {
@@ -39,19 +35,20 @@ public class ServletUtils {
 
     public static String getNativeRequestPath(HttpServletRequest request) {
         StringBuffer sb = new StringBuffer();
-        String servletPath = getIncludeServletPath(request);
-        String pathInfo;
-        if (servletPath != null) {
-            pathInfo = getIncludePathInfo(request);
-        } else {
-            servletPath = request.getServletPath();
-            pathInfo = request.getPathInfo();
-        }
-        sb.append(servletPath);
+        sb.append(request.getServletPath());
+        String pathInfo = request.getPathInfo();
         if (pathInfo != null) {
             sb.append(pathInfo);
         }
         return sb.toString();
+    }
+
+    public static String getContextPath(HttpServletRequest request) {
+        String contextPath = getIncludeContextPath(request);
+        if (contextPath == null) {
+            contextPath = request.getContextPath();
+        }
+        return contextPath;
     }
 
     public static String getPath(HttpServletRequest request) {
@@ -64,8 +61,15 @@ public class ServletUtils {
 
     public static String getNativePath(HttpServletRequest request) {
         StringBuffer sb = new StringBuffer();
-        sb.append(request.getServletPath());
-        String pathInfo = request.getPathInfo();
+        String servletPath = getIncludeServletPath(request);
+        String pathInfo;
+        if (servletPath != null) {
+            pathInfo = getIncludePathInfo(request);
+        } else {
+            servletPath = request.getServletPath();
+            pathInfo = request.getPathInfo();
+        }
+        sb.append(servletPath);
         if (pathInfo != null) {
             sb.append(pathInfo);
         }
