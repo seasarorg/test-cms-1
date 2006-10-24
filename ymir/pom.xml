@@ -59,14 +59,13 @@
           </execution>
         </executions>
       </plugin>
-      <!--
         <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
-              <goal>assembly</goal>
+              <goal>attached</goal>
             </goals>
             <configuration>
               <descriptors>
@@ -76,7 +75,6 @@
           </execution>
         </executions>
       </plugin>
-      -->
     </plugins>
   </build>
   <repositories>
