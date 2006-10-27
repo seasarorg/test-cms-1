@@ -26,7 +26,7 @@
           <artifactId>maven-war-plugin</artifactId>
           <configuration>
             <excludes>
-              WEB-INF/classes/,WEB-INF/lib/,WEB-INF/hsqldb/
+              WEB-INF/classes/,WEB-INF/lib/,WEB-INF/h2/
             </excludes>
             <webResources>
               <resource>
@@ -70,9 +70,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>1.8.0.1</version>
+      <groupId>org.h2</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.0</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

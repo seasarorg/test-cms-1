@@ -16,10 +16,10 @@
 
   <component name="xaDataSource"
     class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
-    <property name="driverClassName">config.getProperty("jdbc.xaDataSource.driverClassName", "org.hsqldb.jdbcDriver")</property>
+    <property name="driverClassName">config.getProperty("jdbc.xaDataSource.driverClassName", "org.h2.Driver")</property>
     <property name="URL">
       config.getProperty("jdbc.xaDataSource.URL",
-        "jdbc:hsqldb:file:" + application.getRealPath("/") + "WEB-INF/hsqldb/hsqldb")
+        "jdbc:h2:file:" + application.getRealPath("/") + "WEB-INF/h2/h2")
     </property>
     <property name="user">config.getProperty("jdbc.xaDataSource.user", "sa")</property>
     <property name="password">config.getProperty("jdbc.xaDataSource.password", "")</property>
