@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR2.3//DTD S2Container//EN" "http://www.seasar.org/dtd/components23.dtd">
+<components>
+  <component name="plugin"
+    class="org.seasar.kvasir.cms.webdav.impl.WebdavPluginImpl" />
+  <component name="webdavPageProcessor"
+    class="org.seasar.kvasir.cms.webdav.impl.WebdavPageProcessor"
+    instance="prototype" />
+  <component name="pageContentElementFactory"
+    class="org.seasar.kvasir.cms.webdav.naming.page.PageContentElementFactory" />
+  <component name="pageTemplateElementFactory"
+    class="org.seasar.kvasir.cms.webdav.naming.page.PageTemplateElementFactory" />
+</components>

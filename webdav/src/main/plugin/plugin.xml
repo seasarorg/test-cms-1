@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.seasar.org/kvasir_plugin/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.seasar.org/kvasir_plugin/4.0.0 http://www.skirnir.net/~skirnir/kvasir_plugin.xsd"
+  id="org.seasar.kvasir.cms.webdav" name="WebDAV Plugin"
+  version="3.0.0-EA3-SNAPSHOT" provider-name="The Seasar Project">
+  <runtime>
+    <library name="conf" />
+    <library
+      name="org.seasar.kvasir.cms.webdav-3.0.0-EA3-SNAPSHOT.jar">
+      <export name="*" />
+    </library>
+  </runtime>
+  <requires>
+    <import plugin="org.seasar.kvasir.page" />
+    <import plugin="org.seasar.kvasir.page.ability.content" />
+    <import plugin="org.seasar.kvasir.page.ability.template" />
+    <import plugin="org.seasar.kvasir.cms" />
+    <import plugin="org.seasar.kvasir.cms.zpt" />
+  </requires>
+  <extension point="org.seasar.kvasir.page.pageGards">
+    <page-gard id="webdav" version="1.0.0" singleton="true" />
+  </extension>
+  <extension point="org.seasar.kvasir.page.pageGardInstalls">
+    <page-gard-install gard-id="org.seasar.kvasir.cms.webdav.webdav"
+      path-account="/DAV" />
+  </extension>
+  <extension point="org.seasar.kvasir.cms.pageFilters">
+    <page-filter id="basicAuthenticationPageFilter"
+      gard-id="org.seasar.kvasir.cms.webdav.webdav"
+      phase="authentication"
+      after="org.seasar.kvasir.cms.actorBindingPageFilter" />
+  </extension>
+  <extension point="org.seasar.kvasir.cms.pageExceptionHandlers">
+    <page-exception-handler id="basicAuthenticationPageExceptionHandler"
+      gard-id="org.seasar.kvasir.cms.webdav.webdav"
+      type="org.seasar.kvasir.page.SecurityRuntimeException" />
+  </extension>
+  <extension point="org.seasar.kvasir.cms.pageProcessors">
+    <page-processor id="webdavPageProcessor" method="*"
+      gard-id="org.seasar.kvasir.cms.webdav.webdav">
+      <init-param>
+        <param-name>listings</param-name>
+        <param-value>true</param-value>
+      </init-param>
+      <init-param>
+        <param-name>readonly</param-name>
+        <param-value>false</param-value>
+      </init-param>
+      <init-param>
+        <param-name>fileEncoding</param-name>
+        <param-value>UTF-8</param-value>
+      </init-param>
+    </page-processor>
+  </extension>
+  <extension point="org.seasar.kvasir.cms.webdav.elementFactories">
+    <element-factory id="pageContentElementFactory" />
+    <element-factory id="pageTemplateElementFactory" />
+  </extension>
+  <extension-point id="elementFactories"
+    element-class="org.seasar.kvasir.cms.webdav.extension.ElementFactoryElement" />
+</plugin>

@@ -1,0 +1,6 @@
+_framework.pageType.page.listing=false
+_framework.pageType.page.listing$type=string
+description=
+description$type=string
+name=WebDAV Interface
+name$type=string
