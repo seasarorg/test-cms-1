@@ -15,11 +15,11 @@
 
   <component name="xaDataSource"
     class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
-    <property name="driverClassName">"org.hsqldb.jdbcDriver"</property>
+    <property name="driverClassName">"org.h2.Driver"</property>
     <property name="URL">
-      "jdbc:hsqldb:file:"
+      "jdbc:h2:file:"
       + @org.seasar.framework.util.ResourceUtil@getBuildDir(@org.seasar.cms.beantable.impl.BeantableImplTest@class).getCanonicalPath()
-      + "/hsqldb/hsqldb"
+      + "/h2/h2"
     </property>
     <property name="user">"sa"</property>
     <property name="password">""</property>

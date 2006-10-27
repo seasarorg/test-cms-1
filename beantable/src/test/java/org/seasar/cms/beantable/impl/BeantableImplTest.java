@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.seasar.cms.beantable.Beantable;
 import org.seasar.cms.database.identity.Identity;
-import org.seasar.cms.database.identity.impl.HsqlIdentity;
+import org.seasar.cms.database.identity.impl.H2Identity;
 import org.seasar.extension.unit.S2TestCase;
 import org.seasar.framework.util.ResourceUtil;
 
@@ -45,7 +45,7 @@ public class BeantableImplTest extends S2TestCase {
     protected void setUpAfterContainerInit() throws Throwable {
         super.setUpAfterContainerInit();
 
-        identity_ = new HsqlIdentity();
+        identity_ = new H2Identity();
         identity_.setDataSource(getDataSource());
         identity_.startUsingDatabase();
     }
