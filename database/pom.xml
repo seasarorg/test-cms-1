@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
+  <parent>
+    <groupId>org.seasar.cms</groupId>
+    <artifactId>cms-project</artifactId>
+    <version>0.0.2</version>
+    <relativePath>../cms-project/pom.xml</relativePath>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms.database</groupId>
   <artifactId>database</artifactId>
@@ -33,13 +39,6 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>www.seasar.org</id>
-      <name>The Seasar Foundation Maven2 Repository</name>
-      <url>http://maven.seasar.org/maven2</url>
-    </repository>
-  </repositories>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

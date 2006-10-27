@@ -6,7 +6,8 @@
   <parent>
     <groupId>org.seasar.cms</groupId>
     <artifactId>cms-project</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
+    <relativePath>../cms-project/pom.xml</relativePath>
   </parent>
   <groupId>org.seasar.cms.s2-pluggable</groupId>
   <artifactId>s2-pluggable</artifactId>
