@@ -6,7 +6,7 @@
   <groupId>org.seasar.cms</groupId>
   <artifactId>cms-project</artifactId>
   <packaging>pom</packaging>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <name>CMS Project</name>
   <description>
     CMS Project is a subproject to develop common utilities and
@@ -192,7 +192,7 @@
       <id>maven.seasar.org</id>
       <name>The Seasar Foundation Maven2 Repository</name>
       <url>
-        scp://www.seasar.org/home/groups/maven/public_html/maven2
+        scp://www.seasar.org/home/groups/maven/maven/maven2
       </url>
     </repository>
   </distributionManagement>
@@ -202,5 +202,7 @@
     <module>../beantable</module>
     <module>../ymir</module>
     <module>../ymir-extension</module>
+    <module>../webdav</module>
+    <module>../webdav-jp</module>
   </modules>
 </project>
