@@ -68,8 +68,9 @@ public class H2Identity extends AbstractIdentity {
             con = ds_.getConnection();
             st = con.createStatement();
             st.executeUpdate("SHUTDOWN COMPACT");
-        } catch (SQLException ex) {
-            throw new RuntimeException("Can't shutdown", ex);
+        } catch (SQLException ignore) {
+            // H2はデフォルトでシャットダウンフックにDatabaseのクローズ処理を登録しているため、
+            // ここでは処理が続行できないことがある。その場合は無視する。
         } finally {
             DbUtils.closeQuietly(con, st, null);
         }
