@@ -12,7 +12,7 @@
   <groupId>org.seasar.cms.ymir</groupId>
   <artifactId>ymir-extension</artifactId>
   <name>Ymir Extension</name>
-  <version>0.0.1</version>
+  <version>0.0.2-SNAPSHOT</version>
   <description>
     Ymir Extension is an extension for Ymir. It includes source code
     generator, bean-table mechanism, etc.
@@ -91,13 +91,13 @@
       <groupId>org.seasar.cms.ymir</groupId>
       <artifactId>ymir</artifactId>
       <classifier>tests</classifier>
-      <version>0.0.1</version>
+      <version>0.0.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.seasar.cms.ymir</groupId>
       <artifactId>ymir</artifactId>
-      <version>0.0.1</version>
+      <version>0.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.container</groupId>
