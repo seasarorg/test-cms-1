@@ -122,12 +122,12 @@
     <dependency>
       <groupId>org.seasar.kvasir</groupId>
       <artifactId>kvasir-util</artifactId>
-      <version>3.0.0-EA3-SNAPSHOT</version>
+      <version>3.0.0-EA3</version>
     </dependency>
     <dependency>
       <groupId>net.skirnir.freyja</groupId>
       <artifactId>freyja</artifactId>
-      <version>1.0.4-SNAPSHOT</version>
+      <version>1.0.4</version>
     </dependency>
     <dependency>
       <groupId>commons-fileupload</groupId>
