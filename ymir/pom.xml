@@ -12,7 +12,7 @@
   <groupId>org.seasar.cms.ymir</groupId>
   <artifactId>ymir</artifactId>
   <name>Ymir</name>
-  <version>0.0.1</version>
+  <version>0.0.2-SNAPSHOT</version>
   <description>
     Ymir is a framework for developing light-weight web application.
   </description>
