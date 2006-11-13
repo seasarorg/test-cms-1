@@ -196,13 +196,4 @@
       </url>
     </repository>
   </distributionManagement>
-  <modules>
-    <module>../s2-pluggable</module>
-    <module>../database</module>
-    <module>../beantable</module>
-    <module>../ymir</module>
-    <module>../ymir-extension</module>
-    <module>../webdav</module>
-    <module>../webdav-jp</module>
-  </modules>
 </project>
