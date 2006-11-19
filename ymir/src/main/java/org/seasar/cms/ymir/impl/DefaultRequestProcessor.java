@@ -2,6 +2,8 @@ package org.seasar.cms.ymir.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -213,12 +215,11 @@ public class DefaultRequestProcessor implements RequestProcessor {
             prepareForComponent(component, request);
 
             // リクエストに対応するアクションの呼び出しを行なう。
-            response = normalizeResponse(constructResponse(invokeAction(
+            response = normalizeResponse(adjustResponse(request, invokeAction(
                     component, getActionMethod(component, request
                             .getActionName(), ACTION_DEFAULT, request
                             .isDispatchingByParameter(), request), request,
-                    true), component, request.getDefaultReturnValue()), request
-                    .getPath());
+                    true), component), request.getPath());
 
             // 画面描画のためのAction呼び出しを行なう。
             // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
@@ -234,9 +235,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
             // デフォルト値からResponseを作るようにしている。
             // （例えば、リクエストパス名がテンプレートパス名ではない場合に、リクエストパス名で
             // テンプレートが作られてしまうとうれしくない。）
-            response = normalizeResponse(constructResponseFromReturnValue(
-                    component, request.getDefaultReturnValue()), request
-                    .getPath());
+
+            response = normalizeResponse(constructDefaultResponse(request,
+                    component), request.getPath());
         }
 
         if (logger_.isDebugEnabled()) {
@@ -477,10 +478,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return method;
     }
 
-    Response constructResponse(Response response, Object component,
-            Object returnValue) {
+    Response adjustResponse(Request request, Response response, Object component) {
         if (response.getType() == Response.TYPE_PASSTHROUGH) {
-            response = constructResponseFromReturnValue(component, returnValue);
+            response = constructDefaultResponse(request, component);
         }
 
         if (logger_.isDebugEnabled()) {
@@ -490,13 +490,23 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return response;
     }
 
-    Response constructResponseFromReturnValue(Object component,
-            Object returnValue) {
-        if (returnValue != null) {
-            return constructResponse(component, returnValue.getClass(),
-                    returnValue);
-        } else {
+    Response constructDefaultResponse(Request request, Object component) {
+        URL resource = null;
+        try {
+            resource = getServletContext().getResource(request.getPath());
+        } catch (MalformedURLException ignore) {
+        }
+        if (resource != null) {
+            // パスに対応するテンプレートファイルが存在する場合はパススルーする。
             return PassthroughResponse.INSTANCE;
+        } else {
+            Object returnValue = request.getDefaultReturnValue();
+            if (returnValue != null) {
+                return constructResponse(component, returnValue.getClass(),
+                        returnValue);
+            } else {
+                return PassthroughResponse.INSTANCE;
+            }
         }
     }
 
