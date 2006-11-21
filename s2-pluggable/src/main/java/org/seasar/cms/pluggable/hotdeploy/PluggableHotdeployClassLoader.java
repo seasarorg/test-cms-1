@@ -147,10 +147,6 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
                     return clazz;
                 }
             }
-            if (logger.isDebugEnabled()) {
-                logger
-                        .debug("Class has not been found in hotdeploy classloader");
-            }
             clazz = classLoader_.loadClass(name);
             if (resolve) {
                 resolveClass(clazz);
