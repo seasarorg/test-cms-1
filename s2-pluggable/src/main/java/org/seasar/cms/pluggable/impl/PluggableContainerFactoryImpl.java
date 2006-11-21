@@ -217,7 +217,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
                     StringBuffer sb = new StringBuffer();
                     String delim = "";
                     for (int j = 0; j < urls.length; j++) {
-                        sb.append(delim).append(urls[i].toExternalForm());
+                        sb.append(delim).append(urls[j].toExternalForm());
                         delim = ", ";
                     }
                     throw new RuntimeException(
