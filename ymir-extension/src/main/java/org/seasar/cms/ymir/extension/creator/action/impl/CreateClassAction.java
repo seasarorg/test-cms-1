@@ -10,16 +10,16 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
-import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
 public class CreateClassAction extends AbstractUpdateAction {
 
-    private static final String PARAM_TRANSITION = SourceCreatorImpl.PARAM_PREFIX
+    private static final String PARAM_TRANSITION = SourceCreator.PARAM_PREFIX
             + "transition";
 
-    public CreateClassAction(SourceCreatorImpl sourceCreator) {
+    public CreateClassAction(SourceCreator sourceCreator) {
         super(sourceCreator);
     }
 

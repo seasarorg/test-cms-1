@@ -13,12 +13,12 @@ import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
-import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.impl.SingleApplication;
 
 public class CreateConfigurationAction extends AbstractUpdateAction {
 
-    private static final String PARAMPREFIX_KEY = SourceCreatorImpl.PARAM_PREFIX
+    private static final String PARAMPREFIX_KEY = SourceCreator.PARAM_PREFIX
             + "key_";
 
     private static final String POM_XML = "pom.xml";
@@ -31,7 +31,7 @@ public class CreateConfigurationAction extends AbstractUpdateAction {
 
     private static final String KEY_WEBAPPSOURCEROOT = "webappSourceRoot";
 
-    public CreateConfigurationAction(SourceCreatorImpl sourceCreator) {
+    public CreateConfigurationAction(SourceCreator sourceCreator) {
         super(sourceCreator);
     }
 

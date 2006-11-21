@@ -12,12 +12,12 @@ import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
 abstract public class AbstractUpdateAction implements UpdateAction {
 
-    public static final String PARAM_SUBTASK = SourceCreatorImpl.PARAM_PREFIX
-        + "subTask";
+    public static final String PARAM_SUBTASK = SourceCreator.PARAM_PREFIX
+            + "subTask";
 
-    private SourceCreatorImpl sourceCreator_;
+    private SourceCreator sourceCreator_;
 
-    public AbstractUpdateAction(SourceCreatorImpl sourceCreator) {
+    public AbstractUpdateAction(SourceCreator sourceCreator) {
 
         sourceCreator_ = sourceCreator;
     }
@@ -56,7 +56,7 @@ abstract public class AbstractUpdateAction implements UpdateAction {
 
         List<Parameter> list = new ArrayList<Parameter>();
         for (Iterator itr = request.getParameterMap().entrySet().iterator(); itr
-            .hasNext();) {
+                .hasNext();) {
             Map.Entry entry = (Map.Entry) itr.next();
             String name = (String) entry.getKey();
             if (name.startsWith(SourceCreatorImpl.PARAM_PREFIX)) {

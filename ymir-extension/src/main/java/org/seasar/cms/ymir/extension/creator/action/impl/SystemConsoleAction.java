@@ -16,15 +16,15 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.impl.LazyPathMetaData;
-import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
 public class SystemConsoleAction extends AbstractUpdateAction {
 
-    private static final String PARAM_APPLY = SourceCreatorImpl.PARAM_PREFIX
+    private static final String PARAM_APPLY = SourceCreator.PARAM_PREFIX
             + "apply";
 
-    public SystemConsoleAction(SourceCreatorImpl sourceCreator) {
+    public SystemConsoleAction(SourceCreator sourceCreator) {
         super(sourceCreator);
     }
 

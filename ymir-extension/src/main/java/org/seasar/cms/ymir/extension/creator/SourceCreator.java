@@ -11,6 +11,10 @@ import org.seasar.cms.ymir.Updater;
 
 public interface SourceCreator extends Updater {
 
+    String PARAM_PREFIX = "__ymir__";
+
+    String PARAM_TASK = PARAM_PREFIX + "task";
+
     String getRootPackageName();
 
     String getPagePackageName();
@@ -70,4 +74,6 @@ public interface SourceCreator extends Updater {
     TemplateProvider getTemplateProvider();
 
     String getEncoding();
+
+    boolean shouldUpdate(Application application);
 }

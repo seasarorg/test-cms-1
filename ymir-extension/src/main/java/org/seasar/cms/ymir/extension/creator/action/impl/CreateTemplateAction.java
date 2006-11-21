@@ -10,15 +10,15 @@ import java.util.Map;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
-import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
 public class CreateTemplateAction extends AbstractUpdateAction {
 
-    private static final String PARAM_TEMPLATE = SourceCreatorImpl.PARAM_PREFIX
+    private static final String PARAM_TEMPLATE = SourceCreator.PARAM_PREFIX
             + "template";
 
-    public CreateTemplateAction(SourceCreatorImpl sourceCreator) {
+    public CreateTemplateAction(SourceCreator sourceCreator) {
         super(sourceCreator);
     }
 

@@ -14,24 +14,24 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
-import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.kvasir.util.PropertyUtils;
 
 public class UpdateClassesAction extends AbstractUpdateAction {
 
-    private static final String PARAM_APPLY = SourceCreatorImpl.PARAM_PREFIX
+    protected static final String PARAM_APPLY = SourceCreator.PARAM_PREFIX
             + "apply";
 
-    private static final String PARAM_REPLACE = SourceCreatorImpl.PARAM_PREFIX
+    protected static final String PARAM_REPLACE = SourceCreator.PARAM_PREFIX
             + "replace";
 
-    private static final String PREFIX_CHECKEDTIME = "updateClassesAction.checkedTime.";
+    protected static final String PREFIX_CHECKEDTIME = "updateClassesAction.checkedTime.";
 
-    private static final String PREFIX_CLASSCHECKED = "updateClassesAction.class.checked.";
+    protected static final String PREFIX_CLASSCHECKED = "updateClassesAction.class.checked.";
 
-    public UpdateClassesAction(SourceCreatorImpl sourceCreator) {
+    public UpdateClassesAction(SourceCreator sourceCreator) {
         super(sourceCreator);
     }
 
@@ -70,7 +70,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 "updateClasses", variableMap);
     }
 
-    ClassDescDto[] createClassDescDtos(ClassDesc[] classDescs) {
+    protected ClassDescDto[] createClassDescDtos(ClassDesc[] classDescs) {
 
         Properties prop = getSourceCreator().getSourceCreatorProperties();
 

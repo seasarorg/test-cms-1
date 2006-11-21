@@ -1,7 +1,8 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -23,16 +24,22 @@ public class ZptResponseCreator implements ResponseCreator {
     private static final String TEMPLATE_SUFFIX = ".zpt";
 
     private TemplateEvaluator evaluator_ = new TemplateEvaluator(
-        new MetalTagEvaluator(), new TalesExpressionEvaluator());
+            new MetalTagEvaluator(), new TalesExpressionEvaluator());
 
-    public Response createResponse(String path, Map variableMap) {
+    public Response createResponse(String templateName, Map variableMap) {
+
+        return createResponse(getClass().getResource(
+                TEMPLATE_PREFIX + templateName + TEMPLATE_SUFFIX), variableMap);
+    }
+
+    public Response createResponse(URL templateURL, Map variableMap) {
 
         TemplateContext context = evaluator_.newContext();
         context.setProperty(TemplateContext.PROP_CONTENT_TYPE, "text/html");
         if (variableMap != null) {
             VariableResolver resolver = new VariableResolverImpl();
             for (Iterator itr = variableMap.entrySet().iterator(); itr
-                .hasNext();) {
+                    .hasNext();) {
                 Map.Entry entry = (Map.Entry) itr.next();
                 resolver.setVariable((String) entry.getKey(), entry.getValue());
             }
@@ -40,9 +47,8 @@ public class ZptResponseCreator implements ResponseCreator {
         }
         try {
             return new SelfContainedResponse(evaluator_.evaluate(context,
-                new InputStreamReader(getClass().getResourceAsStream(
-                    TEMPLATE_PREFIX + path + TEMPLATE_SUFFIX), "UTF-8")));
-        } catch (UnsupportedEncodingException ex) {
+                    new InputStreamReader(templateURL.openStream(), "UTF-8")));
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }

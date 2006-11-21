@@ -10,17 +10,17 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
-import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 public class CreateClassAndTemplateAction extends AbstractUpdateAction {
 
-    private static final String PARAM_REDIRECTPATH = SourceCreatorImpl.PARAM_PREFIX
+    private static final String PARAM_REDIRECTPATH = SourceCreator.PARAM_PREFIX
             + "redirectPath";
 
-    public CreateClassAndTemplateAction(SourceCreatorImpl sourceCreator) {
+    public CreateClassAndTemplateAction(SourceCreator sourceCreator) {
         super(sourceCreator);
     }
 

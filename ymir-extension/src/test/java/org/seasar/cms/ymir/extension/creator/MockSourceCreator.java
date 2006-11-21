@@ -155,4 +155,8 @@ public class MockSourceCreator implements SourceCreator {
     public String getEncoding() {
         return "UTF-8";
     }
+
+    public boolean shouldUpdate(Application application) {
+        return false;
+    }
 }

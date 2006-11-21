@@ -92,10 +92,6 @@ import net.skirnir.xom.XOMapperFactory;
 
 public class SourceCreatorImpl implements SourceCreator {
 
-    public static final String PARAM_PREFIX = "__ymir__";
-
-    public static final String PARAM_TASK = PARAM_PREFIX + "task";
-
     private static final String SOURCECREATOR_PROPERTIES = "sourceCreator.properties";
 
     public static final ServletContext MOCK_SERVLETCONTEXT = new MockServletContextImpl(
@@ -167,6 +163,11 @@ public class SourceCreatorImpl implements SourceCreator {
             return response;
         }
 
+        if (response.getType() != Response.TYPE_PASSTHROUGH
+                && response.getType() != Response.TYPE_FORWARD) {
+            return response;
+        }
+
         String path = request.getPath();
         String method = getOriginalMethod(request);
         String forwardPath = null;
@@ -225,7 +226,7 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    boolean shouldUpdate(Application application) {
+    public boolean shouldUpdate(Application application) {
 
         return (!"false".equals(application
                 .getProperty(APPKEY_SOURCECREATOR_ENABLE)));
