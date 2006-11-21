@@ -245,14 +245,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         if (isUnderDevelopment()) {
-            if (response.getType() == Response.TYPE_PASSTHROUGH
-                    || response.getType() == Response.TYPE_FORWARD) {
-                for (int i = 0; i < updaters_.length; i++) {
-                    Response newResponse = updaters_[i].update(request,
-                            response);
-                    if (newResponse != response) {
-                        return newResponse;
-                    }
+            for (int i = 0; i < updaters_.length; i++) {
+                Response newResponse = updaters_[i].update(request, response);
+                if (newResponse != response) {
+                    return newResponse;
                 }
             }
         }

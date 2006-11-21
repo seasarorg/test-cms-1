@@ -9,6 +9,8 @@ import org.seasar.framework.container.S2Container;
 
 public interface Application {
 
+    String getId();
+
     String getWebappRoot();
 
     String getWebappSourceRoot();

@@ -11,6 +11,10 @@ import org.seasar.framework.container.S2Container;
 
 public class MockApplication implements Application {
 
+    public String getId() {
+        return null;
+    }
+
     public String getDefaultPropertiesFilePath() {
         return null;
     }

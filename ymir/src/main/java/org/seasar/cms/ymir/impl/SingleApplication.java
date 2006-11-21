@@ -14,6 +14,8 @@ import org.seasar.framework.container.S2Container;
 
 public class SingleApplication extends AbstractApplication {
 
+    public static final String ID_DEFAULT = "";
+
     private ServletContext context_;
 
     private Configuration config_;
@@ -26,7 +28,7 @@ public class SingleApplication extends AbstractApplication {
             Class referenceClass, S2Container container,
             LocalOndemandS2Container ondemandContainer,
             PathMappingProvider pathMappingProvider) {
-        super(ondemandContainer, pathMappingProvider);
+        super(ID_DEFAULT, ondemandContainer, pathMappingProvider);
         context_ = context;
         config_ = config;
         referenceClass_ = referenceClass;

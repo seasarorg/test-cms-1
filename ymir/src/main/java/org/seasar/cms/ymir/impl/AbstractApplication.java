@@ -18,14 +18,22 @@ abstract public class AbstractApplication implements Application {
 
     private static final String PROPERTIESFILEPATH = "app.properties";
 
+    private String id_;
+
     private LocalOndemandS2Container ondemandContainer_;
 
     private PathMappingProvider pathMappingProvider_;
 
-    protected AbstractApplication(LocalOndemandS2Container ondemandContainer,
+    protected AbstractApplication(String id,
+            LocalOndemandS2Container ondemandContainer,
             PathMappingProvider pathMappingProvider) {
+        id_ = id;
         ondemandContainer_ = ondemandContainer;
         pathMappingProvider_ = pathMappingProvider;
+    }
+
+    public String getId() {
+        return id_;
     }
 
     public String getProjectRoot() {
