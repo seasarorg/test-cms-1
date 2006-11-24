@@ -1,6 +1,6 @@
 package com.example.dto;
 
-abstract public class TestDtoBase
+public class TestDtoBase
 {
     protected boolean param1_;
 

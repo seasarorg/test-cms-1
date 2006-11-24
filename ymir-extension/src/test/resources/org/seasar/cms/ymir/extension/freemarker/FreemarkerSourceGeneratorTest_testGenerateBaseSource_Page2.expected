@@ -1,7 +1,7 @@
 package org.seasar.cms.ymir.extension.freemarker;
 
 @org.seasar.cms.ymir.extension.constraint.Required("test")
-abstract public class HoePageBase
+public class HoePageBase
 {
     protected String hoe_;
 

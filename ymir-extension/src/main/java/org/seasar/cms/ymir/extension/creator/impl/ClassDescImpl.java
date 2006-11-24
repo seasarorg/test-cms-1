@@ -143,10 +143,7 @@ public class ClassDescImpl extends AbstractClassDesc {
             if (pd == null) {
                 setPropertyDesc((PropertyDesc) propertyDescs[i].clone());
             } else {
-                TypeDesc td = pd.getTypeDesc();
-                if (!td.isExplicit()) {
-                    td.transcript(propertyDescs[i].getTypeDesc());
-                }
+                merge(pd.getTypeDesc(), propertyDescs[i].getTypeDesc());
                 pd.addMode(propertyDescs[i].getMode());
             }
         }
@@ -159,8 +156,7 @@ public class ClassDescImpl extends AbstractClassDesc {
             } else {
                 TypeDesc returnTd = md.getReturnTypeDesc();
                 TypeDesc returnTypeDesc = methodDescs[i].getReturnTypeDesc();
-                if (!returnTd.isExplicit() && !returnTd.equals(returnTypeDesc)) {
-                    returnTd.transcript(returnTypeDesc);
+                if (merge(returnTd, returnTypeDesc)) {
                     md.setBodyDesc(methodDescs[i].getBodyDesc());
                 }
             }
@@ -172,6 +168,15 @@ public class ClassDescImpl extends AbstractClassDesc {
             if (ad == null) {
                 setAnnotationDesc((AnnotationDesc) annotationDescs[i].clone());
             }
+        }
+    }
+
+    boolean merge(TypeDesc td, TypeDesc typeDesc) {
+        if (!td.equals(typeDesc) && !td.isExplicit() && typeDesc.isExplicit()) {
+            td.transcript(typeDesc);
+            return true;
+        } else {
+            return false;
         }
     }
 

@@ -7,9 +7,9 @@ import org.seasar.cms.ymir.extension.creator.BodyDesc;
 
 public class BodyDescImpl implements BodyDesc {
 
-    private static final String KEY_BODY = "body";
-
     private static final String KEY_ASIS = "asIs";
+
+    private static final String PROP_BODY = "body";
 
     private String key_;
 
@@ -25,7 +25,7 @@ public class BodyDescImpl implements BodyDesc {
 
         key_ = KEY_ASIS;
         Map<String, String> root = new HashMap<String, String>();
-        root.put(KEY_BODY, body);
+        root.put(PROP_BODY, body);
         root_ = root;
     }
 

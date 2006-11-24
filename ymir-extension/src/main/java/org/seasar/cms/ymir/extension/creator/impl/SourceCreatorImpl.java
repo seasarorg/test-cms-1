@@ -83,6 +83,7 @@ import org.seasar.framework.log.Logger;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
+import org.seasar.kvasir.util.StringUtils;
 
 import net.skirnir.xom.IllegalSyntaxException;
 import net.skirnir.xom.ValidationException;
@@ -360,9 +361,8 @@ public class SourceCreatorImpl implements SourceCreator {
         if (classDesc != null) {
             classDesc.setMethodDesc(new MethodDescImpl(getActionName(
                     pathMetaData.getPath(), method)));
-            MethodDesc methodDesc = new MethodDescImpl(
-                    DefaultRequestProcessor.ACTION_RENDER);
-            classDesc.setMethodDesc(methodDesc);
+            classDesc.setMethodDesc(new MethodDescImpl(
+                    DefaultRequestProcessor.ACTION_RENDER));
         }
     }
 
@@ -468,10 +468,33 @@ public class SourceCreatorImpl implements SourceCreator {
             for (int j = 0; j < ads.length; j++) {
                 md.setAnnotationDesc(ads[j]);
             }
+            Class<?> returnType = methods[i].getReturnType();
+            md.setReturnTypeDesc(returnType.getName());
+            if (clazz.getName().endsWith("Base") && returnType == String.class
+                    && methods[i].getParameterTypes().length == 0) {
+                // Baseクラスについては、引数なしで返り値がStringのメソッドについてはボディを用意する。
+                // （他のもそうしたいが今はこれだけ）
+                try {
+                    String value = (String) methods[i].invoke(clazz
+                            .newInstance(), new Object[0]);
+                    BodyDesc bodyDesc = new BodyDescImpl("return "
+                            + quote(value) + ";");
+                    md.setBodyDesc(bodyDesc);
+                } catch (Throwable ignore) {
+                }
+            }
             classDesc.setMethodDesc(md);
         }
 
         return classDesc;
+    }
+
+    String quote(String value) {
+        if (value == null) {
+            return "null";
+        } else {
+            return StringUtils.quoteString(value, '"');
+        }
     }
 
     AnnotationDesc[] createAnnotationDescs(AnnotatedElement element) {

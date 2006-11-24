@@ -85,7 +85,7 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
                 pathMetaData.getClassName());
         MethodDesc methodDesc = new MethodDescImpl(getSourceCreator()
                 .getActionName(request.getPath(), method));
-        methodDesc.setReturnTypeDesc(String.class.getName());
+        methodDesc.setReturnTypeDesc(String.class.getName(), true);
         methodDesc.setBodyDesc(new BodyDescImpl("return "
                 + quote("redirect:" + redirectPath) + ";"));
         classDesc.setMethodDesc(methodDesc);

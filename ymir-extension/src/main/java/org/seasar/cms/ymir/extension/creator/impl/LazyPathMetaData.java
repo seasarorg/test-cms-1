@@ -5,7 +5,6 @@ import java.io.File;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
-import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 public class LazyPathMetaData implements PathMetaData {
 
@@ -97,17 +96,7 @@ public class LazyPathMetaData implements PathMetaData {
     public String getComponentName() {
 
         if (!componentNameLoaded_) {
-            if (forwardPath_ != null) {
-                componentName_ = sourceCreator_.getComponentName(forwardPath_,
-                        method_);
-                if (componentName_ == null) {
-                    componentName_ = sourceCreator_.getComponentName(path_,
-                            method_);
-                }
-            } else {
-                componentName_ = sourceCreator_
-                        .getComponentName(path_, method_);
-            }
+            componentName_ = sourceCreator_.getComponentName(path_, method_);
             componentNameLoaded_ = true;
         }
         return componentName_;
@@ -125,11 +114,7 @@ public class LazyPathMetaData implements PathMetaData {
     public String getActionName() {
 
         if (!actionNameLoaded_) {
-            if (forwardPath_ != null) {
-                actionName_ = DefaultRequestProcessor.ACTION_RENDER;
-            } else {
-                actionName_ = sourceCreator_.getActionName(path_, method_);
-            }
+            actionName_ = sourceCreator_.getActionName(path_, method_);
             actionNameLoaded_ = true;
         }
         return actionName_;

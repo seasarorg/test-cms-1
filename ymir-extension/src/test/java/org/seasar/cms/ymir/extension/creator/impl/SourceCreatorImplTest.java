@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.extension.creator.BodyDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.ParameterDesc;
@@ -202,5 +203,15 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
 
         assertNull("生成対象クラスがまだ存在しない場合でも、スーパークラスだけが持っているメソッドは除去されること", cd
                 .getMethodDesc(md));
+    }
+
+    public void testGetClassDesc_引数が0個で返り値がStringのmethodについてはボディを保存するようなBodyDescが生成されること()
+            throws Exception {
+
+        ClassDesc cd = target_.getClassDesc(Class1Base.class,
+                "org.seasar.cms.ymir.extension.creator.impl.Class1");
+        BodyDesc actual = cd.getMethodDescs()[0].getBodyDesc();
+        assertEquals("return \"return value\";", ((Map) actual.getRoot())
+                .get("body"));
     }
 }

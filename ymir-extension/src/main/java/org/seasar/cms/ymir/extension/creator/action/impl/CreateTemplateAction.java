@@ -1,5 +1,6 @@
 package org.seasar.cms.ymir.extension.creator.action.impl;
 
+import static org.seasar.cms.ymir.extension.creator.SourceCreator.PARAM_PREFIX;
 import static org.seasar.cms.ymir.impl.DefaultRequestProcessor.PARAM_METHOD;
 
 import java.io.IOException;
@@ -9,14 +10,22 @@ import java.util.Map;
 
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
+import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
+import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 
 public class CreateTemplateAction extends AbstractUpdateAction {
 
-    private static final String PARAM_TEMPLATE = SourceCreator.PARAM_PREFIX
-            + "template";
+    private static final String PARAM_TEMPLATE = PARAM_PREFIX + "template";
+
+    private static final String PARAM_TRANSITION = PARAM_PREFIX + "transition";
+
+    private static final String PARAM_TRANSITIONREDIRECT = PARAM_TRANSITION
+            + "_redirect";
 
     public CreateTemplateAction(SourceCreator sourceCreator) {
         super(sourceCreator);
@@ -81,16 +90,33 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         }
 
         String templateString = request.getParameter(PARAM_TEMPLATE);
-        if (templateString == null) {
+        boolean redirect = "true".equals(request
+                .getParameter(PARAM_TRANSITIONREDIRECT));
+        String transition = request.getParameter(PARAM_TRANSITION);
+        if (templateString != null) {
+            Template template = pathMetaData.getTemplate();
+            try {
+                getSourceCreator().writeString(templateString,
+                        template.getOutputStream());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        } else if (transition != null) {
+            ClassDesc classDesc = getSourceCreator().newClassDesc(
+                    pathMetaData.getClassName());
+            MethodDesc methodDesc = new MethodDescImpl(getSourceCreator()
+                    .getActionName(request.getPath(), method));
+            methodDesc.setReturnTypeDesc(String.class.getName(), true);
+            if (redirect) {
+                transition = "redirect:" + transition;
+            }
+            methodDesc.setBodyDesc(new BodyDescImpl("return "
+                    + quote(transition.trim()) + ";"));
+            classDesc.setMethodDesc(methodDesc);
+            getSourceCreator().mergeWithExistentClass(classDesc, true);
+            getSourceCreator().writeSourceFile(classDesc, null);
+        } else {
             return null;
-        }
-
-        Template template = pathMetaData.getTemplate();
-        try {
-            getSourceCreator().writeString(templateString,
-                    template.getOutputStream());
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
         }
 
         Map<String, Object> variableMap = new HashMap<String, Object>();
@@ -98,6 +124,9 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         variableMap.put("method", method);
         variableMap.put("parameters", getParameters(request));
         variableMap.put("pathMetaData", pathMetaData);
+        variableMap.put("templateCreatd", (templateString != null));
+        variableMap.put("transitionSet", (transition != null));
+        variableMap.put("transition", transition);
         return getSourceCreator().getResponseCreator().createResponse(
                 "createTemplate_create", variableMap);
     }

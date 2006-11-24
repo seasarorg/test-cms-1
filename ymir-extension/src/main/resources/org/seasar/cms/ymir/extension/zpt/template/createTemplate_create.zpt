@@ -4,8 +4,9 @@
   </head>
   <body>
 <h1>SYSTEM NOTIFICATION</h1>
-<p>テンプレート<span tal:replace="pathMetaData/template/path">TEMPLATE</span>を作成しました。
-EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
+<p tal:condition="templateCreated">テンプレート<span tal:replace="pathMetaData/template/path">TEMPLATE</span>を作成しました。</p>
+<p tal:condition="transitionSet">遷移先を<span tal:replace="transition">TRANSITION</span>に設定しました。</p>
+<p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>
 <form tal:attributes="method method; action request/absolutePath">
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
   <input type="submit" value=" OK " />

@@ -1,6 +1,6 @@
 <#if classDesc.packageName != "">package ${classDesc.packageName};</#if>
 
-abstract public class ${classDesc.shortName}Base
+public class ${classDesc.shortName}Base
 {
 <#list classDesc.propertyDescs as propertyDesc>
     protected ${propertyDesc.typeDesc.name} ${propertyDesc.name}_;
