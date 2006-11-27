@@ -3,13 +3,13 @@ package org.seasar.cms.ymir.extension.freemarker;
 import org.seasar.cms.ymir.YmirTestCase;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
-import org.seasar.cms.ymir.extension.creator.MockSourceCreator;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.PropertyDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
+import org.seasar.cms.ymir.extension.creator.mock.MockSourceCreator;
 
 import com.example.page.TestPageBaseBase;
 

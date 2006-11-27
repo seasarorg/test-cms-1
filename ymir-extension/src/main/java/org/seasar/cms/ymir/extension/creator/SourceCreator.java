@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.ResponseCreator;
@@ -14,6 +18,8 @@ public interface SourceCreator extends Updater {
     String PARAM_PREFIX = "__ymir__";
 
     String PARAM_TASK = PARAM_PREFIX + "task";
+
+    String PATH_PREFIX = "/" + PARAM_PREFIX + "/";
 
     String getRootPackageName();
 
@@ -59,6 +65,8 @@ public interface SourceCreator extends Updater {
 
     Application getApplication();
 
+    ServletContext getServletContext();
+
     ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas);
 
     void updateClasses(ClassDescBag classDescBag, boolean mergeMethod);
@@ -76,4 +84,8 @@ public interface SourceCreator extends Updater {
     String getEncoding();
 
     boolean shouldUpdate(Application application);
+
+    HttpServletRequest getHttpServletRequest();
+
+    HttpServletResponse getHttpServletResponse();
 }

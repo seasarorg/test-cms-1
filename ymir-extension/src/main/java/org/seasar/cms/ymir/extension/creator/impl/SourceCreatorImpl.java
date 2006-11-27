@@ -72,6 +72,9 @@ import org.seasar.cms.ymir.extension.creator.action.impl.CreateClassAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateClassAndTemplateAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateConfigurationAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateTemplateAction;
+import org.seasar.cms.ymir.extension.creator.action.impl.DoEditTemplateAction;
+import org.seasar.cms.ymir.extension.creator.action.impl.DoUpdateTemplateAction;
+import org.seasar.cms.ymir.extension.creator.action.impl.ResourceAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.SystemConsoleAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.UpdateClassesAction;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
@@ -153,23 +156,42 @@ public class SourceCreatorImpl implements SourceCreator {
                     new CreateClassAndTemplateAction(this)).register(
                     "updateClasses", new UpdateClassesAction(this)).register(
                     "createConfiguration", new CreateConfigurationAction(this))
-            .register("systemConsole", new SystemConsoleAction(this));
+            .register("systemConsole", new SystemConsoleAction(this)).register(
+                    "resource", new ResourceAction(this)).register(
+                    "editTemplate.do", new DoEditTemplateAction(this))
+            .register("updateTemplate.do", new DoUpdateTemplateAction(this));
 
     public Logger logger_ = Logger.getLogger(getClass());
 
     public Response update(Request request, Response response) {
 
         Application application = getApplication();
-        if (!shouldUpdate(application)) {
-            return response;
-        }
-
-        if (response.getType() != Response.TYPE_PASSTHROUGH
-                && response.getType() != Response.TYPE_FORWARD) {
-            return response;
-        }
-
         String path = request.getPath();
+        Object condition = null;
+        if (request.getParameter(PARAM_TASK) != null) {
+            condition = request.getParameter(PARAM_TASK);
+        } else if (path.startsWith(PATH_PREFIX)) {
+            int slash = path.indexOf('/', PATH_PREFIX.length());
+            if (slash >= 0) {
+                condition = path.substring(PATH_PREFIX.length(), slash);
+            } else {
+                condition = path.substring(PATH_PREFIX.length());
+            }
+        } else {
+            if (!request.isMatched()) {
+                return response;
+            }
+
+            if (!shouldUpdate(application)) {
+                return response;
+            }
+
+            if (response.getType() != Response.TYPE_PASSTHROUGH
+                    && response.getType() != Response.TYPE_FORWARD) {
+                return response;
+            }
+        }
+
         String method = getOriginalMethod(request);
         String forwardPath = null;
         if (response.getType() == Response.TYPE_FORWARD) {
@@ -180,30 +202,28 @@ public class SourceCreatorImpl implements SourceCreator {
         PathMetaData pathMetaData = new LazyPathMetaData(this, path, method,
                 forwardPath);
 
-        Object condition;
-
-        if (!isAlreadyConfigured(application)) {
-            condition = "createConfiguration";
-        } else if (request.getParameter(PARAM_TASK) != null) {
-            condition = request.getParameter(PARAM_TASK);
-        } else {
-            String className = pathMetaData.getClassName();
-            File sourceFile = pathMetaData.getSourceFile();
-            Template template = pathMetaData.getTemplate();
-
-            if ("".equals(forwardPath)) {
-                String welcomeFile = getWelcomeFile();
-                if (welcomeFile != null) {
-                    return response;
-                }
-                if (className == null || sourceFile.exists()) {
-                    return response;
-                }
-                condition = "createClass";
+        if (condition == null) {
+            if (!isAlreadyConfigured(application)) {
+                condition = "createConfiguration";
             } else {
-                condition = new Condition(State.valueOf(className != null),
-                        State.valueOf(sourceFile.exists()), State
-                                .valueOf(template.exists()), method);
+                String className = pathMetaData.getClassName();
+                File sourceFile = pathMetaData.getSourceFile();
+                Template template = pathMetaData.getTemplate();
+
+                if ("".equals(forwardPath)) {
+                    String welcomeFile = getWelcomeFile();
+                    if (welcomeFile != null) {
+                        return response;
+                    }
+                    if (className == null || sourceFile.exists()) {
+                        return response;
+                    }
+                    condition = "createClass";
+                } else {
+                    condition = new Condition(State.valueOf(className != null),
+                            State.valueOf(sourceFile.exists()), State
+                                    .valueOf(template.exists()), method);
+                }
             }
         }
 
@@ -1001,19 +1021,19 @@ public class SourceCreatorImpl implements SourceCreator {
         return applicationManager_.findContextApplication();
     }
 
-    ServletContext getServletContext() {
+    public ServletContext getServletContext() {
 
         return (ServletContext) getRootS2Container().getComponent(
                 ServletContext.class);
     }
 
-    HttpServletRequest getHttpServletRequest() {
+    public HttpServletRequest getHttpServletRequest() {
 
         return (HttpServletRequest) getRootS2Container().getComponent(
                 HttpServletRequest.class);
     }
 
-    HttpServletResponse getHttpServletResponse() {
+    public HttpServletResponse getHttpServletResponse() {
 
         return (HttpServletResponse) getRootS2Container().getComponent(
                 HttpServletResponse.class);
@@ -1085,5 +1105,17 @@ public class SourceCreatorImpl implements SourceCreator {
     public TemplateProvider getTemplateProvider() {
 
         return templateProvider_;
+    }
+
+    public String filterResponse(String response) {
+
+        String jsPrefix = "<script type=\"text/javascript\" src=\""
+                + getHttpServletRequest().getContextPath() + PATH_PREFIX
+                + "resource/js/";
+        String jsSuffix = "\"></script>";
+        return response.replace("</head>", jsPrefix + "prototype/prototype.js"
+                + jsSuffix + jsPrefix + "scriptaculous/scriptaculous.js"
+                + jsSuffix + jsPrefix + "sourceCreator.js" + jsSuffix
+                + "</head>");
     }
 }

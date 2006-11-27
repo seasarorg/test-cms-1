@@ -214,4 +214,15 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
         assertEquals("return \"return value\";", ((Map) actual.getRoot())
                 .get("body"));
     }
+
+    public void testFilterResponse() throws Exception {
+
+        assertEquals(
+                "<html><head>"
+                        + "<script type=\"text/javascript\" src=\"/context/__ymir__/resource/js/prototype/prototype.js\"></script>"
+                        + "<script type=\"text/javascript\" src=\"/context/__ymir__/resource/js/scriptaculous/scriptaculous.js\"></script>"
+                        + "<script type=\"text/javascript\" src=\"/context/__ymir__/resource/js/sourceCreator.js\"></script>"
+                        + "</head></html>", target_
+                        .filterResponse("<html><head></head></html>"));
+    }
 }

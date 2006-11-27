@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.extension.creator;
 
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
+import org.seasar.cms.ymir.extension.creator.mock.MockSourceCreator;
 
 import junit.framework.TestCase;
 

@@ -2,6 +2,7 @@ package org.seasar.cms.ymir.extension.creator.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,10 +22,14 @@ public class FileTemplate implements Template {
     }
 
     public boolean exists() {
-        return file_.exists();
+        return (file_.exists() && !file_.isDirectory());
     }
 
     public InputStream getInputStream() throws IOException {
+        if (file_.exists() && file_.isDirectory()) {
+            throw new FileNotFoundException(
+                    "Can't open inputStream: is directory: " + file_);
+        }
         return new FileInputStream(file_);
     }
 
@@ -42,6 +47,10 @@ public class FileTemplate implements Template {
 
     public OutputStream getOutputStream() throws IOException {
 
+        if (file_.exists() && file_.isDirectory()) {
+            throw new FileNotFoundException(
+                    "Can't open outputStream: is directory: " + file_);
+        }
         file_.getParentFile().mkdirs();
         return new FileOutputStream(file_);
     }

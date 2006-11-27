@@ -27,6 +27,7 @@ import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.cms.ymir.impl.PathMappingImpl;
 import org.seasar.cms.ymir.impl.PathMappingProviderImpl;
 import org.seasar.cms.ymir.impl.SingleApplication;
+import org.seasar.cms.ymir.impl.YmirImpl;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContext;
 import org.seasar.framework.container.external.servlet.HttpServletExternalContextComponentDefRegister;
@@ -89,6 +90,7 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
                 .setExternalContextComponentDefRegister(new HttpServletExternalContextComponentDefRegister());
         MockHttpServletRequestImpl request = new MockHttpServletRequestImpl(
                 context, "/servlet");
+        container_.register(YmirImpl.class);
         container_.register(SourceCreatorImpl.class);
         container_.register(DefaultRequestProcessor.class);
         container_.register(LocalOndemandS2Container.class);

@@ -1,8 +1,12 @@
-package org.seasar.cms.ymir.extension.creator;
+package org.seasar.cms.ymir.extension.creator.mock;
 
 import java.io.File;
 import java.io.OutputStream;
 import java.util.Properties;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.Application;
@@ -10,8 +14,18 @@ import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
+import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.ClassDescBag;
+import org.seasar.cms.ymir.extension.creator.ClassDescSet;
+import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.SourceGenerator;
+import org.seasar.cms.ymir.extension.creator.Template;
+import org.seasar.cms.ymir.extension.creator.TemplateProvider;
 
 public class MockSourceCreator implements SourceCreator {
+
+    private ServletContext servletContext_;
 
     public MockSourceCreator() {
     }
@@ -158,5 +172,26 @@ public class MockSourceCreator implements SourceCreator {
 
     public boolean shouldUpdate(Application application) {
         return false;
+    }
+
+    public String filterResponse(String response) {
+        return null;
+    }
+
+    public ServletContext getServletContext() {
+        return servletContext_;
+    }
+
+    public MockSourceCreator setServletContext(ServletContext servletContext) {
+        servletContext_ = servletContext;
+        return this;
+    }
+
+    public HttpServletRequest getHttpServletRequest() {
+        return null;
+    }
+
+    public HttpServletResponse getHttpServletResponse() {
+        return null;
     }
 }
