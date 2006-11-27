@@ -57,5 +57,17 @@ public interface Application {
 
     PathMappingProvider getPathMappingProvider();
 
+    /**
+     * このアプリケーションが開発中のステータスであるかどうかを返します。
+     * <p>このメソッドは、このアプリケーションが開発中のステータスかどうかを返すだけであって、
+     * Ymir自体が開発中のステータスを持つかどうかとは無関係であることに注意して下さい。
+     * 仮にこのメソッドがtrueを返しても、Ymir自体が開発中でない場合はアプリケーションを開発中と
+     * みなすべきではありません。
+     * Ymirのステータスを含めてこのアプリケーションを開発中とみなしてよいかどうかを知るためには、
+     * {@link org.seasar.cms.ymir.Ymir#isUnderDevelopment()}を使用して下さい。
+     * </p>
+     *
+     * @return このアプリケーションが開発中のステータスであるかどうか。
+     */
     boolean isUnderDevelopment();
 }

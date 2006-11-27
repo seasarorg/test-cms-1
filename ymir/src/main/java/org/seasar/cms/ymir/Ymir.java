@@ -20,7 +20,7 @@ public interface Ymir {
     Response processRequest(Request request)
             throws ConstraintViolationException;
 
-    boolean processResponse(ServletContext context_,
+    HttpServletResponseFilter processResponse(ServletContext context_,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,
             Request request, Response response) throws IOException,
             ServletException;
@@ -31,4 +31,18 @@ public interface Ymir {
 
     void restoreForInclusion(AttributeContainer attributeContainer,
             Object backupped);
+
+    Application getApplication();
+
+    String getProjectStatus();
+
+    /**
+     * 現在処理中のアプリケーションが開発中であるかどうかを返します。
+     * <p>このメソッドは、Ymir自体のステータスが開発中でかつ
+     * 現在処理中のアプリケーションが開発中のステータスである場合にのみtrueを返します。
+     * </p>
+     *
+     * @return 現在処理中のアプリケーションが開発中であるかどうか。
+     */
+    boolean isUnderDevelopment();
 }

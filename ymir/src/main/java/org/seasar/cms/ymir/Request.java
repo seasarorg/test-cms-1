@@ -248,4 +248,11 @@ public interface Request extends AttributeContainer {
     boolean isDispatchingByParameter();
 
     String extractParameterName(String name);
+
+    /**
+     * リクエストパスがパスマッピングにマッチしたかどうかを返します。
+     *
+     * @return リクエストパスがパスマッピングにマッチしたかどうか。
+     */
+    boolean isMatched();
 }

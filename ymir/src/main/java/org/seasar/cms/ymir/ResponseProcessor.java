@@ -9,7 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface ResponseProcessor {
 
-    boolean process(ServletContext context, HttpServletRequest httpRequest,
-            HttpServletResponse httpResponse, Request request, Response response)
-            throws IOException, ServletException;
+    HttpServletResponseFilter process(ServletContext context,
+            HttpServletRequest httpRequest, HttpServletResponse httpResponse,
+            Request request, Response response) throws IOException,
+            ServletException;
 }

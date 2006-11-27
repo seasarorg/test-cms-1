@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.ymir.ConstraintViolationException;
+import org.seasar.cms.ymir.HttpServletResponseFilter;
 import org.seasar.cms.ymir.MultipartServletRequest;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.Request;
@@ -91,12 +92,14 @@ public class YmirFilter implements Filter {
                     fileParameterMap, attributeContainer);
             Response response = ymir_.processRequest(request);
 
-            if (ymir_.processResponse(context_, httpRequest, httpResponse,
-                    request, response)) {
+            HttpServletResponseFilter responseFilter = ymir_.processResponse(
+                    context_, httpRequest, httpResponse, request, response);
+            if (responseFilter != null) {
                 httpRequest.setAttribute(
                         FreyjaServlet.ATTR_RESPONSECONTENTTYPE, response
                                 .getContentType());
-                chain.doFilter(httpRequest, httpResponse);
+                chain.doFilter(httpRequest, responseFilter);
+                responseFilter.commit();
             }
         } catch (PageNotFoundException ex) {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);

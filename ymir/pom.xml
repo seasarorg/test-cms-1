@@ -128,7 +128,7 @@
     <dependency>
       <groupId>org.seasar.kvasir</groupId>
       <artifactId>kvasir-util</artifactId>
-      <version>3.0.0-EA3</version>
+      <version>3.0.0-EA4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>net.skirnir.freyja</groupId>

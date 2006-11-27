@@ -14,11 +14,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.AnnotationHandler;
-import org.seasar.cms.ymir.Application;
-import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.AttributeHandler;
 import org.seasar.cms.ymir.Constraint;
@@ -33,6 +30,7 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Updater;
+import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
 import org.seasar.cms.ymir.response.PassthroughResponse;
@@ -61,13 +59,11 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private static final String ATTR_NOTES = "notes";
 
+    private Ymir ymir_;
+
     private ResponseConstructorSelector responseConstructorSelector_;
 
     private Updater[] updaters_ = new Updater[0];
-
-    private Configuration configuration_;
-
-    private ApplicationManager applicationManager_;
 
     private AnnotationHandler annotationHandler_ = new DefaultAnnotationHandler();
 
@@ -100,15 +96,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
             Map fileParameterMap, AttributeContainer attributeContainer)
             throws PageNotFoundException {
 
-        if (isUnderDevelopment()) {
+        if (ymir_.isUnderDevelopment()) {
             method = correctMethod(method, parameterMap);
         }
 
         MatchedPathMapping matched = findMatchedPathMapping(path, method);
-        if (matched == null) {
-            return null;
-        }
-        if (matched.isDenied()) {
+        if (matched != null && matched.isDenied()) {
             throw new PageNotFoundException(path);
         }
 
@@ -145,12 +138,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
         attributeContainer.setAttribute(ATTR_SELF, backupped);
     }
 
-    Application getApplication() {
-        return applicationManager_.findContextApplication();
-    }
-
     PathMapping[] getPathMappings() {
-        return getApplication().getPathMappingProvider().getPathMappings();
+        return ymir_.getApplication().getPathMappingProvider()
+                .getPathMappings();
     }
 
     ServletContext getServletContext() {
@@ -159,20 +149,11 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     S2Container getS2Container() {
-        return getApplication().getS2Container();
+        return ymir_.getApplication().getS2Container();
     }
 
     S2Container getRootS2Container() {
         return SingletonS2ContainerFactory.getContainer();
-    }
-
-    String getProjectStatus() {
-
-        if (configuration_ != null) {
-            return configuration_.getProperty(Configuration.KEY_PROJECTSTATUS);
-        } else {
-            return null;
-        }
     }
 
     public MatchedPathMapping findMatchedPathMapping(String path, String method) {
@@ -193,58 +174,56 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public Response process(Request request)
             throws ConstraintViolationException {
 
-        if (request == null) {
-            return PassthroughResponse.INSTANCE;
-        }
-
-        Object component = null;
-        S2Container s2container = getS2Container();
-        if (s2container.hasComponentDef(request.getComponentName())) {
-            ThreadContext context = getThreadContext();
-            try {
-                context.setComponent(Request.class, request);
-                component = s2container
-                        .getComponent(request.getComponentName());
-            } finally {
-                context.setComponent(Request.class, null);
-            }
-        }
-
         Response response = PassthroughResponse.INSTANCE;
-        if (component != null) {
-            prepareForComponent(component, request);
+        if (request.isMatched()) {
+            Object component = null;
+            S2Container s2container = getS2Container();
+            if (s2container.hasComponentDef(request.getComponentName())) {
+                ThreadContext context = getThreadContext();
+                try {
+                    context.setComponent(Request.class, request);
+                    component = s2container.getComponent(request
+                            .getComponentName());
+                } finally {
+                    context.setComponent(Request.class, null);
+                }
+            }
 
-            // リクエストに対応するアクションの呼び出しを行なう。
-            response = normalizeResponse(adjustResponse(request, invokeAction(
-                    component, getActionMethod(component, request
-                            .getActionName(), ACTION_DEFAULT, request
-                            .isDispatchingByParameter(), request), request,
-                    true), component), request.getPath());
+            if (component != null) {
+                prepareForComponent(component, request);
 
-            // 画面描画のためのAction呼び出しを行なう。
-            // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
-            // 制約チェックを行なわない。）
-            invokeAction(component, getActionMethod(component, ACTION_RENDER,
-                    null, false, request), request, false);
+                // リクエストに対応するアクションの呼び出しを行なう。
+                response = normalizeResponse(adjustResponse(request,
+                        invokeAction(component, getActionMethod(component,
+                                request.getActionName(), ACTION_DEFAULT,
+                                request.isDispatchingByParameter(), request),
+                                request, true), component), request.getPath());
 
-            finishForComponent(component, request);
-        } else {
-            // componentがnullになるのは、component名が割り当てられているのにまだ
-            // 対応するcomponentクラスが作成されていない場合。
-            // その場合自動生成機能でクラスやテンプレートの自動生成が適切にできるように、
-            // デフォルト値からResponseを作るようにしている。
-            // （例えば、リクエストパス名がテンプレートパス名ではない場合に、リクエストパス名で
-            // テンプレートが作られてしまうとうれしくない。）
+                // 画面描画のためのAction呼び出しを行なう。
+                // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
+                // 制約チェックを行なわない。）
+                invokeAction(component, getActionMethod(component,
+                        ACTION_RENDER, null, false, request), request, false);
 
-            response = normalizeResponse(constructDefaultResponse(request,
-                    component), request.getPath());
+                finishForComponent(component, request);
+            } else {
+                // componentがnullになるのは、component名が割り当てられているのにまだ
+                // 対応するcomponentクラスが作成されていない場合。
+                // その場合自動生成機能でクラスやテンプレートの自動生成が適切にできるように、
+                // デフォルト値からResponseを作るようにしている。
+                // （例えば、リクエストパス名がテンプレートパス名ではない場合に、リクエストパス名で
+                // テンプレートが作られてしまうとうれしくない。）
+
+                response = normalizeResponse(constructDefaultResponse(request,
+                        component), request.getPath());
+            }
         }
 
         if (logger_.isDebugEnabled()) {
             logger_.debug("FINAL RESPONSE: " + response);
         }
 
-        if (isUnderDevelopment()) {
+        if (ymir_.isUnderDevelopment()) {
             for (int i = 0; i < updaters_.length; i++) {
                 Response newResponse = updaters_[i].update(request, response);
                 if (newResponse != response) {
@@ -263,11 +242,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
         } else {
             return response;
         }
-    }
-
-    boolean isUnderDevelopment() {
-        return Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
-                && getApplication().isUnderDevelopment();
     }
 
     Notes confirmConstraint(Object component, Method action, Request request,
@@ -539,6 +513,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
+    public void setYmir(Ymir ymir) {
+        ymir_ = ymir;
+    }
+
     public void setResponseConstructorSelector(
             ResponseConstructorSelector responseConstructorSelector) {
 
@@ -548,16 +526,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public void setUpdaters(Updater[] updaters) {
 
         updaters_ = updaters;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-
-        configuration_ = configuration;
-    }
-
-    public void setApplicationManager(ApplicationManager applicationManager) {
-
-        applicationManager_ = applicationManager;
     }
 
     public void setAnnotationHandler(AnnotationHandler annotationHandler) {

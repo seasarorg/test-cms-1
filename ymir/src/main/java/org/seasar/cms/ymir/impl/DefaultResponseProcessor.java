@@ -11,18 +11,35 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.seasar.cms.ymir.HttpServletResponseFilter;
+import org.seasar.cms.ymir.RedirectionPathResolver;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
-import org.seasar.cms.ymir.RedirectionPathResolver;
 import org.seasar.cms.ymir.ResponseProcessor;
+import org.seasar.cms.ymir.Updater;
+import org.seasar.cms.ymir.Ymir;
 
 public class DefaultResponseProcessor implements ResponseProcessor {
 
     private static final int BUF_SIZE = 4096;
 
+    private Ymir ymir_;
+
+    private Updater[] updaters_ = new Updater[0];
+
     private RedirectionPathResolver redirectionPathResolver_ = new DefaultRedirectionPathResolver();
 
-    public boolean process(ServletContext context,
+    public void setYmir(Ymir ymir) {
+
+        ymir_ = ymir;
+    }
+
+    public void setUpdaters(Updater[] updaters) {
+
+        updaters_ = updaters;
+    }
+
+    public HttpServletResponseFilter process(ServletContext context,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,
             Request request, Response response) throws IOException,
             ServletException {
@@ -36,17 +53,17 @@ public class DefaultResponseProcessor implements ResponseProcessor {
 
         switch (response.getType()) {
         case Response.TYPE_PASSTHROUGH:
-            return true;
+            return constructResponseFilter(httpRequest, httpResponse);
 
         case Response.TYPE_FORWARD:
             context.getRequestDispatcher(response.getPath()).forward(
                     httpRequest, httpResponse);
-            return false;
+            return null;
 
         case Response.TYPE_REDIRECT:
-            httpResponse.sendRedirect(redirectionPathResolver_
-                    .resolve(response.getPath(), request));
-            return false;
+            httpResponse.sendRedirect(redirectionPathResolver_.resolve(response
+                    .getPath(), request));
+            return null;
 
         case Response.TYPE_SELF_CONTAINED:
             InputStream is = null;
@@ -74,15 +91,21 @@ public class DefaultResponseProcessor implements ResponseProcessor {
                 // httpResponseのoutputStreamのクローズはservletContainerに
                 // 任せて良い（と思う）。
             }
-            return false;
+            return null;
 
         case Response.TYPE_VOID:
-            return false;
+            return null;
 
         default:
             throw new RuntimeException("Unknown response type:"
                     + response.getType());
         }
+    }
+
+    HttpServletResponseFilter constructResponseFilter(
+            HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        return new UpdaterResponseFilter(httpRequest, httpResponse, updaters_,
+                ymir_.isUnderDevelopment());
     }
 
     public void setRedirectionPathResolver(

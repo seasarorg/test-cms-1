@@ -9,8 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.seasar.cms.pluggable.Configuration;
+import org.seasar.cms.ymir.Application;
+import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.ConstraintViolationException;
+import org.seasar.cms.ymir.HttpServletResponseFilter;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.Request;
@@ -26,11 +30,40 @@ public class YmirImpl implements Ymir {
 
     private LifecycleListener[] lifecycleListeners_;
 
+    private Configuration configuration_;
+
+    private ApplicationManager applicationManager_;
+
     private RequestProcessor requestProcessor_;
 
     private ResponseProcessor responseProcessor_;
 
     private Logger logger_ = Logger.getLogger(getClass());
+
+    public void setLifecycleListeners(LifecycleListener[] lifecycleListeners) {
+
+        lifecycleListeners_ = lifecycleListeners;
+    }
+
+    public void setRequestProcessor(RequestProcessor requestProcessor) {
+
+        requestProcessor_ = requestProcessor;
+    }
+
+    public void setResponseProcessor(ResponseProcessor responseProcessor) {
+
+        responseProcessor_ = responseProcessor;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+
+        configuration_ = configuration;
+    }
+
+    public void setApplicationManager(ApplicationManager applicationManager) {
+
+        applicationManager_ = applicationManager;
+    }
 
     public void init() {
 
@@ -70,10 +103,10 @@ public class YmirImpl implements Ymir {
         return requestProcessor_.process(request);
     }
 
-    public boolean processResponse(ServletContext servletContext,
-            HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-            Request request, Response response) throws IOException,
-            ServletException {
+    public HttpServletResponseFilter processResponse(
+            ServletContext servletContext, HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse, Request request, Response response)
+            throws IOException, ServletException {
 
         return responseProcessor_.process(servletContext, httpRequest,
                 httpResponse, request, response);
@@ -115,18 +148,23 @@ public class YmirImpl implements Ymir {
         requestProcessor_.restoreForInclusion(attributeContainer, backupped);
     }
 
-    public void setLifecycleListeners(LifecycleListener[] lifecycleListeners) {
+    public Application getApplication() {
 
-        lifecycleListeners_ = lifecycleListeners;
+        return applicationManager_.findContextApplication();
     }
 
-    public void setRequestProcessor(RequestProcessor requestProcessor) {
+    public String getProjectStatus() {
 
-        requestProcessor_ = requestProcessor;
+        if (configuration_ != null) {
+            return configuration_.getProperty(Configuration.KEY_PROJECTSTATUS);
+        } else {
+            return null;
+        }
     }
 
-    public void setResponseProcessor(ResponseProcessor responseProcessor) {
+    public boolean isUnderDevelopment() {
 
-        responseProcessor_ = responseProcessor;
+        return Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
+                && getApplication().isUnderDevelopment();
     }
 }

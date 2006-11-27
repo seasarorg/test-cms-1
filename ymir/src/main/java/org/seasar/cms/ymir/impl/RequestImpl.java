@@ -228,4 +228,8 @@ public class RequestImpl implements Request {
     public void setAttribute(String name, Object value) {
         attributeContainer_.setAttribute(name, value);
     }
+
+    public boolean isMatched() {
+        return (matched_ != null);
+    }
 }

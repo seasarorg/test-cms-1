@@ -152,4 +152,8 @@ public class MockRequest implements Request {
     public boolean isDispatchingByParameter() {
         return false;
     }
+
+    public boolean isMatched() {
+        return false;
+    }
 }
