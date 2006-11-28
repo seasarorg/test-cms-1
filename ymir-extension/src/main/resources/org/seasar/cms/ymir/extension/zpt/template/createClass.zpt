@@ -7,7 +7,6 @@
 <p>リクエストされたパス<span tal:replace="request/path">PATH</span>に対応するPageクラス<span tal:replace="pathMetaData/className">CLASSNAME</span>が見つかりませんでしたので、クラスを作成します。</p>
 <p>生成されるクラスはリクエストを処理するための<span tal:replace="actionName">ACTIONNAME</span>()メソッドを持ちます。
 「処理後の遷移先」には<span tal:replace="actionName">ACTIONNAME</span>()メソッドの呼び出し後の遷移先のパスをコンテキスト相対で指定して下さい。
-通常はフォワードとなりますが、頭にredirect:とつけた場合はリダイレクトとなります。
 遷移先がない場合は何も指定する必要はありません。</p>
 <p>よろしければ「作成」ボタンを押して下さい。作成しない場合は「戻る」ボタンを押して下さい。</p>
 <form tal:attributes="action request/absolutePath" method="post">
@@ -15,7 +14,14 @@
   <input type="hidden" name="__ymir__task" value="createClass" />
   <input type="hidden" name="__ymir__subTask" value="create" />
   <input type="hidden" name="__ymir__method" tal:attributes="value request/method" />
-  <p>処理後の遷移先：<input type="text" name="__ymir__transition" value="" /></p>
+  <div>
+    <div style="float: left">処理後の遷移先：</div>
+    <div style="float: left; margin-left: 1em">
+      <div><input type="text" name="__ymir__transition" size="32" value="" /></div>
+      <div style="margin-top: 1ex"><input type="checkbox" name="__ymir__transition_redirect" value="true" /> リダイレクトさせる</div>
+    </div>
+  </div>
+  <div style="clear: both"></div>
   <p><input type="submit" value="作成" />
   <input type="button" value="戻る" onclick="history.back()" /></p>
 </form>

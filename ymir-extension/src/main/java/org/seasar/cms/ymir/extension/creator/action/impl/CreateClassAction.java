@@ -19,6 +19,9 @@ public class CreateClassAction extends AbstractUpdateAction {
     private static final String PARAM_TRANSITION = SourceCreator.PARAM_PREFIX
             + "transition";
 
+    private static final String PARAM_TRANSITIONREDIRECT = PARAM_TRANSITION
+            + "_redirect";
+
     public CreateClassAction(SourceCreator sourceCreator) {
         super(sourceCreator);
     }
@@ -55,13 +58,18 @@ public class CreateClassAction extends AbstractUpdateAction {
         }
 
         String transition = request.getParameter(PARAM_TRANSITION);
+        boolean redirect = "true".equals(request
+                .getParameter(PARAM_TRANSITIONREDIRECT));
 
         ClassDesc classDesc = getSourceCreator().newClassDesc(
                 pathMetaData.getClassName());
         MethodDesc methodDesc = new MethodDescImpl(getSourceCreator()
                 .getActionName(request.getPath(), method));
-        methodDesc.setReturnTypeDesc(String.class.getName());
+        methodDesc.setReturnTypeDesc(String.class.getName(), true);
         if (transition != null && transition.trim().length() > 0) {
+            if (redirect) {
+                transition = "redirect:" + transition;
+            }
             methodDesc.setBodyDesc(new BodyDescImpl("return "
                     + quote(transition.trim()) + ";"));
         }

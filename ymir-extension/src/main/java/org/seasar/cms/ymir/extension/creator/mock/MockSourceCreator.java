@@ -27,6 +27,8 @@ public class MockSourceCreator implements SourceCreator {
 
     private ServletContext servletContext_;
 
+    private HttpServletRequest httpServletRequest_;
+
     public MockSourceCreator() {
     }
 
@@ -188,10 +190,16 @@ public class MockSourceCreator implements SourceCreator {
     }
 
     public HttpServletRequest getHttpServletRequest() {
-        return null;
+        return httpServletRequest_;
     }
 
     public HttpServletResponse getHttpServletResponse() {
         return null;
+    }
+
+    public MockSourceCreator setHttpServletRequest(
+            HttpServletRequest httpServletRequest) {
+        httpServletRequest_ = httpServletRequest;
+        return this;
     }
 }

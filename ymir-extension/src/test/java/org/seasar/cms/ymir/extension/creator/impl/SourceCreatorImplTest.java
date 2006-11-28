@@ -51,11 +51,6 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
         assertNull(target_.getClassName("hoehoe"));
     }
 
-    public void testGetWelcomeFile() throws Exception {
-
-        assertEquals("index.html", target_.getWelcomeFile());
-    }
-
     public void testWriteSourceFile1() throws Exception {
 
         ClassDesc classDesc = constructClassDesc();

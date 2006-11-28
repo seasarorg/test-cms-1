@@ -17,10 +17,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -87,12 +85,6 @@ import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
 import org.seasar.kvasir.util.StringUtils;
-
-import net.skirnir.xom.IllegalSyntaxException;
-import net.skirnir.xom.ValidationException;
-import net.skirnir.xom.XMLParserFactory;
-import net.skirnir.xom.XOMapper;
-import net.skirnir.xom.XOMapperFactory;
 
 public class SourceCreatorImpl implements SourceCreator {
 
@@ -211,10 +203,6 @@ public class SourceCreatorImpl implements SourceCreator {
                 Template template = pathMetaData.getTemplate();
 
                 if ("".equals(forwardPath)) {
-                    String welcomeFile = getWelcomeFile();
-                    if (welcomeFile != null) {
-                        return response;
-                    }
                     if (className == null || sourceFile.exists()) {
                         return response;
                     }
@@ -263,44 +251,6 @@ public class SourceCreatorImpl implements SourceCreator {
             return false;
         }
         return true;
-    }
-
-    String getWelcomeFile() {
-
-        XOMapper mapper = XOMapperFactory.newInstance();
-        mapper.setStrict(false);
-        File webXml = new File(getWebappSourceRoot(), "WEB-INF/web.xml");
-        if (!webXml.exists()) {
-            return null;
-        }
-
-        WebApp webApp;
-        try {
-            webApp = (WebApp) mapper.toBean(XMLParserFactory.newInstance()
-                    .parse(
-                            new InputStreamReader(new FileInputStream(webXml),
-                                    "UTF-8")).getRootElement(), WebApp.class);
-        } catch (ValidationException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalSyntaxException ex) {
-            throw new RuntimeException(ex);
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        } catch (FileNotFoundException ex) {
-            throw new RuntimeException(ex);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        WelcomeFileList welcomeFileList = webApp.getWelcomeFileList();
-        if (welcomeFileList == null) {
-            return null;
-        }
-        String[] welcomeFiles = welcomeFileList.getWelcomeFiles();
-        if (welcomeFiles.length > 0) {
-            return welcomeFiles[0];
-        } else {
-            return null;
-        }
     }
 
     public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas) {

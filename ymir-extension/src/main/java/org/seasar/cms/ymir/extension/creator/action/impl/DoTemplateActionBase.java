@@ -31,6 +31,10 @@ abstract public class DoTemplateActionBase implements UpdateAction {
         if (path == null) {
             return null;
         }
+        int question = path.indexOf('?');
+        if (question >= 0) {
+            path = path.substring(0, question);
+        }
 
         HttpServletRequest httpRequest = sourceCreator_.getHttpServletRequest();
         String requestURL = httpRequest.getRequestURL().toString();

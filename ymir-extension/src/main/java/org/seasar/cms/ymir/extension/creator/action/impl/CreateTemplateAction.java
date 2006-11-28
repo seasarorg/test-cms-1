@@ -90,9 +90,9 @@ public class CreateTemplateAction extends AbstractUpdateAction {
         }
 
         String templateString = request.getParameter(PARAM_TEMPLATE);
+        String transition = request.getParameter(PARAM_TRANSITION);
         boolean redirect = "true".equals(request
                 .getParameter(PARAM_TRANSITIONREDIRECT));
-        String transition = request.getParameter(PARAM_TRANSITION);
         if (templateString != null) {
             Template template = pathMetaData.getTemplate();
             try {
