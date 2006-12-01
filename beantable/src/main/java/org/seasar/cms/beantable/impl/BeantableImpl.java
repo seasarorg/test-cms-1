@@ -732,7 +732,7 @@ public class BeantableImpl<T> implements Beantable<T> {
     Object adjust(Object value, Class type) {
         if (type.isInstance(value)) {
             return value;
-        } else if (type == Boolean.TYPE) {
+        } else if (type == Boolean.TYPE || type == Boolean.class) {
             if (value instanceof Boolean) {
                 return value;
             } else if (value instanceof Number) {
@@ -742,7 +742,7 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 return null;
             }
-        } else if (type == Character.TYPE) {
+        } else if (type == Character.TYPE || type == Character.class) {
             if (value instanceof Character) {
                 return value;
             } else if (value instanceof Number) {
@@ -752,7 +752,7 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 return null;
             }
-        } else if (type == Short.TYPE) {
+        } else if (type == Short.TYPE || type == Short.class) {
             if (value instanceof Short) {
                 return value;
             } else if (value instanceof Number) {
@@ -762,7 +762,7 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 return null;
             }
-        } else if (type == Integer.TYPE) {
+        } else if (type == Integer.TYPE || type == Integer.class) {
             if (value instanceof Integer) {
                 return value;
             } else if (value instanceof Number) {
@@ -772,7 +772,7 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 return null;
             }
-        } else if (type == Long.TYPE) {
+        } else if (type == Long.TYPE || type == Long.class) {
             if (value instanceof Long) {
                 return value;
             } else if (value instanceof Number) {
@@ -782,7 +782,7 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 return null;
             }
-        } else if (type == Float.TYPE) {
+        } else if (type == Float.TYPE || type == Float.class) {
             if (value instanceof Float) {
                 return value;
             } else if (value instanceof Number) {
@@ -792,7 +792,7 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 return null;
             }
-        } else if (type == Double.TYPE) {
+        } else if (type == Double.TYPE || type == Double.class) {
             if (value instanceof Double) {
                 return value;
             } else if (value instanceof Number) {
@@ -839,13 +839,20 @@ public class BeantableImpl<T> implements Beantable<T> {
         sb.append("UPDATE ").append(table_.getName()).append(" SET ");
         String delim = null;
         ColumnMetaData[] columns = table_.getColumns();
+        ColumnMetaData versionNoColumn = null;
+        Object versionNoValue = null;
         for (int i = 0; i < columns.length; i++) {
             Object value = getValue(bean, columns[i]);
-            if (value == null) {
-                continue;
-            } else if (value == Null.INSTANCE) {
-                // Null.INSTANCEがセットされている場合はnullが指定されたものとみなす。
-                value = null;
+            if (columns[i].isVersionNo()) {
+                versionNoColumn = columns[i];
+                versionNoValue = value;
+            } else {
+                if (value == null) {
+                    continue;
+                } else if (value == Null.INSTANCE) {
+                    // Null.INSTANCEがセットされている場合はnullが指定されたものとみなす。
+                    value = null;
+                }
             }
 
             if (delim != null) {
@@ -853,8 +860,13 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 delim = ",";
             }
-            sb.append(columns[i].getName()).append("=?");
-            list.add(value);
+            sb.append(columns[i].getName()).append("=");
+            if (columns[i].isVersionNo()) {
+                sb.append(columns[i].getName()).append("+1");
+            } else {
+                sb.append("?");
+                list.add(value);
+            }
         }
         if (delim == null) {
             return null;
@@ -862,6 +874,16 @@ public class BeantableImpl<T> implements Beantable<T> {
         if (formula != null) {
             sb.append(" WHERE ").append(formula.getBase());
         }
+        if (versionNoValue != null) {
+            if (formula != null) {
+                sb.append(" AND ");
+            } else {
+                sb.append(" WHERE ");
+            }
+            sb.append(versionNoColumn.getName()).append("=?");
+            list.add(versionNoValue);
+        }
+
         PreparedStatement pst = con.prepareStatement(sb.toString());
         int size = list.size();
         int cnt = 1;

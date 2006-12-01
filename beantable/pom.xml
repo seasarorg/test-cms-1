@@ -89,7 +89,7 @@
     <dependency>
       <groupId>org.seasar.cms.database</groupId>
       <artifactId>database</artifactId>
-      <version>0.0.1</version>
+      <version>0.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>commons-dbutils</groupId>
