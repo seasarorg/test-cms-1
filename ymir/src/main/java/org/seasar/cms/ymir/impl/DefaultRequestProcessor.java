@@ -199,11 +199,16 @@ public class DefaultRequestProcessor implements RequestProcessor {
                                 request.isDispatchingByParameter(), request),
                                 request, true), component), request.getPath());
 
-                // 画面描画のためのAction呼び出しを行なう。
-                // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
-                // 制約チェックを行なわない。）
-                invokeAction(component, getActionMethod(component,
-                        ACTION_RENDER, null, false, request), request, false);
+                int responseType = response.getType();
+                if (responseType == Response.TYPE_PASSTHROUGH
+                        || responseType == Response.TYPE_FORWARD) {
+                    // 画面描画のためのAction呼び出しを行なう。
+                    // （画面描画のためのAction呼び出しの際にはAction付随の制約以外の
+                    // 制約チェックを行なわない。）
+                    invokeAction(component, getActionMethod(component,
+                            ACTION_RENDER, null, false, request), request,
+                            false);
+                }
 
                 finishForComponent(component, request);
             } else {
