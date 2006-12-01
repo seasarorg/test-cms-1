@@ -6,7 +6,7 @@ import java.beans.PropertyDescriptor;
  * <p><b>同期化：</b>
  * このクラスはスレッドセーフではありません。
  * </p>
- * 
+ *
  * @author YOKOTA Takehiko
  */
 public class ColumnMetaData {
@@ -30,6 +30,8 @@ public class ColumnMetaData {
     private boolean indexCreated_;
 
     private PropertyDescriptor propertyDescriptor_;
+
+    private boolean versionNo_;
 
     public String getDefault() {
         return default_;
@@ -109,5 +111,13 @@ public class ColumnMetaData {
 
     public void setPropertyDescriptor(PropertyDescriptor propertyDescriptor) {
         propertyDescriptor_ = propertyDescriptor;
+    }
+
+    public boolean isVersionNo() {
+        return versionNo_;
+    }
+
+    public void setVersionNo(boolean versionNo) {
+        versionNo_ = versionNo;
     }
 }
