@@ -287,9 +287,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     void prepareForComponent(Object component, Request request) {
-        // 各コンテキストが持つ属性をinjectする。
-        injectContextAttributes(component);
-
         // リクエストパラメータをinjectする。
         try {
             beanUtilsBean_.populate(component, request.getParameterMap());
@@ -310,6 +307,11 @@ public class DefaultRequestProcessor implements RequestProcessor {
                                 t);
             }
         }
+
+        // 各コンテキストが持つ属性をinjectする。
+        // （リクエストパラメータによって予期せぬinjectがあった場合にそれを上書きできるように、
+        // リクエストパラメータのinjectよりも後に行なっている。）
+        injectContextAttributes(component);
     }
 
     void finishForComponent(Object component, Request request) {
