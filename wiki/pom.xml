@@ -4,11 +4,46 @@
   <groupId>org.seasar.cms</groupId>
   <artifactId>wiki</artifactId>
   <name>CMS Wiki</name>
-  <packaging>jar</packaging>
-  <version>0.0.1</version>
-  <description>
-    CMS Wiki parsing and rendering engine.
-  </description>
+  <version>0.1</version>
+  <description>Wiki parsing and rendering engine</description>
+  <build>        
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <id>jjtree</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjtree</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${basedir}/src/main/java/org/seasar/cms/wiki/jjtree</sourceDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>javacc</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <!-- buildParser>true</buildParser>
+              <buildTokenManager>true</buildTokenManager -->
+              <sourceDirectory>${basedir}/src/main/java/org/seasar/cms/wiki/parser</sourceDirectory>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <outputDirectory>${basedir}/src/main/java/org/seasar/cms/wiki/parser</outputDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <repositories>
     <repository>
       <id>maven.seasar.org</id>
@@ -16,40 +51,6 @@
       <url>http://maven.seasar.org/maven2</url>
     </repository>
   </repositories>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.0</version>
-        <configuration>
-          <outputDirectory>${basedir}/src/main/java/org/seasar/cms/wiki/parser</outputDirectory>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <configuration>
-              <sourceDirectory>${basedir}/src/main/java/org/seasar/cms/wiki/jjtree</sourceDirectory>
-            </configuration>
-            <goals>
-              <goal>jjtree</goal>
-            </goals>
-            <id>jjtree</id>
-          </execution>
-          <execution>
-            <phase>generate-sources</phase>
-            <configuration>
-              <sourceDirectory>${basedir}/src/main/java/org/seasar/cms/wiki/parser</sourceDirectory>
-            </configuration>
-            <goals>
-              <goal>javacc</goal>
-            </goals>
-            <id>javacc</id>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -58,9 +59,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.0.3</version>
+      <groupId>org.seasar.container</groupId>
+      <artifactId>s2-extension</artifactId>
+      <version>2.3.15</version>
     </dependency>
   </dependencies>
 </project>
