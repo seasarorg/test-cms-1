@@ -92,8 +92,6 @@ public class Path {
                 if (key == null || values == null || values.length == 0) {
                     continue;
                 }
-                sb.append(delim);
-                delim = "&";
                 String encodedKey;
                 try {
                     encodedKey = URLEncoder.encode(key, parameterEncoding_);
@@ -101,14 +99,14 @@ public class Path {
                     throw new RuntimeException(ex);
                 }
                 for (int i = 0; i < values.length; i++) {
-                    sb.append(encodedKey);
-                    sb.append("=");
+                    sb.append(delim).append(encodedKey).append("=");
                     try {
                         sb.append(URLEncoder.encode(values[i],
                                 parameterEncoding_));
                     } catch (UnsupportedEncodingException ex) {
                         throw new RuntimeException(ex);
                     }
+                    delim = "&";
                 }
             }
         }
