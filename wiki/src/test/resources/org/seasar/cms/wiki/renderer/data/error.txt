@@ -1,0 +1,5 @@
+|hogehoge|hogehoge|
+|errorline|errorline|%&
+|hohoho|hohoho|
+
+''miss string' hoge
