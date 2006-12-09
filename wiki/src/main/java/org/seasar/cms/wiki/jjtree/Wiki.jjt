@@ -2,16 +2,17 @@
  * Wiki.jjt
  * Wiki Syntax Difinition (based on Japanese popular wiki engine syntax)
  */ 
-
 options{
 	STATIC = false;
-	DEBUG_PARSER = true;
+//	DEBUG_PARSER = true;
 //	DEBUG_TOKEN_MANAGER = true;
 //	DEBUG_LOOKAHEAD = true;
+	USER_CHAR_STREAM = true;
 	JAVA_UNICODE_ESCAPE = true;
 	MULTI = true;
 	NODE_PREFIX = "Wiki";
 	NODE_PACKAGE = "org.seasar.cms.wiki.parser";
+	NODE_EXTENDS = "org.seasar.cms.wiki.parser.BasicWikiNode";
 	VISITOR = true;
 	ERROR_REPORTING = false; // don't throw Error LookAheadSuccess
 }
@@ -23,9 +24,10 @@ package org.seasar.cms.wiki.parser;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
 
+import org.seasar.framework.log.Logger;
 import org.seasar.cms.wiki.util.GenerateNodeHelper;
 
 /**
@@ -33,7 +35,6 @@ import org.seasar.cms.wiki.util.GenerateNodeHelper;
  *
  * NOT TO IMPLMENT: (2005/10)
  * - Table format ('h','c', at the end of table line)
- * - Interwiki
  *
  * NOTE:
  * - Token Specification Policy
@@ -77,9 +78,15 @@ public class WikiParser{
  	private int nParseErrors_ = 0;
  	private int startpos_ = -1;
  	
- 	private Log log_ = LogFactory.getLog(getClass());
+ 	private StandardWikiCharStream jj_input_stream;
+ 	
+ 	private Logger log_ = Logger.getLogger(getClass());
  	
  	public WikiParser(){
+ 	}
+ 	
+ 	public void setStandardWikiCharStream(StandardWikiCharStream stream){
+ 		this.jj_input_stream = stream; 		
  	}
  	
  	public int addAnnotation(SimpleNode node){
@@ -131,10 +138,7 @@ public class WikiParser{
     	if(startpos_ == -1) return "";
         	
         int curpos = jj_input_stream.bufpos;
-    	log_.error("current position :" + curpos);
-    	log_.error("start position :" + startpos_);
-    	log_.error("Token Begin :" + jj_input_stream.tokenBegin);
-    	log_.error("Token Source Matched Position :" + token_source.jjmatchedPos);
+        log_.log("WCMSWIKI0001",new Object[]{curpos +"",startpos_ + "",jj_input_stream.tokenBegin+"",token_source.jjmatchedPos +""});
 
         if(curpos >= startpos_)
        		return new String(jj_input_stream.buffer,startpos_,curpos - startpos_ + 1);
@@ -277,8 +281,7 @@ public class WikiParser{
 		}		
 		enode.letter = buf.toString();
 		jjtree.closeNodeScope(enode,true);
-		log_.error(msg);
-		log_.error(enode.letter);
+		log_.log("WCMSWIKI0002",new Object[]{msg,enode.letter});
  	} 	
 }
 
@@ -286,7 +289,7 @@ PARSER_END(WikiParser)
 
 TOKEN_MGR_DECLS :
 {
-	private Log tokenLog = LogFactory.getLog(getClass());
+	private Logger tokenLog = Logger.getLogger(getClass());
 	
 	private int nLexicalErrors_ = 0;
 	
@@ -430,7 +433,7 @@ TOKEN_MGR_DECLS :
 <*> TOKEN :
 {
 	< #ANCHORNAME: "#" <ALPHABET> (<ALPHABET>|<DIGIT>)+>
-	| < #URL: ("http"|"https"|"ftp"|"news") "://" <HOSTNAME> (":" (<DIGIT>)+)? ("/" (["A"-"Z","a"-"z","0"-"9","-","~","&","?","=","%",".","_","#"])*)* >
+	| < #URL: ("http"|"https"|"ftp"|"news") "://" <HOSTNAME> (":" (<DIGIT>)+)? ("/" (["A"-"Z","a"-"z","0"-"9","+","-","~","&","?","=","%",".","_","#",","])*)* >
 	| < #EMAIL: (["A"-"Z","a"-"z","0"-"9","-",".","_"])+ "@" <HOSTNAME> >
 	| < #NAME: (~["\"","#","&","<",">",":","[","]","\n","\r"])+ >
 //	| < #PLUGINARG: (~["\"","#","&","(",")","[","]","<",">",",","\n","\r"])+ >
@@ -458,7 +461,7 @@ TOKEN_MGR_DECLS :
 	< ANYOTHER: ~[]> 
 	{
 		++nLexicalErrors_;
-		tokenLog.info("unknown token " + image);
+		tokenLog.log("ICMSWIKI0001",new Object[]{image});
 	}
 }
 
@@ -868,7 +871,6 @@ void AnyOther():
 	t=<ANYOTHER> 
 	{
 		jjtThis.letter = t.image;
-		log_.warn("AnyOther token : " + t.image);
 	}
 }
 
