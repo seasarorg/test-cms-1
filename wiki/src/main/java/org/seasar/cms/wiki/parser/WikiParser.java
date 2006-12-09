@@ -65,7 +65,7 @@ public class WikiParser/*@bgen(jjtree)*/implements WikiParserTreeConstants, Wiki
         public WikiParser(){
         }
 
-        public void setStandardWikiCharStream(WikiCharStream stream){
+        public void setWikiCharStream(WikiCharStream stream){
                 this.jj_input_stream = stream;
         }
 

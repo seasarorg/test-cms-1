@@ -78,14 +78,14 @@ public class WikiParser{
  	private int nParseErrors_ = 0;
  	private int startpos_ = -1;
  	
- 	private StandardWikiCharStream jj_input_stream;
+ 	private WikiCharStream jj_input_stream;
  	
  	private Logger log_ = Logger.getLogger(getClass());
  	
  	public WikiParser(){
  	}
  	
- 	public void setStandardWikiCharStream(StandardWikiCharStream stream){
+ 	public void setWikiCharStream(WikiCharStream stream){
  		this.jj_input_stream = stream; 		
  	}
  	

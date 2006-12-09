@@ -26,7 +26,7 @@ public class BasicWikiParser extends WikiParser implements org.seasar.cms.wiki.e
 
 	public BasicWikiParser(WikiCharStream stream){
 		super(stream);
-		setStandardWikiCharStream(stream);		
+		setWikiCharStream(stream);		
 	}	
 		
 	public Node parse(){
