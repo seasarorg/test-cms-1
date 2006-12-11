@@ -32,13 +32,13 @@ import org.seasar.extension.unit.S2TestCase;
  * 
  * @author someda
  */
-public class StandardWikiParserTest extends S2TestCase{
+public class BasicWikiParserTest extends S2TestCase{
 	
-	private static final String PATH = "StandardWikiParserTest.dicon";
+	private static final String PATH = "BasicWikiParserTest.dicon";
 	
 	private WikiParserFactory wikiParserFactory;	
 	
-	public StandardWikiParserTest(String name){
+	public BasicWikiParserTest(String name){
 		super(name);
 	}
 	
