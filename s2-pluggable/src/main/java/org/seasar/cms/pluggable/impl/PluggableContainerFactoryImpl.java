@@ -258,16 +258,16 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         }
     }
 
-    void includeChildren(S2Container container, S2Container parent) {
+    void includeChildren(S2Container container, S2Container target) {
         Set childSet = new HashSet();
         int size = container.getChildSize();
         for (int i = 0; i < size; i++) {
             childSet.add(container.getChild(i));
         }
 
-        size = parent.getChildSize();
+        size = target.getChildSize();
         for (int i = 0; i < size; i++) {
-            S2Container child = parent.getChild(i);
+            S2Container child = target.getChild(i);
             if (!childSet.contains(child)) {
                 container.include(child);
                 childSet.add(child);
