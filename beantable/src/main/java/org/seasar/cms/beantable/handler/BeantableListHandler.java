@@ -1,4 +1,4 @@
-package org.seasar.cms.beantable.impl;
+package org.seasar.cms.beantable.handler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

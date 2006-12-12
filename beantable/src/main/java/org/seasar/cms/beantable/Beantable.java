@@ -67,6 +67,10 @@ public interface Beantable<T> {
      */
     void setValue(T bean, ColumnMetaData column, Object value);
 
+    DataSource getDataSource();
+
+    Identity getIdentity();
+
     /*
      * for framework
      */

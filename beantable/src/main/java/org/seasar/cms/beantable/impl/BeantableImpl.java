@@ -45,6 +45,8 @@ import org.seasar.cms.beantable.annotation.Constraint;
 import org.seasar.cms.beantable.annotation.Index;
 import org.seasar.cms.beantable.annotation.PrimaryKey;
 import org.seasar.cms.beantable.annotation.Unique;
+import org.seasar.cms.beantable.handler.BeantableHandler;
+import org.seasar.cms.beantable.handler.BeantableListHandler;
 import org.seasar.cms.database.identity.ColumnMetaData;
 import org.seasar.cms.database.identity.ConstraintMetaData;
 import org.seasar.cms.database.identity.Identity;
@@ -1000,5 +1002,13 @@ public class BeantableImpl<T> implements Beantable<T> {
             }
         }
         return pst;
+    }
+
+    public DataSource getDataSource() {
+        return ds_;
+    }
+
+    public Identity getIdentity() {
+        return identity_;
     }
 }
