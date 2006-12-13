@@ -27,3 +27,15 @@ getDtoCount=\
 
 getIds=\
     SELECT id FROM hoge
+
+getUsername=\
+    SELECT username FROM hoge
+
+getUsernames=\
+    SELECT username FROM hoge
+
+getUsername2=\
+    SELECT username FROM hoge
+
+getUsernames2=\
+    SELECT username FROM hoge

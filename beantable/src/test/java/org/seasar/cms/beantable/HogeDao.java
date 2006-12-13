@@ -3,6 +3,7 @@ package org.seasar.cms.beantable;
 import java.util.Map;
 
 import org.seasar.cms.beantable.impl.Hoge;
+import org.seasar.dao.annotation.tiger.Sql;
 
 public interface HogeDao {
 
@@ -29,4 +30,15 @@ public interface HogeDao {
     Number getDtoCount();
 
     Number[] getIds();
+
+    String getUsername();
+
+    String[] getUsernames();
+
+    Object getUsername2();
+
+    Object[] getUsernames2();
+
+    @Sql("SELECT username FROM hoge")
+    String getUsername3();
 }

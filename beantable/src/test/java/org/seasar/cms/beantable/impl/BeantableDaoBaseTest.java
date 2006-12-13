@@ -179,7 +179,7 @@ public class BeantableDaoBaseTest extends BeantableDaoTestCase<Hoge> {
     }
 
     public void testExecute_返り値がNumberでも正しく動作することTx() throws Exception {
-        assertNull(target_.getDtoCount());
+        assertEquals(0, target_.getDtoCount());
     }
 
     public void testExecute_返り値がNumberの配列でも正しく動作することTx() throws Exception {
@@ -189,5 +189,50 @@ public class BeantableDaoBaseTest extends BeantableDaoTestCase<Hoge> {
                 "user1", "comment1"));
 
         assertEquals(1, target_.getIds().length);
+    }
+
+    public void testExecute_返り値がStringでも正しく動作することTx() throws Exception {
+        assertNull(target_.getUsername());
+
+        target_.insert(new Hoge(new Timestamp(System.currentTimeMillis()),
+                "user1", "comment1"));
+
+        assertEquals("user1", target_.getUsername());
+    }
+
+    public void testExecute_返り値がStringの配列でも正しく動作することTx() throws Exception {
+        assertEquals(0, target_.getIds().length);
+
+        target_.insert(new Hoge(new Timestamp(System.currentTimeMillis()),
+                "user1", "comment1"));
+
+        assertEquals(1, target_.getUsernames().length);
+    }
+
+    public void testExecute_返り値がObjectでも正しく動作することTx() throws Exception {
+        assertNull(target_.getUsername2());
+
+        target_.insert(new Hoge(new Timestamp(System.currentTimeMillis()),
+                "user1", "comment1"));
+
+        assertEquals("user1", target_.getUsername2());
+    }
+
+    public void testExecute_返り値がObjectの配列でも正しく動作することTx() throws Exception {
+        assertEquals(0, target_.getIds().length);
+
+        target_.insert(new Hoge(new Timestamp(System.currentTimeMillis()),
+                "user1", "comment1"));
+
+        assertEquals(1, target_.getUsernames2().length);
+    }
+
+    public void testExecute_Sqlアノテーションを正しく読み取れることTx() throws Exception {
+        assertNull(target_.getUsername3());
+
+        target_.insert(new Hoge(new Timestamp(System.currentTimeMillis()),
+                "user1", "comment1"));
+
+        assertEquals("user1", target_.getUsername3());
     }
 }

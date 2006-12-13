@@ -3,6 +3,7 @@ package org.seasar.cms.beantable.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,6 +31,7 @@ import org.seasar.cms.beantable.handler.BeantableHandler;
 import org.seasar.cms.beantable.handler.BeantableListHandler;
 import org.seasar.cms.beantable.handler.ScalarListHandler;
 import org.seasar.cms.database.SQLRuntimeException;
+import org.seasar.dao.annotation.tiger.Sql;
 import org.seasar.framework.container.annotation.tiger.Aspect;
 import org.seasar.framework.container.annotation.tiger.Binding;
 import org.seasar.framework.container.annotation.tiger.BindingType;
@@ -335,7 +337,9 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
             } else {
                 return mapHandler_;
             }
-        } else if (componentType == Character.class
+        } else if (componentType == Object.class
+                || componentType == String.class
+                || componentType == Character.class
                 || componentType == Boolean.class
                 || Date.class.isAssignableFrom(componentType)
                 || Number.class.isAssignableFrom(componentType)) {
@@ -470,6 +474,9 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
         }
 
         Properties prop = new Properties();
+        loadQueriesFromClass(prop);
+
+        prop = new Properties(prop);
         try {
             prop.load(in);
         } catch (IOException ex) {
@@ -496,5 +503,27 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
         }
 
         sql_ = prop;
+    }
+
+    void loadQueriesFromClass(Properties prop) {
+        Class clazz = getClass();
+        loadQueriesFromMethods(prop, clazz.getMethods());
+
+        while (clazz != Object.class) {
+            Class[] interfaces = clazz.getInterfaces();
+            for (int i = 0; i < interfaces.length; i++) {
+                loadQueriesFromMethods(prop, interfaces[i].getMethods());
+            }
+            clazz = clazz.getSuperclass();
+        }
+    }
+
+    void loadQueriesFromMethods(Properties prop, Method[] methods) {
+        for (int i = 0; i < methods.length; i++) {
+            Sql sql = methods[i].getAnnotation(Sql.class);
+            if (sql != null) {
+                prop.setProperty(methods[i].getName(), sql.value());
+            }
+        }
     }
 }
