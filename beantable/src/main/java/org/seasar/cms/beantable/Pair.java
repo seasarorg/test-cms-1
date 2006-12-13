@@ -1,12 +1,12 @@
-package org.seasar.cms.beantable.impl;
+package org.seasar.cms.beantable;
 
 /**
  * <p><b>同期化：</b>
  * このクラスはスレッドセーフではありません。</p>
- * 
+ *
  * @author YOKOTA Takehiko
  */
-class Pair {
+public class Pair {
 
     private String template_;
 

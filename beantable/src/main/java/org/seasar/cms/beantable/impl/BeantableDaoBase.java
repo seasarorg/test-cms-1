@@ -24,6 +24,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.seasar.cms.beantable.Beantable;
 import org.seasar.cms.beantable.BeantableDao;
 import org.seasar.cms.beantable.Formula;
+import org.seasar.cms.beantable.Pair;
 import org.seasar.cms.beantable.QueryNotFoundRuntimeException;
 import org.seasar.cms.beantable.handler.BeantableHandler;
 import org.seasar.cms.beantable.handler.BeantableListHandler;
