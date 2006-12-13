@@ -7,13 +7,22 @@ import org.seasar.dao.annotation.tiger.IdType;
 
 public class Hoge {
 
-    private int id_;
+    private Integer id_;
 
     private Timestamp postdate_;
 
     private String username_;
 
     private String comment_;
+
+    public Hoge() {
+    }
+
+    public Hoge(Timestamp postdate, String username, String comment) {
+        postdate_ = postdate;
+        username_ = username;
+        comment_ = comment;
+    }
 
     public String getComment() {
         return comment_;
@@ -23,12 +32,12 @@ public class Hoge {
         comment_ = comment;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id_;
     }
 
     @Id(IdType.IDENTITY)
-    public void setId(int id) {
+    public void setId(Integer id) {
         id_ = id;
     }
 

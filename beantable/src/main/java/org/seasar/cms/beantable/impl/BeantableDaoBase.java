@@ -2,10 +2,12 @@ package org.seasar.cms.beantable.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -14,15 +16,22 @@ import java.util.StringTokenizer;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.MapHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.seasar.cms.beantable.Beantable;
 import org.seasar.cms.beantable.BeantableDao;
+import org.seasar.cms.beantable.Formula;
 import org.seasar.cms.beantable.QueryNotFoundRuntimeException;
 import org.seasar.cms.beantable.handler.BeantableHandler;
 import org.seasar.cms.beantable.handler.BeantableListHandler;
 import org.seasar.cms.beantable.handler.ScalarListHandler;
 import org.seasar.cms.database.SQLRuntimeException;
 import org.seasar.framework.container.annotation.tiger.Aspect;
+import org.seasar.framework.container.annotation.tiger.Binding;
+import org.seasar.framework.container.annotation.tiger.BindingType;
 
 /**
  * <p><b>同期化：</b>
@@ -30,7 +39,7 @@ import org.seasar.framework.container.annotation.tiger.Aspect;
  *
  * @author YOKOTA Takehiko
  */
-abstract public class BeantableDaoBase<T> implements BeantableDao<T> {
+abstract public class BeantableDaoBase<T> implements BeantableDao {
 
     protected Beantable<T> beantable_;
 
@@ -38,9 +47,13 @@ abstract public class BeantableDaoBase<T> implements BeantableDao<T> {
 
     protected BeantableListHandler<T> beantableListHandler_;
 
-    protected ScalarHandler scalarHandler_ = new ScalarHandler();
+    protected ResultSetHandler scalarHandler_ = new ScalarHandler();
 
-    protected ScalarListHandler scalarListHandler_ = new ScalarListHandler();
+    protected ResultSetHandler scalarListHandler_ = new ScalarListHandler();
+
+    protected ResultSetHandler mapHandler_ = new MapHandler();
+
+    protected ResultSetHandler mapListHandler_ = new MapListHandler();
 
     private boolean started_ = false;
 
@@ -48,9 +61,14 @@ abstract public class BeantableDaoBase<T> implements BeantableDao<T> {
 
     private Properties sql_;
 
-    public final void start() {
+    @Binding(bindingType = BindingType.MAY)
+    public void setBeantable(Beantable<T> beantable) {
+        beantable_ = beantable;
+    }
+
+    public boolean start() {
         if (started_) {
-            return;
+            return true;
         }
 
         beantable_.setBeanClass(getDtoClass());
@@ -84,6 +102,7 @@ abstract public class BeantableDaoBase<T> implements BeantableDao<T> {
         }
 
         started_ = true;
+        return true;
     }
 
     boolean sqlForInitializingTableDefined() {
@@ -228,6 +247,120 @@ abstract public class BeantableDaoBase<T> implements BeantableDao<T> {
         return new Pair(sb.toString(), list.toArray());
     }
 
+    @SuppressWarnings("unchecked")
+    public Object execute(String queryName, Object[] params,
+            Class<?>[] paramTypes, Class<?> returnType) throws SQLException {
+
+        if (returnType == Void.TYPE && paramTypes.length == 1
+                && paramTypes[0] == getDtoClass()) {
+            // insert。
+            beantable_.insertColumn((T) params[0]);
+            return null;
+        }
+
+        boolean update = false;
+        if (returnType == Void.TYPE || returnType == Integer.TYPE) {
+            if (paramTypes.length >= 1 && paramTypes[0] == getDtoClass()) {
+                // update。
+                Formula formula;
+                if (paramTypes.length == 1) {
+                    String query = getQueryIfExists(queryName);
+                    if (query != null) {
+                        formula = new Formula(query);
+                    } else {
+                        formula = null;
+                    }
+                } else {
+                    formula = new Formula(getQuery(queryName));
+                    for (int i = 1; i < params.length; i++) {
+                        formula.setObject(i, params[i]);
+                    }
+                }
+                return beantable_.updateColumns((T) params[0], formula);
+            }
+
+            update = true;
+        }
+
+        Pair pair = parseQueryAndParameters(queryName, params, paramTypes);
+        ResultSetHandler handler = null;
+        if (!update) {
+            handler = findResultSetHandler(returnType);
+        }
+
+        Connection con = null;
+        try {
+            con = getConnection();
+            QueryRunner runner = new QueryRunner();
+            if (update) {
+                return runner.update(con, pair.getTemplate(), pair
+                        .getParameters());
+            } else {
+                Object result = runner.query(con, pair.getTemplate(), pair
+                        .getParameters(), handler);
+                if (returnType.isArray()) {
+                    return toArray((List) result, returnType.getComponentType());
+                } else {
+                    return result;
+                }
+            }
+        } finally {
+            DbUtils.closeQuietly(con);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    Pair parseQueryAndParameters(String queryName, Object[] params,
+            Class<?>[] paramTypes) {
+        if (paramTypes.length == 1 && Map.class.isAssignableFrom(paramTypes[0])) {
+            return constructPair(queryName, null, (Map) params[0], null);
+        } else {
+            return new Pair(getQuery(queryName), params);
+        }
+    }
+
+    ResultSetHandler findResultSetHandler(Class type) {
+        boolean array = type.isArray();
+        Class componentType = (array ? type.getComponentType() : type);
+        if (componentType == getDtoClass()) {
+            if (array) {
+                return beantableListHandler_;
+            } else {
+                return beantableHandler_;
+            }
+        } else if (componentType == Map.class) {
+            if (array) {
+                return mapListHandler_;
+            } else {
+                return mapHandler_;
+            }
+        } else if (componentType == Byte.class
+                || componentType == Character.class
+                || componentType == Short.class
+                || componentType == Integer.class
+                || componentType == Long.class || componentType == Float.class
+                || componentType == Double.class
+                || componentType == Boolean.class
+                || Date.class.isAssignableFrom(componentType)) {
+            if (array) {
+                return scalarListHandler_;
+            } else {
+                return scalarHandler_;
+            }
+        } else {
+            if (array) {
+                return new BeanListHandler(componentType);
+            } else {
+                return new BeanHandler(componentType);
+            }
+        }
+    }
+
+    Object[] toArray(List<?> list, Class componentType) {
+        return list.toArray((Object[]) Array.newInstance(componentType, list
+                .size()));
+    }
+
     /*
      * protected scope methods
      */
@@ -366,17 +499,5 @@ abstract public class BeantableDaoBase<T> implements BeantableDao<T> {
         }
 
         sql_ = prop;
-    }
-
-    public Beantable<T> getBeantable() {
-        return beantable_;
-    }
-
-    public ResultSetHandler getBeantableHandler() {
-        return beantableHandler_;
-    }
-
-    public ResultSetHandler getBeantableListHandler() {
-        return beantableListHandler_;
     }
 }

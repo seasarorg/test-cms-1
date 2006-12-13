@@ -2,11 +2,10 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
   "http://www.seasar.org/dtd/components24.dtd">
 <components>
+  <include path="j2ee.dicon" />
   <component name="beantable"
     class="org.seasar.cms.beantable.impl.BeantableImpl"
-    instance="prototype">
-    <property name="identity">identitySelector.getIdentity()</property>
-  </component>
+    instance="prototype" />
   <component name="beantableDaoInterceptor"
     class="org.seasar.cms.beantable.aop.BeantableDaoInterceptor" />
 </components>

@@ -1,14 +1,9 @@
 package org.seasar.cms.beantable;
 
-import org.apache.commons.dbutils.ResultSetHandler;
+import java.sql.SQLException;
 
-public interface BeantableDao<T> {
+public interface BeantableDao {
 
-    Beantable<T> getBeantable();
-
-    String getQuery(String name);
-
-    ResultSetHandler getBeantableHandler();
-
-    ResultSetHandler getBeantableListHandler();
+    Object execute(String queryName, Object[] params, Class<?>[] paramTypes,
+            Class<?> returnType) throws SQLException;
 }
