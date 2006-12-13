@@ -58,8 +58,6 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
 
     protected ResultSetHandler mapListHandler_ = new MapListHandler();
 
-    private boolean started_ = false;
-
     private String queriesPath_;
 
     private Properties sql_;
@@ -67,12 +65,6 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
     @Binding(bindingType = BindingType.MAY)
     public void setBeantable(Beantable<T> beantable) {
         beantable_ = beantable;
-    }
-
-    public boolean start() {
-        if (started_) {
-            return true;
-        }
 
         beantable_.setBeanClass(getDtoClass());
         beantableHandler_ = new BeantableHandler<T>(beantable_);
@@ -103,9 +95,6 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
                 throw new SQLRuntimeException(ex);
             }
         }
-
-        started_ = true;
-        return true;
     }
 
     boolean sqlForInitializingTableDefined() {

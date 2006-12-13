@@ -58,7 +58,6 @@ abstract public class BeantableDaoTestCase<T> extends S2TestCase {
 
         target_ = (BeantableDaoBase<T>) getComponent(getDaoClass());
         target_.setBeantable(newBeantable());
-        target_.start();
     }
 
     abstract protected Class<?> getDaoClass();

@@ -5,5 +5,6 @@
   <include path="beantable.dicon" />
   <component class="org.seasar.cms.beantable.impl.HogeDaoImpl">
     <aspect>beantableDaoInterceptor</aspect>
+    <property name="beantable" bindingType="none" />
   </component>
 </components>
