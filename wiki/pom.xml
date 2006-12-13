@@ -7,8 +7,8 @@
   <version>0.1-SNAPSHOT</version>
   <description>Wiki parsing and rendering engine</description>
   <scm>
-    <connection>svn:https://www.seasar.org/svn/sandbox/cms/trunk/wiki</connection>
-    <developerConnection>svn:https://www.seasar.org/svn/sandbox/cms/trunk/wiki</developerConnection>
+    <connection>scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/wiki</connection>
+    <developerConnection>scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/wiki</developerConnection>
     <url>http://svn.seasar.org/browse/trunk/wiki/?root=sandbox.cms</url>
   </scm>
   <developers>
