@@ -21,3 +21,9 @@ delete=\
 
 deleteById=\
     DELETE FROM hoge WHERE id=?
+
+getDtoCount=\
+    SELECT COUNT(*) FROM hoge
+
+getIds=\
+    SELECT id FROM hoge

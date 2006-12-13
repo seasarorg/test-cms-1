@@ -177,4 +177,17 @@ public class BeantableDaoBaseTest extends BeantableDaoTestCase<Hoge> {
         assertEquals(1, actual);
         assertEquals(1, target_.getDtos().length);
     }
+
+    public void testExecute_返り値がNumberでも正しく動作することTx() throws Exception {
+        assertNull(target_.getDtoCount());
+    }
+
+    public void testExecute_返り値がNumberの配列でも正しく動作することTx() throws Exception {
+        assertEquals(0, target_.getIds().length);
+
+        target_.insert(new Hoge(new Timestamp(System.currentTimeMillis()),
+                "user1", "comment1"));
+
+        assertEquals(1, target_.getIds().length);
+    }
 }

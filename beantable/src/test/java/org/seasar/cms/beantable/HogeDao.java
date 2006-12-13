@@ -25,4 +25,8 @@ public interface HogeDao {
     int delete();
 
     int deleteById(Integer id);
+
+    Number getDtoCount();
+
+    Number[] getIds();
 }

@@ -335,14 +335,10 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
             } else {
                 return mapHandler_;
             }
-        } else if (componentType == Byte.class
-                || componentType == Character.class
-                || componentType == Short.class
-                || componentType == Integer.class
-                || componentType == Long.class || componentType == Float.class
-                || componentType == Double.class
+        } else if (componentType == Character.class
                 || componentType == Boolean.class
-                || Date.class.isAssignableFrom(componentType)) {
+                || Date.class.isAssignableFrom(componentType)
+                || Number.class.isAssignableFrom(componentType)) {
             if (array) {
                 return scalarListHandler_;
             } else {
