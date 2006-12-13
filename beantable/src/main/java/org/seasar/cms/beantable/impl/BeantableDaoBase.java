@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -496,19 +497,28 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
 
     void loadQueriesFromClass(Properties prop) {
         Class clazz = getClass();
-        loadQueriesFromMethods(prop, clazz.getMethods());
-
         while (clazz != Object.class) {
             Class[] interfaces = clazz.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
-                loadQueriesFromMethods(prop, interfaces[i].getMethods());
+                loadQueriesFromMethods(prop, interfaces[i].getDeclaredMethods());
             }
+            clazz = clazz.getSuperclass();
+        }
+
+        // インタフェースにあるSQLよりもクラスにあるSQLを優先させる。
+        clazz = getClass();
+        while (clazz != Object.class) {
+            loadQueriesFromMethods(prop, clazz.getDeclaredMethods());
             clazz = clazz.getSuperclass();
         }
     }
 
     void loadQueriesFromMethods(Properties prop, Method[] methods) {
         for (int i = 0; i < methods.length; i++) {
+            int modifiers = methods[i].getModifiers();
+            if (!Modifier.isPublic(modifiers) || Modifier.isStatic(modifiers)) {
+                continue;
+            }
             Sql sql = methods[i].getAnnotation(Sql.class);
             if (sql != null) {
                 prop.setProperty(methods[i].getName(), sql.value());
