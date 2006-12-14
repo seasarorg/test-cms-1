@@ -467,7 +467,7 @@ abstract public class AbstractIdentity implements Identity {
             rs.next();
             return new Integer(rs.getInt(1));
         } finally {
-            DbUtils.closeQuietly(null, st, rs);
+            DbUtils.closeQuietly(con, st, rs);
         }
     }
 
