@@ -13,6 +13,10 @@ abstract public class BeantableDaoTestCase<T> extends S2TestCase {
 
     private BeantableDaoBase<T> target_;
 
+    protected BeantableDaoBase<T> getDao() {
+        return target_;
+    }
+
     @SuppressWarnings("unchecked")
     protected BeantableImpl<T> newBeantable() {
 

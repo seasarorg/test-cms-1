@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -294,7 +295,7 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
                 if (returnType.isArray()) {
                     return toArray((List) result, returnType.getComponentType());
                 } else {
-                    return result;
+                    return beantable_.adjust(result, returnType);
                 }
             }
         } finally {
@@ -331,6 +332,7 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
                 || componentType == String.class
                 || componentType == Character.class
                 || componentType == Boolean.class
+                || componentType.isPrimitive()
                 || Date.class.isAssignableFrom(componentType)
                 || Number.class.isAssignableFrom(componentType)) {
             if (array) {
@@ -348,8 +350,13 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
     }
 
     Object[] toArray(List<?> list, Class componentType) {
-        return list.toArray((Object[]) Array.newInstance(componentType, list
-                .size()));
+        Object[] objs = (Object[]) Array
+                .newInstance(componentType, list.size());
+        int idx = 0;
+        for (Iterator<?> itr = list.iterator(); itr.hasNext();) {
+            objs[idx++] = beantable_.adjust(itr.next(), componentType);
+        }
+        return objs;
     }
 
     /*

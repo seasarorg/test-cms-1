@@ -41,4 +41,7 @@ public interface HogeDao {
 
     @Sql("SELECT username FROM hoge")
     String getUsername3();
+
+    @Sql("SELECT COUNT(*) FROM hoge")
+    boolean exists();
 }
