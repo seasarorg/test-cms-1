@@ -394,9 +394,10 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
                     "Can't detect if table exists: table=" + tableName, ex);
         }
 
+        Connection con = null;
         Statement stmt = null;
         try {
-            Connection con = getConnection();
+            con = getConnection();
             stmt = con.createStatement();
 
             String pre = getQueryIfExists("initialize.specific.pre");
@@ -446,7 +447,7 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
         } catch (SQLException ex) {
             throw new SQLRuntimeException("Can't initialize database", ex);
         } finally {
-            DbUtils.closeQuietly(null, stmt, null);
+            DbUtils.closeQuietly(con, stmt, null);
         }
     }
 
