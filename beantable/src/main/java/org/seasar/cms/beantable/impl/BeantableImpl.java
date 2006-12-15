@@ -39,7 +39,6 @@ import org.apache.commons.dbutils.DbUtils;
 import org.seasar.cms.beantable.Beantable;
 import org.seasar.cms.beantable.Formula;
 import org.seasar.cms.beantable.JDBCType;
-import org.seasar.cms.beantable.Null;
 import org.seasar.cms.beantable.annotation.ColumnDetail;
 import org.seasar.cms.beantable.annotation.Constraint;
 import org.seasar.cms.beantable.annotation.Index;
@@ -661,9 +660,6 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 if (value == null) {
                     continue;
-                } else if (value == Null.INSTANCE) {
-                    // Null.INSTANCEがセットされている場合はnullが指定されたものとみなす。
-                    value = null;
                 }
 
                 columnSb.append(delim).append(columns[i].getName());
@@ -851,9 +847,6 @@ public class BeantableImpl<T> implements Beantable<T> {
             } else {
                 if (value == null) {
                     continue;
-                } else if (value == Null.INSTANCE) {
-                    // Null.INSTANCEがセットされている場合はnullが指定されたものとみなす。
-                    value = null;
                 }
             }
 
