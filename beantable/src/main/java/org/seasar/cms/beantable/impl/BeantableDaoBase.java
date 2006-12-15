@@ -83,10 +83,10 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
                     ".sql");
             if (getClass().getClassLoader().getResource(queriesPath) != null) {
                 queriesPath_ = queriesPath;
-                loadQueries();
                 break;
             }
         }
+        loadQueries();
 
         if (sqlForInitializingTableDefined()) {
             initializeTable();
@@ -459,44 +459,38 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
     }
 
     void loadQueries() {
-        String queriesPath = getQueriesPath();
-        if (queriesPath == null) {
-            return;
-        }
-
-        ClassLoader cl = getClass().getClassLoader();
-        InputStream in = cl.getResourceAsStream(queriesPath);
-        if (in == null) {
-            throw new SQLRuntimeException("Can't find query resource: "
-                    + queriesPath);
-        }
-
         Properties prop = new Properties();
         loadQueriesFromClass(prop);
 
-        prop = new Properties(prop);
-        try {
-            prop.load(in);
-        } catch (IOException ex) {
-            throw new SQLRuntimeException("Can't load queries: " + queriesPath);
-        }
-
-        String productId = beantable_.getIdentity().getDatabaseProductId();
-        String path;
-        int dot = queriesPath.lastIndexOf('.');
-        if (dot >= 0) {
-            path = queriesPath.substring(0, dot) + "_" + productId
-                    + queriesPath.substring(dot);
-        } else {
-            path = queriesPath + "_" + productId;
-        }
-        in = cl.getResourceAsStream(path);
-        if (in != null) {
+        String queriesPath = getQueriesPath();
+        if (queriesPath != null) {
+            ClassLoader cl = getClass().getClassLoader();
+            InputStream in = cl.getResourceAsStream(queriesPath);
             prop = new Properties(prop);
             try {
                 prop.load(in);
             } catch (IOException ex) {
-                throw new SQLRuntimeException("Can't load queries: " + path);
+                throw new SQLRuntimeException("Can't load queries: "
+                        + queriesPath);
+            }
+
+            String productId = beantable_.getIdentity().getDatabaseProductId();
+            String path;
+            int dot = queriesPath.lastIndexOf('.');
+            if (dot >= 0) {
+                path = queriesPath.substring(0, dot) + "_" + productId
+                        + queriesPath.substring(dot);
+            } else {
+                path = queriesPath + "_" + productId;
+            }
+            in = cl.getResourceAsStream(path);
+            if (in != null) {
+                prop = new Properties(prop);
+                try {
+                    prop.load(in);
+                } catch (IOException ex) {
+                    throw new SQLRuntimeException("Can't load queries: " + path);
+                }
             }
         }
 

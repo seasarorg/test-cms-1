@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.seasar.cms.beantable.HogeDao;
+import org.seasar.cms.beantable.Pair;
+import org.seasar.dao.annotation.tiger.Sql;
 
 public class BeantableDaoBaseTest extends BeantableDaoTestCase<Hoge> {
 
@@ -257,5 +259,90 @@ public class BeantableDaoBaseTest extends BeantableDaoTestCase<Hoge> {
                 "user1", "comment1"));
 
         assertTrue(hogeDao_.exists());
+    }
+
+    private BeantableDaoBase<Hoge> getDaoBaseForTestingConstructPair() {
+        BeantableDaoBase<Hoge> beantableDaoBase = new BeantableDaoBase<Hoge>() {
+            @Override
+            protected Class<Hoge> getDtoClass() {
+                return Hoge.class;
+            }
+
+            @SuppressWarnings("unused")
+            @Sql("SELECT COUNT(*) FROM permission WHERE pageid=:pageid AND roleid=:roleid AND type=:type")
+            public void sql1() {
+            }
+
+            @SuppressWarnings("unused")
+            @Sql("INSERT INTO permission (pageid,roleid,type,level) VALUES (:pageid,:roleid,:type,:level)")
+            public void sql2() {
+            }
+
+            @SuppressWarnings("unused")
+            @Sql("UPDATE permission SET level=:level WHERE WHERE pageid=:pageid AND roleid=:roleid AND type=:type")
+            public void sql3() {
+            }
+        };
+        beantableDaoBase.loadQueries();
+        return beantableDaoBase;
+    }
+
+    public void testConstructPair1() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("pageid", new Integer(10));
+        map.put("roleid", new Integer(10));
+        map.put("type", new Integer(0));
+        Pair pair = getDaoBaseForTestingConstructPair().constructPair("sql1",
+                null, map, null);
+        assertNotNull(pair);
+        assertEquals("SELECT COUNT(*) FROM permission "
+                + "WHERE pageid=? AND roleid=? AND type=?", pair.getTemplate());
+        Object[] params = pair.getParameters();
+        assertEquals(3, params.length);
+        int idx = 0;
+        assertEquals(new Integer(10), params[idx++]);
+        assertEquals(new Integer(10), params[idx++]);
+        assertEquals(new Integer(0), params[idx++]);
+    }
+
+    public void testConstructPair2() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("pageid", new Integer(10));
+        map.put("roleid", new Integer(10));
+        map.put("type", new Integer(0));
+        map.put("level", new Integer(1));
+        Pair pair = getDaoBaseForTestingConstructPair().constructPair("sql2",
+                null, map, null);
+        assertNotNull(pair);
+        assertEquals("INSERT INTO permission (pageid,roleid,type,level)"
+                + " VALUES (?,?,?,?)", pair.getTemplate());
+        Object[] params = pair.getParameters();
+        assertEquals(4, params.length);
+        int idx = 0;
+        assertEquals(new Integer(10), params[idx++]);
+        assertEquals(new Integer(10), params[idx++]);
+        assertEquals(new Integer(0), params[idx++]);
+        assertEquals(new Integer(1), params[idx++]);
+    }
+
+    public void testConstructPair3() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("pageid", new Integer(10));
+        map.put("roleid", new Integer(10));
+        map.put("type", new Integer(0));
+        map.put("level", new Integer(1));
+        Pair pair = getDaoBaseForTestingConstructPair().constructPair("sql3",
+                null, map, null);
+        assertNotNull(pair);
+        assertEquals("UPDATE permission SET level=?"
+                + " WHERE WHERE pageid=? AND roleid=? AND type=?", pair
+                .getTemplate());
+        Object[] params = pair.getParameters();
+        assertEquals(4, params.length);
+        int idx = 0;
+        assertEquals(new Integer(1), params[idx++]);
+        assertEquals(new Integer(10), params[idx++]);
+        assertEquals(new Integer(10), params[idx++]);
+        assertEquals(new Integer(0), params[idx++]);
     }
 }
