@@ -6,10 +6,19 @@ import java.util.Map;
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
 import org.seasar.extension.unit.S2TestCase;
 import org.seasar.framework.container.ComponentDef;
+import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.factory.S2ContainerFactory;
 
 
 public class ClassS2ContainerBuilderTest extends S2TestCase
 {
+    @Override
+    public void include(String path)
+    {
+        S2ContainerFactory.include(getContainer(), path);
+    }
+
+
     public void test_Preparerを読み込めること()
         throws Exception
     {
@@ -129,5 +138,38 @@ public class ClassS2ContainerBuilderTest extends S2TestCase
         assertTrue(getContainer().hasComponentDef(Hoe6.class));
         Hoe6 hoe6 = (Hoe6)getComponent(Hoe6.class);
         assertNotNull(hoe6.getFuga6());
+    }
+
+
+    public void testGetClassFromURL_ファイルシステムにあるクラスリソースからクラスを取得できること()
+        throws Exception
+    {
+        Class actual = new ClassS2ContainerBuilder().getClassFromURL(getClass()
+            .getClassLoader().getResource(
+                Fuga.class.getName().replace('.', '/').concat(".class"))
+            .toExternalForm(), getClass().getClassLoader());
+        assertEquals(Fuga.class, actual);
+    }
+
+
+    public void testGetClassFromURL_Jarに含まれているクラスリソースからクラスを取得できること()
+        throws Exception
+    {
+        Class actual = new ClassS2ContainerBuilder().getClassFromURL(getClass()
+            .getClassLoader().getResource(
+                S2Container.class.getName().replace('.', '/').concat(".class"))
+            .toExternalForm(), getClass().getClassLoader());
+        assertEquals(S2Container.class, actual);
+    }
+
+
+    public void testURLのexternalFormを指定しても正しく動作すること()
+        throws Exception
+    {
+        String path = getClass().getClassLoader().getResource(
+            AppPreparer1.class.getName().replace('.', '/').concat(".class"))
+            .toExternalForm();
+        include(path);
+        assertEquals(path, getContainer().getChild(0).getPath());
     }
 }

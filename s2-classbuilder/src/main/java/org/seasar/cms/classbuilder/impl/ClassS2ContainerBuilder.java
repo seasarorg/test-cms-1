@@ -1,6 +1,8 @@
 package org.seasar.cms.classbuilder.impl;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
 import org.seasar.cms.classbuilder.annotation.Component;
@@ -22,6 +24,8 @@ import org.seasar.framework.container.impl.S2ContainerImpl;
 public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
 {
     public static final String SUFFIX = ".class";
+
+    private static final String JAR_SUFFIX = ".jar!/";
 
 
     public S2Container build(String path)
@@ -140,25 +144,74 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
 
     Class<? extends S2ContainerPreparer> getPreparerClass(String path)
     {
-        String className = path.substring(0, path.length() - SUFFIX.length())
-            .replace('/', '.');
-        ClassLoader classLoader = Thread.currentThread()
-            .getContextClassLoader();
+        ClassLoader classLoader = getClassLoaderForLoadingPreparer();
         Class clazz;
-        try {
-            // S2Container関連のクラスがコンテキストクラスローダから見えない場合があるためこうしている。
-            clazz = Class
-                .forName(className, true, new CompositeClassLoader(
-                    new ClassLoader[] { classLoader,
-                        getClass().getClassLoader() }));
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("Class not found: " + className, ex);
+        if (path.indexOf(':') < 0) {
+            clazz = getClassFromClassName(path, classLoader);
+        } else {
+            clazz = getClassFromURL(path, classLoader);
+        }
+        if (clazz == null) {
+            throw new RuntimeException("Class not found: " + path);
         }
         if (S2ContainerPreparer.class.isAssignableFrom(clazz)) {
             return (Class<? extends S2ContainerPreparer>)clazz;
         } else {
             throw new RuntimeException("Not Preparer: " + path);
         }
+    }
+
+
+    Class getClassFromURL(String path, ClassLoader classLoader)
+    {
+        String[] classNames;
+        int jarSuffix = path.indexOf(JAR_SUFFIX);
+        if (jarSuffix >= 0) {
+            // Jar。
+            classNames = new String[] { path.substring(
+                jarSuffix + JAR_SUFFIX.length(),
+                path.length() - SUFFIX.length()).replace('/', '.') };
+        } else {
+            path = path.substring(path.indexOf(':') + 1,
+                path.length() - SUFFIX.length()).replace('/', '.');
+            List<String> classNameList = new ArrayList<String>();
+            int len = path.length();
+            for (int i = len - 1; i >= 0; i--) {
+                if (path.charAt(i) == '.') {
+                    classNameList.add(path.substring(i + 1));
+                }
+            }
+            classNames = classNameList.toArray(new String[0]);
+        }
+        for (int i = 0; i < classNames.length; i++) {
+            try {
+                return Class.forName(classNames[i], true, classLoader);
+            } catch (ClassNotFoundException ignore) {
+            }
+        }
+        return null;
+    }
+
+
+    Class getClassFromClassName(String path, ClassLoader classLoader)
+    {
+        String className = path.substring(0, path.length() - SUFFIX.length())
+            .replace('/', '.');
+        try {
+            return Class.forName(className, true, classLoader);
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
+
+
+    ClassLoader getClassLoaderForLoadingPreparer()
+    {
+        ClassLoader classLoader = Thread.currentThread()
+            .getContextClassLoader();
+        // S2Container関連のクラスがコンテキストクラスローダから見えない場合に備えてこうしている。
+        return new CompositeClassLoader(new ClassLoader[] { classLoader,
+            getClass().getClassLoader() });
     }
 
 
