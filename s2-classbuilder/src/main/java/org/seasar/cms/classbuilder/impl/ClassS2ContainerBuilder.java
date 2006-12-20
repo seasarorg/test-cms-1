@@ -103,9 +103,9 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         String componentName = S2ContainerPreparerUtils.toComponentName(method
             .getName().substring(METHODPREFIX_DEFINE.length()));
         Class<?>[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length == 0) {
+        if (parameterTypes.length != 1) {
             throw new RuntimeException(
-                "Definition method must have at least one parameter but "
+                "Definition method must have only one parameter but "
                     + parameterTypes.length + ": " + method.getName());
         }
         Class componentClass = parameterTypes[0];
