@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
 import org.seasar.cms.classbuilder.annotation.Component;
+import org.seasar.cms.classbuilder.annotation.Dicon;
 import org.seasar.cms.classbuilder.util.CompositeClassLoader;
 import org.seasar.cms.classbuilder.util.S2ContainerPreparerUtils;
 import org.seasar.framework.container.AspectDef;
@@ -57,6 +58,12 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         }
         container.register(preparer);
         preparer.setContainer(container);
+
+        Dicon dicon = preparerClass.getAnnotation(Dicon.class);
+        if (dicon != null && dicon.namespace().length() > 0) {
+            container.setNamespace(dicon.namespace());
+        }
+
         preparer.include();
         registerComponentDefs(container, preparerClass);
 

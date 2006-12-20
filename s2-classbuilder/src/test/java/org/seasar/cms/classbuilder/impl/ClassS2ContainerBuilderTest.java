@@ -172,4 +172,14 @@ public class ClassS2ContainerBuilderTest extends S2TestCase
         include(path);
         assertEquals(path, getContainer().getChild(0).getPath());
     }
+
+
+    public void test_namespaceを指定できること()
+        throws Exception
+    {
+        include(AppPreparer9.class.getName().replace('.', '/').concat(".class"));
+        S2Container actual = getContainer().getChild(0);
+        assertNotNull(actual);
+        assertEquals("dao", actual.getNamespace());
+    }
 }
