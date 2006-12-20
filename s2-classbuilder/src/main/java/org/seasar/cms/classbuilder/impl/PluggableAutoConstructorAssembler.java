@@ -25,8 +25,7 @@ public class PluggableAutoConstructorAssembler extends AutoConstructorAssembler
         S2ContainerPreparer preparer = S2ContainerPreparerUtils
             .getPreparer(getComponentDef());
         if (preparer != null) {
-            component = newInstance(preparer, getComponentDef()
-                .getComponentName());
+            component = newInstance(preparer, getComponentDef());
         }
         if (component == null) {
             component = super.doAssemble();
@@ -35,14 +34,22 @@ public class PluggableAutoConstructorAssembler extends AutoConstructorAssembler
     }
 
 
-    Object newInstance(S2ContainerPreparer preparer, String componentName)
+    Object newInstance(S2ContainerPreparer preparer, ComponentDef componentDef)
     {
         Method method = S2ContainerPreparerUtils.findMethod(
-            preparer.getClass(), componentName,
+            preparer.getClass(), componentDef.getComponentName(),
             ClassS2ContainerBuilder.METHODPREFIX_NEW);
         if (method != null) {
             try {
-                return method.invoke(preparer, new Object[0]);
+                if (method.getParameterTypes().length == 0) {
+                    return method.invoke(preparer, new Object[0]);
+                } else {
+                    // Aspectをかけたコンポーネントの場合はconcreateClassからオブジェクトを
+                    // 生成する必要がある。その場合は引数としてconcreteClassを受け取るタイプ
+                    // のnewメソッドが利用される。
+                    return method.invoke(preparer, new Object[] { componentDef
+                        .getConcreteClass() });
+                }
             } catch (IllegalArgumentException ex) {
                 throw new RuntimeException(
                     "Can't invoke method for instanciating component: "
