@@ -12,4 +12,12 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase
         Hoe hoe = (Hoe)getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
+
+
+    public void test_コンポーネントの追加ができること()
+        throws Exception
+    {
+        include("test2.dicon");
+        assertNotNull(getComponent(Hoe.class));
+    }
 }

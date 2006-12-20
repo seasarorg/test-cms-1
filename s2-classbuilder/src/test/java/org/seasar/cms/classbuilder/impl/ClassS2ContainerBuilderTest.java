@@ -192,4 +192,13 @@ public class ClassS2ContainerBuilderTest extends S2TestCase
         Hoe hoe = (Hoe)getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
+
+
+    public void test_コンポーネントの追加ができること()
+        throws Exception
+    {
+        include(AppPreparer11.class.getName().replace('.', '/')
+            .concat(".class"));
+        assertNotNull(getComponent(Hoe.class));
+    }
 }

@@ -1,8 +1,8 @@
 package org.seasar.cms.classbuilder.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
+import static org.seasar.cms.classbuilder.impl.RedefinableXmlS2ContainerBuilder.DELIMITER;
 
+import org.seasar.cms.classbuilder.util.S2ContainerBuilderUtils;
 import org.seasar.framework.container.ArgDef;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
@@ -19,8 +19,6 @@ import org.seasar.framework.xml.TagHandlerContext;
 public class RedefinableComponentTagHandler extends ComponentTagHandler
 {
     private static final long serialVersionUID = 2513809305883784501L;
-
-    private static final String DELIMITER = "+";
 
 
     public void end(TagHandlerContext context, String body)
@@ -72,7 +70,7 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
 
         String name = componentDef.getComponentName();
         String diconPath = constructRedifinitionDiconPath(path, name);
-        if (!resourceExists(diconPath, builder)) {
+        if (!S2ContainerBuilderUtils.resourceExists(diconPath, builder)) {
             return componentDef;
         }
 
@@ -86,21 +84,6 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
         redefinition.setContainer(componentDef.getContainer());
 
         return redefinition;
-    }
-
-
-    boolean resourceExists(String path, RedefinableXmlS2ContainerBuilder builder)
-    {
-        InputStream is = builder.getResourceResolver().getInputStream(path);
-        if (is == null) {
-            return false;
-        } else {
-            try {
-                is.close();
-            } catch (IOException ignore) {
-            }
-            return true;
-        }
     }
 
 

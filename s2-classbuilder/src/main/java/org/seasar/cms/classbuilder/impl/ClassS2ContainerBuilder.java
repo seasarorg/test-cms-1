@@ -1,7 +1,5 @@
 package org.seasar.cms.classbuilder.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +9,7 @@ import org.seasar.cms.classbuilder.annotation.Component;
 import org.seasar.cms.classbuilder.annotation.Dicon;
 import org.seasar.cms.classbuilder.util.ClassBuilderUtils;
 import org.seasar.cms.classbuilder.util.CompositeClassLoader;
+import org.seasar.cms.classbuilder.util.S2ContainerBuilderUtils;
 import org.seasar.framework.container.ArgDef;
 import org.seasar.framework.container.AspectDef;
 import org.seasar.framework.container.ComponentDef;
@@ -31,15 +30,15 @@ import org.seasar.framework.container.impl.S2ContainerImpl;
 
 public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
 {
-    public static final String METHODPREFIX_DEFINE = "define";
+    public static final String  METHODPREFIX_DEFINE = "define";
 
-    public static final String METHODPREFIX_NEW = "new";
+    public static final String  METHODPREFIX_NEW    = "new";
 
-    public static final String SUFFIX = ".class";
+    public static final String  SUFFIX              = ".class";
 
-    private static final String JAR_SUFFIX = ".jar!/";
+    private static final String JAR_SUFFIX          = ".jar!/";
 
-    private static final String DELIMITER = "_";
+    private static final String DELIMITER           = "_";
 
 
     public S2Container build(String path)
@@ -74,7 +73,25 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         preparer.include();
         registerComponentDefs(container, preparer);
 
+        String additionalDiconPath = constructAdditionalDiconPath(path);
+        if (S2ContainerBuilderUtils.resourceExists(additionalDiconPath, this)) {
+            S2ContainerBuilderUtils.mergeContainer(container,
+                S2ContainerFactory.create(additionalDiconPath));
+        }
+
         return container;
+    }
+
+
+    protected ClassLoader getClassLoader()
+    {
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+
+    protected String constructAdditionalDiconPath(String path)
+    {
+        return constructRedifinitionDiconPath(path, null);
     }
 
 
@@ -119,7 +136,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
     {
         String name = componentDef.getComponentName();
         String diconPath = constructRedifinitionDiconPath(path, name);
-        if (!resourceExists(diconPath)) {
+        if (!S2ContainerBuilderUtils.resourceExists(diconPath, this)) {
             return componentDef;
         }
 
@@ -134,21 +151,6 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
     }
 
 
-    boolean resourceExists(String path)
-    {
-        InputStream is = getResourceResolver().getInputStream(path);
-        if (is == null) {
-            return false;
-        } else {
-            try {
-                is.close();
-            } catch (IOException ignore) {
-            }
-            return true;
-        }
-    }
-
-
     protected String constructRedifinitionDiconPath(String path, String name)
     {
         String body;
@@ -160,6 +162,9 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         } else {
             body = path.substring(0, dot);
             suffix = path.substring(dot);
+        }
+        if (name == null) {
+            name = "";
         }
         return body + DELIMITER + name + suffix;
     }
