@@ -1,5 +1,7 @@
 package org.seasar.cms.classbuilder.util;
 
+import java.lang.reflect.Method;
+
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
@@ -32,5 +34,21 @@ public class S2ContainerPreparerUtils
         }
 
         return (S2ContainerPreparer)componentDefs[0].getComponent();
+    }
+
+
+    public static Method findMethod(Class<?> clazz, String componentName,
+        String prefix)
+    {
+        Method[] methods = clazz.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            String methodName = methods[i].getName();
+            if (methodName.startsWith(prefix)
+                && componentName.equals(toComponentName(methodName
+                    .substring(prefix.length())))) {
+                return methods[i];
+            }
+        }
+        return null;
     }
 }

@@ -1,10 +1,12 @@
 package org.seasar.cms.classbuilder.impl;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
+import org.seasar.cms.classbuilder.annotation.ManualBindingProperties;
 import org.seasar.cms.classbuilder.util.S2ContainerPreparerUtils;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.IllegalPropertyRuntimeException;
@@ -43,11 +45,11 @@ public class PluggableAutoPropertyAssembler extends AbstractPropertyAssembler
             names.add(propName);
         }
 
-        S2ContainerPreparer preparer = S2ContainerPreparerUtils.getPreparer(getComponentDef());
+        S2ContainerPreparer preparer = S2ContainerPreparerUtils
+            .getPreparer(getComponentDef());
         if (preparer != null) {
-            names.addAll(Arrays.asList(preparer
-                .getManualBindingProperties(getComponentDef()
-                    .getComponentName())));
+            names.addAll(Arrays.asList(getManualBindingProperties(preparer,
+                getComponentDef().getComponentName())));
         }
 
         if (cd.isExternalBinding()) {
@@ -62,5 +64,22 @@ public class PluggableAutoPropertyAssembler extends AbstractPropertyAssembler
                     propDesc, component);
             }
         }
+    }
+
+
+    String[] getManualBindingProperties(S2ContainerPreparer preparer,
+        String componentName)
+    {
+        Method method = S2ContainerPreparerUtils.findMethod(
+            preparer.getClass(), componentName,
+            ClassS2ContainerBuilder.METHODPREFIX_DEFINE);
+        if (method != null) {
+            ManualBindingProperties annotation = method
+                .getAnnotation(ManualBindingProperties.class);
+            if (annotation != null) {
+                return annotation.value();
+            }
+        }
+        return new String[0];
     }
 }

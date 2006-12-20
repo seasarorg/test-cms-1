@@ -23,6 +23,12 @@ import org.seasar.framework.container.impl.S2ContainerImpl;
 
 public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
 {
+    public static final String METHODPREFIX_DEFINE = "define";
+
+    public static final String METHODPREFIX_REDEFINE = "redefine";
+
+    public static final String METHODPREFIX_NEW = "new";
+
     public static final String SUFFIX = ".class";
 
     private static final String JAR_SUFFIX = ".jar!/";
@@ -75,10 +81,9 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         Method[] methods = preparerClass.getMethods();
         for (int i = 0; i < methods.length; i++) {
             String name = methods[i].getName();
-            if (name.startsWith(S2ContainerPreparer.METHODPREFIX_DEFINE)) {
+            if (name.startsWith(METHODPREFIX_DEFINE)) {
                 defineComponentDef(container, methods[i]);
-            } else if (name
-                .startsWith(S2ContainerPreparer.METHODPREFIX_REDEFINE)) {
+            } else if (name.startsWith(METHODPREFIX_REDEFINE)) {
                 redefineComponentDef(methods[i]);
             }
         }
@@ -96,8 +101,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
             .getAnnotationHandler();
 
         String componentName = S2ContainerPreparerUtils.toComponentName(method
-            .getName().substring(
-                S2ContainerPreparer.METHODPREFIX_DEFINE.length()));
+            .getName().substring(METHODPREFIX_DEFINE.length()));
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 0) {
             throw new RuntimeException(
