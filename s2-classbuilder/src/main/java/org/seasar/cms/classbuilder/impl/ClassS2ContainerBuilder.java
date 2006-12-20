@@ -1,5 +1,7 @@
 package org.seasar.cms.classbuilder.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,10 +9,12 @@ import java.util.List;
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
 import org.seasar.cms.classbuilder.annotation.Component;
 import org.seasar.cms.classbuilder.annotation.Dicon;
+import org.seasar.cms.classbuilder.util.ClassBuilderUtils;
 import org.seasar.cms.classbuilder.util.CompositeClassLoader;
-import org.seasar.cms.classbuilder.util.S2ContainerPreparerUtils;
+import org.seasar.framework.container.ArgDef;
 import org.seasar.framework.container.AspectDef;
 import org.seasar.framework.container.ComponentDef;
+import org.seasar.framework.container.InitMethodDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.annotation.tiger.Aspect;
 import org.seasar.framework.container.assembler.AutoBindingDefFactory;
@@ -19,6 +23,9 @@ import org.seasar.framework.container.factory.AbstractS2ContainerBuilder;
 import org.seasar.framework.container.factory.AnnotationHandler;
 import org.seasar.framework.container.factory.AnnotationHandlerFactory;
 import org.seasar.framework.container.factory.AspectDefFactory;
+import org.seasar.framework.container.factory.S2ContainerFactory;
+import org.seasar.framework.container.impl.ArgDefImpl;
+import org.seasar.framework.container.impl.InitMethodDefImpl;
 import org.seasar.framework.container.impl.S2ContainerImpl;
 
 
@@ -26,13 +33,13 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
 {
     public static final String METHODPREFIX_DEFINE = "define";
 
-    public static final String METHODPREFIX_REDEFINE = "redefine";
-
     public static final String METHODPREFIX_NEW = "new";
 
     public static final String SUFFIX = ".class";
 
     private static final String JAR_SUFFIX = ".jar!/";
+
+    private static final String DELIMITER = "_";
 
 
     public S2Container build(String path)
@@ -65,7 +72,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         }
 
         preparer.include();
-        registerComponentDefs(container, preparerClass);
+        registerComponentDefs(container, preparer);
 
         return container;
     }
@@ -83,31 +90,88 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
 
 
     void registerComponentDefs(S2Container container,
-        Class<? extends S2ContainerPreparer> preparerClass)
+        S2ContainerPreparer preparer)
     {
-        Method[] methods = preparerClass.getMethods();
+        Method[] methods = preparer.getClass().getMethods();
         for (int i = 0; i < methods.length; i++) {
             String name = methods[i].getName();
             if (name.startsWith(METHODPREFIX_DEFINE)) {
-                defineComponentDef(container, methods[i]);
-            } else if (name.startsWith(METHODPREFIX_REDEFINE)) {
-                redefineComponentDef(methods[i]);
+                defineComponentDef(container, methods[i], preparer);
             }
         }
     }
 
 
-    void redefineComponentDef(Method method)
+    void defineComponentDef(S2Container container, Method method,
+        S2ContainerPreparer preparer)
     {
+        ComponentDef componentDef = constructComponentDef(method, preparer);
+
+        if (componentDef.getComponentName() != null) {
+            componentDef = redefine(componentDef, container.getPath());
+        }
+
+        container.register(componentDef);
     }
 
 
-    void defineComponentDef(S2Container container, Method method)
+    ComponentDef redefine(ComponentDef componentDef, String path)
+    {
+        String name = componentDef.getComponentName();
+        String diconPath = constructRedifinitionDiconPath(path, name);
+        if (!resourceExists(diconPath)) {
+            return componentDef;
+        }
+
+        S2Container container = S2ContainerFactory.create(diconPath);
+        if (!container.hasComponentDef(name)) {
+            throw new RuntimeException(
+                "Can't find component definition named '" + name + "' in "
+                    + diconPath);
+        }
+
+        return container.getComponentDef(name);
+    }
+
+
+    boolean resourceExists(String path)
+    {
+        InputStream is = getResourceResolver().getInputStream(path);
+        if (is == null) {
+            return false;
+        } else {
+            try {
+                is.close();
+            } catch (IOException ignore) {
+            }
+            return true;
+        }
+    }
+
+
+    protected String constructRedifinitionDiconPath(String path, String name)
+    {
+        String body;
+        String suffix;
+        int dot = path.lastIndexOf('.');
+        if (dot < 0) {
+            body = path;
+            suffix = "";
+        } else {
+            body = path.substring(0, dot);
+            suffix = path.substring(dot);
+        }
+        return body + DELIMITER + name + suffix;
+    }
+
+
+    ComponentDef constructComponentDef(Method method,
+        S2ContainerPreparer preparer)
     {
         AnnotationHandler annoHandler = AnnotationHandlerFactory
             .getAnnotationHandler();
 
-        String componentName = S2ContainerPreparerUtils.toComponentName(method
+        String componentName = ClassBuilderUtils.toComponentName(method
             .getName().substring(METHODPREFIX_DEFINE.length()));
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1) {
@@ -149,7 +213,12 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         annoHandler.appendInitMethod(componentDef);
         annoHandler.appendDestroyMethod(componentDef);
 
-        container.register(componentDef);
+        InitMethodDef initMethodDef = new InitMethodDefImpl(method);
+        ArgDef argDef = new ArgDefImpl(preparer);
+        initMethodDef.addArgDef(argDef);
+        componentDef.addInitMethodDef(initMethodDef);
+
+        return componentDef;
     }
 
 

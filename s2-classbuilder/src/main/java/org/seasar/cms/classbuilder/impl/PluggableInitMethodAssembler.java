@@ -4,9 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
-import org.seasar.cms.classbuilder.util.S2ContainerPreparerUtils;
+import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.IllegalMethodRuntimeException;
+import org.seasar.framework.container.MethodDef;
 import org.seasar.framework.container.assembler.DefaultInitMethodAssembler;
 
 
@@ -22,40 +23,42 @@ public class PluggableInitMethodAssembler extends DefaultInitMethodAssembler
     public void assemble(Object component)
         throws IllegalMethodRuntimeException
     {
-        super.assemble(component);
-
-        S2ContainerPreparer preparer = S2ContainerPreparerUtils
-            .getPreparer(getComponentDef());
-        if (preparer == null) {
+        if (component == null) {
             return;
         }
-        try {
-            initializeComponent(preparer, component, getComponentDef()
-                .getComponentName());
-        } catch (Throwable t) {
-            throw new IllegalMethodRuntimeException(
-                getComponentClass(component), getComponentDef()
-                    .getComponentName(), t);
+        BeanDesc beanDesc = getBeanDesc(component);
+        int size = getComponentDef().getInitMethodDefSize();
+        for (int i = 0; i < size; ++i) {
+            MethodDef methodDef = getComponentDef().getInitMethodDef(i);
+            Method method = methodDef.getMethod();
+            if (method != null
+                && S2ContainerPreparer.class.isAssignableFrom(method
+                    .getDeclaringClass())) {
+                initializeComponent(component, methodDef);
+            } else {
+                invoke(beanDesc, component, methodDef);
+            }
         }
     }
 
 
-    void initializeComponent(S2ContainerPreparer preparer, Object component,
-        String componentName)
+    void initializeComponent(Object component, MethodDef methodDef)
     {
-        Method method = S2ContainerPreparerUtils.findMethod(
-            preparer.getClass(), componentName,
-            ClassS2ContainerBuilder.METHODPREFIX_DEFINE);
-        if (method != null) {
-            try {
-                method.invoke(preparer, new Object[] { component });
-            } catch (IllegalArgumentException ex) {
-                throw new RuntimeException("Can't initialize: " + componentName);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException("Can't initialize: " + componentName);
-            } catch (InvocationTargetException ex) {
-                throw new RuntimeException("Can't initialize: " + componentName);
-            }
+        try {
+            methodDef.getMethod().invoke(methodDef.getArgs()[0],
+                new Object[] { component });
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalMethodRuntimeException(
+                getComponentClass(component), getComponentDef()
+                    .getComponentName(), ex);
+        } catch (IllegalAccessException ex) {
+            throw new IllegalMethodRuntimeException(
+                getComponentClass(component), getComponentDef()
+                    .getComponentName(), ex);
+        } catch (InvocationTargetException ex) {
+            throw new IllegalMethodRuntimeException(
+                getComponentClass(component), getComponentDef()
+                    .getComponentName(), ex);
         }
     }
 }

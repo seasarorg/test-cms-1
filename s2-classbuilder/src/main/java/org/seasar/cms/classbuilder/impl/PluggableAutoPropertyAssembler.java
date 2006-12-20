@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
 import org.seasar.cms.classbuilder.annotation.ManualBindingProperties;
-import org.seasar.cms.classbuilder.util.S2ContainerPreparerUtils;
+import org.seasar.cms.classbuilder.util.ClassBuilderUtils;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.IllegalPropertyRuntimeException;
 import org.seasar.framework.beans.PropertyDesc;
@@ -45,7 +45,7 @@ public class PluggableAutoPropertyAssembler extends AbstractPropertyAssembler
             names.add(propName);
         }
 
-        S2ContainerPreparer preparer = S2ContainerPreparerUtils
+        S2ContainerPreparer preparer = ClassBuilderUtils
             .getPreparer(getComponentDef());
         if (preparer != null) {
             names.addAll(Arrays.asList(getManualBindingProperties(preparer,
@@ -70,7 +70,7 @@ public class PluggableAutoPropertyAssembler extends AbstractPropertyAssembler
     String[] getManualBindingProperties(S2ContainerPreparer preparer,
         String componentName)
     {
-        Method method = S2ContainerPreparerUtils.findMethod(
+        Method method = ClassBuilderUtils.findMethod(
             preparer.getClass(), componentName,
             ClassS2ContainerBuilder.METHODPREFIX_DEFINE);
         if (method != null) {

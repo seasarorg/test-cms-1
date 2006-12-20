@@ -7,9 +7,9 @@ import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 
 
-public class S2ContainerPreparerUtils
+public class ClassBuilderUtils
 {
-    protected S2ContainerPreparerUtils()
+    protected ClassBuilderUtils()
     {
     }
 

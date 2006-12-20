@@ -182,4 +182,14 @@ public class ClassS2ContainerBuilderTest extends S2TestCase
         assertNotNull(actual);
         assertEquals("dao", actual.getNamespace());
     }
+
+
+    public void test_コンポーネントの再定義ができること()
+        throws Exception
+    {
+        include(AppPreparer10.class.getName().replace('.', '/')
+            .concat(".class"));
+        Hoe hoe = (Hoe)getComponent(Hoe.class);
+        assertEquals("redefined", hoe.getName());
+    }
 }

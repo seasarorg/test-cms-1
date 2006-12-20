@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.seasar.cms.classbuilder.S2ContainerPreparer;
-import org.seasar.cms.classbuilder.util.S2ContainerPreparerUtils;
+import org.seasar.cms.classbuilder.util.ClassBuilderUtils;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.assembler.AutoConstructorAssembler;
 
@@ -22,7 +22,7 @@ public class PluggableAutoConstructorAssembler extends AutoConstructorAssembler
     {
         Object component = null;
 
-        S2ContainerPreparer preparer = S2ContainerPreparerUtils
+        S2ContainerPreparer preparer = ClassBuilderUtils
             .getPreparer(getComponentDef());
         if (preparer != null) {
             component = newInstance(preparer, getComponentDef());
@@ -36,7 +36,7 @@ public class PluggableAutoConstructorAssembler extends AutoConstructorAssembler
 
     Object newInstance(S2ContainerPreparer preparer, ComponentDef componentDef)
     {
-        Method method = S2ContainerPreparerUtils.findMethod(
+        Method method = ClassBuilderUtils.findMethod(
             preparer.getClass(), componentDef.getComponentName(),
             ClassS2ContainerBuilder.METHODPREFIX_NEW);
         if (method != null) {
