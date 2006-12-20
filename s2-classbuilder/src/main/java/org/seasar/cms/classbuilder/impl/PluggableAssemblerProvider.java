@@ -28,4 +28,11 @@ public class PluggableAssemblerProvider extends DefaultProvider
     {
         return new PluggableInitMethodAssembler(cd);
     }
+
+
+    @Override
+    public MethodAssembler createDestroyMethodAssembler(ComponentDef cd)
+    {
+        return new PluggableDestroyMethodAssembler(cd);
+    }
 }

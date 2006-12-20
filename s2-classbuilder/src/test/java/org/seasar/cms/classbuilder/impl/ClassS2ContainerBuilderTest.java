@@ -201,4 +201,16 @@ public class ClassS2ContainerBuilderTest extends S2TestCase
             .concat(".class"));
         assertNotNull(getComponent(Hoe.class));
     }
+
+
+    public void test_destroy処理が登録できること()
+        throws Exception
+    {
+        include(AppPreparer12.class.getName().replace('.', '/')
+            .concat(".class"));
+        Hoe hoe = (Hoe)getComponent(Hoe.class);
+        getContainer().getChild(0).init();
+        getContainer().getChild(0).destroy();
+        assertEquals("destroyed", hoe.getName());
+    }
 }

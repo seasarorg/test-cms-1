@@ -8,14 +8,16 @@ import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.IllegalMethodRuntimeException;
 import org.seasar.framework.container.MethodDef;
-import org.seasar.framework.container.assembler.DefaultInitMethodAssembler;
+import org.seasar.framework.container.assembler.DefaultDestroyMethodAssembler;
 
 
-public class PluggableInitMethodAssembler extends DefaultInitMethodAssembler
+public class PluggableDestroyMethodAssembler extends
+    DefaultDestroyMethodAssembler
 {
-    public PluggableInitMethodAssembler(ComponentDef componentDef)
+    public PluggableDestroyMethodAssembler(ComponentDef componentDef)
     {
         super(componentDef);
+
     }
 
 
@@ -27,9 +29,9 @@ public class PluggableInitMethodAssembler extends DefaultInitMethodAssembler
             return;
         }
         BeanDesc beanDesc = getBeanDesc(component);
-        int size = getComponentDef().getInitMethodDefSize();
+        int size = getComponentDef().getDestroyMethodDefSize();
         for (int i = 0; i < size; ++i) {
-            MethodDef methodDef = getComponentDef().getInitMethodDef(i);
+            MethodDef methodDef = getComponentDef().getDestroyMethodDef(i);
             Method method = methodDef.getMethod();
             if (method != null
                 && S2ContainerPreparer.class.isAssignableFrom(method

@@ -13,6 +13,7 @@ import org.seasar.cms.classbuilder.util.S2ContainerBuilderUtils;
 import org.seasar.framework.container.ArgDef;
 import org.seasar.framework.container.AspectDef;
 import org.seasar.framework.container.ComponentDef;
+import org.seasar.framework.container.DestroyMethodDef;
 import org.seasar.framework.container.InitMethodDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.annotation.tiger.Aspect;
@@ -24,21 +25,24 @@ import org.seasar.framework.container.factory.AnnotationHandlerFactory;
 import org.seasar.framework.container.factory.AspectDefFactory;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.impl.ArgDefImpl;
+import org.seasar.framework.container.impl.DestroyMethodDefImpl;
 import org.seasar.framework.container.impl.InitMethodDefImpl;
 import org.seasar.framework.container.impl.S2ContainerImpl;
 
 
 public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
 {
-    public static final String  METHODPREFIX_DEFINE = "define";
+    public static final String  METHODPREFIX_DEFINE  = "define";
 
-    public static final String  METHODPREFIX_NEW    = "new";
+    public static final String  METHODPREFIX_NEW     = "new";
 
-    public static final String  SUFFIX              = ".class";
+    public static final String  METHODPREFIX_DESTROY = "destroy";
 
-    private static final String JAR_SUFFIX          = ".jar!/";
+    public static final String  SUFFIX               = ".class";
 
-    private static final String DELIMITER           = "_";
+    private static final String JAR_SUFFIX           = ".jar!/";
+
+    private static final String DELIMITER            = "_";
 
 
     public S2Container build(String path)
@@ -113,13 +117,13 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         for (int i = 0; i < methods.length; i++) {
             String name = methods[i].getName();
             if (name.startsWith(METHODPREFIX_DEFINE)) {
-                defineComponentDef(container, methods[i], preparer);
+                registerComponentDef(container, methods[i], preparer);
             }
         }
     }
 
 
-    void defineComponentDef(S2Container container, Method method,
+    void registerComponentDef(S2Container container, Method method,
         S2ContainerPreparer preparer)
     {
         ComponentDef componentDef = constructComponentDef(method, preparer);
@@ -222,6 +226,16 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
         ArgDef argDef = new ArgDefImpl(preparer);
         initMethodDef.addArgDef(argDef);
         componentDef.addInitMethodDef(initMethodDef);
+
+        Method destroyMethod = ClassBuilderUtils.findMethod(
+            preparer.getClass(), componentName, METHODPREFIX_DESTROY);
+        if (destroyMethod != null) {
+            DestroyMethodDef destroyMethodDef = new DestroyMethodDefImpl(
+                destroyMethod);
+            argDef = new ArgDefImpl(preparer);
+            destroyMethodDef.addArgDef(argDef);
+            componentDef.addDestroyMethodDef(destroyMethodDef);
+        }
 
         return componentDef;
     }
