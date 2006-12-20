@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
+  "http://www.seasar.org/dtd/components24.dtd">
+<components>
+  <!-- For S2Pluggable -->
+  <include path="external.dicon" />
+  <include path="global.dicon" />
+  <component class="org.seasar.cms.pluggable.PluggableProvider" />
+  <component name="statusFilterInterceptor"
+    class="org.seasar.cms.pluggable.aop.interceptors.StatusFilterInterceptor">
+    <property name="interceptor">
+      <component
+        class="org.seasar.cms.pluggable.aop.interceptors.TraceS2Interceptor" />
+    </property>
+    <initMethod name="addEnabledStatus">
+      <arg>"develop"</arg>
+    </initMethod>
+    <initMethod name="init" />
+  </component>
+  <component
+    class="org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior">
+    <aspect>statusFilterInterceptor</aspect>
+  </component>
+  <component class="org.seasar.cms.pluggable.PluggablePathResolver" />
+
+  <!-- For S2ClassBuilder -->
+  <component name="class" class="org.seasar.cms.classbuilder.impl.ClassS2ContainerBuilder" />
+  <component class="org.seasar.cms.classbuilder.impl.PluggableAssemblerProvider" />
+</components>
