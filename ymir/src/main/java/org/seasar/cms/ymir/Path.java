@@ -14,6 +14,8 @@ public class Path {
 
     private String parameterEncoding_;
 
+    private boolean asNoCache_;
+
     public Path() {
 
         this(null);
@@ -109,8 +111,16 @@ public class Path {
                     delim = "&";
                 }
             }
+            if (asNoCache_) {
+                sb.append(delim).append(getUniqueKey());
+                delim = "&";
+            }
         }
         return sb.toString();
+    }
+
+    String getUniqueKey() {
+        return String.valueOf(System.currentTimeMillis());
     }
 
     public String getTrunk() {
@@ -118,9 +128,10 @@ public class Path {
         return trunk_;
     }
 
-    public void setTrunk(String trunk) {
+    public Path setTrunk(String trunk) {
 
         trunk_ = trunk;
+        return this;
     }
 
     public Map getParameterMap() {
@@ -128,25 +139,27 @@ public class Path {
         return parameterMap_;
     }
 
-    public void setParameterMap(Map parameterMap) {
+    public Path setParameterMap(Map parameterMap) {
 
         parameterMap_ = parameterMap;
+        return this;
     }
 
-    public void setParameter(String name, String value) {
+    public Path setParameter(String name, String value) {
 
-        setParameter(name, new String[] { value });
+        return setParameter(name, new String[] { value });
     }
 
-    public void setParameter(String name, String[] values) {
+    public Path setParameter(String name, String[] values) {
 
         parameterMap_.put(name, values);
+        return this;
     }
 
-    public void addParameter(String name, String value) {
+    public Path addParameter(String name, String value) {
 
         if (value == null) {
-            return;
+            return this;
         }
 
         String[] values = (String[]) parameterMap_.get(name);
@@ -159,16 +172,19 @@ public class Path {
             newValues[values.length] = value;
         }
         parameterMap_.put(name, newValues);
+        return this;
     }
 
-    public void removeParameter(String name) {
+    public Path removeParameter(String name) {
 
         parameterMap_.remove(name);
+        return this;
     }
 
-    public void clearParameters() {
+    public Path clearParameters() {
 
         parameterMap_.clear();
+        return this;
     }
 
     public String getParameterEncoding() {
@@ -176,8 +192,18 @@ public class Path {
         return parameterEncoding_;
     }
 
-    public void setParameterEncoding(String parameterEncoding) {
+    public Path setParameterEncoding(String parameterEncoding) {
 
         parameterEncoding_ = parameterEncoding;
+        return this;
+    }
+
+    public boolean isAsNoCache() {
+        return asNoCache_;
+    }
+
+    public Path setAsNoCache(boolean asNoCache) {
+        asNoCache_ = asNoCache;
+        return this;
     }
 }

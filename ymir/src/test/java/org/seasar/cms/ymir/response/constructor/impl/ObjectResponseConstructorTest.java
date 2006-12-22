@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.seasar.cms.ymir.Path;
 import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 
 import junit.framework.TestCase;
 
@@ -33,6 +34,16 @@ public class ObjectResponseConstructorTest extends TestCase {
             }
         });
         selector.add(new InputStreamResponseConstructor());
+        selector.add(new ResponseConstructor() {
+            public Response constructResponse(Object component,
+                    Object returnValue) {
+                return null;
+            }
+
+            public Class getTargetClass() {
+                return I.class;
+            }
+        });
 
         target_ = new ObjectResponseConstructor();
         target_.setResponseConstructorSelector(selector);
@@ -66,5 +77,8 @@ public class ObjectResponseConstructorTest extends TestCase {
         assertEquals("実装しているインタフェースのResponseConstructorがあればそれを返すこと",
                 InputStream.class, target_.findResponseConstructor(
                         FileInputStream.class).getTargetClass());
+
+        assertEquals("スーパークラスが実装しているインタフェースのサブインタフェースも見ること", I.class, target_
+                .findResponseConstructor(L.class).getTargetClass());
     }
 }

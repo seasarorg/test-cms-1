@@ -1,5 +1,10 @@
 package org.seasar.cms.ymir.response.constructor.impl;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.response.VoidResponse;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
@@ -45,19 +50,29 @@ public class ObjectResponseConstructor implements ResponseConstructor {
             return null;
         }
 
-        Class type = clazz;
-        do {
-            if (responseConstructorSelector_.hasResponseConstructor(type)) {
+        Set interfaceSet = new LinkedHashSet();
+        if (clazz.isInterface()) {
+            if (responseConstructorSelector_.hasResponseConstructor(clazz)) {
                 return responseConstructorSelector_
-                        .getResponseConstructor(type);
+                        .getResponseConstructor(clazz);
             }
-        } while ((type = type.getSuperclass()) != Object.class);
-        Class[] interfaces = clazz.getInterfaces();
-        for (int i = 0; i < interfaces.length; i++) {
-            if (responseConstructorSelector_
-                    .hasResponseConstructor(interfaces[i])) {
-                return responseConstructorSelector_
-                        .getResponseConstructor(interfaces[i]);
+            interfaceSet.addAll(Arrays.asList(clazz.getInterfaces()));
+        } else {
+            Class type = clazz;
+            do {
+                if (responseConstructorSelector_.hasResponseConstructor(type)) {
+                    return responseConstructorSelector_
+                            .getResponseConstructor(type);
+                }
+                interfaceSet.addAll(Arrays.asList(type.getInterfaces()));
+            } while ((type = type.getSuperclass()) != Object.class);
+        }
+
+        for (Iterator itr = interfaceSet.iterator(); itr.hasNext();) {
+            Class interfaze = (Class) itr.next();
+            ResponseConstructor constructor = findResponseConstructor(interfaze);
+            if (constructor != null) {
+                return constructor;
             }
         }
         return null;
