@@ -2,6 +2,7 @@ package org.seasar.cms.pluggable.hotdeploy;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     private List projects_ = new ArrayList();
 
-    private Map componentDefCache_ = new HashMap();
+    private Map componentDefCache_ = Collections.synchronizedMap(new HashMap());
 
     public static final String namingConvention_BINDING = "bindingType=may";
 
@@ -247,7 +248,8 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
         if (logger_.isDebugEnabled()) {
             logger_.debug("Set HotdeployClassLoader: id="
-                    + System.identityHashCode(hotdeployClassLoader_));
+                    + System.identityHashCode(hotdeployClassLoader_)
+                    + ", classDirectory=" + classesDirectory_);
         }
     }
 
@@ -270,11 +272,13 @@ public class LocalOndemandS2Container implements HotdeployListener,
     void stop0() {
         if (logger_.isDebugEnabled()) {
             logger_
-                    .debug("LocalOndemandS2Container's stop0() method called: classesDirectory="
-                            + classesDirectory_);
+                    .debug("LocalOndemandS2Container's stop0() method called: objectId="
+                            + System.identityHashCode(this)
+                            + ", classesDirectory=" + classesDirectory_);
         }
         if (logger_.isDebugEnabled()) {
-            logger_.debug("Unset HotdeployClassLoader");
+            logger_.debug("Unset HotdeployClassLoader: id="
+                    + System.identityHashCode(hotdeployClassLoader_));
         }
         container_.setClassLoader(originalClassLoader_);
 
