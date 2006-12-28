@@ -2,7 +2,6 @@ package org.seasar.cms.pluggable.hotdeploy;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     private List projects_ = new ArrayList();
 
-    private Map componentDefCache_ = Collections.synchronizedMap(new HashMap());
+    private Map componentDefCache_ = new HashMap();
 
     public static final String namingConvention_BINDING = "bindingType=may";
 
@@ -76,7 +75,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
     }
 
     public ComponentDef getComponentDef(Class targetClass) {
-        return (ComponentDef) componentDefCache_.get(targetClass);
+        return getComponentDefFromCache(targetClass);
     }
 
     public ComponentDef findComponentDef(Object key) {
@@ -93,7 +92,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
         }
     }
 
-    protected ComponentDef getComponentDefFromCache(Object key) {
+    protected synchronized ComponentDef getComponentDefFromCache(Object key) {
         return (ComponentDef) componentDefCache_.get(key);
     }
 
@@ -285,7 +284,9 @@ public class LocalOndemandS2Container implements HotdeployListener,
         hotdeployClassLoader_ = null;
         originalClassLoader_ = null;
 
-        componentDefCache_.clear();
+        synchronized (this) {
+            componentDefCache_.clear();
+        }
     }
 
     public void setClassesDirectory(String classesDirectory) {
