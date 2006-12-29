@@ -70,15 +70,15 @@ public class LocalOndemandS2Container implements HotdeployListener,
         namingConvention_ = namingConvention;
     }
 
-    public void definedClass(Class clazz) {
+    public synchronized void definedClass(Class clazz) {
         loadComponentDef(clazz);
     }
 
-    public ComponentDef getComponentDef(Class targetClass) {
+    public synchronized ComponentDef getComponentDef(Class targetClass) {
         return getComponentDefFromCache(targetClass);
     }
 
-    public ComponentDef findComponentDef(Object key) {
+    public synchronized ComponentDef findComponentDef(Object key) {
         ComponentDef cd = getComponentDefFromCache(key);
         if (cd != null) {
             return cd;
@@ -92,7 +92,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
         }
     }
 
-    protected synchronized ComponentDef getComponentDefFromCache(Object key) {
+    protected ComponentDef getComponentDefFromCache(Object key) {
         return (ComponentDef) componentDefCache_.get(key);
     }
 
@@ -160,7 +160,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
         return (DistributedOndemandBehavior) S2ContainerBehavior.getProvider();
     }
 
-    public void register(ComponentDef componentDef) {
+    public synchronized void register(ComponentDef componentDef) {
         componentDef.setContainer(container_);
         registerByClass(componentDef);
         registerByName(componentDef);
