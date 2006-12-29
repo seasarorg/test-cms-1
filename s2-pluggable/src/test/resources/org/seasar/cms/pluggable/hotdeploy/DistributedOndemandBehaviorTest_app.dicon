@@ -11,13 +11,28 @@
       <arg>
         <component
           class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
-          <property name="rootPackageName">"test1"</property>
+          <property name="rootPackageName">"test2.hotdeploy"</property>
         </component>
       </arg>
     </initMethod>
     <initMethod name="addReferenceClassName">
-      <arg>"test1.dto.HoeDto"</arg>
+      <arg>"test2.hotdeploy.dto.HotDto"</arg>
     </initMethod>
+  </component>
+  <component
+    class="org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container">
+    <initMethod name="addProject">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
+          <property name="rootPackageName">"test2.cooldeploy"</property>
+        </component>
+      </arg>
+    </initMethod>
+    <initMethod name="addReferenceClassName">
+      <arg>"test2.cooldeploy.dto.CoolDto"</arg>
+    </initMethod>
+    <initMethod name="setHotdeployDisabled" />
   </component>
   <component
     class="org.seasar.framework.container.hotdeploy.creator.DtoOndemandCreator" />

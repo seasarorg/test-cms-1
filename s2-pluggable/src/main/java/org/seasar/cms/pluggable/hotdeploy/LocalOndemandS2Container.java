@@ -1,10 +1,13 @@
 package org.seasar.cms.pluggable.hotdeploy;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarFile;
 
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
@@ -20,9 +23,15 @@ import org.seasar.framework.convention.impl.NamingConventionImpl;
 import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.ArrayUtil;
+import org.seasar.framework.util.ClassTraversal;
+import org.seasar.framework.util.ClassUtil;
+import org.seasar.framework.util.JarFileUtil;
+import org.seasar.framework.util.ResourceUtil;
+import org.seasar.framework.util.StringUtil;
+import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
 public class LocalOndemandS2Container implements HotdeployListener,
-        OndemandS2Container {
+        ClassHandler, OndemandS2Container {
 
     private S2Container container_;
 
@@ -31,6 +40,10 @@ public class LocalOndemandS2Container implements HotdeployListener,
     private HotdeployClassLoader hotdeployClassLoader_;
 
     private List projects_ = new ArrayList();
+
+    private List referenceClassNames_ = new ArrayList();
+
+    private Map strategies_ = new HashMap();
 
     private Map componentDefCache_ = new HashMap();
 
@@ -46,6 +59,24 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     private Logger logger_ = Logger.getLogger(getClass());
 
+    public LocalOndemandS2Container() {
+        addStrategy("file", new FileSystemStrategy());
+        addStrategy("jar", new JarFileStrategy());
+        addStrategy("zip", new ZipFileStrategy());
+    }
+
+    public void setClassesDirectory(String classesDirectory) {
+        classesDirectory_ = new File(classesDirectory);
+    }
+
+    public void setHotdeployDisabled() {
+        hotdeployEnabled_ = false;
+    }
+
+    public void addHotdeployListener(HotdeployListener listener) {
+        listeners_ = (HotdeployListener[]) ArrayUtil.add(listeners_, listener);
+    }
+
     public OndemandProject getProject(int index) {
         return (OndemandProject) projects_.get(index);
     }
@@ -60,6 +91,34 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     public void addProject(OndemandProject project) {
         projects_.add(project);
+    }
+
+    public String getReferenceClassName(int index) {
+        return (String) referenceClassNames_.get(index);
+    }
+
+    public String[] getReferenceClassNames() {
+        return (String[]) referenceClassNames_.toArray(new String[0]);
+    }
+
+    public int getReferenceClassNameSize() {
+        return referenceClassNames_.size();
+    }
+
+    public void addReferenceClassName(String referenceClassName) {
+        referenceClassNames_.add(referenceClassName);
+    }
+
+    public Map getStrategies() {
+        return strategies_;
+    }
+
+    protected Strategy getStrategy(String protocol) {
+        return (Strategy) strategies_.get(protocol);
+    }
+
+    protected void addStrategy(String protocol, Strategy strategy) {
+        strategies_.put(protocol, strategy);
     }
 
     public NamingConvention getNamingConvention() {
@@ -210,17 +269,101 @@ public class LocalOndemandS2Container implements HotdeployListener,
             hotdeployEnabled_ = false;
         }
 
+        // hotdeployがenableの時でも、reference resourceが登録されていないことをチェック
+        // するためにgetReferenceResources()を呼び出している。こうすれば、開発環境で動いて
+        // いたものがいきなり本番環境でエラーになる心配がなくなる。
+        ReferenceResource[] resources = getReferenceResources();
         if (!hotdeployEnabled_) {
-            start0();
+            registerComponents(resources);
+        }
+    }
+
+    void registerComponents(ReferenceResource[] resources) {
+
+        for (int i = 0; i < resources.length; i++) {
+            Strategy strategy = getStrategy(resources[i].getURL().getProtocol());
+            strategy.registerAll(resources[i]);
+        }
+    }
+
+    ReferenceResource[] getReferenceResources() {
+
+        ClassLoader classLoader = container_.getClassLoader();
+        List resourceList = new ArrayList();
+        if (referenceClassNames_.size() == 0) {
+            // リファレンスクラス名が無指定の場合はコンテナに対応するdiconファイルを
+            // 読み込んだクラスローダを基準とする。
+            String path = container_.getPath();
+            URL url = classLoader.getResource(path);
+            if (url != null) {
+                resourceList.add(new ReferenceResource(url, path));
+            }
+        } else {
+            for (Iterator itr = referenceClassNames_.iterator(); itr.hasNext();) {
+                String referenceClassName = (String) itr.next();
+                String resourceName = referenceClassName.replace('.', '/')
+                        .concat(".class");
+                URL url = classLoader.getResource(resourceName);
+                if (url == null) {
+                    throw new RuntimeException("Project ("
+                            + getFirstProjectRootPackageName()
+                            + "): Can't find class resource for: "
+                            + referenceClassName + ": from classLoader: "
+                            + classLoader);
+                }
+                resourceList.add(new ReferenceResource(url, resourceName));
+            }
+        }
+        if (resourceList.size() == 0) {
+            throw new RuntimeException(
+                    "Project ("
+                            + getFirstProjectRootPackageName()
+                            + "): Please register reference classes to LocalOndemandS2Container");
+        }
+
+        return (ReferenceResource[]) resourceList
+                .toArray(new ReferenceResource[0]);
+    }
+
+    String getFirstProjectRootPackageName() {
+        if (projects_.size() > 0) {
+            return ((OndemandProject) projects_.get(0)).getRootPackageName();
+        } else {
+            return "(Unknown)";
+        }
+    }
+
+    public void processClass(String packageName, String shortClassName) {
+        String className = ClassUtil.concatName(packageName, shortClassName);
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(
+                    container_.getClassLoader());
+
+            Class clazz = ClassUtil.forName(className);
+
+            for (int i = 0; i < getProjectSize(); ++i) {
+                OndemandProject project = getProject(i);
+                int m = project.matchClassName(className);
+                if (m == OndemandProject.IGNORE) {
+                    break;
+                } else if (m == OndemandProject.UNMATCH) {
+                    continue;
+                }
+                if (project.loadComponentDef(this, clazz)) {
+                    break;
+                }
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
         }
     }
 
     public void destroy() {
 
-        if (!hotdeployEnabled_) {
-            stop0();
-        }
-
+        componentDefCache_.clear();
+        projects_.clear();
+        referenceClassNames_.clear();
         listeners_ = new HotdeployListener[0];
         hotdeployEnabled_ = true;
     }
@@ -289,15 +432,81 @@ public class LocalOndemandS2Container implements HotdeployListener,
         }
     }
 
-    public void setClassesDirectory(String classesDirectory) {
-        classesDirectory_ = new File(classesDirectory);
+    protected interface Strategy {
+
+        void registerAll(ReferenceResource resource);
     }
 
-    public void setHotdeployDisabled() {
-        hotdeployEnabled_ = false;
+    protected class FileSystemStrategy implements Strategy {
+
+        public void registerAll(ReferenceResource resource) {
+            File rootDir = getRootDir(resource);
+            ClassTraversal.forEach(rootDir, LocalOndemandS2Container.this);
+        }
+
+        protected File getRootDir(ReferenceResource resource) {
+            File file = ResourceUtil.getFile(resource.getURL());
+            String[] names = StringUtil.split(resource.getResourceName(), "/");
+            for (int i = 0; i < names.length; ++i) {
+                file = file.getParentFile();
+            }
+            return file;
+        }
     }
 
-    public void addHotdeployListener(HotdeployListener listener) {
-        listeners_ = (HotdeployListener[]) ArrayUtil.add(listeners_, listener);
+    protected class JarFileStrategy implements Strategy {
+
+        public void registerAll(ReferenceResource resource) {
+            JarFile jarFile = createJarFile(resource.getURL());
+            ClassTraversal.forEach(jarFile, LocalOndemandS2Container.this);
+        }
+
+        protected JarFile createJarFile(URL url) {
+            String urlString = ResourceUtil.toExternalForm(url);
+            int pos = urlString.lastIndexOf('!');
+            String jarFileName = urlString.substring("jar:file:".length(), pos);
+            return JarFileUtil.create(new File(jarFileName));
+        }
+    }
+
+    /**
+     * WebLogic固有の<code>zip:</code>プロトコルで表現されるURLをサポートするストラテジです。
+     */
+    protected class ZipFileStrategy implements Strategy {
+
+        public void registerAll(ReferenceResource resource) {
+            final JarFile jarFile = createJarFile(resource.getURL());
+            ClassTraversal.forEach(jarFile, LocalOndemandS2Container.this);
+        }
+
+        protected JarFile createJarFile(URL url) {
+            final String urlString = ResourceUtil.toExternalForm(url);
+            final int pos = urlString.lastIndexOf('!');
+            final String jarFileName = urlString
+                    .substring("zip:".length(), pos);
+            return JarFileUtil.create(new File(jarFileName));
+        }
+    }
+
+    protected static class ReferenceResource {
+
+        private URL url_;
+
+        private String resourceName_;
+
+        public ReferenceResource(URL url, String resourceName) {
+            super();
+
+            url_ = url;
+            resourceName_ = resourceName;
+        }
+
+        public String getResourceName() {
+            return resourceName_;
+        }
+
+        public URL getURL() {
+            return url_;
+        }
     }
 }

@@ -2,7 +2,7 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
   "http://www.seasar.org/dtd/components24.dtd">
 <components>
-  <include path="global.dicon" />
+  <include path="global_release.dicon" />
   <component
     class="org.seasar.framework.convention.impl.NamingConventionImpl" />
   <component
@@ -11,13 +11,28 @@
       <arg>
         <component
           class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
-          <property name="rootPackageName">"test1"</property>
+          <property name="rootPackageName">"test2.hotdeploy"</property>
         </component>
       </arg>
     </initMethod>
     <initMethod name="addReferenceClassName">
-      <arg>"test1.dto.HoeDto"</arg>
+      <arg>"test2.hotdeploy.dto.HotDto"</arg>
     </initMethod>
+  </component>
+  <component
+    class="org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container">
+    <initMethod name="addProject">
+      <arg>
+        <component
+          class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
+          <property name="rootPackageName">"test2.cooldeploy"</property>
+        </component>
+      </arg>
+    </initMethod>
+    <initMethod name="addReferenceClassName">
+      <arg>"test2.cooldeploy.dto.CoolDto"</arg>
+    </initMethod>
+    <initMethod name="setHotdeployDisabled" />
   </component>
   <component
     class="org.seasar.framework.container.hotdeploy.creator.DtoOndemandCreator" />

@@ -1,12 +1,17 @@
 package org.seasar.cms.pluggable.hotdeploy;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
+import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container.FileSystemStrategy;
+import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container.ReferenceResource;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
+import org.seasar.framework.util.ResourceUtil;
 
 public class LocalOndemandS2ContainerTest extends TestCase {
 
@@ -62,5 +67,16 @@ public class LocalOndemandS2ContainerTest extends TestCase {
             Thread.sleep(1000);
         }
         assertEquals(threads.length, okCount[0]);
+    }
+
+    public void testFileStrategy_getRootDir() throws Exception {
+
+        FileSystemStrategy target = new LocalOndemandS2Container().new FileSystemStrategy();
+        String resourceName = getClass().getName().replace('.', '/').concat(
+                ".class");
+        File actual = target.getRootDir(new ReferenceResource(getClass()
+                .getClassLoader().getResource(resourceName), resourceName));
+
+        assertEquals(ResourceUtil.getBuildDir(getClass()), actual);
     }
 }
