@@ -133,11 +133,27 @@ public class LocalOndemandS2Container implements HotdeployListener,
         loadComponentDef(clazz);
     }
 
-    public synchronized ComponentDef getComponentDef(Class targetClass) {
-        return getComponentDefFromCache(targetClass);
+    public ComponentDef getComponentDef(Class targetClass) {
+        if (hotdeployEnabled_) {
+            synchronized (this) {
+                return getComponentDefFromCache(targetClass);
+            }
+        } else {
+            return getComponentDefFromCache(targetClass);
+        }
     }
 
-    public synchronized ComponentDef findComponentDef(Object key) {
+    public ComponentDef findComponentDef(Object key) {
+        if (hotdeployEnabled_) {
+            synchronized (this) {
+                return findComponentDef0(key);
+            }
+        } else {
+            return findComponentDef0(key);
+        }
+    }
+
+    protected ComponentDef findComponentDef0(Object key) {
         ComponentDef cd = getComponentDefFromCache(key);
         if (cd != null) {
             return cd;
