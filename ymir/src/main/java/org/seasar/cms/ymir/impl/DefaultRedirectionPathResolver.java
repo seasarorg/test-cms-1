@@ -2,6 +2,7 @@ package org.seasar.cms.ymir.impl;
 
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RedirectionPathResolver;
+import org.seasar.cms.ymir.util.ServletUtils;
 
 public class DefaultRedirectionPathResolver implements RedirectionPathResolver {
 
@@ -10,10 +11,11 @@ public class DefaultRedirectionPathResolver implements RedirectionPathResolver {
             return null;
         }
 
-        if (path.startsWith("/") || path.length() == 0) {
+        String stripped = ServletUtils.stripParametersAndQueries(path);
+        if (stripped.startsWith("/") || stripped.length() == 0) {
             path = request.getContextPath() + path;
-            if ("".equals(path)) {
-                path = "/";
+            if ("".equals(ServletUtils.stripParametersAndQueries(path))) {
+                path = "/" + path;
             }
         }
 
