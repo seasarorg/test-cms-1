@@ -99,6 +99,11 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         container_.register(ZptAnalyzer.class);
         container_.register(ConfigurationImpl.class);
         container_.register(ApplicationManagerImpl.class);
+
+        LocalOndemandS2Container ondemandContainer = (LocalOndemandS2Container) container_
+                .getComponent(LocalOndemandS2Container.class);
+        ondemandContainer.addReferenceClassName(getClass().getName());
+
         container_.init();
 
         container_.getRoot().getExternalContext().setRequest(request);
@@ -116,8 +121,6 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
                 .getComponent(NamingConvention.class);
         project.setCreators(new OndemandCreator[] { new PageOndemandCreator(
                 namingConvention) });
-        LocalOndemandS2Container ondemandContainer = (LocalOndemandS2Container) container_
-                .getComponent(LocalOndemandS2Container.class);
         ondemandContainer.addProject(project);
 
         Configuration configuration = (Configuration) container_
