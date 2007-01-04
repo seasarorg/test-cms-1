@@ -23,8 +23,7 @@ public interface Identity {
     /**
      * 指定されたテーブルが存在するかどうかを返します。
      *
-     * @param tableName
-     *            テーブル名。
+     * @param tableName テーブル名。
      * @return テーブルが存在するかどうか。
      */
     boolean existsTable(String tableName) throws SQLException;
