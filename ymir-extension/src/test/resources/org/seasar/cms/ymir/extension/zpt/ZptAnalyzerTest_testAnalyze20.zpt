@@ -1,0 +1,8 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <p tal:condition="self/enabled">ENABLED</p>
+  </body>
+</html>

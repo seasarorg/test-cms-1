@@ -443,4 +443,14 @@ public class ZptAnalyzerTest extends TestCase {
         assertNull("余計なDtoが生成されないこと",
                 getClassDesc("com.example.dto.CommentsDto"));
     }
+
+    public void testAnalyze20() throws Exception {
+
+        act("testAnalyze20");
+
+        PropertyDesc actual = getClassDesc(CLASSNAME)
+                .getPropertyDesc("enabled");
+        assertNotNull("tal:conditionの式については生成するプロパティの型がbooleanになること", actual);
+        assertEquals("boolean", actual.getTypeDesc().getName());
+    }
 }

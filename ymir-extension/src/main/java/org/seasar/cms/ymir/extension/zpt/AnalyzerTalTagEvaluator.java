@@ -301,4 +301,26 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             return theOtherAttributes_;
         }
     }
+
+    @Override
+    protected boolean evaluateCondition(TemplateContext context,
+            ExpressionEvaluator expEvaluator, VariableResolver varResolver,
+            String condition) {
+
+        if (condition.trim().length() == 0) {
+            return false;
+        }
+
+        Object evaluated = expEvaluator.evaluate(context, varResolver,
+                condition);
+        if (evaluated instanceof DescWrapper) {
+            DescWrapper wrapper = (DescWrapper) evaluated;
+            PropertyDesc pd = wrapper.getPropertyDesc();
+            if (pd != null) {
+                pd.setTypeDesc("boolean");
+            }
+        }
+
+        return expEvaluator.isTrue(evaluated);
+    }
 }
