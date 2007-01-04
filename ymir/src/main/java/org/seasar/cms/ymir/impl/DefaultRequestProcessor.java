@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -492,9 +493,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
         } else {
             normalized = path;
         }
-        return getServletContext().getResourcePaths(
-                normalized.substring(0, normalized.lastIndexOf('/') + 1))
-                .contains(normalized);
+        Set resourceSet = getServletContext().getResourcePaths(
+                normalized.substring(0, normalized.lastIndexOf('/') + 1));
+        return (resourceSet != null && resourceSet.contains(normalized));
     }
 
     public Method getActionMethod(Object component, String actionName) {

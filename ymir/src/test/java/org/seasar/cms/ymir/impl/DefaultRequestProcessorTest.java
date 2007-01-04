@@ -33,7 +33,7 @@ public class DefaultRequestProcessorTest extends S2TestCase {
                     return new HashSet(Arrays.asList(new String[] { "/file",
                         "/dir/" }));
                 } else {
-                    return new HashSet();
+                    return null;
                 }
             }
         });
@@ -86,5 +86,8 @@ public class DefaultRequestProcessorTest extends S2TestCase {
         assertTrue(target_.fileResourceExists("/path/to/file"));
         assertFalse(target_.fileResourceExists("/path/to/nonexistentfile"));
         assertFalse(target_.fileResourceExists("/path/to/dir"));
+
+        assertFalse("親ディレクトリが存在しない場合もfalseを返すこと", target_
+                .fileResourceExists("/nonexistentdir/file"));
     }
 }
