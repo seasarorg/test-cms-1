@@ -310,9 +310,11 @@ public class LocalOndemandS2Container implements HotdeployListener,
             // リファレンスクラス名が無指定の場合はコンテナに対応するdiconファイルを
             // 読み込んだクラスローダを基準とする。
             String path = container_.getPath();
-            URL url = classLoader.getResource(path);
-            if (url != null) {
-                resourceList.add(new ReferenceResource(url, path));
+            if (path != null) {
+                URL url = classLoader.getResource(path);
+                if (url != null) {
+                    resourceList.add(new ReferenceResource(url, path));
+                }
             }
         } else {
             for (Iterator itr = referenceClassNames_.iterator(); itr.hasNext();) {
