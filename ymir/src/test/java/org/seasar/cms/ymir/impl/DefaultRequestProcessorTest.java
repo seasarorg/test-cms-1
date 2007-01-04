@@ -1,5 +1,9 @@
 package org.seasar.cms.ymir.impl;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.PathMappingProvider;
@@ -9,6 +13,7 @@ import org.seasar.cms.ymir.mock.MockApplication;
 import org.seasar.cms.ymir.mock.MockRequest;
 import org.seasar.cms.ymir.response.ForwardResponse;
 import org.seasar.extension.unit.S2TestCase;
+import org.seasar.framework.mock.servlet.MockServletContextImpl;
 
 public class DefaultRequestProcessorTest extends S2TestCase {
 
@@ -16,11 +21,29 @@ public class DefaultRequestProcessorTest extends S2TestCase {
 
     private PathMappingProvider pathMappingProvider_;
 
+    protected void setUpContainer() throws Throwable {
+        setServletContext(new MockServletContextImpl("test") {
+            private static final long serialVersionUID = 1L;
+
+            public Set getResourcePaths(String path) {
+                if ("/path/to/".equals(path)) {
+                    return new HashSet(Arrays.asList(new String[] {
+                        "/path/to/file", "/path/to/dir/" }));
+                } else if ("/".equals(path)) {
+                    return new HashSet(Arrays.asList(new String[] { "/file",
+                        "/dir/" }));
+                } else {
+                    return new HashSet();
+                }
+            }
+        });
+        super.setUpContainer();
+    }
+
     protected void setUp() throws Exception {
         super.setUp();
 
         include("DefaultRequestProcessor.dicon");
-        getContainer().init();
 
         target_ = (DefaultRequestProcessor) getComponent(DefaultRequestProcessor.class);
         pathMappingProvider_ = (PathMappingProvider) getComponent(PathMappingProvider.class);
@@ -52,5 +75,16 @@ public class DefaultRequestProcessorTest extends S2TestCase {
 
         assertEquals("リクエストパスと同じパスへのフォワードはPASSTHROUGHに正規化されること",
                 Response.TYPE_PASSTHROUGH, actual.getType());
+    }
+
+    public void testFileResourceExists() throws Exception {
+
+        assertTrue(target_.fileResourceExists("/file"));
+        assertFalse(target_.fileResourceExists("/nonexistentfile"));
+        assertFalse(target_.fileResourceExists("/dir"));
+
+        assertTrue(target_.fileResourceExists("/path/to/file"));
+        assertFalse(target_.fileResourceExists("/path/to/nonexistentfile"));
+        assertFalse(target_.fileResourceExists("/path/to/dir"));
     }
 }

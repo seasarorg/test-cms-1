@@ -2,8 +2,6 @@ package org.seasar.cms.ymir.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -468,12 +466,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Response constructDefaultResponse(Request request, Object component) {
-        URL resource = null;
-        try {
-            resource = getServletContext().getResource(request.getPath());
-        } catch (MalformedURLException ignore) {
-        }
-        if (resource != null) {
+
+        if (fileResourceExists(request.getPath())) {
             // パスに対応するテンプレートファイルが存在する場合はパススルーする。
             return PassthroughResponse.INSTANCE;
         } else {
@@ -485,6 +479,22 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 return PassthroughResponse.INSTANCE;
             }
         }
+    }
+
+    boolean fileResourceExists(String path) {
+
+        if (path.length() == 0 || path.equals("/")) {
+            return false;
+        }
+        String normalized;
+        if (path.endsWith("/")) {
+            normalized = path.substring(0, path.length() - 1);
+        } else {
+            normalized = path;
+        }
+        return getServletContext().getResourcePaths(
+                normalized.substring(0, normalized.lastIndexOf('/') + 1))
+                .contains(normalized);
     }
 
     public Method getActionMethod(Object component, String actionName) {
