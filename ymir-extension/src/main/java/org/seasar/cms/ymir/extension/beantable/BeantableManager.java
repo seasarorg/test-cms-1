@@ -167,7 +167,7 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
     boolean isManaged(Class<?> beanClass) {
 
         Managed managed = beanClass.getAnnotation(Managed.class);
-        return (managed == null || managed.value());
+        return (managed != null && managed.value());
     }
 
     public void setConfiguration(Configuration configuration) {
