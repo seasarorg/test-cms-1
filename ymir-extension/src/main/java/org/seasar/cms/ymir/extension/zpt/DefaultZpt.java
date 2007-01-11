@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import java.util.Locale;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +37,7 @@ public class DefaultZpt implements Zpt {
 
     public void buildTemplateContext(TemplateContext context,
             ServletContext servletContext, HttpServletRequest request,
-            HttpServletResponse response, String path) {
+            HttpServletResponse response, Locale locale, String path) {
         String responseContentType = null;
         Object obj = request
                 .getAttribute(FreyjaServlet.ATTR_RESPONSECONTENTTYPE);
@@ -56,7 +58,7 @@ public class DefaultZpt implements Zpt {
         context.setProperty(TemplateContext.PROP_CONTENT_TYPE,
                 responseContentType);
         context.setVariableResolver(vrf_.newResolver(request, response,
-                servletContext, resolver));
+                servletContext, locale, resolver));
         context.setTemplateName(path);
     }
 }

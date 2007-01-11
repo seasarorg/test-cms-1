@@ -6,6 +6,7 @@ import static net.skirnir.freyja.zpt.webapp.ServletTalesExpressionEvaluator.TYPE
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -49,7 +50,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         path = zpt_.getTemplatePathResolver().resolve(path, request);
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
         zpt_.buildTemplateContext(context, servletContext, request, response,
-                path);
+                Locale.getDefault(), path);
         context.setTemplateSet(new AnalyzerTemplateSet(evaluator_, context
                 .getTemplateSet(), sourceCreator_, zpt_
                 .getTemplatePathResolver()));

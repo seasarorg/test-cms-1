@@ -1,5 +1,7 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import java.util.Locale;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,5 +17,5 @@ public interface Zpt {
 
     void buildTemplateContext(TemplateContext context,
             ServletContext servletContext, HttpServletRequest request,
-            HttpServletResponse response, String path);
+            HttpServletResponse response, Locale locale, String path);
 }
