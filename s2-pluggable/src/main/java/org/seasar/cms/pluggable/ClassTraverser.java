@@ -179,7 +179,7 @@ public class ClassTraverser {
     }
 
     /**
-     * WebLogic固有�?�<code>zip:</code>プロトコルで表現されるURLをサポ�?�トするストラ�?ジです�??
+     * WebLogic固有の<code>zip:</code>プロトコルで表現されるURLをサポートするストラテジです。
      */
     protected class ZipFileStrategy implements Strategy {
 
@@ -209,7 +209,14 @@ public class ClassTraverser {
             if (isIgnore(packageName, shortClassName)) {
                 return;
             }
-            classHandler_.processClass(packageName, shortClassName);
+
+            for (int i = 0; i < getClassPatternSize(); ++i) {
+                final ClassPattern cp = getClassPattern(i);
+                if (cp.isAppliedPackageName(packageName)
+                        && cp.isAppliedShortClassName(shortClassName)) {
+                    classHandler_.processClass(packageName, shortClassName);
+                }
+            }
         }
     }
 }
