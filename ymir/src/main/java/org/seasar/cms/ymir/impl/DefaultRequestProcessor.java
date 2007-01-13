@@ -368,7 +368,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 } catch (IllegalAccessException ex) {
                     throw new RuntimeException(ex);
                 } catch (InvocationTargetException ex) {
-                    throw new RuntimeException(ex);
+                    Throwable cause = ex.getCause();
+                    if (cause instanceof Error) {
+                        throw (Error) cause;
+                    } else if (cause instanceof RuntimeException) {
+                        throw (RuntimeException) cause;
+                    } else {
+                        throw new RuntimeException(cause);
+                    }
                 }
                 response = constructResponse(component, action.getReturnType(),
                         returnValue);
