@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
+import org.seasar.cms.ymir.extension.creator.impl.NullTemplate;
 
 import net.skirnir.freyja.Element;
 import net.skirnir.freyja.Macro;
@@ -161,9 +162,14 @@ public class AnalyzerTemplateSet implements TemplateSet {
         }
 
         Template getTemplate(String templateName) {
-            return sourceCreator_.getTemplateProvider().getTemplate(
-                    resolver_.getLocalPath(templateName,
-                            getHttpServletRequest()));
+            String localPath = resolver_.getLocalPath(templateName,
+                    getHttpServletRequest());
+            if (localPath != null) {
+                return sourceCreator_.getTemplateProvider().getTemplate(
+                        localPath);
+            } else {
+                return NullTemplate.INSTANCE;
+            }
         }
 
         HttpServletRequest getHttpServletRequest() {
