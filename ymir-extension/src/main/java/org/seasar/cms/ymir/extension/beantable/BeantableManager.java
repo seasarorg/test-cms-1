@@ -131,9 +131,11 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
 
     ClassTraverserBag getClassTraverserBag(Class clazz) {
 
-        for (int i = 0; i < traverserBags_.length; i++) {
-            if (traverserBags_[i].getApplication().isCapable(clazz)) {
-                return traverserBags_[i];
+        if (traverserBags_ != null) {
+            for (int i = 0; i < traverserBags_.length; i++) {
+                if (traverserBags_[i].getApplication().isCapable(clazz)) {
+                    return traverserBags_[i];
+                }
             }
         }
         return null;
