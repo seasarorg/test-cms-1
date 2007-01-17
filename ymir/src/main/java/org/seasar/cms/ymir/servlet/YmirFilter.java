@@ -95,9 +95,11 @@ public class YmirFilter implements Filter {
             HttpServletResponseFilter responseFilter = ymir_.processResponse(
                     context_, httpRequest, httpResponse, request, response);
             if (responseFilter != null) {
-                httpRequest.setAttribute(
-                        FreyjaServlet.ATTR_RESPONSECONTENTTYPE, response
-                                .getContentType());
+                String contentType = response.getContentType();
+                if (contentType != null) {
+                    httpRequest.setAttribute(FreyjaServlet.ATTR_RESPONSECONTENTTYPE,
+                        contentType);
+                }
                 chain.doFilter(httpRequest, responseFilter);
                 responseFilter.commit();
             }
