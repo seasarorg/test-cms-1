@@ -599,7 +599,11 @@ public class SourceCreatorImpl implements SourceCreator {
         if (gapDesc == null) {
             gapDesc = newClassDesc(className);
         }
-        Class baseClass = (clazz != null ? clazz.getSuperclass() : null);
+
+        Class baseClass = (clazz != null
+                && clazz.getSuperclass().getName().equals(className + "Base") ? clazz
+                .getSuperclass()
+                : null);
         ClassDesc baseDesc = (mergeMethod ? getClassDesc(baseClass, className)
                 : null);
         if (baseDesc == null) {

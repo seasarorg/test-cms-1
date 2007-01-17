@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.BodyDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
@@ -196,8 +197,7 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
 
         target_.mergeWithExistentClass(cd, true);
 
-        assertNull("生成対象クラスがまだ存在しない場合でも、スーパークラスだけが持っているメソッドは除去されること", cd
-                .getMethodDesc(md));
+        assertNull(cd.getMethodDesc(md));
     }
 
     public void testGetClassDesc_引数が0個で返り値がStringのmethodについてはボディを保存するようなBodyDescが生成されること()
@@ -219,5 +219,19 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
                         + "<script type=\"text/javascript\" src=\"/context/__ymir__/resource/js/sourceCreator.js\"></script>"
                         + "</head></html>", target_
                         .filterResponse("<html><head></head></html>"));
+    }
+
+    public void testMergeWithExistentClass_既にギャップクラスがあるがベースクラスがない場合にObjectのメソッドがベースクラスに追加されないこと()
+            throws Exception {
+
+        getConfiguration().removeProperty(
+                Globals.APPKEY_SOURCECREATOR_SUPERCLASS);
+
+        ClassDesc cd = new ClassDescImpl(
+                "org.seasar.cms.ymir.extension.creator.impl.Merge5");
+
+        target_.mergeWithExistentClass(cd, true);
+
+        assertNull(cd.getPropertyDesc("class"));
     }
 }

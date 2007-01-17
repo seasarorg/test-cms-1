@@ -159,6 +159,10 @@ abstract public class SourceCreatorImplTestBase extends YmirTestCase {
         SingletonPluggableContainerFactory.init();
     }
 
+    protected Configuration getConfiguration(){
+        return (Configuration) container_.getComponent(Configuration.class);
+    }
+
     protected File getSourceDir() {
         return ResourceUtil.getBuildDir(getClass());
     }
