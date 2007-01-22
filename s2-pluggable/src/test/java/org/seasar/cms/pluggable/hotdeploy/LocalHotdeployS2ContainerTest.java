@@ -5,15 +5,18 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
-import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container.FileSystemStrategy;
-import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container.ReferenceResource;
+import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container.FileSystemStrategy;
+import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container.ReferenceResource;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
 import org.seasar.framework.util.ResourceUtil;
 
-public class LocalOndemandS2ContainerTest extends TestCase {
+public class LocalHotdeployS2ContainerTest extends TestCase {
+    protected void tearDown() throws Exception {
+        SingletonPluggableContainerFactory.destroy();
+    }
 
     public void test_同時アクセスしても正常に処理が行なわれること() throws Exception {
         SingletonPluggableContainerFactory.setConfigPath(getClass().getName()
@@ -27,7 +30,7 @@ public class LocalOndemandS2ContainerTest extends TestCase {
                 new MockHttpServletRequestImpl(new MockServletContextImpl("/"),
                         "/hoe.do"));
 
-        final DistributedOndemandBehavior ondemand = (DistributedOndemandBehavior) S2ContainerBehavior
+        final DistributedHotdeployBehavior ondemand = (DistributedHotdeployBehavior) S2ContainerBehavior
                 .getProvider();
         Thread[] threads = new Thread[500];
         final int[] count = new int[1];
@@ -71,7 +74,7 @@ public class LocalOndemandS2ContainerTest extends TestCase {
 
     public void testFileStrategy_getRootDir() throws Exception {
 
-        FileSystemStrategy target = new LocalOndemandS2Container().new FileSystemStrategy();
+        FileSystemStrategy target = new LocalHotdeployS2Container().new FileSystemStrategy();
         String resourceName = getClass().getName().replace('.', '/').concat(
                 ".class");
         File actual = target.getRootDir(new ReferenceResource(getClass()

@@ -9,18 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 
+import org.seasar.cms.pluggable.PluggableNamingConvention;
+import org.seasar.framework.container.ComponentCreator;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
-import org.seasar.framework.container.hotdeploy.HotdeployListener;
-import org.seasar.framework.container.hotdeploy.OndemandProject;
-import org.seasar.framework.container.hotdeploy.OndemandS2Container;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.container.impl.S2ContainerImpl;
 import org.seasar.framework.container.util.S2ContainerUtil;
-import org.seasar.framework.convention.NamingConvention;
-import org.seasar.framework.convention.impl.NamingConventionImpl;
-import org.seasar.framework.exception.ClassNotFoundRuntimeException;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.ArrayUtil;
 import org.seasar.framework.util.ClassTraversal;
@@ -30,16 +26,13 @@ import org.seasar.framework.util.ResourceUtil;
 import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
-public class LocalOndemandS2Container implements HotdeployListener,
-        ClassHandler, OndemandS2Container {
+public class LocalHotdeployS2Container implements ClassHandler {
 
     private S2Container container_;
 
     private ClassLoader originalClassLoader_;
 
-    private HotdeployClassLoader hotdeployClassLoader_;
-
-    private List projects_ = new ArrayList();
+    private PluggableHotdeployClassLoader hotdeployClassLoader_;
 
     private List referenceClassNames_ = new ArrayList();
 
@@ -47,9 +40,11 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     private Map componentDefCache_ = new HashMap();
 
-    public static final String namingConvention_BINDING = "bindingType=may";
+    public static final String namingConvention_BINDING = "bindingType=must";
 
-    private NamingConvention namingConvention_ = new NamingConventionImpl();
+    private PluggableNamingConvention namingConvention_;
+
+    private ComponentCreator[] creators_ = new ComponentCreator[0];
 
     private HotdeployListener[] listeners_ = new HotdeployListener[0];
 
@@ -59,7 +54,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     private Logger logger_ = Logger.getLogger(getClass());
 
-    public LocalOndemandS2Container() {
+    public LocalHotdeployS2Container() {
         addStrategy("file", new FileSystemStrategy());
         addStrategy("jar", new JarFileStrategy());
         addStrategy("zip", new ZipFileStrategy());
@@ -75,22 +70,6 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     public void addHotdeployListener(HotdeployListener listener) {
         listeners_ = (HotdeployListener[]) ArrayUtil.add(listeners_, listener);
-    }
-
-    public OndemandProject getProject(int index) {
-        return (OndemandProject) projects_.get(index);
-    }
-
-    public OndemandProject[] getProjects() {
-        return (OndemandProject[]) projects_.toArray(new OndemandProject[0]);
-    }
-
-    public int getProjectSize() {
-        return projects_.size();
-    }
-
-    public void addProject(OndemandProject project) {
-        projects_.add(project);
     }
 
     public String getReferenceClassName(int index) {
@@ -121,26 +100,20 @@ public class LocalOndemandS2Container implements HotdeployListener,
         strategies_.put(protocol, strategy);
     }
 
-    public NamingConvention getNamingConvention() {
+    public PluggableNamingConvention getNamingConvention() {
         return namingConvention_;
     }
 
-    public void setNamingConvention(NamingConvention namingConvention) {
+    public void setNamingConvention(PluggableNamingConvention namingConvention) {
         namingConvention_ = namingConvention;
     }
 
-    public synchronized void definedClass(Class clazz) {
-        loadComponentDef(clazz);
+    public ComponentCreator[] getCreators() {
+        return creators_;
     }
 
-    public ComponentDef getComponentDef(Class targetClass) {
-        if (hotdeployEnabled_) {
-            synchronized (this) {
-                return getComponentDefFromCache(targetClass);
-            }
-        } else {
-            return getComponentDefFromCache(targetClass);
-        }
+    public void setCreators(ComponentCreator[] creators) {
+        creators_ = creators;
     }
 
     public ComponentDef findComponentDef(Object key) {
@@ -158,81 +131,60 @@ public class LocalOndemandS2Container implements HotdeployListener,
         if (cd != null) {
             return cd;
         }
-        if (key instanceof Class) {
-            return getComponentDef0((Class) key);
-        } else if (key instanceof String) {
-            return getComponentDef0((String) key);
-        } else {
-            throw new IllegalArgumentException("key");
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(
+                    getHotdeployClassLoader());
+            if (key instanceof Class) {
+                cd = createComponentDef((Class) key);
+            } else if (key instanceof String) {
+                cd = createComponentDef((String) key);
+            } else {
+                throw new IllegalArgumentException("key");
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
         }
+        if (cd != null) {
+            register(cd);
+            S2ContainerUtil.putRegisterLog(cd);
+            cd.init();
+        }
+        return cd;
     }
 
     protected ComponentDef getComponentDefFromCache(Object key) {
         return (ComponentDef) componentDefCache_.get(key);
     }
 
-    protected void loadComponentDef(Class clazz) {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(
-                    getHotdeployClassLoader());
-            for (int i = 0; i < getProjectSize(); ++i) {
-                OndemandProject project = getProject(i);
-                if (project.loadComponentDef(this, clazz)) {
-                    break;
-                }
+    protected ComponentDef createComponentDef(Class componentClass) {
+        for (int i = 0; i < creators_.length; ++i) {
+            ComponentCreator creator = creators_[i];
+            ComponentDef cd = creator.createComponentDef(componentClass);
+            if (cd != null) {
+                return cd;
             }
-        } finally {
-            Thread.currentThread().setContextClassLoader(cl);
         }
+        return null;
     }
 
-    protected ComponentDef getComponentDef0(Class clazz) {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(
-                    getHotdeployClassLoader());
-            for (int i = 0; i < getProjectSize(); ++i) {
-                OndemandProject project = getProject(i);
-                ComponentDef cd = project.getComponentDef(this, clazz);
-                if (cd != null) {
-                    return cd;
-                }
+    protected ComponentDef createComponentDef(String componentName) {
+        for (int i = 0; i < creators_.length; ++i) {
+            ComponentCreator creator = creators_[i];
+            ComponentDef cd = creator.createComponentDef(componentName);
+            if (cd != null) {
+                return cd;
             }
-            return null;
-        } finally {
-            Thread.currentThread().setContextClassLoader(cl);
         }
-    }
-
-    protected ComponentDef getComponentDef0(String componentName) {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(
-                    getHotdeployClassLoader());
-            for (int i = 0; i < getProjectSize(); ++i) {
-                OndemandProject project = getProject(i);
-                try {
-                    ComponentDef cd = project.getComponentDef(this,
-                            componentName);
-                    if (cd != null) {
-                        return cd;
-                    }
-                } catch (ClassNotFoundRuntimeException ignore) {
-                }
-            }
-            return null;
-        } finally {
-            Thread.currentThread().setContextClassLoader(cl);
-        }
+        return null;
     }
 
     public HotdeployClassLoader getHotdeployClassLoader() {
         return hotdeployClassLoader_;
     }
 
-    DistributedOndemandBehavior getOndemandBehavior() {
-        return (DistributedOndemandBehavior) S2ContainerBehavior.getProvider();
+    DistributedHotdeployBehavior getHotdeployBehavior() {
+        return (DistributedHotdeployBehavior) S2ContainerBehavior.getProvider();
     }
 
     public synchronized void register(ComponentDef componentDef) {
@@ -258,12 +210,14 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
     protected synchronized void registerMap(Object key,
             ComponentDef componentDef) {
-        ComponentDef current = (ComponentDef) componentDefCache_.get(key);
-        if (current != null) {
-            componentDef = S2ContainerImpl.createTooManyRegistration(key,
-                    current, componentDef);
+        ComponentDef previousCd = (ComponentDef) componentDefCache_.get(key);
+        if (previousCd == null) {
+            componentDefCache_.put(key, componentDef);
+        } else {
+            ComponentDef tmrcd = S2ContainerImpl.createTooManyRegistration(key,
+                    previousCd, componentDef);
+            componentDefCache_.put(key, tmrcd);
         }
-        componentDefCache_.put(key, componentDef);
     }
 
     public S2Container getContainer() {
@@ -336,7 +290,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
             throw new RuntimeException(
                     "Project ("
                             + getFirstProjectRootPackageName()
-                            + "): Please register reference classes to LocalOndemandS2Container");
+                            + "): Please register reference classes to LocalHotdeployS2Container");
         }
 
         return (ReferenceResource[]) resourceList
@@ -344,8 +298,9 @@ public class LocalOndemandS2Container implements HotdeployListener,
     }
 
     String getFirstProjectRootPackageName() {
-        if (projects_.size() > 0) {
-            return ((OndemandProject) projects_.get(0)).getRootPackageName();
+        String[] rootPackageNames = namingConvention_.getRootPackageNames();
+        if (rootPackageNames.length > 0) {
+            return rootPackageNames[0];
         } else {
             return "(Unknown)";
         }
@@ -359,17 +314,12 @@ public class LocalOndemandS2Container implements HotdeployListener,
                     container_.getClassLoader());
 
             Class clazz = ClassUtil.forName(className);
-
-            for (int i = 0; i < getProjectSize(); ++i) {
-                OndemandProject project = getProject(i);
-                int m = project.matchClassName(className);
-                if (m == OndemandProject.IGNORE) {
-                    break;
-                } else if (m == OndemandProject.UNMATCH) {
-                    continue;
-                }
-                if (project.loadComponentDef(this, clazz)) {
-                    break;
+            if (namingConvention_.isTargetClassName(className)) {
+                ComponentDef cd = createComponentDef(clazz);
+                if (cd != null) {
+                    register(cd);
+                    S2ContainerUtil.putRegisterLog(cd);
+                    cd.init();
                 }
             }
         } finally {
@@ -380,7 +330,8 @@ public class LocalOndemandS2Container implements HotdeployListener,
     public void destroy() {
 
         componentDefCache_.clear();
-        projects_.clear();
+        creators_ = new ComponentCreator[0];
+        namingConvention_ = null;
         referenceClassNames_.clear();
         listeners_ = new HotdeployListener[0];
         hotdeployEnabled_ = true;
@@ -395,7 +346,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
     void start0() {
         if (logger_.isDebugEnabled()) {
             logger_
-                    .debug("LocalOndemandS2Container's start0() method called: classesDirectory="
+                    .debug("LocalHotdeployS2Container's start0() method called: classesDirectory="
                             + classesDirectory_);
         }
         originalClassLoader_ = container_.getClassLoader();
@@ -413,10 +364,10 @@ public class LocalOndemandS2Container implements HotdeployListener,
         }
     }
 
-    HotdeployClassLoader newHotdeployClassLoader(ClassLoader originalClassLoader) {
+    PluggableHotdeployClassLoader newHotdeployClassLoader(
+            ClassLoader originalClassLoader) {
         PluggableHotdeployClassLoader hotdeployClassLoader = new PluggableHotdeployClassLoader(
-                originalClassLoader);
-        hotdeployClassLoader.setProjects(getProjects());
+                originalClassLoader, namingConvention_);
         if (classesDirectory_ != null) {
             hotdeployClassLoader.setClassesDirectory(classesDirectory_);
         }
@@ -432,7 +383,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
     void stop0() {
         if (logger_.isDebugEnabled()) {
             logger_
-                    .debug("LocalOndemandS2Container's stop0() method called: objectId="
+                    .debug("LocalHotdeployS2Container's stop0() method called: objectId="
                             + System.identityHashCode(this)
                             + ", classesDirectory=" + classesDirectory_);
         }
@@ -459,7 +410,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
         public void registerAll(ReferenceResource resource) {
             File rootDir = getRootDir(resource);
-            ClassTraversal.forEach(rootDir, LocalOndemandS2Container.this);
+            ClassTraversal.forEach(rootDir, LocalHotdeployS2Container.this);
         }
 
         protected File getRootDir(ReferenceResource resource) {
@@ -476,7 +427,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
         public void registerAll(ReferenceResource resource) {
             JarFile jarFile = createJarFile(resource.getURL());
-            ClassTraversal.forEach(jarFile, LocalOndemandS2Container.this);
+            ClassTraversal.forEach(jarFile, LocalHotdeployS2Container.this);
         }
 
         protected JarFile createJarFile(URL url) {
@@ -494,7 +445,7 @@ public class LocalOndemandS2Container implements HotdeployListener,
 
         public void registerAll(ReferenceResource resource) {
             final JarFile jarFile = createJarFile(resource.getURL());
-            ClassTraversal.forEach(jarFile, LocalOndemandS2Container.this);
+            ClassTraversal.forEach(jarFile, LocalHotdeployS2Container.this);
         }
 
         protected JarFile createJarFile(URL url) {

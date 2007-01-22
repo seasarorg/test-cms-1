@@ -8,7 +8,7 @@ import java.util.Set;
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.PluggableContainerFactory;
 import org.seasar.cms.pluggable.PluggableProvider;
-import org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior;
+import org.seasar.cms.pluggable.hotdeploy.DistributedHotdeployBehavior;
 import org.seasar.cms.pluggable.util.PluggableUtils;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.ExternalContext;
@@ -361,12 +361,13 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         logger_.info("Project status is: "
                 + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
 
-        getOndemandBehavior().init(
+        getHotdeployBehavior().init(
                 Configuration.PROJECTSTATUS_DEVELOP.equals(projectStatus));
     }
 
-    DistributedOndemandBehavior getOndemandBehavior() {
-        return ((DistributedOndemandBehavior) S2ContainerBehavior.getProvider());
+    DistributedHotdeployBehavior getHotdeployBehavior() {
+        return ((DistributedHotdeployBehavior) S2ContainerBehavior
+                .getProvider());
     }
 
     Configuration getConfiguration() {
@@ -379,7 +380,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             return;
         }
 
-        getOndemandBehavior().destroy();
+        getHotdeployBehavior().destroy();
 
         rootContainer_.destroy();
         rootContainer_ = null;

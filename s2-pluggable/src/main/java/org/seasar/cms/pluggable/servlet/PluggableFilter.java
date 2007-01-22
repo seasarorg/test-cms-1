@@ -10,7 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
-import org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior;
+import org.seasar.cms.pluggable.hotdeploy.DistributedHotdeployBehavior;
 import org.seasar.framework.container.ExternalContext;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 
@@ -25,7 +25,7 @@ public class PluggableFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
         FilterChain chain) throws IOException, ServletException {
 
-        DistributedOndemandBehavior ondemand = (DistributedOndemandBehavior) S2ContainerBehavior
+        DistributedHotdeployBehavior ondemand = (DistributedHotdeployBehavior) S2ContainerBehavior
             .getProvider();
         ondemand.start();
         try {

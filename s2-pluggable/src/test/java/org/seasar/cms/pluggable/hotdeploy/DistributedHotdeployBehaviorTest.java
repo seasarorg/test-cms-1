@@ -9,12 +9,12 @@ import org.seasar.framework.mock.servlet.MockServletContextImpl;
 
 import junit.framework.TestCase;
 
-public class DistributedOndemandBehaviorTest extends TestCase {
+public class DistributedHotdeployBehaviorTest extends TestCase {
     protected void tearDown() throws Exception {
         SingletonPluggableContainerFactory.destroy();
     }
 
-    public void test_開発モードではLocalOndemaneS2Containerのモードに従ってhotdeployやcooldeployになること()
+    public void test_開発モードではLocalHotdeployS2Containerのモードに従ってhotdeployやcooldeployになること()
             throws Exception {
         SingletonPluggableContainerFactory.setConfigPath(getClass().getName()
                 .replace('.', '/').concat("_app.dicon"));
@@ -27,7 +27,7 @@ public class DistributedOndemandBehaviorTest extends TestCase {
                 new MockHttpServletRequestImpl(new MockServletContextImpl("/"),
                         "/hoe.do"));
 
-        DistributedOndemandBehavior ondemand = (DistributedOndemandBehavior) S2ContainerBehavior
+        DistributedHotdeployBehavior ondemand = (DistributedHotdeployBehavior) S2ContainerBehavior
                 .getProvider();
 
         ComponentDef expected;
@@ -65,7 +65,7 @@ public class DistributedOndemandBehaviorTest extends TestCase {
         assertSame(expected.getComponentClass(), actual.getComponentClass());
     }
 
-    public void test_本番モードではLocalOndemaneS2Containerのモードとは無関係にcooldeployになること()
+    public void test_本番モードではLocalHotdeployS2Containerのモードとは無関係にcooldeployになること()
             throws Exception {
         SingletonPluggableContainerFactory.setConfigPath(getClass().getName()
                 .replace('.', '/').concat("_app2.dicon"));
@@ -78,7 +78,7 @@ public class DistributedOndemandBehaviorTest extends TestCase {
                 new MockHttpServletRequestImpl(new MockServletContextImpl("/"),
                         "/hoe.do"));
 
-        DistributedOndemandBehavior ondemand = (DistributedOndemandBehavior) S2ContainerBehavior
+        DistributedHotdeployBehavior ondemand = (DistributedHotdeployBehavior) S2ContainerBehavior
                 .getProvider();
 
         ComponentDef expected;

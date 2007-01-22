@@ -6,6 +6,6 @@
   <include path="global.dicon" />
   <component class="org.seasar.cms.pluggable.PluggableProvider" />
   <component
-    class="org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior" />
+    class="org.seasar.cms.pluggable.hotdeploy.DistributedHotdeployBehavior" />
   <component class="org.seasar.cms.pluggable.PluggablePathResolver" />
 </components>

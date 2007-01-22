@@ -6,13 +6,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
+import org.seasar.framework.convention.NamingConvention;
 import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.ResourceUtil;
@@ -20,6 +23,8 @@ import org.seasar.framework.util.ResourceUtil;
 public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
 
     private ClassLoader classLoader_;
+
+    private List listeners_ = new ArrayList();
 
     private File classesDirectory_;
 
@@ -31,9 +36,26 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
 
     private static Logger logger = Logger.getLogger(HotdeployClassLoader.class);
 
-    public PluggableHotdeployClassLoader(ClassLoader classLoader) {
-        super(classLoader);
+    public PluggableHotdeployClassLoader(ClassLoader classLoader,
+            NamingConvention namingConvention) {
+        super(classLoader, namingConvention);
         classLoader_ = classLoader;
+    }
+
+    public void addHotdeployListener(HotdeployListener listener) {
+        listeners_.add(listener);
+    }
+
+    public HotdeployListener getHotdeployListener(int index) {
+        return (HotdeployListener) listeners_.get(index);
+    }
+
+    public int getHotdeployListenerSize() {
+        return listeners_.size();
+    }
+
+    public void removeHotdeployListener(HotdeployListener listener) {
+        listeners_.remove(listener);
     }
 
     public void setClassesDirectory(File classesDirectory) {
@@ -77,51 +99,54 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
         }
     }
 
-    public Class loadClass(String name) throws ClassNotFoundException {
-        return loadClass(name, false);
+    public Class loadClass(String className) throws ClassNotFoundException {
+        return loadClass(className, false);
     }
 
-    public synchronized Class loadClass(String name, boolean resolve)
+    public synchronized Class loadClass(String className, boolean resolve)
             throws ClassNotFoundException {
-        if (classCache_.containsKey(name)) {
-            Class clazz = (Class) classCache_.get(name);
+        if (classCache_.containsKey(className)) {
+            Class clazz = (Class) classCache_.get(className);
             if (clazz != null) {
                 if (resolve) {
                     resolveClass(clazz);
                 }
                 return clazz;
             } else {
-                throw new ClassNotFoundException(name);
+                throw new ClassNotFoundException(className);
             }
         }
+
         Class clazz = null;
         try {
-            if (isTargetClass(name)) {
+            if (isTargetClass(className)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("isTargetClass(" + name + ") == true");
+                    logger.debug("isTargetClass(" + className + ") == true");
                 }
-                clazz = findLoadedClass(name);
+                clazz = findLoadedClass(className);
                 if (clazz != null) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Class " + name + " is already loaded");
+                        logger.debug("Class " + className
+                                + " is already loaded");
                     }
                     return clazz;
                 }
                 if (classesDirectory_ != null) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Try to load class " + name
+                        logger.debug("Try to load class " + className
                                 + " from classes directory '"
                                 + classesDirectory_ + "'");
                     }
-                    File file = new File(classesDirectory_, name.replace('.',
-                            '/').concat(".class"));
+                    File file = new File(classesDirectory_, className.replace(
+                            '.', '/').concat(".class"));
                     if (file.exists()) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("Class resource has been found in '"
                                     + classesDirectory_ + "'");
                         }
                         try {
-                            clazz = defineClass(name, new FileInputStream(file));
+                            clazz = defineClass(className, new FileInputStream(
+                                    file));
                             definedClass(clazz);
                             if (resolve) {
                                 resolveClass(clazz);
@@ -131,7 +156,7 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
                         }
                     }
                 }
-                String path = ClassUtil.getResourcePath(name);
+                String path = ClassUtil.getResourcePath(className);
                 InputStream is = ResourceUtil
                         .getResourceAsStreamNoException(path);
                 if (is != null) {
@@ -139,7 +164,7 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
                         logger.debug("Class resource has been found as '"
                                 + path + "'");
                     }
-                    clazz = defineClass(name, is);
+                    clazz = defineClass(className, is);
                     definedClass(clazz);
                     if (resolve) {
                         resolveClass(clazz);
@@ -147,13 +172,21 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
                     return clazz;
                 }
             }
-            clazz = classLoader_.loadClass(name);
+            clazz = classLoader_.loadClass(className);
             if (resolve) {
                 resolveClass(clazz);
             }
             return clazz;
         } finally {
-            classCache_.put(name, clazz);
+            classCache_.put(className, clazz);
+        }
+    }
+
+    protected void definedClass(Class clazz) {
+        final int listenerSize = getHotdeployListenerSize();
+        for (int i = 0; i < listenerSize; ++i) {
+            HotdeployListener listener = getHotdeployListener(i);
+            listener.definedClass(clazz);
         }
     }
 }
