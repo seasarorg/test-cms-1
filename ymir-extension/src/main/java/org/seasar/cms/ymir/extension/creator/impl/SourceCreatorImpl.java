@@ -37,7 +37,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.MatchedPathMapping;
@@ -764,19 +764,13 @@ public class SourceCreatorImpl implements SourceCreator {
 
     public String getClassName(String componentName) {
 
-        if (componentName == null) {
-            return null;
-        } else {
-            LocalOndemandS2Container ondemandContainer = getApplication()
-                    .getOndemandS2Container();
-            int size = ondemandContainer.getProjectSize();
-            for (int i = 0; i < size; i++) {
-                String className = ondemandContainer.getProject(i)
-                        .fromComponentNameToClassName(ondemandContainer,
-                                componentName);
-                if (className != null) {
-                    return className;
-                }
+        if (componentName != null) {
+            LocalHotdeployS2Container hotdeployContainer = getApplication()
+                    .getHotdeployS2Container();
+            String className = hotdeployContainer.getNamingConvention()
+                    .fromComponentNameToClassName(componentName);
+            if (className != null) {
+                return className;
             }
         }
         return null;
@@ -929,7 +923,7 @@ public class SourceCreatorImpl implements SourceCreator {
     public String getPagePackageName() {
 
         return getRootPackageName() + "."
-                + namingConvention_.getWebPackageName();
+                + namingConvention_.getSubApplicationRootPackageName();
     }
 
     public String getDtoPackageName() {

@@ -18,12 +18,14 @@
     <initMethod name="init" />
   </component>
   <component
-    class="org.seasar.cms.pluggable.hotdeploy.DistributedOndemandBehavior">
+    class="org.seasar.cms.pluggable.hotdeploy.DistributedHotdeployBehavior">
     <aspect>statusFilterInterceptor</aspect>
   </component>
   <component class="org.seasar.cms.pluggable.PluggablePathResolver" />
 
   <!-- For S2ClassBuilder -->
-  <component name="class" class="org.seasar.cms.classbuilder.impl.ClassS2ContainerBuilder" />
-  <component class="org.seasar.cms.classbuilder.impl.PluggableAssemblerProvider" />
+  <component name="class"
+    class="org.seasar.cms.classbuilder.impl.ClassS2ContainerBuilder" />
+  <component
+    class="org.seasar.cms.classbuilder.impl.PluggableAssemblerProvider" />
 </components>
