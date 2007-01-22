@@ -72,13 +72,8 @@
     </dependency>
     <dependency>
       <groupId>org.seasar.dao</groupId>
-      <artifactId>s2-dao</artifactId>
-      <version>1.0.39</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seasar.dao</groupId>
       <artifactId>s2-dao-tiger</artifactId>
-      <version>1.0.35</version>
+      <version>1.0.40</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.cms.database</groupId>
