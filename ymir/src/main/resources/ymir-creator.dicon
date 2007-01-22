@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
+  "http://www.seasar.org/dtd/components24.dtd">
+<components>
+  <component class="org.seasar.cms.ymir.creator.PageCreator" />
+  <component class="org.seasar.framework.container.creator.DtoCreator" />
+  <component name="daoOndemandCreatorInterceptor"
+    class="org.seasar.framework.aop.interceptors.InterceptorChain"
+    instance="prototype">
+    <initMethod name="add">
+      <arg>j2ee.requiredTx</arg>
+    </initMethod>
+    <initMethod name="add">
+      <arg>dao.interceptor</arg>
+    </initMethod>
+  </component>
+  <component class="org.seasar.framework.container.creator.DaoCreator">
+    <initMethod name="setDaoCustomizer">
+      <arg>
+        <component
+          class="org.seasar.framework.container.customizer.AspectCustomizer"
+          autoBinding="none">
+          <property name="interceptorName">
+            "daoOndemandCreatorInterceptor"
+          </property>
+        </component>
+      </arg>
+    </initMethod>
+  </component>
+  <component class="org.seasar.framework.container.creator.DxoCreator">
+    <initMethod name="setDxoCustomizer">
+      <arg>
+        <component
+          class="org.seasar.framework.container.customizer.AspectCustomizer"
+          autoBinding="none">
+          <property name="interceptorName">
+            "dxo.intereceptor"
+          </property>
+        </component>
+      </arg>
+    </initMethod>
+  </component>
+</components>

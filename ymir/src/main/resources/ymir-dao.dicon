@@ -5,7 +5,6 @@
   <include path="j2ee.dicon" />
   <component class="org.seasar.dao.impl.AnnotationReaderFactoryImpl" />
   <component class="org.seasar.dao.impl.DaoMetaDataFactoryImpl">
-    <property name="daoSuffixes">new String[]{"Dao","Page"}</property>
     <property name="sqlFileEncoding">"UTF-8"</property>
   </component>
   <component name="interceptor"
@@ -17,4 +16,9 @@
   <component class="org.seasar.dao.impl.ValueTypeFactoryImpl" />
   <component name="stringClobType"
     class="org.seasar.extension.jdbc.types.StringClobType" />
+  <component class="org.seasar.dao.impl.BeanMetaDataFactoryImpl" />
+  <component class="org.seasar.dao.impl.DaoNamingConventionImpl">
+    <property name="daoSuffixes">new String[]{"Dao","Page"}</property>
+  </component>
+  <component class="org.seasar.dao.impl.BeanEnhancerImpl" />
 </components>
