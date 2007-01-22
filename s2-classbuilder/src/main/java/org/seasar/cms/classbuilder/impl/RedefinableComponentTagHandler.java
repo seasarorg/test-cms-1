@@ -28,6 +28,8 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
             .getAnnotationHandler();
         annoHandler.appendInitMethod(componentDef);
         annoHandler.appendDestroyMethod(componentDef);
+        annoHandler.appendAspect(componentDef);
+        annoHandler.appendInterType(componentDef);
         String expression = null;
         if (body != null) {
             expression = body.trim();
