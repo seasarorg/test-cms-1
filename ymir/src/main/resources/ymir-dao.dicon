@@ -2,14 +2,18 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
   "http://www.seasar.org/dtd/components24.dtd">
 <components namespace="dao">
-  <include path="jdbc.dicon" />
-  <include path="app.dicon" />
-  <component class="org.seasar.cms.pluggable.dao.OndemandDaoMetaDataFactory">
+  <include path="j2ee.dicon" />
+  <component class="org.seasar.dao.impl.AnnotationReaderFactoryImpl" />
+  <component class="org.seasar.dao.impl.DaoMetaDataFactoryImpl">
     <property name="daoSuffixes">new String[]{"Dao","Page"}</property>
     <property name="sqlFileEncoding">"UTF-8"</property>
   </component>
   <component name="interceptor"
-    class="org.seasar.dao.interceptors.S2DaoInterceptor" />
+    class="org.seasar.dao.pager.PagerS2DaoInterceptorWrapper">
+    <arg>
+      <component class="org.seasar.dao.interceptors.S2DaoInterceptor" />
+    </arg>
+  </component>
   <component class="org.seasar.dao.impl.ValueTypeFactoryImpl" />
   <component name="stringClobType"
     class="org.seasar.extension.jdbc.types.StringClobType" />

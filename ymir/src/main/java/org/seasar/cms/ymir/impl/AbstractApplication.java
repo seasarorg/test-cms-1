@@ -1,6 +1,6 @@
 package org.seasar.cms.ymir.impl;
 
-import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.PathMappingProvider;
 
@@ -20,12 +20,12 @@ abstract public class AbstractApplication implements Application {
 
     private String id_;
 
-    private LocalOndemandS2Container ondemandContainer_;
+    private LocalHotdeployS2Container ondemandContainer_;
 
     private PathMappingProvider pathMappingProvider_;
 
     protected AbstractApplication(String id,
-            LocalOndemandS2Container ondemandContainer,
+            LocalHotdeployS2Container ondemandContainer,
             PathMappingProvider pathMappingProvider) {
         id_ = id;
         ondemandContainer_ = ondemandContainer;
@@ -121,7 +121,7 @@ abstract public class AbstractApplication implements Application {
         }
     }
 
-    public LocalOndemandS2Container getOndemandS2Container() {
+    public LocalHotdeployS2Container getHotdeployS2Container() {
         return ondemandContainer_;
     }
 

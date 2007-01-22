@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import javax.servlet.ServletContext;
 
 import org.seasar.cms.pluggable.Configuration;
-import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.cms.ymir.PathMappingProvider;
 import org.seasar.framework.container.S2Container;
 
@@ -26,7 +26,7 @@ public class SingleApplication extends AbstractApplication {
 
     public SingleApplication(ServletContext context, Configuration config,
             Class referenceClass, S2Container container,
-            LocalOndemandS2Container ondemandContainer,
+            LocalHotdeployS2Container ondemandContainer,
             PathMappingProvider pathMappingProvider) {
         super(ID_DEFAULT, ondemandContainer, pathMappingProvider);
         context_ = context;

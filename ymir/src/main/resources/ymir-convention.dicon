@@ -5,25 +5,19 @@
   <include path="app.dicon" />
   <include path="global.dicon" />
   <include path="j2ee.dicon" />
-  <include path="dao.dicon" />
-  <include path="s2dxo.dicon" />
+  <include path="ymir-dao.dicon" />
   <component
-    class="org.seasar.cms.ymir.convention.YmirNamingConvention" />
-  <component
-    class="org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container">
-    <initMethod name="addProject">
-      <arg>
-        <component
-          class="org.seasar.framework.container.hotdeploy.impl.OndemandProjectImpl">
-          <property name="rootPackageName">
-            config.getProperty("rootPackageName", "skeleton")
-          </property>
-        </component>
-      </arg>
+    class="org.seasar.cms.ymir.convention.YmirNamingConvention">
+    <initMethod name="addRootPackageName">
+      <arg>config.getProperty("rootPackageName", "skeleton")</arg>
     </initMethod>
   </component>
-  <component class="org.seasar.cms.ymir.creator.PageCreator" />
-  <component class="org.seasar.cms.ymir.creator.DtoCreator" />
+  <component
+    class="org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container" />
+  <component class="org.seasar.cms.ymir.creator.PageCreator"
+    instance="prototype" />
+  <component class="org.seasar.framework.container.creator.DtoCreator"
+    instance="prototype" />
   <component name="daoOndemandCreatorInterceptor"
     class="org.seasar.framework.aop.interceptors.InterceptorChain"
     instance="prototype">
@@ -34,11 +28,12 @@
       <arg>dao.interceptor</arg>
     </initMethod>
   </component>
-  <component class="org.seasar.cms.ymir.creator.DaoCreator">
+  <component class="org.seasar.framework.container.creator.DaoCreator"
+    instance="prototype">
     <initMethod name="setDaoCustomizer">
       <arg>
         <component
-          class="org.seasar.framework.container.autoregister.AspectCustomizer"
+          class="org.seasar.framework.container.customizer.AspectCustomizer"
           autoBinding="none">
           <property name="interceptorName">
             "daoOndemandCreatorInterceptor"
@@ -47,11 +42,12 @@
       </arg>
     </initMethod>
   </component>
-  <component class="org.seasar.cms.ymir.creator.DxoCreator">
+  <component class="org.seasar.framework.container.creator.DxoCreator"
+    instance="prototype">
     <initMethod name="setDxoCustomizer">
       <arg>
         <component
-          class="org.seasar.framework.container.autoregister.AspectCustomizer"
+          class="org.seasar.framework.container.customizer.AspectCustomizer"
           autoBinding="none">
           <property name="interceptorName">
             "s2dxo.s2DxoIntereceptor"

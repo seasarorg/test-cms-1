@@ -3,12 +3,13 @@ package org.seasar.cms.ymir;
 import junit.framework.TestCase;
 
 import org.seasar.cms.ymir.convention.YmirNamingConvention;
-import org.seasar.cms.ymir.creator.PageCreator;
+import org.seasar.cms.ymir.web._RootPage;
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.creator.PageCreator;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.kvasir.util.el.VariableResolver;
 
-public class ConventionTest extends TestCase {
+public class YmirConventionTest extends TestCase {
 
     /*
      * 標準のマッピングをテストします。
@@ -44,10 +45,11 @@ public class ConventionTest extends TestCase {
 
     public void testFromComponentNameToClassName() throws Exception {
 
-        PageCreator creator = new PageCreator(
-                new YmirNamingConvention());
-        assertEquals("org.example.web._RootPage", creator
-                .getComponentClassName(null, "org.example", "_RootPage"));
+        YmirNamingConvention convention = new YmirNamingConvention();
+        convention.addRootPackageName("org.seasar.cms.ymir");
+        PageCreator creator = new PageCreator(convention);
+        assertEquals(_RootPage.class, creator.getNamingConvention()
+                .fromComponentNameToClass("_RootPage"));
     }
 
     private MatchedPathMapping match(String path, String method,

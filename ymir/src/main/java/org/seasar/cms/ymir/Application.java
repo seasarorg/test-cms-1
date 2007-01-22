@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
-import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.framework.container.S2Container;
 
 public interface Application {
@@ -53,7 +53,7 @@ public interface Application {
 
     String getDefaultPropertiesFilePath();
 
-    LocalOndemandS2Container getOndemandS2Container();
+    LocalHotdeployS2Container getHotdeployS2Container();
 
     PathMappingProvider getPathMappingProvider();
 

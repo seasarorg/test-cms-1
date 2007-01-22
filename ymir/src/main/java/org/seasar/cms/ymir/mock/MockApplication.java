@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
-import org.seasar.cms.pluggable.hotdeploy.LocalOndemandS2Container;
+import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.PathMappingProvider;
 import org.seasar.framework.container.S2Container;
@@ -19,7 +19,7 @@ public class MockApplication implements Application {
         return null;
     }
 
-    public LocalOndemandS2Container getOndemandS2Container() {
+    public LocalHotdeployS2Container getHotdeployS2Container() {
         return null;
     }
 
