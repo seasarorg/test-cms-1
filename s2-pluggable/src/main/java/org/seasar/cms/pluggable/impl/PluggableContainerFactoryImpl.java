@@ -196,42 +196,52 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     void integrate(S2Container root, S2Container container,
             S2Container[] dependencies, URL[] pathURLs) {
 
-        MetaDef metaDef = container.getMetaDef(META_EXPAND);
-        if (metaDef != null) {
-            Object value = metaDef.getValue();
-            if (value == null) {
-                throw new NullPointerException("container '"
-                        + container.getPath() + "' has null 'expand' meta-data");
-            }
-            String[] paths = value.toString().split(",");
-            for (int i = 0; i < paths.length; i++) {
-                URL[] urls = PluggableUtils.getResourceURLs(paths[i].trim());
-                if (urls.length == 1) {
-                    addAll(container, readS2Container(urls[0].toExternalForm()));
-                } else if (urls.length == 0) {
-                    throw new RuntimeException(
-                            "Resource to expand not found: container="
-                                    + container.getPath() + ", name="
-                                    + paths[i]);
-                } else {
-                    StringBuffer sb = new StringBuffer();
-                    String delim = "";
-                    for (int j = 0; j < urls.length; j++) {
-                        sb.append(delim).append(urls[j].toExternalForm());
-                        delim = ", ";
-                    }
-                    throw new RuntimeException(
-                            "Too many resources to expand: container="
-                                    + container.getPath() + ", name="
-                                    + paths[i] + ", resources=" + sb.toString());
-                }
-            }
-        }
+        processExpanding(container);
+
         for (int i = 0; i < pathURLs.length; i++) {
             addAll(container, readS2Container(pathURLs[i].toExternalForm()));
         }
 
         includeToLeaves(container, dependencies);
+    }
+
+    S2Container processExpanding(S2Container container) {
+        MetaDef metaDef = container.getMetaDef(META_EXPAND);
+        if (metaDef == null) {
+            return container;
+        }
+
+        Object value = metaDef.getValue();
+        if (value == null) {
+            throw new NullPointerException("container '" + container.getPath()
+                    + "' has null 'expand' meta-data");
+        }
+
+        String[] paths = value.toString().split(",");
+        for (int i = 0; i < paths.length; i++) {
+            URL[] urls = PluggableUtils.getResourceURLs(paths[i].trim());
+            if (urls.length == 1) {
+                addAll(container, processExpanding(readS2Container(urls[0]
+                        .toExternalForm())));
+            } else if (urls.length == 0) {
+                throw new RuntimeException(
+                        "Resource to expand not found: container="
+                                + container.getPath() + ", name=" + paths[i]);
+            } else {
+                StringBuffer sb = new StringBuffer();
+                String delim = "";
+                for (int j = 0; j < urls.length; j++) {
+                    sb.append(delim).append(urls[j].toExternalForm());
+                    delim = ", ";
+                }
+                throw new RuntimeException(
+                        "Too many resources to expand: container="
+                                + container.getPath() + ", name=" + paths[i]
+                                + ", resources=" + sb.toString());
+            }
+        }
+
+        return container;
     }
 
     S2Container readS2Container(String path) {

@@ -142,6 +142,26 @@ public class PluggableContainerFactoryImplTest extends TestCase {
                 included, actual.getChild(0));
     }
 
+    public void testIntegrate7() throws Exception {
+
+        target_.prepareForContainer();
+        S2Container actual = target_.integrate(getClass().getName().replace(
+                '.', '/')
+                + "_testIntegrate7.dicon", new S2Container[0]);
+
+        assertEquals("同じものを2回expandした場合でも両方とも正しく展開されること", 2, actual
+                .findAllComponentDefs(List.class).length);
+    }
+
+    public void testIntegrate8() throws Exception {
+
+        target_.prepareForContainer();
+        S2Container actual = target_.integrate(getClass().getName().replace(
+                '.', '/')
+                + "_testIntegrate8.dicon", new S2Container[0]);
+        assertTrue("expandが再帰的に展開されること", actual.hasComponentDef(List.class));
+    }
+
     /*
      * S2Container#findComponents()はコンテナをまたがってコンポーネントを
      * 収集しないという仕様とのこと。

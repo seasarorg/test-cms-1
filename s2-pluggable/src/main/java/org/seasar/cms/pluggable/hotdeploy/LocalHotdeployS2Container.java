@@ -122,7 +122,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
                 return findComponentDef0(key);
             }
         } else {
-            return findComponentDef0(key);
+            return getComponentDefFromCache(key);
         }
     }
 
