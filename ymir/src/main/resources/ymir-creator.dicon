@@ -34,7 +34,7 @@
           class="org.seasar.framework.container.customizer.AspectCustomizer"
           autoBinding="none">
           <property name="interceptorName">
-            "dxo.intereceptor"
+            "dxo.interceptor"
           </property>
         </component>
       </arg>
