@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
@@ -85,6 +86,7 @@ import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
 import org.seasar.kvasir.util.StringUtils;
+import org.seasar.kvasir.util.collection.MapProperties;
 
 public class SourceCreatorImpl implements SourceCreator {
 
@@ -830,11 +832,16 @@ public class SourceCreatorImpl implements SourceCreator {
         return new File(getResourcesDirectory(), SOURCECREATOR_PROPERTIES);
     }
 
+    @SuppressWarnings("unchecked")
     public void saveSourceCreatorProperties() {
 
         if (sourceCreatorProperties_ == null) {
             return;
         }
+
+        MapProperties prop = new MapProperties(new TreeMap(
+                sourceCreatorProperties_));
+
         File file = getSourceCreatorPropertiesFile();
         if (!file.exists()) {
             file.getParentFile().mkdirs();
@@ -842,7 +849,8 @@ public class SourceCreatorImpl implements SourceCreator {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file);
-            sourceCreatorProperties_.store(new BufferedOutputStream(fos), null);
+            prop.store(new BufferedOutputStream(fos), "ISO-8859-1");
+            fos = null;
         } catch (IOException ex) {
             logger_.error("Can't write properties: " + file);
         } finally {
