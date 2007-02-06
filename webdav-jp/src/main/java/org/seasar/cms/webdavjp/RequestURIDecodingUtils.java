@@ -42,7 +42,7 @@ public class RequestURIDecodingUtils {
             for (int i = 0; i < n; i++) {
                 char ch = url.charAt(i);
                 if (ch > 0x7f) {
-                    byte[] bytes = url.substring(i, i + 1).getBytes("UTF-8");
+                    byte[] bytes = url.substring(i, i + 1).getBytes(encoding);
                     for (int j = 0; j < bytes.length; j++) {
                         int b = bytes[j];
                         if (b < 0) {
