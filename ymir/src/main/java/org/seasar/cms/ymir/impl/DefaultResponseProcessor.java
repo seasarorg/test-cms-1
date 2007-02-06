@@ -61,8 +61,17 @@ public class DefaultResponseProcessor implements ResponseProcessor {
             return null;
 
         case Response.TYPE_REDIRECT:
-            httpResponse.sendRedirect(redirectionPathResolver_.resolve(response
-                    .getPath(), request));
+            String resolved = redirectionPathResolver_.resolve(response
+                    .getPath(), request);
+            if (resolved == null) {
+                throw new NullPointerException(
+                        "Redirection path is null: may logic is wrong");
+            }
+            if (resolved.startsWith("/")) {
+                // 内部パスの場合はエンコードする。
+                resolved = httpResponse.encodeRedirectURL(resolved);
+            }
+            httpResponse.sendRedirect(resolved);
             return null;
 
         case Response.TYPE_SELF_CONTAINED:
