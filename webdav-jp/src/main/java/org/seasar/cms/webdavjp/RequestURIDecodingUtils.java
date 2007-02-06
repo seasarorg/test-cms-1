@@ -36,6 +36,10 @@ public class RequestURIDecodingUtils {
      * @return エンコードしたURL。
      */
     public static String reencode(String url, String encoding) {
+        if (url == null) {
+            return null;
+        }
+
         try {
             StringBuffer sb = new StringBuffer();
             int n = url.length();
