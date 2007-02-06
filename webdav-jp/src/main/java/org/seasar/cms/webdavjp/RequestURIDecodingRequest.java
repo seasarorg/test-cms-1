@@ -8,10 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 public class RequestURIDecodingRequest extends HttpServletRequestWrapper {
-    private static final char[] byteTable_ = new char[] { '0', '1', '2', '3',
-        '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    public static final String ATTR_FORWARD_PATH_INFO = "javax.servlet.forward.path_info";
 
-    private HttpServletRequest request_;
+    public static final String ATTR_FORWARD_SERVLET_PATH = "javax.servlet.forward.servlet_path";
+
+    public static final String ATTR_FORWARD_REQUEST_URI = "javax.servlet.forward.request_uri";
 
     private RequestURIDecodingFilter filter_;
 
@@ -54,7 +55,6 @@ public class RequestURIDecodingRequest extends HttpServletRequestWrapper {
             System.out.println("urlEncoding: " + urlEncoding);
         }
 
-        request_ = request;
         nativeEncoding_ = nativeEncoding;
         urlEncoding_ = urlEncoding;
         requestURI_ = decode(request.getRequestURI());
@@ -69,10 +69,10 @@ public class RequestURIDecodingRequest extends HttpServletRequestWrapper {
         if (destination_ != null) {
             destination_ = URLDecode(decode(destination_));
             if (!filter_.isDestinationUrlDecode()) {
-                destination_ = reencodeUTF8(destination_);
-                // XXX - reencodeUTF8()は、元々URLエンコードされていた
+                // FIXME - ここでは、元々URLエンコードされていた
                 // 文字のうちASCII文字に関しては再エンコードすべきだが、
                 // これは非常に困難なので今はそうなっていない。
+                destination_ = RequestURIDecodingUtils.reencode(destination_);
             }
             if (filter_.isDestinationAbsolutePath()) {
                 // Tomcat4.1.29, Tomcat4.1.30のWebdavServlet不具合を回避
@@ -150,26 +150,50 @@ public class RequestURIDecodingRequest extends HttpServletRequestWrapper {
      */
 
     public String getRequestURI() {
-        return requestURI_;
+        if (isForwared()) {
+            return getHttpRequest().getRequestURI();
+        } else {
+            return requestURI_;
+        }
+    }
+
+    HttpServletRequest getHttpRequest() {
+        return (HttpServletRequest) getRequest();
+    }
+
+    boolean isForwared() {
+        return (getHttpRequest().getAttribute(ATTR_FORWARD_REQUEST_URI) != null);
     }
 
     public StringBuffer getRequestURL() {
-        return new StringBuffer(requestURL_);
+        if (isForwared()) {
+            return getHttpRequest().getRequestURL();
+        } else {
+            return new StringBuffer(requestURL_);
+        }
     }
 
     public String getPathInfo() {
-        return pathInfo_;
+        if (isForwared()) {
+            return getHttpRequest().getPathInfo();
+        } else {
+            return pathInfo_;
+        }
     }
 
     public String getServletPath() {
-        return servletPath_;
+        if (isForwared()) {
+            return getHttpRequest().getServletPath();
+        } else {
+            return servletPath_;
+        }
     }
 
     public String getHeader(String name) {
         if ("destination".equalsIgnoreCase(name)) {
             return destination_;
         } else {
-            return request_.getHeader(name);
+            return getHttpRequest().getHeader(name);
         }
     }
 
@@ -181,7 +205,7 @@ public class RequestURIDecodingRequest extends HttpServletRequestWrapper {
             }
             return vector.elements();
         } else {
-            return request_.getHeaders(name);
+            return getHttpRequest().getHeaders(name);
         }
     }
 
@@ -318,44 +342,6 @@ public class RequestURIDecodingRequest extends HttpServletRequestWrapper {
                 throw new IllegalArgumentException("Illegal URI: "
                         + relativeURI);
             }
-        }
-    }
-
-    /**
-     * 指定されたURL中の非ASCIIコードに関してのみ
-     * URLエンコードを行ないます。
-     * <p>エンコード後の文字エンコーディングはUTF8になります。</p>
-     * <p>非ASCIIコード部分以外はエンコードされません。
-     * 従って '%' 等はそのままになります。</p>
-     *
-     * @param url エンコードするURL。
-     * @return エンコードしたURL。
-     */
-    protected String reencodeUTF8(String url) {
-        try {
-            StringBuffer sb = new StringBuffer();
-            int n = url.length();
-            for (int i = 0; i < n; i++) {
-                char ch = url.charAt(i);
-                if (ch > 0x7f) {
-                    byte[] bytes = url.substring(i, i + 1).getBytes("UTF-8");
-                    for (int j = 0; j < bytes.length; j++) {
-                        int b = bytes[j];
-                        if (b < 0) {
-                            b += 256;
-                        }
-                        sb.append("%");
-                        sb.append(byteTable_[b / 16]);
-                        sb.append(byteTable_[b % 16]);
-                    }
-                } else {
-                    sb.append(ch);
-                }
-            }
-
-            return sb.toString();
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException("Can't happen!");
         }
     }
 }

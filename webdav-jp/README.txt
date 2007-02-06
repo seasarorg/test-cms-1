@@ -78,6 +78,11 @@ web.xml中の<filter>タグに書くことのできる初期パラメータ（in
 
 ■変更履歴
 
+0.1.5:
+・リクエストがフォワードされた後にservletPathやpathInfoなどを取得するとフォワード以前の
+  情報が返されてしまう不具合を修正した。
+・Webアプリケーション内のパスにリダイレクトをする際に、パスが日本語を含む場合は%XX形式に
+  エンコードするようにした。
 0.1.4: 2004/04/16
 ・useServletPathAsPathInfoを指定した時に、今まではservletPathとpathInfoが
   ともに非nullの場合は何もしなかったのを止めて、servletPathとpathInfoを連

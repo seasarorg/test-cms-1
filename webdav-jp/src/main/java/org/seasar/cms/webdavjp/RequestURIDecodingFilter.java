@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class RequestURIDecodingFilter implements Filter {
     private FilterConfig config_;
@@ -124,6 +125,7 @@ public class RequestURIDecodingFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res,
             FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) res;
 
         String userAgent = request.getHeader("User-Agent");
         String nativeEncoding = null;
@@ -164,10 +166,12 @@ public class RequestURIDecodingFilter implements Filter {
             urlEncoding = urlEncoding_;
         }
 
-        RequestURIDecodingRequest r = new RequestURIDecodingRequest(this,
-                request, nativeEncoding, urlEncoding);
+        RequestURIDecodingRequest wrappedRequest = new RequestURIDecodingRequest(
+                this, request, nativeEncoding, urlEncoding);
+        RequestURIDecodingResponse wrappedResponse = new RequestURIDecodingResponse(
+                this, response, nativeEncoding, urlEncoding);
 
-        chain.doFilter(r, res);
+        chain.doFilter(wrappedRequest, wrappedResponse);
     }
 
     /*
