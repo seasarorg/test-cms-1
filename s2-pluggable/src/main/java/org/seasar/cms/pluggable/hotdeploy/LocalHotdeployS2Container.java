@@ -1,6 +1,7 @@
 package org.seasar.cms.pluggable.hotdeploy;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -266,6 +267,15 @@ public class LocalHotdeployS2Container implements ClassHandler {
             String path = container_.getPath();
             if (path != null) {
                 URL url = classLoader.getResource(path);
+                if (url == null) {
+                    // もともとpathがURLの場合。
+                    try {
+                        url = new URL(path);
+                    } catch (MalformedURLException ex) {
+                        throw new RuntimeException(
+                                "Can't generate URL from path: " + path);
+                    }
+                }
                 if (url != null) {
                     resourceList.add(new ReferenceResource(url, path));
                 }
