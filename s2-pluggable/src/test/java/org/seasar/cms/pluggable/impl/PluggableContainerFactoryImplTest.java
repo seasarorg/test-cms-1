@@ -162,6 +162,15 @@ public class PluggableContainerFactoryImplTest extends TestCase {
         assertTrue("expandが再帰的に展開されること", actual.hasComponentDef(List.class));
     }
 
+    public void testIntegrate9() throws Exception {
+
+        target_.prepareForContainer();
+        S2Container actual = target_.integrate(getClass().getName().replace(
+                '.', '/')
+                + "_testIntegrate9.dicon", new S2Container[0]);
+        assertTrue("include先のexpandも展開されること", actual.hasComponentDef(List.class));
+    }
+
     /*
      * S2Container#findComponents()はコンテナをまたがってコンポーネントを
      * 収集しないという仕様とのこと。

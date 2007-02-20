@@ -196,8 +196,6 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     void integrate(S2Container root, S2Container container,
             S2Container[] dependencies, URL[] pathURLs) {
 
-        processExpanding(container);
-
         for (int i = 0; i < pathURLs.length; i++) {
             addAll(container, readS2Container(pathURLs[i].toExternalForm()));
         }
@@ -205,7 +203,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         includeToLeaves(container, dependencies);
     }
 
-    S2Container processExpanding(S2Container container) {
+    public S2Container processExpanding(S2Container container) {
         MetaDef metaDef = container.getMetaDef(META_EXPAND);
         if (metaDef == null) {
             return container;

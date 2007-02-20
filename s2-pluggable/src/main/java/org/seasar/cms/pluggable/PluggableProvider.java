@@ -31,13 +31,18 @@ public class PluggableProvider extends DefaultProvider {
                     child = root.getDescendant(realPath);
                     parent.include(child);
                 } else {
-                    child = super.include(parent, path);
+                    child = includeWithExpanding(parent, path);
                     root.registerDescendant(child);
                 }
                 return child;
             }
         } else {
-            return super.include(parent, path);
+            return includeWithExpanding(parent, path);
         }
+    }
+
+    S2Container includeWithExpanding(S2Container parent, String path) {
+        return SingletonPluggableContainerFactory.getInstance()
+                .processExpanding(super.include(parent, path));
     }
 }

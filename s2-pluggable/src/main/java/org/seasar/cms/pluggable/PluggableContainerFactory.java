@@ -38,6 +38,8 @@ public interface PluggableContainerFactory {
     S2Container integrate(String configPath, ClassLoader classLoader,
             S2Container[] dependencies);
 
+    S2Container processExpanding(S2Container container);
+
     void init();
 
     void destroy();
