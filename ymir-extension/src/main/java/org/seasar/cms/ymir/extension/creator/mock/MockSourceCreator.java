@@ -120,6 +120,11 @@ public class MockSourceCreator implements SourceCreator {
         return null;
     }
 
+    public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas,
+            String[] ignoreVariables) {
+        return null;
+    }
+
     public void updateClasses(ClassDescBag classDescBag, boolean mergeMethod) {
     }
 

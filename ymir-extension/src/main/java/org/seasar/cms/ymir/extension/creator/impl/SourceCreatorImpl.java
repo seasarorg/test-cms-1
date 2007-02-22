@@ -256,10 +256,15 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas) {
+        return gatherClassDescs(pathMetaDatas, null);
+    }
+
+    public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas,
+            String[] ignoreVariables) {
 
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         for (int i = 0; i < pathMetaDatas.length; i++) {
-            gatherClassDescs(classDescMap, pathMetaDatas[i]);
+            gatherClassDescs(classDescMap, pathMetaDatas[i], ignoreVariables);
         }
         ClassDesc[] classDescs = addRelativeClassDescs(classDescMap.values()
                 .toArray(new ClassDesc[0]));
@@ -314,14 +319,14 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public void gatherClassDescs(Map<String, ClassDesc> classDescMap,
-            PathMetaData pathMetaData) {
+            PathMetaData pathMetaData, String[] ignoreVariables) {
 
         String path = pathMetaData.getPath();
         String method = pathMetaData.getMethod();
         String className = pathMetaData.getClassName();
         analyzer_.analyze(getServletContext(), getHttpServletRequest(),
                 getHttpServletResponse(), path, method, classDescMap,
-                pathMetaData.getTemplate(), className);
+                pathMetaData.getTemplate(), className, ignoreVariables);
 
         ClassDesc classDesc = classDescMap.get(className);
         if (classDesc == null && method.equalsIgnoreCase(Request.METHOD_POST)) {

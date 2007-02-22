@@ -1,0 +1,8 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <p tal:content="self/content">CONTENT</p>
+  </body>
+</html>

@@ -11,5 +11,5 @@ public interface TemplateAnalyzer {
     void analyze(ServletContext servletContext, HttpServletRequest request,
             HttpServletResponse response, String path, String method,
             Map<String, ClassDesc> classDescriptorMap, Template template,
-            String className);
+            String className, String[] ignoreVariables);
 }

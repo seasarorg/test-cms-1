@@ -133,7 +133,11 @@ public class ZptAnalyzerTest extends TestCase {
         target_.setSourceCreator(creator);
     }
 
-    private void act(final String methodName) {
+    private void act(String methodName) {
+        act(methodName, null);
+    }
+
+    private void act(final String methodName, String[] ignoreVariables) {
 
         target_.analyze(MOCK_SERVLETCONTEXT, MOCK_REQUEST, MOCK_RESPONSE,
                 "/hoe", Request.METHOD_GET, classDescMap_, new Template() {
@@ -161,7 +165,7 @@ public class ZptAnalyzerTest extends TestCase {
                     public long lastModified() {
                         return 0;
                     }
-                }, CLASSNAME);
+                }, CLASSNAME, ignoreVariables);
     }
 
     private ClassDesc getClassDesc(String name) {
@@ -452,5 +456,12 @@ public class ZptAnalyzerTest extends TestCase {
                 .getPropertyDesc("enabled");
         assertNotNull("tal:conditionの式については生成するプロパティの型がbooleanになること", actual);
         assertEquals("boolean", actual.getTypeDesc().getName());
+    }
+
+    public void testAnalyze21() throws Exception {
+
+        act("testAnalyze21", new String[] { "self" });
+
+        assertNull("無視するように指定した変数が正しく無視されること", getClassDesc(CLASSNAME));
     }
 }

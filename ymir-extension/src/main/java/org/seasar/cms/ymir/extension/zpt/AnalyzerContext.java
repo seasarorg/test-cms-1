@@ -1,5 +1,6 @@
 package org.seasar.cms.ymir.extension.zpt;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -43,9 +44,11 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private VariableResolver variableResolver_;
 
-    private Set<String> usedWithVariableSet_ = new HashSet<String>();
+    private Set<String> usedAsVariableSet_ = new HashSet<String>();
 
-    private Set<String> usedWithLocalVariableSet_ = new HashSet<String>();
+    private Set<String> usedAsLocalVariableSet_ = new HashSet<String>();
+
+    private Set<String> ignoreVariableSet_ = new HashSet<String>();
 
     @Override
     public VariableResolver getVariableResolver() {
@@ -66,15 +69,27 @@ public class AnalyzerContext extends ZptTemplateContext {
         usingFreyjaRenderClasses_ = usingFreyjaRenderClasses;
     }
 
+    public void setIgnoreVariables(String[] ignoreVariables) {
+        if (ignoreVariables == null) {
+            ignoreVariableSet_.clear();
+        } else {
+            ignoreVariableSet_.addAll(Arrays.asList(ignoreVariables));
+        }
+    }
+
+    public boolean shouldIgnoreVariable(String name) {
+        return ignoreVariableSet_.contains(name);
+    }
+
     public void defineVariable(int scope, String name, Object value) {
 
+        setUsedAsLocalVariable(name);
         if (value != null && value instanceof DescWrapper) {
             DescWrapper wrapper = (DescWrapper) value;
             PropertyDesc propertyDesc = wrapper.getPropertyDesc();
             if (propertyDesc != null) {
                 TypeDesc typeDesc = propertyDesc.getTypeDesc();
                 ClassDesc classDescOfdefinedVariable = getTemporaryClassDesc(name);
-                setUsedWithLocalVariable(classDescOfdefinedVariable);
                 typeDesc.setClassDesc(classDescOfdefinedVariable);
             } else {
                 // self/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
@@ -88,6 +103,7 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public RepeatInfo pushRepeatInfo(String name, Object[] objs) {
 
+        setUsedAsLocalVariable(name);
         if (objs != null && objs.length == 1 && objs[0] instanceof DescWrapper) {
             DescWrapper wrapper = (DescWrapper) objs[0];
             PropertyDesc propertyDesc = wrapper.getPropertyDesc();
@@ -95,7 +111,6 @@ public class AnalyzerContext extends ZptTemplateContext {
                 TypeDesc typeDesc = propertyDesc.getTypeDesc();
                 typeDesc.setArray(true);
                 ClassDesc classDescOfDefinedVariable = getTemporaryClassDesc(name);
-                setUsedWithLocalVariable(classDescOfDefinedVariable);
                 typeDesc.setClassDesc(classDescOfDefinedVariable);
             } else {
                 // self/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
@@ -258,8 +273,8 @@ public class AnalyzerContext extends ZptTemplateContext {
             // 以外は無視する。
             if (isPage(classDesc)) {
                 registerAvailablePagesAndDtos(classDesc);
-            } else if (isUsedWithVariable(classDesc)
-                    && !isUsedWithLocalVariable(classDesc)) {
+            } else if (isUsedAsVariable(classDesc.getName())
+                    && !isUsedAsLocalVariable(classDesc.getName())) {
                 register(classDesc);
             }
         }
@@ -377,23 +392,23 @@ public class AnalyzerContext extends ZptTemplateContext {
         return returned;
     }
 
-    public boolean isUsedWithVariable(ClassDesc classDesc) {
+    public boolean isUsedAsVariable(String name) {
 
-        return usedWithVariableSet_.contains(classDesc.getName());
+        return usedAsVariableSet_.contains(name);
     }
 
-    public void setUsedWithVariable(ClassDesc classDesc) {
+    public void setUsedAsVariable(String name) {
 
-        usedWithVariableSet_.add(classDesc.getName());
+        usedAsVariableSet_.add(name);
     }
 
-    public boolean isUsedWithLocalVariable(ClassDesc classDesc) {
+    public boolean isUsedAsLocalVariable(String name) {
 
-        return usedWithLocalVariableSet_.contains(classDesc.getName());
+        return usedAsLocalVariableSet_.contains(name);
     }
 
-    public void setUsedWithLocalVariable(ClassDesc classDesc) {
+    public void setUsedAsLocalVariable(String name) {
 
-        usedWithLocalVariableSet_.add(classDesc.getName());
+        usedAsLocalVariableSet_.add(name);
     }
 }

@@ -22,7 +22,7 @@ public class AnalyzerVariableResolver implements VariableResolver {
 
         if (context != null && shouldGenerateClassOf(analyzerContext, name)) {
             ClassDesc classDesc = analyzerContext.getTemporaryClassDesc(name);
-            analyzerContext.setUsedWithVariable(classDesc);
+            analyzerContext.setUsedAsVariable(classDesc.getName());
             return new DescWrapper(classDesc);
         } else {
             return delegated_.getVariable(context, name);
@@ -30,6 +30,9 @@ public class AnalyzerVariableResolver implements VariableResolver {
     }
 
     boolean shouldGenerateClassOf(AnalyzerContext analyzerContext, String name) {
+        if (analyzerContext.shouldIgnoreVariable(name)) {
+            return false;
+        }
         Class type = Object.class;
         Entry entry = delegated_.getVariableEntry(analyzerContext, name);
         if (entry != null) {

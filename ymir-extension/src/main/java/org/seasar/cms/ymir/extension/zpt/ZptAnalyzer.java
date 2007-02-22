@@ -45,10 +45,11 @@ public class ZptAnalyzer implements TemplateAnalyzer {
     public void analyze(ServletContext servletContext,
             HttpServletRequest request, HttpServletResponse response,
             String path, String method, Map<String, ClassDesc> classDescMap,
-            Template template, String className) {
+            Template template, String className, String[] ignoreVariables) {
 
         path = zpt_.getTemplatePathResolver().resolve(path, request);
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
+        context.setIgnoreVariables(ignoreVariables);
         zpt_.buildTemplateContext(context, servletContext, request, response,
                 Locale.getDefault(), path);
         context.setTemplateSet(new AnalyzerTemplateSet(evaluator_, context

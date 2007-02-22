@@ -69,6 +69,9 @@ public interface SourceCreator extends Updater {
 
     ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas);
 
+    ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas,
+            String[] ignoreVariables);
+
     void updateClasses(ClassDescBag classDescBag, boolean mergeMethod);
 
     Properties getSourceCreatorProperties();
