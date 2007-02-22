@@ -167,15 +167,18 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     public String toClassName(String componentName) {
 
+        String className = null;
         if (DefaultRequestProcessor.ATTR_SELF.equals(componentName)) {
-            return getPageClassName();
+            className = getPageClassName();
+            // Kvasir/SoraのpopプラグインのexternalTemplate機能を使って自動生成
+            // をしている場合、classNameはnullになり得ることに注意。
         } else {
-            String className = sourceCreator_.getClassName(componentName);
-            if (className == null) {
-                className = getDtoClassName(componentName);
-            }
-            return className;
+            className = sourceCreator_.getClassName(componentName);
         }
+        if (className == null) {
+            className = getDtoClassName(componentName);
+        }
+        return className;
     }
 
     public String getPageClassName() {
