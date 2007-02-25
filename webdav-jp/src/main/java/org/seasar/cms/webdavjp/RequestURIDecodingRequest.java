@@ -61,7 +61,8 @@ public class RequestURIDecodingRequest extends HttpServletRequestWrapper {
         requestURL_ = decode(request.getRequestURL().toString());
 
         String contextPath = request.getContextPath();
-        String relativeURI = requestURI_.substring(contextPath.length());
+        String relativeURI = stripPathParameter(requestURI_).substring(
+                contextPath.length());
         relativeURI = URLDecode(relativeURI);
         validate(relativeURI);
 
@@ -132,7 +133,20 @@ public class RequestURIDecodingRequest extends HttpServletRequestWrapper {
      * static methods
      */
 
-    protected static byte convertHexDigit(byte b) {
+    static String stripPathParameter(String uri) {
+        if (uri == null) {
+            return null;
+        } else {
+            int semi = uri.lastIndexOf(';');
+            if (semi < 0) {
+                return uri;
+            } else {
+                return uri.substring(0, semi);
+            }
+        }
+    }
+
+    static byte convertHexDigit(byte b) {
         if (b >= '0' && b <= '9') {
             return (byte) (b - '0');
         } else if (b >= 'a' && b <= 'f') {
