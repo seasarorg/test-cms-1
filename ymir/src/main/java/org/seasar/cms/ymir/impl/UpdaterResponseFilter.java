@@ -113,7 +113,7 @@ public class UpdaterResponseFilter extends HttpServletResponseWrapper implements
 
     void commit(String response) throws IOException {
         IOUtils.writeString(getResponse().getOutputStream(), response,
-                getResponseCharset(), false);
+                getResponseCharset(), false, false);
     }
 
     String getResponseCharset() {
@@ -125,6 +125,6 @@ public class UpdaterResponseFilter extends HttpServletResponseWrapper implements
     }
 
     void commit(byte[] response) throws IOException {
-        IOUtils.writeBytes(getResponse().getOutputStream(), response);
+        IOUtils.writeBytes(getResponse().getOutputStream(), response, false);
     }
 }
