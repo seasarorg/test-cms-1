@@ -141,19 +141,4 @@ public class ServletUtils {
             response.setDateHeader("Expires", 1);
         }
     }
-
-    public static String stripParametersAndQueries(String path) {
-        if (path == null) {
-            return null;
-        }
-        int semi = path.indexOf(';');
-        if (semi >= 0) {
-            return path.substring(0, semi);
-        }
-        int question = path.indexOf('?');
-        if (question >= 0) {
-            return path.substring(0, question);
-        }
-        return path;
-    }
 }

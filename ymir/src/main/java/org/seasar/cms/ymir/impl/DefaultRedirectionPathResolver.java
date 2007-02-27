@@ -1,8 +1,7 @@
 package org.seasar.cms.ymir.impl;
 
-import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RedirectionPathResolver;
-import org.seasar.cms.ymir.util.ServletUtils;
+import org.seasar.cms.ymir.Request;
 
 public class DefaultRedirectionPathResolver implements RedirectionPathResolver {
 
@@ -11,12 +10,11 @@ public class DefaultRedirectionPathResolver implements RedirectionPathResolver {
             return null;
         }
 
-        String stripped = ServletUtils.stripParametersAndQueries(path);
-        if (stripped.startsWith("/") || stripped.length() == 0) {
+        if (path.startsWith("/")) {
             path = request.getContextPath() + path;
-            if ("".equals(ServletUtils.stripParametersAndQueries(path))) {
-                path = "/" + path;
-            }
+        } else {
+            // pathが「;a=b」などの場合。
+            path = request.getContextPath() + "/" + path;
         }
 
         return path;
