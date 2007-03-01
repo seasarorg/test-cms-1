@@ -17,7 +17,7 @@
     <li tal:repeat="classDesc updatedClassDescs"><input type="checkbox" name="__ymir__apply" tal:attributes="value classDesc/name; checked classDesc/checked" /> <span tal:content="classDesc/name">CLASS</span></li>
   </ul>
   </p>
-  <p><input type="checkbox" name="__ymir__replace" value="true" /> 以前のクラスが持つメソッドやプロパティのうち、新しいクラスに含まれないものを除去する</p>
+  <p><input type="checkbox" name="__ymir__replace" value="true" /> 以前の生成結果を新しい結果で置き換える（以前のクラスが持つメソッドやプロパティの情報は全て失われます！）</p>
   <p>よろしいですか？</p>
   <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
   <input type="hidden" name="__ymir__task" value="updateClasses" />
