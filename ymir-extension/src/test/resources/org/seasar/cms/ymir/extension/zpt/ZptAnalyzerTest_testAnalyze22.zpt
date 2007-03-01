@@ -1,0 +1,11 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <form tal:attributes="action page:/action.html" action="">
+      <input type="checkbox" name="check" value="1" />
+      <input type="checkbox" name="check" value="2" />
+    </form>
+  </body>
+</html>

@@ -340,11 +340,11 @@ public class AnalyzerContext extends ZptTemplateContext {
 
         int dot = name.indexOf('.');
         if (dot < 0) {
-            return getSinglePropertyDesc(classDesc, name, mode);
+            return getSinglePropertyDesc(classDesc, name, mode, true);
         } else {
             String baseName = name.substring(0, dot);
             PropertyDesc propertyDesc = getSinglePropertyDesc(classDesc,
-                    baseName, PropertyDesc.READ);
+                    baseName, PropertyDesc.READ, false);
             ClassDesc typeClassDesc = prepareTypeClassDesc(propertyDesc);
             if (typeClassDesc != null) {
                 return getPropertyDesc(typeClassDesc, name.substring(dot + 1),
@@ -356,7 +356,7 @@ public class AnalyzerContext extends ZptTemplateContext {
     }
 
     PropertyDesc getSinglePropertyDesc(ClassDesc classDesc, String name,
-            int mode) {
+            int mode, boolean setAsArrayIfExists) {
 
         boolean array = false;
         int lparen = name.indexOf(STR_ARRAY_LPAREN);
@@ -364,11 +364,17 @@ public class AnalyzerContext extends ZptTemplateContext {
         if (lparen >= 0 && rparen > lparen) {
             array = true;
             name = name.substring(0, lparen);
+        } else {
+            // 今のところ、添え字つきパラメータの型が配列というのはサポートできていない。
+            if (setAsArrayIfExists) {
+                array = (classDesc.getPropertyDesc(name) != null);
+            }
         }
         PropertyDesc propertyDesc = classDesc.addProperty(name, mode);
         if (array) {
             // なるべく元の状態を壊さないようにこうしている。
             // （添字があるならば配列である、は真であるが、裏は真ではない。）
+            // つまり、arrayがtrueの時だけsetArray()している、ということ。
             propertyDesc.getTypeDesc().setArray(array);
         }
         return propertyDesc;

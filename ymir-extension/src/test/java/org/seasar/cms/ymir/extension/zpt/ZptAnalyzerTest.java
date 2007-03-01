@@ -464,4 +464,15 @@ public class ZptAnalyzerTest extends TestCase {
 
         assertNull("無視するように指定した変数が正しく無視されること", getClassDesc(CLASSNAME));
     }
+
+    public void testAnalyze22() throws Exception {
+
+        act("testAnalyze22");
+
+        ClassDesc cd = getClassDesc("com.example.web.ActionPage");
+        PropertyDesc pd = cd.getPropertyDesc("check");
+        assertTrue("同一のnameを持つパラメータが複数存在する場合は配列になること", pd.getTypeDesc()
+                .isArray());
+    }
+
 }
