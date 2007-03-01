@@ -50,6 +50,8 @@ public class AnalyzerContext extends ZptTemplateContext {
 
     private Set<String> ignoreVariableSet_ = new HashSet<String>();
 
+    private String path_;
+
     @Override
     public VariableResolver getVariableResolver() {
         if (variableResolver_ == null) {
@@ -410,5 +412,15 @@ public class AnalyzerContext extends ZptTemplateContext {
     public void setUsedAsLocalVariable(String name) {
 
         usedAsLocalVariableSet_.add(name);
+    }
+
+    public String getPath() {
+
+        return path_;
+    }
+
+    public void setPath(String path) {
+
+        path_ = path;
     }
 }

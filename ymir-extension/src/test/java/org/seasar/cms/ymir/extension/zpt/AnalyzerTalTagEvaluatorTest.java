@@ -52,4 +52,18 @@ public class AnalyzerTalTagEvaluatorTest extends TestCase {
         } catch (EvaluationRuntimeException expected) {
         }
     }
+
+    public void testToAbsolutePath() throws Exception {
+
+        AnalyzerTalTagEvaluator evaluator = new AnalyzerTalTagEvaluator();
+
+        assertEquals("/path/to/page.html", evaluator.toAbsolutePath(
+                "/path/to/page.html", ""));
+
+        assertEquals("/path/to/page2.html", evaluator.toAbsolutePath(
+                "/path/to/page.html", "page2.html"));
+
+        assertEquals("/path/page2.html", evaluator.toAbsolutePath(
+                "/path/to/page.html", "../page2.html"));
+    }
 }

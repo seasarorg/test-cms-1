@@ -49,6 +49,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
 
         path = zpt_.getTemplatePathResolver().resolve(path, request);
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
+        context.setPath(path);
         context.setIgnoreVariables(ignoreVariables);
         zpt_.buildTemplateContext(context, servletContext, request, response,
                 Locale.getDefault(), path);

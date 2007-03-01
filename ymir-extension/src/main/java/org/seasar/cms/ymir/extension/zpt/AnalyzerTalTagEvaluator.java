@@ -3,6 +3,7 @@ package org.seasar.cms.ymir.extension.zpt;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,8 @@ import net.skirnir.freyja.zpt.TalTagEvaluator;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
 
 public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
+
+    private static final String SEGMENT_PARENT = "..";
 
     public String[] getSpecialTagPatternStrings() {
         return new String[] { "form", "input", "select", "textarea" };
@@ -111,7 +114,8 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             Map attrMap, String attrName, String method) {
 
         SourceCreator creator = analyzerContext.getSourceCreator();
-        Path path = constructPath(getAttributeValue(attrMap, attrName, null));
+        Path path = constructPath(analyzerContext.getPath(), getAttributeValue(
+                attrMap, attrName, null));
         if (path == null) {
             return null;
         }
@@ -136,13 +140,69 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         return new FormDescImpl(classDesc, actionName, dispatchingByParameter);
     }
 
-    Path constructPath(String pathWithParameters) {
+    Path constructPath(String basePath, String pathWithParameters) {
 
         if (pathWithParameters == null) {
             return null;
         } else {
-            return new Path(pathWithParameters);
+            return new Path(toAbsolutePath(basePath, pathWithParameters));
         }
+    }
+
+    String toAbsolutePath(String basePath, String path) {
+        if (path == null) {
+            return null;
+        } else if (path.length() == 0 || path.startsWith(";")
+                || path.startsWith("?")) {
+            return basePath + path;
+        }
+        String absolutePath;
+        if (path.startsWith("/")) {
+            absolutePath = path;
+        } else {
+            int slash = basePath.lastIndexOf('/');
+            if (slash >= 0) {
+                absolutePath = basePath.substring(0, slash + 1) + path;
+            } else {
+                absolutePath = basePath + "/" + path;
+            }
+        }
+
+        if (absolutePath.indexOf(SEGMENT_PARENT) < 0) {
+            // 効率化のため。
+            return absolutePath;
+        }
+
+        int pre = 0;
+        int idx;
+        LinkedList<String> segmentList = new LinkedList<String>();
+        while ((idx = absolutePath.indexOf('/', pre)) >= 0) {
+            String segment = absolutePath.substring(pre, idx);
+            if (segment.equals(SEGMENT_PARENT)) {
+                if (!segmentList.isEmpty()) {
+                    segmentList.removeLast();
+                }
+            } else {
+                segmentList.addLast(segment);
+            }
+            pre = idx + 1;
+        }
+        String segment = absolutePath.substring(pre);
+        if (segment.equals(SEGMENT_PARENT)) {
+            if (!segmentList.isEmpty()) {
+                segmentList.removeLast();
+            }
+        } else {
+            segmentList.addLast(segment);
+        }
+        StringBuilder sb = new StringBuilder();
+        String delim = "";
+        for (Iterator<String> itr = segmentList.iterator(); itr.hasNext();) {
+            sb.append(delim).append(itr.next());
+            delim = "/";
+        }
+
+        return sb.toString();
     }
 
     AnnotationResult findAnnotation(TemplateContext context, String name,
