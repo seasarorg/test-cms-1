@@ -475,4 +475,13 @@ public class ZptAnalyzerTest extends TestCase {
                 .isArray());
     }
 
+    public void testAnalyze23() throws Exception {
+
+        act("testAnalyze23");
+
+        ClassDesc cd = getClassDesc("com.example.web.ActionPage");
+        PropertyDesc pd = cd.getPropertyDesc("radio");
+        assertFalse("同一のnameを持つパラメータがradio buttonである場合は配列にならないこと", pd
+                .getTypeDesc().isArray());
+    }
 }

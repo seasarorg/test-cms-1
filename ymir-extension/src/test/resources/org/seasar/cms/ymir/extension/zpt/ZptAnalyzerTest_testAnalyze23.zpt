@@ -1,0 +1,11 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <form tal:attributes="action page:/action.html" action="">
+      <input type="radio" name="radio" value="1" />
+      <input type="radio" name="radio" value="2" />
+    </form>
+  </body>
+</html>

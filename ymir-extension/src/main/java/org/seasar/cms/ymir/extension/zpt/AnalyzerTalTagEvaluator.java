@@ -74,9 +74,13 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
             } else {
                 PropertyDesc propertyDesc = processParameterTag(
                         analyzerContext, attrMap, annotation);
-                if ("file".equals(type) && propertyDesc != null) {
-                    propertyDesc.getTypeDesc().setClassDesc(
-                            FormFile.class.getName());
+                if (propertyDesc != null) {
+                    if ("file".equals(type)) {
+                        propertyDesc.getTypeDesc().setClassDesc(
+                                FormFile.class.getName());
+                    } else if ("radio".equals(type)) {
+                        propertyDesc.getTypeDesc().setArray(false);
+                    }
                 }
             }
         } else if (("select".equals(name) || "textarea".equals(name))
