@@ -27,12 +27,15 @@
         <plugin>
           <artifactId>maven-war-plugin</artifactId>
           <configuration>
-            <excludes>
-              WEB-INF/classes/,WEB-INF/lib/,WEB-INF/h2/
-            </excludes>
+            <warSourceDirectory>${basedir}/src/main/web-resource</warSourceDirectory>
             <webResources>
               <resource>
-                <directory>${basedir}/src/main/web-resource</directory>
+                <directory>${basedir}/src/main/webapp</directory>
+                <excludes>
+                  <exclude>WEB-INF/classes/</exclude>
+                  <exclude>WEB-INF/h2/</exclude>
+                  <exclude>WEB-INF/lib/</exclude>
+                </excludes>
               </resource>
             </webResources>
           </configuration>
