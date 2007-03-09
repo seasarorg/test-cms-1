@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -92,8 +93,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     public Request prepareForProcessing(String contextPath, String path,
             String method, String dispatcher, Map parameterMap,
-            Map fileParameterMap, AttributeContainer attributeContainer)
-            throws PageNotFoundException {
+            Map fileParameterMap, AttributeContainer attributeContainer,
+            Locale locale) throws PageNotFoundException {
 
         if (ymir_.isUnderDevelopment()) {
             method = correctMethod(method, parameterMap);
@@ -105,7 +106,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         return new RequestImpl(contextPath, path, method, dispatcher,
-                parameterMap, fileParameterMap, attributeContainer, matched);
+                parameterMap, fileParameterMap, attributeContainer, locale,
+                matched);
     }
 
     String correctMethod(String method, Map parameterMap) {

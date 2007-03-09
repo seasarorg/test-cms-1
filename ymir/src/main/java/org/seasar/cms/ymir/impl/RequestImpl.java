@@ -2,6 +2,7 @@ package org.seasar.cms.ymir.impl;
 
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import org.seasar.cms.ymir.AttributeContainer;
@@ -25,6 +26,8 @@ public class RequestImpl implements Request {
 
     private AttributeContainer attributeContainer_;
 
+    private Locale locale_;
+
     private MatchedPathMapping matched_;
 
     public RequestImpl() {
@@ -32,7 +35,8 @@ public class RequestImpl implements Request {
 
     public RequestImpl(String contextPath, String path, String method,
             String dispatcher, Map parameterMap, Map fileParameterMap,
-            AttributeContainer attributeContainer, MatchedPathMapping matched) {
+            AttributeContainer attributeContainer, Locale locale,
+            MatchedPathMapping matched) {
 
         contextPath_ = contextPath;
         path_ = path;
@@ -41,6 +45,7 @@ public class RequestImpl implements Request {
         parameterMap_ = parameterMap;
         fileParameterMap_ = fileParameterMap;
         attributeContainer_ = attributeContainer;
+        locale_ = locale;
         matched_ = matched;
     }
 
@@ -227,6 +232,10 @@ public class RequestImpl implements Request {
 
     public void setAttribute(String name, Object value) {
         attributeContainer_.setAttribute(name, value);
+    }
+
+    public Locale getLocale() {
+        return locale_;
     }
 
     public boolean isMatched() {

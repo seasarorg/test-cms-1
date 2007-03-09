@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.impl;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -89,12 +90,12 @@ public class YmirImpl implements Ymir {
 
     public Request prepareForProcessing(String contextPath, String path,
             String method, String dispatcher, Map parameterMap,
-            Map fileParameterMap, AttributeContainer attributeContainer)
-            throws PageNotFoundException {
+            Map fileParameterMap, AttributeContainer attributeContainer,
+            Locale locale) throws PageNotFoundException {
 
         return requestProcessor_.prepareForProcessing(contextPath, path, method
                 .toUpperCase(), dispatcher, parameterMap, fileParameterMap,
-                attributeContainer);
+                attributeContainer, locale);
     }
 
     public Response processRequest(Request request)

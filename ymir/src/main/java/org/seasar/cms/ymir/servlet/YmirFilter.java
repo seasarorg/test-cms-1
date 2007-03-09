@@ -23,6 +23,7 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.YmirVariableResolver;
 import org.seasar.cms.ymir.impl.HttpServletRequestAttributeContainer;
+import org.seasar.cms.ymir.util.LocaleUtils;
 import org.seasar.cms.ymir.util.ServletUtils;
 
 import net.skirnir.freyja.webapp.FreyjaServlet;
@@ -72,24 +73,24 @@ public class YmirFilter implements Filter {
         HttpServletRequestAttributeContainer attributeContainer = new HttpServletRequestAttributeContainer(
                 httpRequest);
 
-        if (Request.DISPATCHER_REQUEST.equals(dispatcher_)) {
-            httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,
-                    new YmirVariableResolver(httpRequest));
-        }
-
         Object backupped = null;
         Object responseContentType = null;
+        Object variableResolver = null;
         if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
             backupped = ymir_.backupForInclusion(attributeContainer);
             responseContentType = httpRequest
                     .getAttribute(FreyjaServlet.ATTR_RESPONSECONTENTTYPE);
+            variableResolver = httpRequest
+                    .getAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER);
         }
         try {
             Request request = ymir_.prepareForProcessing(ServletUtils
                     .getContextPath(httpRequest), ServletUtils
                     .getPath(httpRequest), httpRequest.getMethod(),
                     dispatcher_, httpRequest.getParameterMap(),
-                    fileParameterMap, attributeContainer);
+                    fileParameterMap, attributeContainer, LocaleUtils
+                            .findLocale(httpRequest));
+
             Response response = ymir_.processRequest(request);
 
             HttpServletResponseFilter responseFilter = ymir_.processResponse(
@@ -97,9 +98,15 @@ public class YmirFilter implements Filter {
             if (responseFilter != null) {
                 String contentType = response.getContentType();
                 if (contentType != null) {
-                    httpRequest.setAttribute(FreyjaServlet.ATTR_RESPONSECONTENTTYPE,
-                        contentType);
+                    httpRequest
+                            .setAttribute(
+                                    FreyjaServlet.ATTR_RESPONSECONTENTTYPE,
+                                    contentType);
                 }
+
+                httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,
+                        new YmirVariableResolver(request, httpRequest));
+
                 chain.doFilter(httpRequest, responseFilter);
                 responseFilter.commit();
             }
@@ -109,6 +116,8 @@ public class YmirFilter implements Filter {
             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
         } finally {
             if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
+                httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,
+                        variableResolver);
                 httpRequest.setAttribute(
                         FreyjaServlet.ATTR_RESPONSECONTENTTYPE,
                         responseContentType);

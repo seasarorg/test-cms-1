@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 public interface Request extends AttributeContainer {
@@ -248,6 +249,13 @@ public interface Request extends AttributeContainer {
     boolean isDispatchingByParameter();
 
     String extractParameterName(String name);
+
+    /**
+     * 現在のリクエストがどのロケールに基づいて処理されているかを返します。
+     *
+     * @return ロケール。nullを返すことはありません。
+     */
+    Locale getLocale();
 
     /**
      * リクエストパスがパスマッピングにマッチしたかどうかを返します。

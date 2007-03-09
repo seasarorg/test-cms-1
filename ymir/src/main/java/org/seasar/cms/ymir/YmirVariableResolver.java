@@ -17,22 +17,29 @@ import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.impl.VariableResolverImpl;
 
 public class YmirVariableResolver extends VariableResolverImpl {
+    public static final String NAME_YMIRREQUEST = "ymirRequest";
+
+    private Request ymirRequest_;
+
     private HttpServletRequest request_;
 
     private VariableResolver parent_;
 
-    public YmirVariableResolver(HttpServletRequest request) {
-        this(request, null);
+    public YmirVariableResolver(Request ymirRequest, HttpServletRequest request) {
+        this(ymirRequest, request, null);
     }
 
-    public YmirVariableResolver(HttpServletRequest request,
-            VariableResolver parent) {
+    public YmirVariableResolver(Request ymirRequest,
+            HttpServletRequest request, VariableResolver parent) {
+        ymirRequest_ = ymirRequest;
         request_ = request;
         parent_ = parent;
     }
 
     public Object getVariable(TemplateContext context, String name) {
-        if (super.containsVariable(name)) {
+        if (NAME_YMIRREQUEST.equals(name)) {
+            return ymirRequest_;
+        } else if (super.containsVariable(name)) {
             return super.getVariable(context, name);
         } else if (parent_ != null) {
             Entry entry = parent_.getVariableEntry(context, name);
@@ -60,6 +67,7 @@ public class YmirVariableResolver extends VariableResolverImpl {
 
     public String[] getVariableNames() {
         Set nameSet = new HashSet();
+        nameSet.add(NAME_YMIRREQUEST);
         nameSet.addAll(Arrays.asList(super.getVariableNames()));
         if (parent_ != null) {
             nameSet.addAll(Arrays.asList(parent_.getVariableNames()));
@@ -84,7 +92,9 @@ public class YmirVariableResolver extends VariableResolverImpl {
     }
 
     public boolean containsVariable(String name) {
-        if (super.containsVariable(name)) {
+        if (NAME_YMIRREQUEST.equals(name)) {
+            return true;
+        } else if (super.containsVariable(name)) {
             return true;
         } else if (parent_ != null && parent_.containsVariable(name)) {
             return true;
@@ -107,6 +117,10 @@ public class YmirVariableResolver extends VariableResolverImpl {
     }
 
     public Entry getVariableEntry(TemplateContext context, String name) {
+        if (NAME_YMIRREQUEST.equals(name)) {
+            return new EntryImpl(name, Request.class, ymirRequest_);
+        }
+
         Entry entry = super.getVariableEntry(context, name);
         if (entry != null) {
             return entry;

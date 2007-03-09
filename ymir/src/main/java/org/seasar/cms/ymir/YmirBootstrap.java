@@ -16,6 +16,7 @@ public class YmirBootstrap {
     public Ymir init() {
 
         ymir_ = (Ymir) getContainer().getComponent(Ymir.class);
+        YmirContext.setYmir(ymir_);
         initializeApplication(ymir_, getServletContext());
         ymir_.init();
         return ymir_;

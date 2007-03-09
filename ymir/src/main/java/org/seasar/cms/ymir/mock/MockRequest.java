@@ -2,6 +2,7 @@ package org.seasar.cms.ymir.mock;
 
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import org.seasar.cms.ymir.AttributeContainer;
@@ -35,6 +36,8 @@ public class MockRequest implements Request {
     private boolean dispatchingByRequestParameter_;
 
     private boolean dispatchingByParameter_;
+
+    private Locale locale_;
 
     private boolean matched_;
 
@@ -218,5 +221,13 @@ public class MockRequest implements Request {
     }
 
     public void setAttribute(String name, Object value) {
+    }
+
+    public Locale getLocale() {
+        return locale_;
+    }
+
+    public void setLocale(Locale locale) {
+        locale_ = locale;
     }
 }

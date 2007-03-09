@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -14,8 +15,8 @@ public interface Ymir {
 
     Request prepareForProcessing(String contextPath, String path,
             String method, String dispatcher, Map parameterMap,
-            Map fileParameterMap, AttributeContainer attributeContainer)
-            throws PageNotFoundException;
+            Map fileParameterMap, AttributeContainer attributeContainer,
+            Locale locale) throws PageNotFoundException;
 
     Response processRequest(Request request)
             throws ConstraintViolationException;
