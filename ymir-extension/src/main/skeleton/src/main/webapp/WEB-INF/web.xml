@@ -90,7 +90,7 @@
     <init-param>
       <param-name>expressionEvaluator</param-name>
       <param-value>
-        net.skirnir.freyja.zpt.webapp.ServletTalesExpressionEvaluator
+        org.seasar.cms.ymir.zpt.YmirTalesExpressionEvaluator
       </param-value>
     </init-param>
     <init-param>
