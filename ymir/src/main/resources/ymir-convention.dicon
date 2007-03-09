@@ -23,5 +23,5 @@
   <component name="messageResources"
     class="org.seasar.cms.ymir.impl.MessageResourcesImpl">
     <arg>"messageResources.xproperties"</arg>
-    </component>
+  </component>
 </components>
