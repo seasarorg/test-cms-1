@@ -57,6 +57,7 @@ public class YmirBootstrap {
         if (ymir_ != null) {
             ymir_.destroy();
         }
+        YmirContext.setYmir(null);
     }
 
     S2Container getContainer() {
