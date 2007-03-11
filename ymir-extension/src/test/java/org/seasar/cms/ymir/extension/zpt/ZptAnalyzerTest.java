@@ -484,4 +484,18 @@ public class ZptAnalyzerTest extends TestCase {
         assertFalse("同一のnameを持つパラメータがradio buttonである場合は配列にならないこと", pd
                 .getTypeDesc().isArray());
     }
+
+    public void testAnalyze24_配列に対するlength呼び出しがあっても正しく自動生成されること()
+            throws Exception {
+
+        act("testAnalyze24");
+
+        ClassDesc cd = getClassDesc(CLASSNAME);
+        PropertyDesc pd = cd.getPropertyDesc("results");
+        assertTrue(pd.getTypeDesc().isArray());
+        assertEquals("com.example.dto.ResultDto", pd.getTypeDesc()
+                .getClassDesc().getName());
+        assertNull(getClassDesc("com.example.dto.ResultDto").getPropertyDesc(
+                "length"));
+    }
 }
