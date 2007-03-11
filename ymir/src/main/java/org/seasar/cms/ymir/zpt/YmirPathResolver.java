@@ -113,7 +113,7 @@ public class YmirPathResolver implements PathResolver {
                             .append("')");
                 } else {
                     sb.append("default MessageResources (").append(
-                            Globals.MESSAGE_RESOURCES).append(")");
+                            Globals.MESSAGERESOURCES).append(")");
                 }
                 throw new MessageResourceNotFoundRuntimeException(sb.toString())
                         .setMessageResourcesName(resourcesName)
@@ -135,7 +135,7 @@ public class YmirPathResolver implements PathResolver {
             return (MessageResources) container.getComponent(resourcesName);
         } else {
             return (MessageResources) container
-                    .getComponent(MessageResources.class);
+                    .getComponent(Globals.NAME_MESSAGERESOURCES);
         }
     }
 

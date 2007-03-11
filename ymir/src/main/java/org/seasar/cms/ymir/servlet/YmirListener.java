@@ -8,7 +8,7 @@ import org.seasar.cms.ymir.YmirBootstrap;
 
 public class YmirListener implements ServletContextListener {
 
-    public static final String YMIR_KEY = "org.seasar.cms.ymir.ymir";
+    public static final String ATTR_YMIR = "org.seasar.cms.ymir.ymir";
 
     private YmirBootstrap bootstrap_ = new YmirBootstrap();
 
@@ -16,7 +16,7 @@ public class YmirListener implements ServletContextListener {
 
         ServletContext sc = sce.getServletContext();
         try {
-            sc.setAttribute(YMIR_KEY, bootstrap_.init());
+            sc.setAttribute(ATTR_YMIR, bootstrap_.init());
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             throw ex;
@@ -26,7 +26,7 @@ public class YmirListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
 
         ServletContext sc = sce.getServletContext();
-        sc.removeAttribute(YMIR_KEY);
+        sc.removeAttribute(ATTR_YMIR);
         bootstrap_.destroy();
     }
 }

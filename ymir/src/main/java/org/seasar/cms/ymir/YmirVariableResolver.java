@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
+import org.seasar.framework.container.S2Container;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
@@ -19,26 +20,45 @@ import net.skirnir.freyja.impl.VariableResolverImpl;
 public class YmirVariableResolver extends VariableResolverImpl {
     public static final String NAME_YMIRREQUEST = "ymirRequest";
 
+    private static final Object NAME_CONTAINER = "container";
+
+    private static final Object NAME_MESSAGES = "messages";
+
+    private static final Object NAME_LABELS = "labels";
+
     private Request ymirRequest_;
 
     private HttpServletRequest request_;
 
+    private S2Container container_;
+
     private VariableResolver parent_;
 
-    public YmirVariableResolver(Request ymirRequest, HttpServletRequest request) {
-        this(ymirRequest, request, null);
+    private MessageResources messageResources_;
+
+    public YmirVariableResolver(Request ymirRequest,
+            HttpServletRequest request, S2Container container) {
+        this(ymirRequest, request, container, null);
     }
 
     public YmirVariableResolver(Request ymirRequest,
-            HttpServletRequest request, VariableResolver parent) {
+            HttpServletRequest request, S2Container container,
+            VariableResolver parent) {
         ymirRequest_ = ymirRequest;
         request_ = request;
+        container_ = container;
+        messageResources_ = (MessageResources) container
+                .getComponent(Globals.NAME_MESSAGERESOURCES);
         parent_ = parent;
     }
 
     public Object getVariable(TemplateContext context, String name) {
         if (NAME_YMIRREQUEST.equals(name)) {
             return ymirRequest_;
+        } else if (NAME_CONTAINER.equals(name)) {
+            return container_;
+        } else if (NAME_MESSAGES.equals(name) || NAME_LABELS.equals(name)) {
+            return messageResources_;
         } else if (super.containsVariable(name)) {
             return super.getVariable(context, name);
         } else if (parent_ != null) {
@@ -68,6 +88,9 @@ public class YmirVariableResolver extends VariableResolverImpl {
     public String[] getVariableNames() {
         Set nameSet = new HashSet();
         nameSet.add(NAME_YMIRREQUEST);
+        nameSet.add(NAME_CONTAINER);
+        nameSet.add(NAME_MESSAGES);
+        nameSet.add(NAME_LABELS);
         nameSet.addAll(Arrays.asList(super.getVariableNames()));
         if (parent_ != null) {
             nameSet.addAll(Arrays.asList(parent_.getVariableNames()));
@@ -92,7 +115,8 @@ public class YmirVariableResolver extends VariableResolverImpl {
     }
 
     public boolean containsVariable(String name) {
-        if (NAME_YMIRREQUEST.equals(name)) {
+        if (NAME_YMIRREQUEST.equals(name) || NAME_CONTAINER.equals(name)
+                || NAME_MESSAGES.equals(name) || NAME_LABELS.equals(name)) {
             return true;
         } else if (super.containsVariable(name)) {
             return true;
@@ -119,6 +143,11 @@ public class YmirVariableResolver extends VariableResolverImpl {
     public Entry getVariableEntry(TemplateContext context, String name) {
         if (NAME_YMIRREQUEST.equals(name)) {
             return new EntryImpl(name, Request.class, ymirRequest_);
+        } else if (NAME_CONTAINER.equals(name)) {
+            return new EntryImpl(name, S2Container.class, container_);
+        } else if (NAME_MESSAGES.equals(name) || NAME_LABELS.equals(name)) {
+            return new EntryImpl(name, MessageResources.class,
+                    messageResources_);
         }
 
         Entry entry = super.getVariableEntry(context, name);

@@ -6,5 +6,7 @@ public interface Globals {
 
     String ATTR_LOCALE = "org.seasar.cms.ymir.locale";
 
-    String MESSAGE_RESOURCES = "messageResources.xproperties";
+    String MESSAGERESOURCES = "messageResources.xproperties";
+
+    String NAME_MESSAGERESOURCES = "messageResources";
 }

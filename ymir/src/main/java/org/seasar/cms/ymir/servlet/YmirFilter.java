@@ -25,6 +25,8 @@ import org.seasar.cms.ymir.YmirVariableResolver;
 import org.seasar.cms.ymir.impl.HttpServletRequestAttributeContainer;
 import org.seasar.cms.ymir.util.LocaleUtils;
 import org.seasar.cms.ymir.util.ServletUtils;
+import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
 import net.skirnir.freyja.webapp.FreyjaServlet;
 
@@ -39,7 +41,7 @@ public class YmirFilter implements Filter {
     public void init(FilterConfig config) throws ServletException {
 
         context_ = config.getServletContext();
-        ymir_ = (Ymir) context_.getAttribute(YmirListener.YMIR_KEY);
+        ymir_ = (Ymir) context_.getAttribute(YmirListener.ATTR_YMIR);
 
         String dispatcher = config.getInitParameter("dispatcher");
         if (dispatcher == null) {
@@ -105,7 +107,8 @@ public class YmirFilter implements Filter {
                 }
 
                 httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,
-                        new YmirVariableResolver(request, httpRequest));
+                        new YmirVariableResolver(request, httpRequest,
+                                getContainer()));
 
                 chain.doFilter(httpRequest, responseFilter);
                 responseFilter.commit();
@@ -124,5 +127,10 @@ public class YmirFilter implements Filter {
                 ymir_.restoreForInclusion(attributeContainer, backupped);
             }
         }
+    }
+
+    S2Container getContainer() {
+
+        return SingletonS2ContainerFactory.getContainer();
     }
 }
