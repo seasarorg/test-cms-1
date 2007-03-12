@@ -20,8 +20,8 @@
       container.findLocalComponents(@org.seasar.framework.container.ComponentCreator@class)
     </property>
   </component>
-  <component name="messageResources"
-    class="org.seasar.cms.ymir.impl.MessageResourcesImpl">
-    <arg>"messageResources.xproperties"</arg>
+  <component name="messages"
+    class="org.seasar.cms.ymir.impl.MessagesImpl">
+    <arg>"messages.xproperties"</arg>
   </component>
 </components>

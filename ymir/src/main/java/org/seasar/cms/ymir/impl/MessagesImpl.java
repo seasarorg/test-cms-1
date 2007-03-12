@@ -2,16 +2,16 @@ package org.seasar.cms.ymir.impl;
 
 import java.util.Locale;
 
-import org.seasar.cms.ymir.MessageResources;
+import org.seasar.cms.ymir.Messages;
 import org.seasar.kvasir.util.collection.I18NProperties;
 import org.seasar.kvasir.util.io.Resource;
 import org.seasar.kvasir.util.io.impl.JavaResource;
 
-public class MessageResourcesImpl implements MessageResources {
+public class MessagesImpl implements Messages {
 
-    private I18NProperties resources_;
+    private I18NProperties messages_;
 
-    public MessageResourcesImpl(String path) {
+    public MessagesImpl(String path) {
 
         Resource resource = new JavaResource(path, Thread.currentThread()
                 .getContextClassLoader());
@@ -34,17 +34,17 @@ public class MessageResourcesImpl implements MessageResources {
             suffix = "";
         }
 
-        resources_ = new I18NProperties(resource.getParentResource(), baseName,
+        messages_ = new I18NProperties(resource.getParentResource(), baseName,
                 suffix);
     }
 
     public String getProperty(String name, Locale locale) {
 
-        return resources_.getProperty(name, locale);
+        return messages_.getProperty(name, locale);
     }
 
     public String getProperty(String name) {
 
-        return resources_.getProperty(name);
+        return messages_.getProperty(name);
     }
 }

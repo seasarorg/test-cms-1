@@ -4,9 +4,9 @@ import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.seasar.cms.ymir.Globals;
-import org.seasar.cms.ymir.MessageResourceNotFoundRuntimeException;
-import org.seasar.cms.ymir.MessageResources;
-import org.seasar.cms.ymir.MessageResourcesNotFoundRuntimeException;
+import org.seasar.cms.ymir.MessageNotFoundRuntimeException;
+import org.seasar.cms.ymir.Messages;
+import org.seasar.cms.ymir.MessagesNotFoundRuntimeException;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.YmirContext;
@@ -63,40 +63,37 @@ public class YmirPathResolver implements PathResolver {
             return null;
         }
 
-        String resourcesName;
+        String messagesName;
         int slash = value.indexOf('/');
         if (slash >= 0) {
-            resourcesName = value.substring(0, slash);
+            messagesName = value.substring(0, slash);
             value = value.substring(slash + 1);
         } else {
-            resourcesName = null;
+            messagesName = null;
         }
 
-        MessageResources resources;
+        Messages messages;
         try {
-            resources = findMessageResources(resourcesName);
+            messages = findMessages(messagesName);
         } catch (ClassCastException ex) {
             throw new RuntimeException(
-                    "Not MessageResources Object: message resources' name may be incorrect: key="
-                            + value + ", message resources' name="
-                            + resourcesName, ex);
+                    "Not Messages Object: messages' name may be incorrect: key="
+                            + value + ", messages' name=" + messagesName, ex);
         } catch (ComponentNotFoundRuntimeException ex) {
-            throw new MessageResourcesNotFoundRuntimeException(
-                    "MessageResources object not found: message resources' name may be incorrect: key="
-                            + value
-                            + ", message resources' name="
-                            + resourcesName, ex)
-                    .setMessageResourcesName(resourcesName);
+            throw new MessagesNotFoundRuntimeException(
+                    "Messages object not found: messages' name may be incorrect: key="
+                            + value + ", messages' name=" + messagesName, ex)
+                    .setMessagesName(messagesName);
         }
 
-        if (resources != null) {
+        if (messages != null) {
             Locale locale = findLocale(context, varResolver);
-            String v = resources.getProperty(value, locale);
+            String v = messages.getProperty(value, locale);
             if (v != null) {
                 Object[] parameters = note.getParameters();
                 for (int i = 0; i < parameters.length; i++) {
                     if (parameters[i] instanceof String) {
-                        String localizedValue = resources.getProperty(
+                        String localizedValue = messages.getProperty(
                                 PROPERTYPREFIX_LABEL + parameters[i], locale);
                         if (localizedValue != null) {
                             parameters[i] = localizedValue;
@@ -108,34 +105,32 @@ public class YmirPathResolver implements PathResolver {
                 StringBuffer sb = new StringBuffer();
                 sb.append("Message corresponding key ('").append(value).append(
                         "') does not exist in ");
-                if (resourcesName != null) {
-                    sb.append("MessageResources ('").append(resourcesName)
-                            .append("')");
+                if (messagesName != null) {
+                    sb.append("Messages ('").append(messagesName).append("')");
                 } else {
-                    sb.append("default MessageResources (").append(
-                            Globals.MESSAGERESOURCES).append(")");
+                    sb.append("default Messages (").append(Globals.MESSAGES)
+                            .append(")");
                 }
-                throw new MessageResourceNotFoundRuntimeException(sb.toString())
-                        .setMessageResourcesName(resourcesName)
-                        .setMessageResourceKey(value).setLocale(locale);
+                throw new MessageNotFoundRuntimeException(sb.toString())
+                        .setMessagesName(messagesName).setMessageKey(value)
+                        .setLocale(locale);
             }
         }
 
         return value;
     }
 
-    MessageResources findMessageResources(String resourcesName) {
+    Messages findMessages(String messagesName) {
         Ymir ymir = YmirContext.getYmir();
         if (ymir == null) {
             return null;
         }
 
         S2Container container = ymir.getApplication().getS2Container();
-        if (resourcesName != null) {
-            return (MessageResources) container.getComponent(resourcesName);
+        if (messagesName != null) {
+            return (Messages) container.getComponent(messagesName);
         } else {
-            return (MessageResources) container
-                    .getComponent(Globals.NAME_MESSAGERESOURCES);
+            return (Messages) container.getComponent(Globals.NAME_MESSAGES);
         }
     }
 
