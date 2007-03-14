@@ -17,7 +17,7 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeContainer;
-import org.seasar.cms.ymir.AttributeHandler;
+import org.seasar.cms.ymir.ScopeHandler;
 import org.seasar.cms.ymir.Constraint;
 import org.seasar.cms.ymir.ConstraintViolationException;
 import org.seasar.cms.ymir.FormFile;
@@ -324,7 +324,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     void injectContextAttributes(Object component) {
-        AttributeHandler[] handlers = annotationHandler_
+        ScopeHandler[] handlers = annotationHandler_
                 .getInjectedScopeAttributes(component);
         for (int i = 0; i < handlers.length; i++) {
             handlers[i].injectTo(component);
@@ -332,7 +332,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     void outjectContextAttributes(Object component) {
-        AttributeHandler[] handlers = annotationHandler_
+        ScopeHandler[] handlers = annotationHandler_
                 .getOutjectedScopeAttributes(component);
         for (int i = 0; i < handlers.length; i++) {
             handlers[i].outjectFrom(component);

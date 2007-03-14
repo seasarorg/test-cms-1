@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import org.seasar.cms.ymir.scope.Scope;
 import org.seasar.kvasir.util.io.IORuntimeException;
 
-public class AttributeHandler {
+public class ScopeHandler {
 
     private String name_;
 
@@ -15,7 +15,7 @@ public class AttributeHandler {
 
     private Method readMethod_;
 
-    public AttributeHandler(String name, Scope scope, Method writeMethod,
+    public ScopeHandler(String name, Scope scope, Method writeMethod,
             Method readMethod) {
         name_ = name;
         scope_ = scope;
