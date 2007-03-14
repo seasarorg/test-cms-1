@@ -17,6 +17,8 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeContainer;
+import org.seasar.cms.ymir.Note;
+import org.seasar.cms.ymir.Notes;
 import org.seasar.cms.ymir.ScopeHandler;
 import org.seasar.cms.ymir.Constraint;
 import org.seasar.cms.ymir.ConstraintViolatedException;
@@ -44,9 +46,6 @@ import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 import org.seasar.kvasir.util.el.VariableResolver;
-
-import net.skirnir.freyja.render.Note;
-import net.skirnir.freyja.render.Notes;
 
 public class DefaultRequestProcessor implements RequestProcessor {
 

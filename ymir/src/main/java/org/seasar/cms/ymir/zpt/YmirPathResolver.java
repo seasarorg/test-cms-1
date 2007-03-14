@@ -7,6 +7,7 @@ import org.seasar.cms.ymir.Globals;
 import org.seasar.cms.ymir.MessageNotFoundRuntimeException;
 import org.seasar.cms.ymir.Messages;
 import org.seasar.cms.ymir.MessagesNotFoundRuntimeException;
+import org.seasar.cms.ymir.Note;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.YmirContext;
@@ -19,7 +20,6 @@ import org.seasar.kvasir.util.collection.PropertyReader;
 
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.VariableResolver;
-import net.skirnir.freyja.render.Note;
 import net.skirnir.freyja.zpt.tales.PathResolver;
 
 public class YmirPathResolver implements PathResolver {
@@ -29,7 +29,9 @@ public class YmirPathResolver implements PathResolver {
 
     public boolean accept(TemplateContext context,
             VariableResolver varResolver, Object obj, String child) {
-        return (obj instanceof Note || obj instanceof I18NPropertyReader
+        return (obj instanceof Note
+                || obj instanceof net.skirnir.freyja.render.Note
+                || obj instanceof I18NPropertyReader
                 || obj instanceof PropertyReader || obj instanceof AttributeReader);
     }
 
@@ -38,7 +40,14 @@ public class YmirPathResolver implements PathResolver {
         if (obj instanceof Note) {
             Note note = (Note) obj;
             if (child.equals(NAME_VALUE)) {
-                return getMessageResourceValue(context, varResolver, note);
+                return getMessageResourceValue(context, varResolver, note
+                        .getValue(), note.getParameters());
+            }
+        } else if (obj instanceof net.skirnir.freyja.render.Note) {
+            net.skirnir.freyja.render.Note note = (net.skirnir.freyja.render.Note) obj;
+            if (child.equals(NAME_VALUE)) {
+                return getMessageResourceValue(context, varResolver, note
+                        .getValue(), note.getParameters());
             }
         } else if (obj instanceof I18NPropertyReader) {
             I18NPropertyReader reader = (I18NPropertyReader) obj;
@@ -57,17 +66,17 @@ public class YmirPathResolver implements PathResolver {
     }
 
     String getMessageResourceValue(TemplateContext context,
-            VariableResolver varResolver, Note note) {
-        String value = note.getValue();
-        if (value == null) {
+            VariableResolver varResolver, String noteValue,
+            Object[] noteParameters) {
+        if (noteValue == null) {
             return null;
         }
 
         String messagesName;
-        int slash = value.indexOf('/');
+        int slash = noteValue.indexOf('/');
         if (slash >= 0) {
-            messagesName = value.substring(0, slash);
-            value = value.substring(slash + 1);
+            messagesName = noteValue.substring(0, slash);
+            noteValue = noteValue.substring(slash + 1);
         } else {
             messagesName = null;
         }
@@ -78,33 +87,34 @@ public class YmirPathResolver implements PathResolver {
         } catch (ClassCastException ex) {
             throw new RuntimeException(
                     "Not Messages Object: messages' name may be incorrect: key="
-                            + value + ", messages' name=" + messagesName, ex);
+                            + noteValue + ", messages' name=" + messagesName,
+                    ex);
         } catch (ComponentNotFoundRuntimeException ex) {
             throw new MessagesNotFoundRuntimeException(
                     "Messages object not found: messages' name may be incorrect: key="
-                            + value + ", messages' name=" + messagesName, ex)
-                    .setMessagesName(messagesName);
+                            + noteValue + ", messages' name=" + messagesName,
+                    ex).setMessagesName(messagesName);
         }
 
         if (messages != null) {
             Locale locale = findLocale(context, varResolver);
-            String v = messages.getProperty(value, locale);
+            String v = messages.getProperty(noteValue, locale);
             if (v != null) {
-                Object[] parameters = note.getParameters();
-                for (int i = 0; i < parameters.length; i++) {
-                    if (parameters[i] instanceof String) {
+                for (int i = 0; i < noteParameters.length; i++) {
+                    if (noteParameters[i] instanceof String) {
                         String localizedValue = messages.getProperty(
-                                PROPERTYPREFIX_LABEL + parameters[i], locale);
+                                PROPERTYPREFIX_LABEL + noteParameters[i],
+                                locale);
                         if (localizedValue != null) {
-                            parameters[i] = localizedValue;
+                            noteParameters[i] = localizedValue;
                         }
                     }
                 }
-                value = MessageFormat.format(v, note.getParameters());
+                noteValue = MessageFormat.format(v, noteParameters);
             } else {
                 StringBuffer sb = new StringBuffer();
-                sb.append("Message corresponding key ('").append(value).append(
-                        "') does not exist in ");
+                sb.append("Message corresponding key ('").append(noteValue)
+                        .append("') does not exist in ");
                 if (messagesName != null) {
                     sb.append("Messages ('").append(messagesName).append("')");
                 } else {
@@ -112,12 +122,12 @@ public class YmirPathResolver implements PathResolver {
                             .append(")");
                 }
                 throw new MessageNotFoundRuntimeException(sb.toString())
-                        .setMessagesName(messagesName).setMessageKey(value)
+                        .setMessagesName(messagesName).setMessageKey(noteValue)
                         .setLocale(locale);
             }
         }
 
-        return value;
+        return noteValue;
     }
 
     Messages findMessages(String messagesName) {
