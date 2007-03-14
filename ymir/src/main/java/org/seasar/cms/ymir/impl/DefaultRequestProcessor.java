@@ -30,6 +30,7 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Updater;
+import org.seasar.cms.ymir.ValidationFailedException;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
@@ -172,8 +173,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return null;
     }
 
-    public Response process(Request request)
-            throws ConstraintViolatedException {
+    public Response process(Request request) throws PermissionDeniedException {
 
         Response response = PassthroughResponse.INSTANCE;
         if (request.isMatched()) {
@@ -250,32 +250,31 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
     }
 
-    Notes confirmConstraint(Object component, Method action, Request request,
-            boolean alsoConfirmCommonConstraints)
-            throws ConstraintViolatedException {
+    Notes confirmConstraint(Object component, Method action, Request request)
+            throws PermissionDeniedException {
 
+        boolean validationFailed = false;
         Notes notes = new Notes();
         Constraint[] constraint = annotationHandler_.getConstraints(component,
-                action, alsoConfirmCommonConstraints);
+                action);
         for (int i = 0; i < constraint.length; i++) {
             try {
                 constraint[i].confirm(component, request);
             } catch (PermissionDeniedException ex) {
                 throw ex;
-            } catch (ConstraintViolatedException ex) {
-                if (ex.hasMessage()) {
-                    ConstraintViolatedException.Message[] messages = ex
-                            .getMessages();
-                    for (int j = 0; j < messages.length; j++) {
-                        notes.add(new Note(messages[j].getKey(), messages[j]
-                                .getParameters()));
-                    }
-                } else {
-                    throw ex;
+            } catch (ValidationFailedException ex) {
+                validationFailed = true;
+                ConstraintViolatedException.Message[] messages = ex
+                        .getMessages();
+                for (int j = 0; j < messages.length; j++) {
+                    notes.add(new Note(messages[j].getKey(), messages[j]
+                            .getParameters()));
                 }
+            } catch (ConstraintViolatedException ex) {
+                throw new RuntimeException("May logic error", ex);
             }
         }
-        if (notes.size() > 0) {
+        if (validationFailed) {
             return notes;
         } else {
             return null;
@@ -348,8 +347,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Response invokeAction(Object component, Method action, Request request,
-            boolean alsoConfirmCommonConstraints)
-            throws ConstraintViolatedException {
+            boolean confirmConstraints) throws PermissionDeniedException {
 
         Response response = PassthroughResponse.INSTANCE;
 
@@ -359,8 +357,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
                         + action);
             }
 
-            Notes notes = confirmConstraint(component, action, request,
-                    alsoConfirmCommonConstraints);
+            Notes notes = null;
+            if (confirmConstraints) {
+                notes = confirmConstraint(component, action, request);
+            }
             if (notes == null) {
                 Object returnValue;
                 try {

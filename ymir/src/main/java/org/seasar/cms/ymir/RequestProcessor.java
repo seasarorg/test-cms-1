@@ -10,7 +10,7 @@ public interface RequestProcessor {
             Map fileParameterMap, AttributeContainer attributeContainer,
             Locale locale) throws PageNotFoundException;
 
-    Response process(Request request) throws ConstraintViolatedException;
+    Response process(Request request) throws PermissionDeniedException;
 
     Object backupForInclusion(AttributeContainer attributeContainer);
 

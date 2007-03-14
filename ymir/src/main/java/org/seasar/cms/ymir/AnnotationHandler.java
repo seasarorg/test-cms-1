@@ -8,6 +8,5 @@ public interface AnnotationHandler {
 
     ScopeHandler[] getOutjectedScopeAttributes(Object component);
 
-    Constraint[] getConstraints(Object component, Method action,
-            boolean includeCommonConstraints);
+    Constraint[] getConstraints(Object component, Method action);
 }

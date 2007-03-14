@@ -16,8 +16,7 @@ public class DefaultAnnotationHandler implements AnnotationHandler {
         return new ScopeHandler[0];
     }
 
-    public Constraint[] getConstraints(Object component, Method action,
-            boolean includeCommonConstraints) {
+    public Constraint[] getConstraints(Object component, Method action) {
         return new Constraint[0];
     }
 }

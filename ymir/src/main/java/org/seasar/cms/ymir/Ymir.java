@@ -18,8 +18,7 @@ public interface Ymir {
             Map fileParameterMap, AttributeContainer attributeContainer,
             Locale locale) throws PageNotFoundException;
 
-    Response processRequest(Request request)
-            throws ConstraintViolatedException;
+    Response processRequest(Request request) throws PermissionDeniedException;
 
     HttpServletResponseFilter processResponse(ServletContext context_,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,

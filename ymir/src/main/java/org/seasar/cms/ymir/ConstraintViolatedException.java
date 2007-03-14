@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConstraintViolatedException extends Exception {
+abstract public class ConstraintViolatedException extends Exception {
 
     private static final long serialVersionUID = -7148377969598636958L;
 

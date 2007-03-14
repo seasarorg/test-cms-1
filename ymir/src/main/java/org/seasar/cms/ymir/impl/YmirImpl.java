@@ -14,10 +14,10 @@ import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.AttributeContainer;
-import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.HttpServletResponseFilter;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.PageNotFoundException;
+import org.seasar.cms.ymir.PermissionDeniedException;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
@@ -99,7 +99,7 @@ public class YmirImpl implements Ymir {
     }
 
     public Response processRequest(Request request)
-            throws ConstraintViolatedException {
+            throws PermissionDeniedException {
 
         return requestProcessor_.process(request);
     }
