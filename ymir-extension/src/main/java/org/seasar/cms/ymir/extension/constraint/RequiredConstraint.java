@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.cms.ymir.Constraint;
-import org.seasar.cms.ymir.ConstraintViolationException;
+import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.Request;
-import org.seasar.cms.ymir.ConstraintViolationException.Message;
+import org.seasar.cms.ymir.ConstraintViolatedException.Message;
 
 public class RequiredConstraint implements Constraint {
 
@@ -18,7 +18,7 @@ public class RequiredConstraint implements Constraint {
     }
 
     public void confirm(Object component, Request request)
-            throws ConstraintViolationException {
+            throws ConstraintViolatedException {
         List<Message> messageList = new ArrayList<Message>();
         for (int i = 0; i < names_.length; i++) {
             if (isEmpty(request, names_[i])) {
@@ -27,7 +27,7 @@ public class RequiredConstraint implements Constraint {
             }
         }
         if (messageList.size() > 0) {
-            throw new ConstraintViolationException().setMessages(messageList
+            throw new ConstraintViolatedException().setMessages(messageList
                     .toArray(new Message[0]));
         }
     }
