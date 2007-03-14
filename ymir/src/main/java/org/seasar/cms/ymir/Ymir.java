@@ -19,7 +19,7 @@ public interface Ymir {
             Locale locale) throws PageNotFoundException;
 
     Response processRequest(Request request)
-            throws ConstraintViolationException;
+            throws ConstraintViolatedException;
 
     HttpServletResponseFilter processResponse(ServletContext context_,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,

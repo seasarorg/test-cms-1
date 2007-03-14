@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConstraintViolationException extends Exception {
+public class ConstraintViolatedException extends Exception {
 
     private static final long serialVersionUID = -7148377969598636958L;
 
@@ -12,21 +12,21 @@ public class ConstraintViolationException extends Exception {
 
     private List messageList_ = new ArrayList();
 
-    public ConstraintViolationException() {
+    public ConstraintViolatedException() {
     }
 
-    public ConstraintViolationException(String message) {
+    public ConstraintViolatedException(String message) {
 
         super(message);
     }
 
-    public ConstraintViolationException(Throwable cause) {
+    public ConstraintViolatedException(Throwable cause) {
 
         super(cause);
 
     }
 
-    public ConstraintViolationException(String message, Throwable cause) {
+    public ConstraintViolatedException(String message, Throwable cause) {
 
         super(message, cause);
 
@@ -37,7 +37,7 @@ public class ConstraintViolationException extends Exception {
         return path_;
     }
 
-    public ConstraintViolationException setPath(String path) {
+    public ConstraintViolatedException setPath(String path) {
 
         path_ = path;
         return this;
@@ -53,20 +53,20 @@ public class ConstraintViolationException extends Exception {
         return (Message[]) messageList_.toArray(new Message[0]);
     }
 
-    public ConstraintViolationException setMessages(Message[] messages) {
+    public ConstraintViolatedException setMessages(Message[] messages) {
 
         messageList_.clear();
         messageList_.addAll(Arrays.asList(messages));
         return this;
     }
 
-    public ConstraintViolationException addMessage(Message message) {
+    public ConstraintViolatedException addMessage(Message message) {
 
         messageList_.add(message);
         return this;
     }
 
-    public ConstraintViolationException addMessage(String key,
+    public ConstraintViolatedException addMessage(String key,
             Object[] parameters) {
 
         return addMessage(new Message(key, parameters));

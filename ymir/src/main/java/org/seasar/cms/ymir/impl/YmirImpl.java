@@ -14,7 +14,7 @@ import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.AttributeContainer;
-import org.seasar.cms.ymir.ConstraintViolationException;
+import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.HttpServletResponseFilter;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.PageNotFoundException;
@@ -99,7 +99,7 @@ public class YmirImpl implements Ymir {
     }
 
     public Response processRequest(Request request)
-            throws ConstraintViolationException {
+            throws ConstraintViolatedException {
 
         return requestProcessor_.process(request);
     }

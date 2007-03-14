@@ -14,7 +14,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.ymir.ConstraintViolationException;
+import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.HttpServletResponseFilter;
 import org.seasar.cms.ymir.MultipartServletRequest;
 import org.seasar.cms.ymir.PageNotFoundException;
@@ -115,7 +115,7 @@ public class YmirFilter implements Filter {
             }
         } catch (PageNotFoundException ex) {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
-        } catch (ConstraintViolationException ex) {
+        } catch (ConstraintViolatedException ex) {
             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
         } finally {
             if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {

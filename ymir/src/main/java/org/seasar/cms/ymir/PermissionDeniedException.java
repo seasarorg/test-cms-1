@@ -1,6 +1,6 @@
 package org.seasar.cms.ymir;
 
-public class PermissionDeniedException extends ConstraintViolationException {
+public class PermissionDeniedException extends ConstraintViolatedException {
 
     private static final long serialVersionUID = -7495239316902981080L;
 

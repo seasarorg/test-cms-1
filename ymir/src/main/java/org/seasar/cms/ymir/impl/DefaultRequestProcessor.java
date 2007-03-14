@@ -19,7 +19,7 @@ import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.ScopeHandler;
 import org.seasar.cms.ymir.Constraint;
-import org.seasar.cms.ymir.ConstraintViolationException;
+import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.PageNotFoundException;
@@ -173,7 +173,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     public Response process(Request request)
-            throws ConstraintViolationException {
+            throws ConstraintViolatedException {
 
         Response response = PassthroughResponse.INSTANCE;
         if (request.isMatched()) {
@@ -252,7 +252,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     Notes confirmConstraint(Object component, Method action, Request request,
             boolean alsoConfirmCommonConstraints)
-            throws ConstraintViolationException {
+            throws ConstraintViolatedException {
 
         Notes notes = new Notes();
         Constraint[] constraint = annotationHandler_.getConstraints(component,
@@ -262,9 +262,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 constraint[i].confirm(component, request);
             } catch (PermissionDeniedException ex) {
                 throw ex;
-            } catch (ConstraintViolationException ex) {
+            } catch (ConstraintViolatedException ex) {
                 if (ex.hasMessage()) {
-                    ConstraintViolationException.Message[] messages = ex
+                    ConstraintViolatedException.Message[] messages = ex
                             .getMessages();
                     for (int j = 0; j < messages.length; j++) {
                         notes.add(new Note(messages[j].getKey(), messages[j]
@@ -349,7 +349,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     Response invokeAction(Object component, Method action, Request request,
             boolean alsoConfirmCommonConstraints)
-            throws ConstraintViolationException {
+            throws ConstraintViolatedException {
 
         Response response = PassthroughResponse.INSTANCE;
 
