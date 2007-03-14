@@ -6,6 +6,7 @@ import java.util.List;
 import org.seasar.cms.ymir.Constraint;
 import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.ValidationFailedException;
 import org.seasar.cms.ymir.ConstraintViolatedException.Message;
 
 public class NumericConstraint implements Constraint {
@@ -40,7 +41,7 @@ public class NumericConstraint implements Constraint {
             confirm(request, names_[i], messageList);
         }
         if (messageList.size() > 0) {
-            throw new ConstraintViolatedException().setMessages(messageList
+            throw new ValidationFailedException().setMessages(messageList
                     .toArray(new Message[0]));
         }
     }

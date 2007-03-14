@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.seasar.cms.ymir.AnnotationHandler;
-import org.seasar.cms.ymir.ScopeHandler;
 import org.seasar.cms.ymir.Constraint;
+import org.seasar.cms.ymir.ScopeHandler;
 import org.seasar.cms.ymir.extension.ConstraintType;
 import org.seasar.cms.ymir.extension.annotation.ConstraintAnnotation;
 import org.seasar.cms.ymir.extension.annotation.In;
@@ -66,8 +66,8 @@ public class TigerAnnotationHandler implements AnnotationHandler {
                                 + clazz.getName() + ", method=" + method);
             }
 
-            handlerList.add(new ScopeHandler(toAttributeName(method
-                    .getName(), in.name()), getScope(in), method, null));
+            handlerList.add(new ScopeHandler(toAttributeName(method.getName(),
+                    in.name()), getScope(in), method, null));
         }
 
         return handlerList.toArray(new ScopeHandler[0]);
@@ -113,8 +113,8 @@ public class TigerAnnotationHandler implements AnnotationHandler {
                                 + clazz.getName() + ", method=" + method);
             }
 
-            handlerList.add(new ScopeHandler(toAttributeName(method
-                    .getName(), out.name()), getScope(out), null, method));
+            handlerList.add(new ScopeHandler(toAttributeName(method.getName(),
+                    out.name()), getScope(out), null, method));
         }
 
         return handlerList.toArray(new ScopeHandler[0]);
@@ -153,41 +153,36 @@ public class TigerAnnotationHandler implements AnnotationHandler {
         container_ = container;
     }
 
-    public Constraint[] getConstraints(Object component, Method action,
-            boolean includeCommonConstraints) {
-        return getConstraints(component.getClass(), action,
-                includeCommonConstraints);
+    public Constraint[] getConstraints(Object component, Method action) {
+        return getConstraints(component.getClass(), action);
     }
 
     // PropertyDescriptorのreadMethodは対象外。fieldも対象外。
-    Constraint[] getConstraints(Class<?> clazz, Method action,
-            boolean includeCommonConstraints) {
+    Constraint[] getConstraints(Class<?> clazz, Method action) {
         List<Constraint> list = new ArrayList<Constraint>();
 
-        if (includeCommonConstraints) {
-            Set<ConstraintType> suppressTypeSet = EnumSet
-                    .noneOf(ConstraintType.class);
-            if (action != null) {
-                SuppressConstraints suppress = action
-                        .getAnnotation(SuppressConstraints.class);
-                if (suppress != null) {
-                    ConstraintType[] types = suppress.value();
-                    for (int i = 0; i < types.length; i++) {
-                        suppressTypeSet.add(types[i]);
-                    }
+        Set<ConstraintType> suppressTypeSet = EnumSet
+                .noneOf(ConstraintType.class);
+        if (action != null) {
+            SuppressConstraints suppress = action
+                    .getAnnotation(SuppressConstraints.class);
+            if (suppress != null) {
+                ConstraintType[] types = suppress.value();
+                for (int i = 0; i < types.length; i++) {
+                    suppressTypeSet.add(types[i]);
                 }
             }
-            getConstraint(clazz, list, suppressTypeSet);
-            BeanInfo beanInfo;
-            try {
-                beanInfo = Introspector.getBeanInfo(clazz);
-            } catch (IntrospectionException ex) {
-                throw new RuntimeException(ex);
-            }
-            PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
-            for (int i = 0; i < pds.length; i++) {
-                getConstraint(pds[i].getWriteMethod(), list, suppressTypeSet);
-            }
+        }
+        getConstraint(clazz, list, suppressTypeSet);
+        BeanInfo beanInfo;
+        try {
+            beanInfo = Introspector.getBeanInfo(clazz);
+        } catch (IntrospectionException ex) {
+            throw new RuntimeException(ex);
+        }
+        PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
+        for (int i = 0; i < pds.length; i++) {
+            getConstraint(pds[i].getWriteMethod(), list, suppressTypeSet);
         }
         getConstraint(action, list, EMPTY_SUPPRESSTYPESET);
 

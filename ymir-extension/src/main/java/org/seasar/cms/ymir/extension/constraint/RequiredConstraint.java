@@ -7,6 +7,7 @@ import org.seasar.cms.ymir.Constraint;
 import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.Request;
+import org.seasar.cms.ymir.ValidationFailedException;
 import org.seasar.cms.ymir.ConstraintViolatedException.Message;
 
 public class RequiredConstraint implements Constraint {
@@ -27,7 +28,7 @@ public class RequiredConstraint implements Constraint {
             }
         }
         if (messageList.size() > 0) {
-            throw new ConstraintViolatedException().setMessages(messageList
+            throw new ValidationFailedException().setMessages(messageList
                     .toArray(new Message[0]));
         }
     }
