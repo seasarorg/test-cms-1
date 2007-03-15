@@ -350,17 +350,18 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
         Response response = PassthroughResponse.INSTANCE;
 
-        if (action != null) {
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("INVOKE: " + component.getClass().getName() + "#"
-                        + action);
-            }
-
-            Notes notes = null;
-            if (confirmConstraints) {
-                notes = confirmConstraint(component, action, request);
-            }
-            if (notes == null) {
+        Notes notes = null;
+        if (confirmConstraints) {
+            notes = confirmConstraint(component, action, request);
+        }
+        if (notes != null) {
+            request.setAttribute(ATTR_NOTES, notes);
+        } else {
+            if (action != null) {
+                if (logger_.isDebugEnabled()) {
+                    logger_.debug("INVOKE: " + component.getClass().getName()
+                            + "#" + action);
+                }
                 Object returnValue;
                 try {
                     returnValue = action.invoke(component, new Object[0]);
@@ -380,12 +381,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 }
                 response = constructResponse(component, action.getReturnType(),
                         returnValue);
-            } else {
-                request.setAttribute(ATTR_NOTES, notes);
-            }
-
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("RESPONSE: " + response);
+                if (logger_.isDebugEnabled()) {
+                    logger_.debug("RESPONSE: " + response);
+                }
             }
         }
 
