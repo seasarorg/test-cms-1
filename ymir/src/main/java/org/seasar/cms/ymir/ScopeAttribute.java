@@ -3,9 +3,10 @@ package org.seasar.cms.ymir;
 import java.lang.reflect.Method;
 
 import org.seasar.cms.ymir.scope.Scope;
+import org.seasar.framework.log.Logger;
 import org.seasar.kvasir.util.io.IORuntimeException;
 
-public class ScopeHandler {
+public class ScopeAttribute {
 
     private String name_;
 
@@ -15,7 +16,10 @@ public class ScopeHandler {
 
     private Method readMethod_;
 
-    public ScopeHandler(String name, Scope scope, Method writeMethod,
+    private static final Logger logger_ = Logger
+            .getLogger(ScopeAttribute.class);
+
+    public ScopeAttribute(String name, Scope scope, Method writeMethod,
             Method readMethod) {
         name_ = name;
         scope_ = scope;
@@ -28,6 +32,11 @@ public class ScopeHandler {
         if (value != null) {
             try {
                 writeMethod_.invoke(component, new Object[] { value });
+            } catch (IllegalArgumentException ex) {
+                // 型が合わなかった場合は単に無視する。
+                logger_.warn("Can't inject scope attribute: scope=" + scope_
+                        + ", attribute name=" + name_ + ", value=" + value
+                        + ", write method=" + writeMethod_, ex);
             } catch (Throwable t) {
                 throw new IORuntimeException(
                         "Can't inject scope attribute: scope=" + scope_

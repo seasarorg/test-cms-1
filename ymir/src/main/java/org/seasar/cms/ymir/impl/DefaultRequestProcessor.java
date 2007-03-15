@@ -19,7 +19,7 @@ import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.Note;
 import org.seasar.cms.ymir.Notes;
-import org.seasar.cms.ymir.ScopeHandler;
+import org.seasar.cms.ymir.ScopeAttribute;
 import org.seasar.cms.ymir.Constraint;
 import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.FormFile;
@@ -314,18 +314,18 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     void injectContextAttributes(Object component) {
-        ScopeHandler[] handlers = annotationHandler_
+        ScopeAttribute[] attributes = annotationHandler_
                 .getInjectedScopeAttributes(component);
-        for (int i = 0; i < handlers.length; i++) {
-            handlers[i].injectTo(component);
+        for (int i = 0; i < attributes.length; i++) {
+            attributes[i].injectTo(component);
         }
     }
 
     void outjectContextAttributes(Object component) {
-        ScopeHandler[] handlers = annotationHandler_
+        ScopeAttribute[] attributes = annotationHandler_
                 .getOutjectedScopeAttributes(component);
-        for (int i = 0; i < handlers.length; i++) {
-            handlers[i].outjectFrom(component);
+        for (int i = 0; i < attributes.length; i++) {
+            attributes[i].outjectFrom(component);
         }
     }
 

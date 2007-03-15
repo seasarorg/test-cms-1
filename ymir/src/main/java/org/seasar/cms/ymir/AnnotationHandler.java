@@ -4,9 +4,9 @@ import java.lang.reflect.Method;
 
 public interface AnnotationHandler {
 
-    ScopeHandler[] getInjectedScopeAttributes(Object component);
+    ScopeAttribute[] getInjectedScopeAttributes(Object component);
 
-    ScopeHandler[] getOutjectedScopeAttributes(Object component);
+    ScopeAttribute[] getOutjectedScopeAttributes(Object component);
 
     Constraint[] getConstraints(Object component, Method action);
 }
