@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.Constraint;
-import org.seasar.cms.ymir.ScopeHandler;
+import org.seasar.cms.ymir.ScopeAttribute;
 import org.seasar.cms.ymir.extension.ConstraintType;
 import org.seasar.cms.ymir.extension.annotation.ConstraintAnnotation;
 import org.seasar.cms.ymir.extension.annotation.In;
@@ -33,17 +33,21 @@ public class TigerAnnotationHandler implements AnnotationHandler {
 
     private S2Container container_;
 
-    public ScopeHandler[] getInjectedScopeAttributes(Object component) {
+    public void setS2Container(S2Container container) {
+        container_ = container;
+    }
+
+    public ScopeAttribute[] getInjectedScopeAttributes(Object component) {
         return getInjectedScopeAttributes(component.getClass());
     }
 
-    public ScopeHandler[] getOutjectedScopeAttributes(Object component) {
+    public ScopeAttribute[] getOutjectedScopeAttributes(Object component) {
         return getOutjectedScopeAttributes(component.getClass());
     }
 
-    ScopeHandler[] getInjectedScopeAttributes(Class clazz) {
+    ScopeAttribute[] getInjectedScopeAttributes(Class clazz) {
         Method[] methods = clazz.getMethods();
-        List<ScopeHandler> handlerList = new ArrayList<ScopeHandler>();
+        List<ScopeAttribute> handlerList = new ArrayList<ScopeAttribute>();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             In in = method.getAnnotation(In.class);
@@ -66,11 +70,11 @@ public class TigerAnnotationHandler implements AnnotationHandler {
                                 + clazz.getName() + ", method=" + method);
             }
 
-            handlerList.add(new ScopeHandler(toAttributeName(method.getName(),
-                    in.name()), getScope(in), method, null));
+            handlerList.add(new ScopeAttribute(toAttributeName(
+                    method.getName(), in.name()), getScope(in), method, null));
         }
 
-        return handlerList.toArray(new ScopeHandler[0]);
+        return handlerList.toArray(new ScopeAttribute[0]);
     }
 
     Scope getScope(In in) {
@@ -87,9 +91,9 @@ public class TigerAnnotationHandler implements AnnotationHandler {
         return (Scope) container_.getComponent(key);
     }
 
-    ScopeHandler[] getOutjectedScopeAttributes(Class clazz) {
+    ScopeAttribute[] getOutjectedScopeAttributes(Class clazz) {
         Method[] methods = clazz.getMethods();
-        List<ScopeHandler> handlerList = new ArrayList<ScopeHandler>();
+        List<ScopeAttribute> handlerList = new ArrayList<ScopeAttribute>();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             Out out = method.getAnnotation(Out.class);
@@ -113,11 +117,12 @@ public class TigerAnnotationHandler implements AnnotationHandler {
                                 + clazz.getName() + ", method=" + method);
             }
 
-            handlerList.add(new ScopeHandler(toAttributeName(method.getName(),
-                    out.name()), getScope(out), null, method));
+            handlerList
+                    .add(new ScopeAttribute(toAttributeName(method.getName(),
+                            out.name()), getScope(out), null, method));
         }
 
-        return handlerList.toArray(new ScopeHandler[0]);
+        return handlerList.toArray(new ScopeAttribute[0]);
     }
 
     Scope getScope(Out out) {
@@ -147,10 +152,6 @@ public class TigerAnnotationHandler implements AnnotationHandler {
             }
             return implicitName;
         }
-    }
-
-    public void setS2Container(S2Container container) {
-        container_ = container;
     }
 
     public Constraint[] getConstraints(Object component, Method action) {
