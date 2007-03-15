@@ -53,6 +53,10 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     public static final String ACTION_RENDER = "_render";
 
+    public static final String ACTION_VALIDATIONFAILED = "_validationFailed";
+
+    public static final String ACTION_PERMISSIONDENIED = "_permissionDenied";
+
     public static final String ATTR_SELF = "self";
 
     public static final String PARAM_METHOD = "__ymir__method";
@@ -349,41 +353,69 @@ public class DefaultRequestProcessor implements RequestProcessor {
             boolean confirmConstraints) throws PermissionDeniedException {
 
         Response response = PassthroughResponse.INSTANCE;
+        Object[] params = new Object[0];
 
-        Notes notes = null;
         if (confirmConstraints) {
-            notes = confirmConstraint(component, action, request);
-        }
-        if (notes != null) {
-            request.setAttribute(ATTR_NOTES, notes);
-        } else {
-            if (action != null) {
-                if (logger_.isDebugEnabled()) {
-                    logger_.debug("INVOKE: " + component.getClass().getName()
-                            + "#" + action);
-                }
-                Object returnValue;
-                try {
-                    returnValue = action.invoke(component, new Object[0]);
-                } catch (IllegalArgumentException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalAccessException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InvocationTargetException ex) {
-                    Throwable cause = ex.getCause();
-                    if (cause instanceof Error) {
-                        throw (Error) cause;
-                    } else if (cause instanceof RuntimeException) {
-                        throw (RuntimeException) cause;
+            // 制約チェックを行なう。
+            try {
+                Notes notes = confirmConstraint(component, action, request);
+                if (notes != null) {
+                    request.setAttribute(ATTR_NOTES, notes);
+
+                    // バリデーションエラーが発生した場合は、エラー処理メソッドが存在すればそれを呼び出す。
+                    // メソッドが存在しなければ何もしない（元のアクションメソッドの呼び出しをスキップする）。
+                    action = getActionMethod(component,
+                            ACTION_VALIDATIONFAILED,
+                            new Class[] { Notes.class });
+                    if (action != null) {
+                        params = new Object[] { notes };
                     } else {
-                        throw new RuntimeException(cause);
+                        action = getActionMethod(component,
+                                ACTION_VALIDATIONFAILED);
                     }
                 }
-                response = constructResponse(component, action.getReturnType(),
-                        returnValue);
-                if (logger_.isDebugEnabled()) {
-                    logger_.debug("RESPONSE: " + response);
+            } catch (PermissionDeniedException ex) {
+                // 権限エラーが発生した場合は、エラー処理メソッドが存在すればそれを呼び出す。
+                // メソッドが存在しなければPermissionDeniedExceptionを上に再スローする。
+                action = getActionMethod(component, ACTION_PERMISSIONDENIED,
+                        new Class[] { PermissionDeniedException.class });
+                if (action != null) {
+                    params = new Object[] { ex };
+                } else {
+                    action = getActionMethod(component, ACTION_PERMISSIONDENIED);
                 }
+                if (action == null) {
+                    throw ex;
+                }
+            }
+        }
+
+        if (action != null) {
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("INVOKE: " + component.getClass().getName() + "#"
+                        + action);
+            }
+            Object returnValue;
+            try {
+                returnValue = action.invoke(component, params);
+            } catch (IllegalArgumentException ex) {
+                throw new RuntimeException(ex);
+            } catch (IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            } catch (InvocationTargetException ex) {
+                Throwable cause = ex.getCause();
+                if (cause instanceof Error) {
+                    throw (Error) cause;
+                } else if (cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                } else {
+                    throw new RuntimeException(cause);
+                }
+            }
+            response = constructResponse(component, action.getReturnType(),
+                    returnValue);
+            if (logger_.isDebugEnabled()) {
+                logger_.debug("RESPONSE: " + response);
             }
         }
 
@@ -506,8 +538,14 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     public Method getActionMethod(Object component, String actionName) {
 
+        return getActionMethod(component, actionName, new Class[0]);
+    }
+
+    public Method getActionMethod(Object component, String actionName,
+            Class[] paramTypes) {
+
         try {
-            return component.getClass().getMethod(actionName, new Class[0]);
+            return component.getClass().getMethod(actionName, paramTypes);
         } catch (SecurityException ex) {
             return null;
         } catch (NoSuchMethodException ex) {
