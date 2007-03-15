@@ -39,6 +39,7 @@ import org.seasar.cms.ymir.beanutils.FormFileConverter;
 import org.seasar.cms.ymir.response.PassthroughResponse;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructorSelector;
+import org.seasar.cms.ymir.util.BeanUtils;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
@@ -291,25 +292,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     void prepareForComponent(Object component, Request request) {
         // リクエストパラメータをinjectする。
-        try {
-            beanUtilsBean_.populate(component, request.getParameterMap());
-        } catch (Throwable t) {
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("Can't populate request parameters", t);
-            }
-        }
+        BeanUtils
+                .populate(beanUtilsBean_, component, request.getParameterMap());
 
         // FormFileのリクエストパラメータをinjectする。
-        try {
-            beanUtilsBean_.copyProperties(component, request
-                    .getFileParameterMap());
-        } catch (Throwable t) {
-            if (logger_.isDebugEnabled()) {
-                logger_
-                        .debug("Can't populate request parameters (FormFile)",
-                                t);
-            }
-        }
+        BeanUtils.copyProperties(beanUtilsBean_, component, request
+                .getFileParameterMap());
 
         // 各コンテキストが持つ属性をinjectする。
         // （リクエストパラメータによって予期せぬinjectがあった場合にそれを上書きできるように、
