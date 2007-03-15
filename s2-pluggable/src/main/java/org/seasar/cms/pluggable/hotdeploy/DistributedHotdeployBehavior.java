@@ -11,7 +11,7 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
 
     private boolean hotdeployEnabled_;
 
-    private LocalHotdeployS2Container[] ondemandContainers_;
+    private LocalHotdeployS2Container[] localHotdeployS2Containers_;
 
     private int counter_ = 0;
 
@@ -28,10 +28,10 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
         // LocalHotdeployS2Containerを集める。
         ComponentDef[] componentDefs = container
                 .findAllComponentDefs(LocalHotdeployS2Container.class);
-        ondemandContainers_ = new LocalHotdeployS2Container[componentDefs.length];
+        localHotdeployS2Containers_ = new LocalHotdeployS2Container[componentDefs.length];
         for (int i = 0; i < componentDefs.length; i++) {
             ComponentDef cd = componentDefs[i];
-            LocalHotdeployS2Container ondemandContainer = (LocalHotdeployS2Container) cd
+            LocalHotdeployS2Container localContainer = (LocalHotdeployS2Container) cd
                     .getComponent();
 
             // このLocalHotdeployS2Containerが登録されているコンテナから見える
@@ -41,21 +41,25 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
             for (int j = 0; j < listeners.length; j++) {
                 HotdeployListener listener = listeners[j];
                 if (listener instanceof LocalHotdeployS2Container
-                        && listener != ondemandContainer) {
+                        && listener != localContainer) {
                     // このLocalHotdeployS2Containerが登録されているコンテナから見えても、
                     // 自分以外のLocalHotdeployS2Containerは登録しない。
                     continue;
                 }
-                ondemandContainer.addHotdeployListener(listener);
+                localContainer.addHotdeployListener(listener);
             }
-            ondemandContainer.init(hotdeployEnabled_);
-            ondemandContainers_[i] = ondemandContainer;
+            localContainer.init(hotdeployEnabled_);
+            localHotdeployS2Containers_[i] = localContainer;
         }
     }
 
+    public LocalHotdeployS2Container[] getLocalHotdeployS2Containers() {
+        return localHotdeployS2Containers_;
+    }
+
     public void destroy() {
-        for (int i = 0; i < ondemandContainers_.length; i++) {
-            ondemandContainers_[i].destroy();
+        for (int i = 0; i < localHotdeployS2Containers_.length; i++) {
+            localHotdeployS2Containers_[i].destroy();
         }
         hotdeployEnabled_ = false;
     }
@@ -72,8 +76,8 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
             if (logger_.isDebugEnabled()) {
                 logger_.debug("HOTDEPLOY BEHAVIOR STARTING...");
             }
-            for (int i = 0; i < ondemandContainers_.length; i++) {
-                ondemandContainers_[i].start();
+            for (int i = 0; i < localHotdeployS2Containers_.length; i++) {
+                localHotdeployS2Containers_[i].start();
             }
             if (logger_.isDebugEnabled()) {
                 logger_.debug("HOTDEPLOY BEHAVIOR STARTED");
@@ -99,8 +103,8 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
             }
             DisposableUtil.dispose();
 
-            for (int i = 0; i < ondemandContainers_.length; i++) {
-                ondemandContainers_[i].stop();
+            for (int i = 0; i < localHotdeployS2Containers_.length; i++) {
+                localHotdeployS2Containers_[i].stop();
             }
 
             if (logger_.isDebugEnabled()) {
