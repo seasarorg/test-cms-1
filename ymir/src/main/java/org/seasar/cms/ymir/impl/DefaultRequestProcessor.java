@@ -50,19 +50,7 @@ import org.seasar.kvasir.util.el.VariableResolver;
 
 public class DefaultRequestProcessor implements RequestProcessor {
 
-    public static final String ACTION_DEFAULT = "_default";
-
-    public static final String ACTION_RENDER = "_render";
-
-    public static final String ACTION_VALIDATIONFAILED = "_validationFailed";
-
-    public static final String ACTION_PERMISSIONDENIED = "_permissionDenied";
-
-    public static final String ATTR_SELF = "self";
-
     public static final String PARAM_METHOD = "__ymir__method";
-
-    private static final String ATTR_NOTES = "notes";
 
     private Ymir ymir_;
 
