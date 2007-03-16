@@ -12,6 +12,8 @@ import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.FormDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHint;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHintBag;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
@@ -52,6 +54,8 @@ public class AnalyzerContext extends ZptTemplateContext {
     private Set<String> ignoreVariableSet_ = new HashSet<String>();
 
     private String path_;
+
+    private PropertyTypeHintBag hintBag_;
 
     @Override
     public VariableResolver getVariableResolver() {
@@ -358,7 +362,7 @@ public class AnalyzerContext extends ZptTemplateContext {
             String baseName = name.substring(0, dot);
             PropertyDesc propertyDesc = getSinglePropertyDesc(classDesc,
                     baseName, PropertyDesc.READ, false);
-            ClassDesc typeClassDesc = prepareTypeClassDesc(propertyDesc);
+            ClassDesc typeClassDesc = preparePropertyTypeClassDesc(propertyDesc);
             if (typeClassDesc != null) {
                 return getPropertyDesc(typeClassDesc, name.substring(dot + 1),
                         mode);
@@ -384,16 +388,25 @@ public class AnalyzerContext extends ZptTemplateContext {
             }
         }
         PropertyDesc propertyDesc = classDesc.addProperty(name, mode);
-        if (array) {
-            // なるべく元の状態を壊さないようにこうしている。
-            // （添字があるならば配列である、は真であるが、裏は真ではない。）
-            // つまり、arrayがtrueの時だけsetArray()している、ということ。
-            propertyDesc.getTypeDesc().setArray(array);
+        PropertyTypeHint hint = getPropertyTypeHint(classDesc.getName(), name);
+        TypeDesc typeDesc = propertyDesc.getTypeDesc();
+        if (hint != null) {
+            typeDesc.setExplicit(true);
+            typeDesc.setClassDesc(getTemporaryClassDescFromClassName(hint
+                    .getPropertyName()));
+            typeDesc.setArray(hint.isArray());
+        } else {
+            if (array) {
+                // なるべく元の状態を壊さないようにこうしている。
+                // （添字があるならば配列である、は真であるが、裏は真ではない。）
+                // つまり、arrayがtrueの時だけsetArray()している、ということ。
+                typeDesc.setArray(array);
+            }
         }
         return propertyDesc;
     }
 
-    public ClassDesc prepareTypeClassDesc(PropertyDesc propertyDesc) {
+    public ClassDesc preparePropertyTypeClassDesc(PropertyDesc propertyDesc) {
 
         ClassDesc cd = propertyDesc.getTypeDesc().getClassDesc();
         ClassDesc returned = null;
@@ -441,5 +454,19 @@ public class AnalyzerContext extends ZptTemplateContext {
     public void setPath(String path) {
 
         path_ = path;
+    }
+
+    public void setPropertyTypeHintBag(PropertyTypeHintBag hintBag) {
+
+        hintBag_ = hintBag;
+    }
+
+    public PropertyTypeHint getPropertyTypeHint(String className,
+            String propertyName) {
+        if (hintBag_ != null) {
+            return hintBag_.getHint(className, propertyName);
+        } else {
+            return null;
+        }
     }
 }

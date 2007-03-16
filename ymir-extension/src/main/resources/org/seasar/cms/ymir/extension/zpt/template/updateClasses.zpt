@@ -9,7 +9,19 @@
 追加・更新したくないものについてはチェックを外して下さい。</p>
   <p tal:condition="createdClassDescs"><strong>追加されるクラス：</strong>
   <ul>
-    <li tal:repeat="classDesc createdClassDescs"><input type="checkbox" name="__ymir__apply" tal:attributes="value classDesc/name; checked classDesc/checked" /> <span tal:content="classDesc/name">CLASS</span></li>
+    <li tal:repeat="classDesc createdClassDescs">
+      <input type="checkbox" name="__ymir__apply" tal:attributes="value classDesc/name; checked classDesc/checked" /> <span tal:content="classDesc/name">CLASS</span>
+      <table tal:condition="classDesc/propertyDescs">
+        <tr tal:repeat="propertyDesc classDesc/propertyDescs">
+          <th align="right" nowrap="nowrap">
+            <span tal:replace="propertyDesc/name">PROPERTYNAME</span>プロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <input type="text" tal:attributes="name string:__ymir__propertyType_${classDesc/name}/${propertyDesc/name}; value propertyDesc/typeName" />
+          </td>
+        </tr>
+      </table>
+    </li>
   </ul>
   </p>
   <p tal:condition="updatedClassDescs"><strong>更新されるクラス：</strong>

@@ -187,7 +187,7 @@ public class ZptAnalyzerTest extends TestCase {
                     public long lastModified() {
                         return 0;
                     }
-                }, pageClassName, ignoreVariables);
+                }, pageClassName, null, ignoreVariables);
     }
 
     private ClassDesc getClassDesc(String name) {

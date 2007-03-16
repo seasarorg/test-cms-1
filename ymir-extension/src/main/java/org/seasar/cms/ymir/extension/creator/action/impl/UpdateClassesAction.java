@@ -2,9 +2,12 @@ package org.seasar.cms.ymir.extension.creator.action.impl;
 
 import static org.seasar.cms.ymir.impl.DefaultRequestProcessor.PARAM_METHOD;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -14,6 +17,8 @@ import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHint;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHintBag;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
@@ -27,9 +32,14 @@ public class UpdateClassesAction extends AbstractUpdateAction {
     protected static final String PARAM_REPLACE = SourceCreator.PARAM_PREFIX
             + "replace";
 
+    protected static final String PARAMPREFIX_PROPERTYTYPE = SourceCreator.PARAM_PREFIX
+            + "propertyType_";
+
     protected static final String PREFIX_CHECKEDTIME = "updateClassesAction.checkedTime.";
 
     protected static final String PREFIX_CLASSCHECKED = "updateClassesAction.class.checked.";
+
+    private static final String SUFFIX_ARRAY = "[]";
 
     public UpdateClassesAction(SourceCreator sourceCreator) {
         super(sourceCreator);
@@ -81,10 +91,11 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             if (ClassDesc.KIND_DAO.equals(kind)
                     || ClassDesc.KIND_BEAN.equals(kind)
                     || ClassDesc.KIND_DXO.equals(kind)) {
-                dtos[i] = new ClassDescDto(name, false);
+                dtos[i] = new ClassDescDto(classDescs[i], false);
             } else {
-                dtos[i] = new ClassDescDto(name, PropertyUtils.valueOf(prop
-                        .getProperty(PREFIX_CLASSCHECKED + name), true));
+                dtos[i] = new ClassDescDto(classDescs[i], PropertyUtils
+                        .valueOf(prop.getProperty(PREFIX_CLASSCHECKED + name),
+                                true));
             }
         }
 
@@ -98,8 +109,37 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             return null;
         }
 
+        List<PropertyTypeHint> hintList = new ArrayList<PropertyTypeHint>();
+        for (Iterator itr = request.getParameterNames(); itr.hasNext();) {
+            String name = (String) itr.next();
+            if (!name.startsWith(PARAMPREFIX_PROPERTYTYPE)) {
+                continue;
+            }
+            String classAndPropertyName = name
+                    .substring(PARAMPREFIX_PROPERTYTYPE.length());
+            int slash = classAndPropertyName.indexOf('/');
+            if (slash < 0) {
+                continue;
+            }
+            String className = classAndPropertyName.substring(0, slash);
+            String propertyName = classAndPropertyName.substring(slash + 1);
+            String typeName = request.getParameter(name);
+            boolean array;
+            if (typeName.endsWith(SUFFIX_ARRAY)) {
+                array = true;
+                typeName = typeName.substring(0, typeName.length()
+                        - SUFFIX_ARRAY.length());
+            } else {
+                array = false;
+            }
+            hintList.add(new PropertyTypeHint(className, propertyName,
+                    typeName, array));
+        }
+
         ClassDescBag classDescBag = getSourceCreator().gatherClassDescs(
-                new PathMetaData[] { pathMetaData });
+                new PathMetaData[] { pathMetaData },
+                new PropertyTypeHintBag(hintList
+                        .toArray(new PropertyTypeHint[0])), null);
 
         String[] appliedClassNames = request.getParameterValues(PARAM_APPLY);
         Set<String> appliedClassNameSet = new HashSet<String>();

@@ -20,6 +20,7 @@ import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.ClassDescSet;
 import org.seasar.cms.ymir.extension.creator.InvalidClassDescException;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHintBag;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.SourceGenerator;
 import org.seasar.cms.ymir.extension.creator.Template;
@@ -127,7 +128,7 @@ public class MockSourceCreator implements SourceCreator {
     }
 
     public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas,
-            String[] ignoreVariables) {
+            PropertyTypeHintBag hintBag, String[] ignoreVariables) {
         return null;
     }
 

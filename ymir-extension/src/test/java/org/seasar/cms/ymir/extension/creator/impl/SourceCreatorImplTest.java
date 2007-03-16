@@ -14,6 +14,8 @@ import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.ParameterDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHint;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHintBag;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.framework.util.ResourceUtil;
 import org.seasar.kvasir.util.io.IOUtils;
@@ -98,10 +100,14 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
     public void testGatherClassDescs() throws Exception {
 
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
+        PropertyTypeHintBag hintBag = new PropertyTypeHintBag(
+                new PropertyTypeHint[] { new PropertyTypeHint(
+                        "com.example.web.TestPage", "result",
+                        "java.lang.Integer", false) });
         target_.gatherClassDescs(classDescMap, new PathMetaDataImpl(
                 "/test.html", Request.METHOD_GET, false, "testPage",
                 "com.example.web.TestPage", null, null, null,
-                getSourceCreator().getTemplate("/test.html")), null);
+                getSourceCreator().getTemplate("/test.html")), hintBag, null);
         ClassDesc[] actual = (ClassDesc[]) classDescMap.values().toArray(
                 new ClassDesc[0]);
 
@@ -113,6 +119,8 @@ public class SourceCreatorImplTest extends SourceCreatorImplTestBase {
         assertNotNull(md);
         assertEquals(TypeDesc.TYPE_VOID, md.getReturnTypeDesc().getName());
         assertNotNull(actual[0].getMethodDesc(new MethodDescImpl("_render")));
+        assertEquals("Integer", actual[0].getPropertyDesc("result")
+                .getTypeDesc().getName());
     }
 
     public void testNewClassDesc() throws Exception {

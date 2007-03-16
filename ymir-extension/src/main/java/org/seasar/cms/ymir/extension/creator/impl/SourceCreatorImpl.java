@@ -58,6 +58,7 @@ import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.ParameterDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHintBag;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.SourceGenerator;
 import org.seasar.cms.ymir.extension.creator.Template;
@@ -258,15 +259,16 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas) {
-        return gatherClassDescs(pathMetaDatas, null);
+        return gatherClassDescs(pathMetaDatas, null, null);
     }
 
     public ClassDescBag gatherClassDescs(PathMetaData[] pathMetaDatas,
-            String[] ignoreVariables) {
+            PropertyTypeHintBag hintBag, String[] ignoreVariables) {
 
         Map<String, ClassDesc> classDescMap = new LinkedHashMap<String, ClassDesc>();
         for (int i = 0; i < pathMetaDatas.length; i++) {
-            gatherClassDescs(classDescMap, pathMetaDatas[i], ignoreVariables);
+            gatherClassDescs(classDescMap, pathMetaDatas[i], hintBag,
+                    ignoreVariables);
         }
         ClassDesc[] classDescs = addRelativeClassDescs(classDescMap.values()
                 .toArray(new ClassDesc[0]));
@@ -321,14 +323,16 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public void gatherClassDescs(Map<String, ClassDesc> classDescMap,
-            PathMetaData pathMetaData, String[] ignoreVariables) {
+            PathMetaData pathMetaData, PropertyTypeHintBag hintBag,
+            String[] ignoreVariables) {
 
         String path = pathMetaData.getPath();
         String method = pathMetaData.getMethod();
         String className = pathMetaData.getClassName();
-        analyzer_.analyze(getServletContext(), getHttpServletRequest(),
+        analyzer_
+                .analyze(getServletContext(), getHttpServletRequest(),
                 getHttpServletResponse(), path, method, classDescMap,
-                pathMetaData.getTemplate(), className, ignoreVariables);
+                pathMetaData.getTemplate(), className, hintBag, ignoreVariables);
 
         ClassDesc classDesc = classDescMap.get(className);
         if (classDesc == null && method.equalsIgnoreCase(Request.METHOD_POST)) {

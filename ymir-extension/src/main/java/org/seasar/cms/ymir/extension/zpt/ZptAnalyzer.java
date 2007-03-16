@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.ymir.extension.Globals;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.PropertyTypeHintBag;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.extension.creator.TemplateAnalyzer;
@@ -45,7 +46,8 @@ public class ZptAnalyzer implements TemplateAnalyzer {
     public void analyze(ServletContext servletContext,
             HttpServletRequest request, HttpServletResponse response,
             String path, String method, Map<String, ClassDesc> classDescMap,
-            Template template, String className, String[] ignoreVariables) {
+            Template template, String className, PropertyTypeHintBag hintBag,
+            String[] ignoreVariables) {
 
         path = zpt_.getTemplatePathResolver().resolve(path, request);
         AnalyzerContext context = (AnalyzerContext) evaluator_.newContext();
@@ -61,6 +63,7 @@ public class ZptAnalyzer implements TemplateAnalyzer {
         context.setClassDescMap(classDescMap);
         context.setPageClassName(className);
         context.setUsingFreyjaRenderClasses(isUsingFreyjaRenderClasses());
+        context.setPropertyTypeHintBag(hintBag);
 
         InputStream inputStream = null;
         try {
