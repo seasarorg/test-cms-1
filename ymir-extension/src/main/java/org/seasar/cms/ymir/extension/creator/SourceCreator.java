@@ -1,5 +1,6 @@
 package org.seasar.cms.ymir.extension.creator;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.Properties;
@@ -63,6 +64,9 @@ public interface SourceCreator extends Updater {
     void writeString(String string, OutputStream os);
 
     Class getClass(String className);
+
+    PropertyDescriptor getPropertyDescriptor(String className,
+            String propertyName);
 
     Application getApplication();
 

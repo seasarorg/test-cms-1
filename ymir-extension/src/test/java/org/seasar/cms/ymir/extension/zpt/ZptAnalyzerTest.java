@@ -16,6 +16,7 @@ import junit.framework.TestCase;
 
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.MatchedPathMapping;
+import org.seasar.cms.ymir.Note;
 import org.seasar.cms.ymir.PathMapping;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
@@ -121,6 +122,18 @@ public class ZptAnalyzerTest extends TestCase {
             public String getRootPackageName() {
                 return "com.example";
             }
+
+            @Override
+            public Class getClass(String className) {
+                if (className == null) {
+                    return null;
+                }
+                try {
+                    return Class.forName(className);
+                } catch (ClassNotFoundException ex) {
+                    return null;
+                }
+            }
         };
         creator.setNamingConvention(new NamingConventionImpl());
         ApplicationManagerImpl applicationManager = new ApplicationManagerImpl();
@@ -134,10 +147,19 @@ public class ZptAnalyzerTest extends TestCase {
     }
 
     private void act(String methodName) {
-        act(methodName, null);
+        act(methodName, CLASSNAME);
     }
 
-    private void act(final String methodName, String[] ignoreVariables) {
+    private void act(String methodName, String pageClassName) {
+        act(methodName, pageClassName, null);
+    }
+
+    private void act(String methodName, String[] ignoreVariables) {
+        act(methodName, CLASSNAME, ignoreVariables);
+    }
+
+    private void act(final String methodName, String pageClassName,
+            String[] ignoreVariables) {
 
         target_.analyze(MOCK_SERVLETCONTEXT, MOCK_REQUEST, MOCK_RESPONSE,
                 "/hoe", Request.METHOD_GET, classDescMap_, new Template() {
@@ -165,7 +187,7 @@ public class ZptAnalyzerTest extends TestCase {
                     public long lastModified() {
                         return 0;
                     }
-                }, CLASSNAME, ignoreVariables);
+                }, pageClassName, ignoreVariables);
     }
 
     private ClassDesc getClassDesc(String name) {
@@ -491,11 +513,11 @@ public class ZptAnalyzerTest extends TestCase {
         act("testAnalyze24");
 
         ClassDesc cd = getClassDesc(CLASSNAME);
-        PropertyDesc pd = cd.getPropertyDesc("results");
+        PropertyDesc pd = cd.getPropertyDesc("comments");
         assertTrue(pd.getTypeDesc().isArray());
-        assertEquals("com.example.dto.ResultDto", pd.getTypeDesc()
+        assertEquals("com.example.dto.CommentDto", pd.getTypeDesc()
                 .getClassDesc().getName());
-        assertNull(getClassDesc("com.example.dto.ResultDto").getPropertyDesc(
+        assertNull(getClassDesc("com.example.dto.CommentDto").getPropertyDesc(
                 "length"));
     }
 
@@ -504,5 +526,18 @@ public class ZptAnalyzerTest extends TestCase {
         act("testAnalyze25");
 
         assertNull(getClassDesc("com.example.dto.NotesDto"));
+    }
+
+    public void testAnalyze26_明示的に型を指定したプロパティについては自動的にマッピングされるDto型が生成されないこと()
+            throws Exception {
+
+        act("testAnalyze26");
+
+        ClassDesc cd = getClassDesc(CLASSNAME);
+        PropertyDesc pd = cd.getPropertyDesc("results");
+        assertEquals(Note.class.getName(), pd.getTypeDesc().getClassDesc()
+                .getName());
+        assertNull(getClassDesc(Note.class.getName()));
+        assertNull(getClassDesc("com.example.dto.ResultDto"));
     }
 }

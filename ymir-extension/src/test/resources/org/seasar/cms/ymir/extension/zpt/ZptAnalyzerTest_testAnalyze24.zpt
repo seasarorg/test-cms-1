@@ -3,7 +3,7 @@
     <title>TEST</title>
   </head>
   <body>
-    <p tal:content="self/results/length">10</p>
-    <p tal:repeat="result self/results" tal:content="result/body">BODY</p>
+    <p tal:content="self/comments/length">10</p>
+    <p tal:repeat="comment self/comments" tal:content="comment/body">BODY</p>
   </body>
 </html>

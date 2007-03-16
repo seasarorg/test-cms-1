@@ -92,8 +92,9 @@ public class AnalyzerContext extends ZptTemplateContext {
             PropertyDesc propertyDesc = wrapper.getPropertyDesc();
             if (propertyDesc != null) {
                 TypeDesc typeDesc = propertyDesc.getTypeDesc();
-                ClassDesc classDescOfdefinedVariable = getTemporaryClassDesc(name);
-                typeDesc.setClassDesc(classDescOfdefinedVariable);
+                if (!typeDesc.isExplicit()) {
+                    typeDesc.setClassDesc(getTemporaryClassDesc(name));
+                }
             } else {
                 // self/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
                 // 自動生成ではそのようなプロパティは今のところ扱わない。
@@ -112,9 +113,11 @@ public class AnalyzerContext extends ZptTemplateContext {
             PropertyDesc propertyDesc = wrapper.getPropertyDesc();
             if (propertyDesc != null) {
                 TypeDesc typeDesc = propertyDesc.getTypeDesc();
-                typeDesc.setArray(true);
-                ClassDesc classDescOfDefinedVariable = getTemporaryClassDesc(name);
-                typeDesc.setClassDesc(classDescOfDefinedVariable);
+                if (!typeDesc.isExplicit()) {
+                    typeDesc.setArray(true);
+                    typeDesc.setClassDesc(getTemporaryClassDesc(name));
+                }
+                objs[0] = new DescWrapper(typeDesc.getClassDesc());
             } else {
                 // self/entitiesのような形式ではなく、直接entitiesのように式が書かれている。
                 // 自動生成ではそのようなプロパティは今のところ扱わない。
@@ -172,6 +175,11 @@ public class AnalyzerContext extends ZptTemplateContext {
         } else {
             className = name;
         }
+        return getTemporaryClassDescFromClassName(className);
+    }
+
+    public ClassDesc getTemporaryClassDescFromClassName(String className) {
+
         ClassDesc classDesc = (ClassDesc) temporaryClassDescMap_.get(className);
         if (classDesc == null) {
             classDesc = sourceCreator_.newClassDesc(className);

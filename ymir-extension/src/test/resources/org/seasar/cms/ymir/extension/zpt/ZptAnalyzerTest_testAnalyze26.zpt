@@ -1,0 +1,8 @@
+<html>
+  <head>
+    <title>TEST</title>
+  </head>
+  <body>
+    <p tal:repeat="result self/results" tal:content="result/value">VALUE</p>
+  </body>
+</html>

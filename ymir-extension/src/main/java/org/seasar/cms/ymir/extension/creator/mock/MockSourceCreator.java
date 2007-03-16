@@ -1,5 +1,6 @@
 package org.seasar.cms.ymir.extension.creator.mock;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.Properties;
@@ -109,6 +110,11 @@ public class MockSourceCreator implements SourceCreator {
     }
 
     public Class getClass(String className) {
+        return null;
+    }
+
+    public PropertyDescriptor getPropertyDescriptor(String className,
+            String propertyName) {
         return null;
     }
 

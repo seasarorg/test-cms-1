@@ -596,7 +596,8 @@ public class SourceCreatorImpl implements SourceCreator {
             } catch (InvalidClassDescException ex) {
                 // ソースファイルの生成に失敗した。
                 classDescBag.remove(classDescs[i].getName());
-                classDescBag.addAsFailed(classDescs[i], ex.getLackingClassNames());
+                classDescBag.addAsFailed(classDescs[i], ex
+                        .getLackingClassNames());
             }
         }
     }
@@ -796,6 +797,29 @@ public class SourceCreatorImpl implements SourceCreator {
         } catch (ClassNotFoundException ex) {
             return null;
         }
+    }
+
+    public PropertyDescriptor getPropertyDescriptor(String className,
+            String propertyName) {
+
+        Class clazz = getClass(className);
+        if (clazz == null || propertyName == null) {
+            return null;
+        }
+
+        BeanInfo beanInfo;
+        try {
+            beanInfo = Introspector.getBeanInfo(clazz);
+        } catch (IntrospectionException ex) {
+            throw new RuntimeException(ex);
+        }
+        PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
+        for (int i = 0; i < pds.length; i++) {
+            if (pds[i].getName().equals(propertyName)) {
+                return pds[i];
+            }
+        }
+        return null;
     }
 
     public Template getTemplate(String path) {

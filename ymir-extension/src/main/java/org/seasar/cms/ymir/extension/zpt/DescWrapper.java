@@ -11,16 +11,19 @@ public class DescWrapper {
 
     private PropertyDesc propertyDesc_;
 
+    private boolean array_;
+
     public DescWrapper(ClassDesc classDesc) {
 
         classDesc_ = classDesc;
     }
 
     public DescWrapper(AnalyzerContext analyzerContext,
-        PropertyDesc propertyDesc) {
+            PropertyDesc propertyDesc) {
 
         analyzerContext_ = analyzerContext;
         propertyDesc_ = propertyDesc;
+        array_ = propertyDesc.getTypeDesc().isArray();
     }
 
     public String toString() {
@@ -40,5 +43,10 @@ public class DescWrapper {
     public PropertyDesc getPropertyDesc() {
 
         return propertyDesc_;
+    }
+
+    public boolean isArray() {
+
+        return array_;
     }
 }
