@@ -7,13 +7,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.cms.ymir.Notes;
+import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.FormDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
-import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
@@ -185,10 +186,12 @@ public class AnalyzerContext extends ZptTemplateContext {
     public String toClassName(String componentName) {
 
         String className = null;
-        if (DefaultRequestProcessor.ATTR_SELF.equals(componentName)) {
+        if (RequestProcessor.ATTR_SELF.equals(componentName)) {
             className = getPageClassName();
             // Kvasir/SoraのpopプラグインのexternalTemplate機能を使って自動生成
             // をしている場合、classNameはnullになり得ることに注意。
+        } else if (RequestProcessor.ATTR_NOTES.equals(componentName)) {
+            className = Notes.class.getName();
         } else {
             className = sourceCreator_.getClassName(componentName);
         }

@@ -498,4 +498,11 @@ public class ZptAnalyzerTest extends TestCase {
         assertNull(getClassDesc("com.example.dto.ResultDto").getPropertyDesc(
                 "length"));
     }
+
+    public void testAnalyze25_notesはYmir内蔵のNotesクラスと解釈されること() throws Exception {
+
+        act("testAnalyze25");
+
+        assertNull(getClassDesc("com.example.dto.NotesDto"));
+    }
 }
