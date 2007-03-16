@@ -150,7 +150,9 @@ public class AnalyzerContext extends ZptTemplateContext {
         String className;
         int dot = name.lastIndexOf('.');
         if (dot < 0) {
-            if (usingFreyjaRenderClasses_) {
+            if (usingFreyjaRenderClasses_
+                    && !RequestProcessor.ATTR_NOTES.equals(name)) {
+                // NotesはFreyjaにもYmirにもあるが、Ymirのものを優先させたいため上のようにしている。
                 String renderClassName = "net.skirnir.freyja.render."
                         + capFirst(name);
                 if (isAvailable(renderClassName)) {
