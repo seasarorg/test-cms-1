@@ -11,6 +11,7 @@ import java.util.Map;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.InvalidClassDescException;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
@@ -114,7 +115,11 @@ public class CreateTemplateAction extends AbstractUpdateAction {
                     + quote(transition.trim()) + ";"));
             classDesc.setMethodDesc(methodDesc);
             getSourceCreator().mergeWithExistentClass(classDesc, true);
-            getSourceCreator().writeSourceFile(classDesc, null);
+            try {
+                getSourceCreator().writeSourceFile(classDesc, null);
+            } catch (InvalidClassDescException ex) {
+                throw new RuntimeException("Can't happen!", ex);
+            }
         } else {
             return null;
         }

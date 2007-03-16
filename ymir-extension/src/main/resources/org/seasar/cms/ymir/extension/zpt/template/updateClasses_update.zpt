@@ -16,7 +16,14 @@
 </p>
 <p tal:condition="classDescBag/failedClassDescs">必要な情報を取得できなかったため、以下のクラスは追加・更新できませんでした：
 <ul>
-  <li tal:repeat="classDesc classDescBag/failedClassDescs" tal:content="classDesc/name">CLASS</li>
+  <li tal:repeat="classDesc classDescBag/failedClassDescs">
+    <span tal:content="classDesc/name">CLASS</span>
+    <ul>
+      <li tal:define="method string:failedClassDescLackingClassNames(${classDesc/name})" tal:repeat="className classDescBag/?method">
+        <span tal:content="className">CLASS</span>が不足しています。
+      </li>
+    </ul>
+  </li>
 </ul>
 </p>
 <p>EclipseでプロジェクトルートをRefreshしてから、以下の「OK」ボタンを押して下さい。</p>

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
+import org.seasar.cms.ymir.extension.creator.InvalidClassDescException;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
@@ -92,12 +93,18 @@ public class CreateClassAndTemplateAction extends AbstractUpdateAction {
         classDesc.setMethodDesc(new MethodDescImpl(
                 DefaultRequestProcessor.ACTION_RENDER));
 
-        getSourceCreator().writeSourceFile(classDesc, null);
+        String[] lackingClassNames = null;
+        try {
+            getSourceCreator().writeSourceFile(classDesc, null);
+        } catch (InvalidClassDescException ex) {
+            lackingClassNames = ex.getLackingClassNames();
+        }
 
         Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("request", request);
         variableMap.put("method", method);
         variableMap.put("pathMetaData", pathMetaData);
+        variableMap.put("lackingClassNames", lackingClassNames);
         return getSourceCreator().getResponseCreator().createResponse(
                 "createClassAndTemplate_redirect", variableMap);
     }

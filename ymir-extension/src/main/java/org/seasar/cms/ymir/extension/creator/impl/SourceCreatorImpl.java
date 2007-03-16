@@ -53,6 +53,7 @@ import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.ClassDescSet;
 import org.seasar.cms.ymir.extension.creator.DescValidator;
 import org.seasar.cms.ymir.extension.creator.EntityMetaData;
+import org.seasar.cms.ymir.extension.creator.InvalidClassDescException;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.ParameterDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
@@ -63,6 +64,7 @@ import org.seasar.cms.ymir.extension.creator.Template;
 import org.seasar.cms.ymir.extension.creator.TemplateAnalyzer;
 import org.seasar.cms.ymir.extension.creator.TemplateProvider;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
+import org.seasar.cms.ymir.extension.creator.DescValidator.Result;
 import org.seasar.cms.ymir.extension.creator.action.Condition;
 import org.seasar.cms.ymir.extension.creator.action.State;
 import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
@@ -291,7 +293,7 @@ public class SourceCreatorImpl implements SourceCreator {
             PropertyDesc[] pds = pageClassDescs[i].getPropertyDescs();
             for (int j = 0; j < pds.length; j++) {
                 TypeDesc td = pds[j].getTypeDesc();
-                if (!DescValidator.isValid(td, classDescSet)
+                if (!DescValidator.validate(td, classDescSet).isValid()
                         || !ClassDesc.KIND_DTO.equals(td.getClassDesc()
                                 .getKind())) {
                     continue;
@@ -573,7 +575,7 @@ public class SourceCreatorImpl implements SourceCreator {
     boolean addPropertyIfValid(ClassDesc classDesc, TypeDesc typeDesc,
             int mode, ClassDescSet classDescSet) {
 
-        if (DescValidator.isValid(typeDesc, classDescSet)) {
+        if (DescValidator.validate(typeDesc, classDescSet).isValid()) {
             classDesc.addProperty(typeDesc.getInstanceName(), mode)
                     .setTypeDesc(typeDesc);
             return true;
@@ -589,11 +591,12 @@ public class SourceCreatorImpl implements SourceCreator {
         for (int i = 0; i < classDescs.length; i++) {
             // 既存のクラスがあればマージする。
             mergeWithExistentClass(classDescs[i], mergeMethod);
-            if (!writeSourceFile(classDescs[i], classDescBag.getClassDescSet())) {
+            try {
+                writeSourceFile(classDescs[i], classDescBag.getClassDescSet());
+            } catch (InvalidClassDescException ex) {
                 // ソースファイルの生成に失敗した。
                 classDescBag.remove(classDescs[i].getName());
-                classDescBag.addAsFailed(classDescs[i]);
-
+                classDescBag.addAsFailed(classDescs[i], ex.getLackingClassNames());
             }
         }
     }
@@ -663,11 +666,12 @@ public class SourceCreatorImpl implements SourceCreator {
         }
     }
 
-    public boolean writeSourceFile(ClassDesc classDesc,
-            ClassDescSet classDescSet) {
+    public void writeSourceFile(ClassDesc classDesc, ClassDescSet classDescSet)
+            throws InvalidClassDescException {
 
-        if (!DescValidator.isValid(classDesc, classDescSet)) {
-            return false;
+        Result result = DescValidator.validate(classDesc, classDescSet);
+        if (!result.isValid()) {
+            throw new InvalidClassDescException(result.getClassNames());
         }
 
         writeString(sourceGenerator_.generateBaseSource(classDesc),
@@ -679,8 +683,6 @@ public class SourceCreatorImpl implements SourceCreator {
             writeString(sourceGenerator_.generateGapSource(classDesc),
                     sourceFile);
         }
-
-        return true;
     }
 
     public void writeString(String string, File file) {

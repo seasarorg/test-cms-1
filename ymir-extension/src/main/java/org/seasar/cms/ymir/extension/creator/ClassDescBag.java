@@ -17,6 +17,8 @@ public class ClassDescBag {
 
     private ClassDescSet set_ = new ClassDescSet();
 
+    private Map<String, String[]> failedClassDescLackingClassNamesMap_ = new HashMap<String, String[]>();
+
     public Map<String, ClassDesc> getClassDescMap() {
         return getClassDescMap(map_, null);
     }
@@ -85,8 +87,22 @@ public class ClassDescBag {
         return getFailedClassDescMap(kind).values().toArray(new ClassDesc[0]);
     }
 
+    public Map<String, String[]> getFailedClassDescLackingClassNamesMap() {
+        return failedClassDescLackingClassNamesMap_;
+    }
+
+    public String[] getFailedClassDescLackingClassNames(String className) {
+        String[] classNames = failedClassDescLackingClassNamesMap_
+                .get(className);
+        if (classNames != null) {
+            return classNames;
+        } else {
+            return new String[0];
+        }
+    }
+
     Map<String, ClassDesc> getClassDescMap(
-        Map<String, Map<String, ClassDesc>> map, String kind) {
+            Map<String, Map<String, ClassDesc>> map, String kind) {
         Map<String, ClassDesc> got = map.get(kind);
         if (got == null) {
             got = new LinkedHashMap<String, ClassDesc>();
@@ -96,7 +112,7 @@ public class ClassDescBag {
     }
 
     ClassDesc[] getClassDescs(Map<String, Map<String, ClassDesc>> map,
-        String kind) {
+            String kind) {
         return getClassDescMap(map, kind).values().toArray(new ClassDesc[0]);
     }
 
@@ -107,30 +123,32 @@ public class ClassDescBag {
     public void addAsCreated(ClassDesc classDesc) {
         getClassDescMap().put(classDesc.getName(), classDesc);
         getClassDescMap(classDesc.getKind())
-            .put(classDesc.getName(), classDesc);
+                .put(classDesc.getName(), classDesc);
         getCreatedClassDescMap().put(classDesc.getName(), classDesc);
         getCreatedClassDescMap(classDesc.getKind()).put(classDesc.getName(),
-            classDesc);
+                classDesc);
         set_.add(classDesc);
     }
 
     public void addAsUpdated(ClassDesc classDesc) {
         getClassDescMap().put(classDesc.getName(), classDesc);
         getClassDescMap(classDesc.getKind())
-            .put(classDesc.getName(), classDesc);
+                .put(classDesc.getName(), classDesc);
         getUpdatedClassDescMap().put(classDesc.getName(), classDesc);
         getUpdatedClassDescMap(classDesc.getKind()).put(classDesc.getName(),
-            classDesc);
+                classDesc);
         set_.add(classDesc);
     }
 
-    public void addAsFailed(ClassDesc classDesc) {
+    public void addAsFailed(ClassDesc classDesc, String[] lackingClassNames) {
         getClassDescMap().put(classDesc.getName(), classDesc);
         getClassDescMap(classDesc.getKind())
-            .put(classDesc.getName(), classDesc);
+                .put(classDesc.getName(), classDesc);
         getFailedClassDescMap().put(classDesc.getName(), classDesc);
         getFailedClassDescMap(classDesc.getKind()).put(classDesc.getName(),
-            classDesc);
+                classDesc);
+        getFailedClassDescLackingClassNamesMap().put(classDesc.getName(),
+                lackingClassNames);
     }
 
     public void remove(String className) {

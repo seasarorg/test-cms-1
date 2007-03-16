@@ -53,7 +53,8 @@ public interface SourceCreator extends Updater {
 
     ResponseCreator getResponseCreator();
 
-    boolean writeSourceFile(ClassDesc classDesc, ClassDescSet classDescSet);
+    void writeSourceFile(ClassDesc classDesc, ClassDescSet classDescSet)
+            throws InvalidClassDescException;
 
     SourceGenerator getSourceGenerator();
 

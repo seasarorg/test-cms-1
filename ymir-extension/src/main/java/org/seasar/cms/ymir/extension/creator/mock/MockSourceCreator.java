@@ -17,6 +17,7 @@ import org.seasar.cms.ymir.ResponseCreator;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.ClassDescSet;
+import org.seasar.cms.ymir.extension.creator.InvalidClassDescException;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.SourceGenerator;
@@ -96,9 +97,8 @@ public class MockSourceCreator implements SourceCreator {
         return null;
     }
 
-    public boolean writeSourceFile(ClassDesc classDesc,
-            ClassDescSet classDescSet) {
-        return false;
+    public void writeSourceFile(ClassDesc classDesc, ClassDescSet classDescSet)
+            throws InvalidClassDescException {
     }
 
     public SourceGenerator getSourceGenerator() {
