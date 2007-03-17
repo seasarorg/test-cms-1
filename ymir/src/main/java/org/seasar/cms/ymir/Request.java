@@ -263,4 +263,11 @@ public interface Request extends AttributeContainer {
      * @return リクエストパスがパスマッピングにマッチしたかどうか。
      */
     boolean isMatched();
+
+    /**
+     * リクエストパスへのリクエストを拒否すべきかどうかを返します。
+     *
+     * @return リクエストパスへのリクエストを拒否すべきかどうか。
+     */
+    boolean isDenied();
 }

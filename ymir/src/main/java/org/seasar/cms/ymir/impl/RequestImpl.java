@@ -241,4 +241,8 @@ public class RequestImpl implements Request {
     public boolean isMatched() {
         return (matched_ != null);
     }
+
+    public boolean isDenied() {
+        return (matched_ != null && matched_.isDenied());
+    }
 }

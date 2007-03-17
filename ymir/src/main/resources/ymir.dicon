@@ -25,6 +25,14 @@
       <arg>"org.seasar.cms.ymir.response.scheme.impl"</arg>
       <arg>"Abstract.*"</arg>
     </initMethod>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.ymir.exception"</arg>
+      <arg>".*Handler"</arg>
+    </initMethod>
+    <initMethod name="addIgnoreClassPattern">
+      <arg>"org.seasar.cms.ymir.exception"</arg>
+      <arg>"Abstract.*"</arg>
+    </initMethod>
     <initMethod name="registerAll" />
   </component>
   <component

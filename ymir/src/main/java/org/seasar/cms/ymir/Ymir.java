@@ -16,9 +16,10 @@ public interface Ymir {
     Request prepareForProcessing(String contextPath, String path,
             String method, String dispatcher, Map parameterMap,
             Map fileParameterMap, AttributeContainer attributeContainer,
-            Locale locale) throws PageNotFoundException;
+            Locale locale);
 
-    Response processRequest(Request request) throws PermissionDeniedException;
+    Response processRequest(Request request) throws PageNotFoundException,
+            PermissionDeniedException;
 
     HttpServletResponseFilter processResponse(ServletContext context_,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse,
@@ -45,4 +46,6 @@ public interface Ymir {
      * @return 現在処理中のアプリケーションが開発中であるかどうか。
      */
     boolean isUnderDevelopment();
+
+    Response processException(Throwable t);
 }

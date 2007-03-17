@@ -20,9 +20,10 @@ public interface RequestProcessor {
     Request prepareForProcessing(String contextPath, String path,
             String method, String dispatcher, Map parameterMap,
             Map fileParameterMap, AttributeContainer attributeContainer,
-            Locale locale) throws PageNotFoundException;
+            Locale locale);
 
-    Response process(Request request) throws PermissionDeniedException;
+    Response process(Request request) throws PageNotFoundException,
+            PermissionDeniedException;
 
     Object backupForInclusion(AttributeContainer attributeContainer);
 

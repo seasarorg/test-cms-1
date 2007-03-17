@@ -14,10 +14,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.seasar.cms.ymir.AttributeContainer;
 import org.seasar.cms.ymir.HttpServletResponseFilter;
 import org.seasar.cms.ymir.MultipartServletRequest;
-import org.seasar.cms.ymir.PageNotFoundException;
-import org.seasar.cms.ymir.PermissionDeniedException;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Ymir;
@@ -72,7 +71,7 @@ public class YmirFilter implements Filter {
         } else {
             fileParameterMap = new HashMap();
         }
-        HttpServletRequestAttributeContainer attributeContainer = new HttpServletRequestAttributeContainer(
+        AttributeContainer attributeContainer = new HttpServletRequestAttributeContainer(
                 httpRequest);
 
         Object backupped = null;
@@ -85,14 +84,13 @@ public class YmirFilter implements Filter {
             variableResolver = httpRequest
                     .getAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER);
         }
-        try {
-            Request request = ymir_.prepareForProcessing(ServletUtils
-                    .getContextPath(httpRequest), ServletUtils
-                    .getPath(httpRequest), httpRequest.getMethod(),
-                    dispatcher_, httpRequest.getParameterMap(),
-                    fileParameterMap, attributeContainer, LocaleUtils
-                            .findLocale(httpRequest));
 
+        Request request = ymir_.prepareForProcessing(ServletUtils
+                .getContextPath(httpRequest),
+                ServletUtils.getPath(httpRequest), httpRequest.getMethod(),
+                dispatcher_, httpRequest.getParameterMap(), fileParameterMap,
+                attributeContainer, LocaleUtils.findLocale(httpRequest));
+        try {
             Response response = ymir_.processRequest(request);
 
             HttpServletResponseFilter responseFilter = ymir_.processResponse(
@@ -113,10 +111,9 @@ public class YmirFilter implements Filter {
                 chain.doFilter(httpRequest, responseFilter);
                 responseFilter.commit();
             }
-        } catch (PageNotFoundException ex) {
-            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
-        } catch (PermissionDeniedException ex) {
-            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
+        } catch (Throwable t) {
+            ymir_.processResponse(context_, httpRequest, httpResponse, request,
+                    ymir_.processException(t));
         } finally {
             if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
                 httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,

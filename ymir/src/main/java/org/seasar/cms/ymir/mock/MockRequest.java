@@ -41,6 +41,8 @@ public class MockRequest implements Request {
 
     private boolean matched_;
 
+    private boolean denied_;
+
     public String getAbsolutePath() {
         return absolutePath_;
     }
@@ -79,6 +81,10 @@ public class MockRequest implements Request {
 
     public boolean isMatched() {
         return matched_;
+    }
+
+    public boolean isDenied() {
+        return denied_;
     }
 
     public String getMethod() {

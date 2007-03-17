@@ -14,6 +14,7 @@ import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.AttributeContainer;
+import org.seasar.cms.ymir.ExceptionProcessor;
 import org.seasar.cms.ymir.HttpServletResponseFilter;
 import org.seasar.cms.ymir.LifecycleListener;
 import org.seasar.cms.ymir.PageNotFoundException;
@@ -39,6 +40,8 @@ public class YmirImpl implements Ymir {
 
     private ResponseProcessor responseProcessor_;
 
+    private ExceptionProcessor exceptionProcessor_;
+
     private Logger logger_ = Logger.getLogger(getClass());
 
     public void setLifecycleListeners(LifecycleListener[] lifecycleListeners) {
@@ -54,6 +57,11 @@ public class YmirImpl implements Ymir {
     public void setResponseProcessor(ResponseProcessor responseProcessor) {
 
         responseProcessor_ = responseProcessor;
+    }
+
+    public void setExceptionProcessor(ExceptionProcessor exceptionProcessor) {
+
+        exceptionProcessor_ = exceptionProcessor;
     }
 
     public void setConfiguration(Configuration configuration) {
@@ -91,7 +99,7 @@ public class YmirImpl implements Ymir {
     public Request prepareForProcessing(String contextPath, String path,
             String method, String dispatcher, Map parameterMap,
             Map fileParameterMap, AttributeContainer attributeContainer,
-            Locale locale) throws PageNotFoundException {
+            Locale locale) {
 
         return requestProcessor_.prepareForProcessing(contextPath, path, method
                 .toUpperCase(), dispatcher, parameterMap, fileParameterMap,
@@ -99,7 +107,7 @@ public class YmirImpl implements Ymir {
     }
 
     public Response processRequest(Request request)
-            throws PermissionDeniedException {
+            throws PageNotFoundException, PermissionDeniedException {
 
         return requestProcessor_.process(request);
     }
@@ -167,5 +175,10 @@ public class YmirImpl implements Ymir {
 
         return Configuration.PROJECTSTATUS_DEVELOP.equals(getProjectStatus())
                 && getApplication().isUnderDevelopment();
+    }
+
+    public Response processException(Throwable t) {
+
+        return exceptionProcessor_.process(t);
     }
 }

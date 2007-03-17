@@ -87,16 +87,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
     public Request prepareForProcessing(String contextPath, String path,
             String method, String dispatcher, Map parameterMap,
             Map fileParameterMap, AttributeContainer attributeContainer,
-            Locale locale) throws PageNotFoundException {
+            Locale locale) {
 
         if (ymir_.isUnderDevelopment()) {
             method = correctMethod(method, parameterMap);
         }
 
         MatchedPathMapping matched = findMatchedPathMapping(path, method);
-        if (matched != null && matched.isDenied()) {
-            throw new PageNotFoundException(path);
-        }
 
         return new RequestImpl(contextPath, path, method, dispatcher,
                 parameterMap, fileParameterMap, attributeContainer, locale,
@@ -165,7 +162,12 @@ public class DefaultRequestProcessor implements RequestProcessor {
         return null;
     }
 
-    public Response process(Request request) throws PermissionDeniedException {
+    public Response process(Request request) throws PageNotFoundException,
+            PermissionDeniedException {
+
+        if (request.isDenied()) {
+            throw new PageNotFoundException(request.getPath());
+        }
 
         Response response = PassthroughResponse.INSTANCE;
         if (request.isMatched()) {
