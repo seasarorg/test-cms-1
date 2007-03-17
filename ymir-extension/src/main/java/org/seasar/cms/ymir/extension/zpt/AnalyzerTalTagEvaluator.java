@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.cms.ymir.FormFile;
+import org.seasar.cms.ymir.Globals;
 import org.seasar.cms.ymir.MatchedPathMapping;
 import org.seasar.cms.ymir.Path;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
@@ -248,7 +249,7 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         }
 
         String name = getAttributeValue(attrMap, "name", null);
-        if (name != null && isValidAsPropertyName(name)) {
+        if (name != null && shouldGeneratePropertyForParameter(name)) {
             return context.getPropertyDesc(formDesc.getClassDesc(), name,
                     PropertyDesc.READ | PropertyDesc.WRITE);
         }
@@ -256,26 +257,27 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
         return null;
     }
 
-    boolean isValidAsPropertyName(String name) {
-        if (name == null) {
+    boolean shouldGeneratePropertyForParameter(String name) {
+        if (name == null || name.startsWith(Globals.IDPREFIX)) {
             return false;
         }
 
         int pre = 0;
         int idx;
         while ((idx = name.indexOf('.', pre)) >= 0) {
-            if (!isValidAsSinglePropertyName(name.substring(pre, idx))) {
+            if (!shouldGeneratePropertyForParameterSegment(name.substring(pre,
+                    idx))) {
                 return false;
             }
             pre = idx + 1;
         }
-        if (!isValidAsSinglePropertyName(name.substring(pre))) {
+        if (!shouldGeneratePropertyForParameterSegment(name.substring(pre))) {
             return false;
         }
         return true;
     }
 
-    boolean isValidAsSinglePropertyName(String name) {
+    boolean shouldGeneratePropertyForParameterSegment(String name) {
         if (name == null) {
             return false;
         }
