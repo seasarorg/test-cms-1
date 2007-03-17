@@ -2,9 +2,11 @@ package org.seasar.cms.ymir;
 
 public interface Globals {
 
-    String LANDMARK_CLASSNAME = "org.seasar.cms.ymir.landmark.Landmark";
+    String IDPREFIX = "org.seasar.cms.ymir.";
 
-    String ATTR_LOCALE = "org.seasar.cms.ymir.locale";
+    String LANDMARK_CLASSNAME = IDPREFIX + "landmark.Landmark";
+
+    String ATTR_LOCALE = IDPREFIX + "locale";
 
     String MESSAGES = "messages.xproperties";
 

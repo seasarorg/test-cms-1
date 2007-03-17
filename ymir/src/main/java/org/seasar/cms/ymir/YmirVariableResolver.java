@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
+import org.seasar.cms.ymir.util.TokenUtils;
 import org.seasar.framework.container.S2Container;
 
 import net.skirnir.freyja.TemplateContext;
@@ -20,9 +21,11 @@ import net.skirnir.freyja.impl.VariableResolverImpl;
 public class YmirVariableResolver extends VariableResolverImpl {
     public static final String NAME_YMIRREQUEST = "ymirRequest";
 
-    private static final Object NAME_CONTAINER = "container";
+    public static final String NAME_CONTAINER = "container";
 
-    private static final Object NAME_MESSAGES = "messages";
+    public static final String NAME_MESSAGES = "messages";
+
+    public static final String NAME_TOKEN = "token";
 
     private Request ymirRequest_;
 
@@ -56,6 +59,8 @@ public class YmirVariableResolver extends VariableResolverImpl {
             return container_;
         } else if (NAME_MESSAGES.equals(name)) {
             return messages_;
+        } else if (NAME_TOKEN.equals(name)) {
+            return getToken();
         } else if (super.containsVariable(name)) {
             return super.getVariable(context, name);
         } else if (parent_ != null) {
@@ -87,6 +92,7 @@ public class YmirVariableResolver extends VariableResolverImpl {
         nameSet.add(NAME_YMIRREQUEST);
         nameSet.add(NAME_CONTAINER);
         nameSet.add(NAME_MESSAGES);
+        nameSet.add(NAME_TOKEN);
         nameSet.addAll(Arrays.asList(super.getVariableNames()));
         if (parent_ != null) {
             nameSet.addAll(Arrays.asList(parent_.getVariableNames()));
@@ -112,7 +118,7 @@ public class YmirVariableResolver extends VariableResolverImpl {
 
     public boolean containsVariable(String name) {
         if (NAME_YMIRREQUEST.equals(name) || NAME_CONTAINER.equals(name)
-                || NAME_MESSAGES.equals(name)) {
+                || NAME_MESSAGES.equals(name) || NAME_TOKEN.equals(name)) {
             return true;
         } else if (super.containsVariable(name)) {
             return true;
@@ -143,6 +149,8 @@ public class YmirVariableResolver extends VariableResolverImpl {
             return new EntryImpl(name, S2Container.class, container_);
         } else if (NAME_MESSAGES.equals(name)) {
             return new EntryImpl(name, Messages.class, messages_);
+        } else if (NAME_TOKEN.equals(name)) {
+            return new TokenEntry(name);
         }
 
         Entry entry = super.getVariableEntry(context, name);
@@ -178,5 +186,30 @@ public class YmirVariableResolver extends VariableResolverImpl {
         }
 
         return null;
+    }
+
+    String getToken() {
+        TokenUtils.saveToken(request_, false);
+        return TokenUtils.getToken(request_);
+    }
+
+    class TokenEntry implements Entry {
+        private String name_;
+
+        public TokenEntry(String name) {
+            name_ = name;
+        }
+
+        public String getName() {
+            return name_;
+        }
+
+        public Class getType() {
+            return String.class;
+        }
+
+        public Object getValue() {
+            return getToken();
+        }
     }
 }
