@@ -67,4 +67,18 @@ public class UpdateClassesActionTest extends SourceCreatorImplTestBase {
 
         assertFalse(target_.shouldUpdate(pathMetaData));
     }
+
+    public void testNormalizeTypeName() throws Exception {
+
+        assertNull(target_.normalizeTypeName(null));
+        assertEquals("boolean", target_.normalizeTypeName("boolean"));
+        assertEquals("byte", target_.normalizeTypeName("byte"));
+        assertEquals("char", target_.normalizeTypeName("char"));
+        assertEquals("short", target_.normalizeTypeName("short"));
+        assertEquals("int", target_.normalizeTypeName("int"));
+        assertEquals("long", target_.normalizeTypeName("long"));
+        assertEquals("float", target_.normalizeTypeName("float"));
+        assertEquals("double", target_.normalizeTypeName("double"));
+        assertEquals("java.lang.Integer", target_.normalizeTypeName("Integer"));
+    }
 }

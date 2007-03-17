@@ -4,6 +4,7 @@ import static org.seasar.cms.ymir.impl.DefaultRequestProcessor.PARAM_METHOD;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,6 +41,17 @@ public class UpdateClassesAction extends AbstractUpdateAction {
     protected static final String PREFIX_CLASSCHECKED = "updateClassesAction.class.checked.";
 
     private static final String SUFFIX_ARRAY = "[]";
+
+    private static final String PACKAGEPREFIX_JAVA_LANG = "java.lang.";
+
+    private static final Set<String> primitiveSet_;
+
+    static {
+        Set<String> primitiveSet = new HashSet<String>();
+        primitiveSet.addAll(Arrays.asList(new String[] { "boolean", "byte",
+            "char", "short", "int", "long", "float", "double" }));
+        primitiveSet_ = Collections.unmodifiableSet(primitiveSet);
+    }
 
     public UpdateClassesAction(SourceCreator sourceCreator) {
         super(sourceCreator);
@@ -132,6 +144,7 @@ public class UpdateClassesAction extends AbstractUpdateAction {
             } else {
                 array = false;
             }
+            typeName = normalizeTypeName(typeName);
             hintList.add(new PropertyTypeHint(className, propertyName,
                     typeName, array));
         }
@@ -186,6 +199,15 @@ public class UpdateClassesAction extends AbstractUpdateAction {
                 .getCreatedClassDescs(ClassDesc.KIND_BEAN));
         return getSourceCreator().getResponseCreator().createResponse(
                 "updateClasses_update", variableMap);
+    }
+
+    String normalizeTypeName(String typeName) {
+        if (typeName == null || typeName.indexOf('.') >= 0
+                || primitiveSet_.contains(typeName)) {
+            return typeName;
+        } else {
+            return PACKAGEPREFIX_JAVA_LANG + typeName;
+        }
     }
 
     boolean shouldUpdate(PathMetaData pathMetaData) {

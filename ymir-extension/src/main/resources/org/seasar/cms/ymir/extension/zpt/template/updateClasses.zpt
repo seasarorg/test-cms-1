@@ -7,6 +7,7 @@
 <form tal:attributes="action request/absolutePath" method="post">
 <p>テンプレート<span tal:replace="pathMetaData/template/path">TEMPLATE</span>の変更を検出しました。テンプレートに関連する以下のクラスを追加・更新します。
 追加・更新したくないものについてはチェックを外して下さい。</p>
+<p>クラスのプロパティの型を指定する場合、java.langパッケージのものについてはパッケージ表記を省略しても構いません。</p>
   <p tal:condition="createdClassDescs"><strong>追加されるクラス：</strong>
   <ul>
     <li tal:repeat="classDesc createdClassDescs">
@@ -26,7 +27,19 @@
   </p>
   <p tal:condition="updatedClassDescs"><strong>更新されるクラス：</strong>
   <ul>
-    <li tal:repeat="classDesc updatedClassDescs"><input type="checkbox" name="__ymir__apply" tal:attributes="value classDesc/name; checked classDesc/checked" /> <span tal:content="classDesc/name">CLASS</span></li>
+    <li tal:repeat="classDesc updatedClassDescs">
+      <input type="checkbox" name="__ymir__apply" tal:attributes="value classDesc/name; checked classDesc/checked" /> <span tal:content="classDesc/name">CLASS</span>
+      <table tal:condition="classDesc/propertyDescs">
+        <tr tal:repeat="propertyDesc classDesc/propertyDescs">
+          <th align="right" nowrap="nowrap">
+            <span tal:replace="propertyDesc/name">PROPERTYNAME</span>プロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <input type="text" tal:attributes="name string:__ymir__propertyType_${classDesc/name}/${propertyDesc/name}; value propertyDesc/typeName" />
+          </td>
+        </tr>
+      </table>
+    </li>
   </ul>
   </p>
   <p><input type="checkbox" name="__ymir__replace" value="true" /> 以前の生成結果を新しい結果で置き換える（以前のクラスが持つメソッドやプロパティの情報は全て失われます！）</p>
