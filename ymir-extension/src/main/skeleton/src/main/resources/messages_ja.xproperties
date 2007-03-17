@@ -1,1 +1,2 @@
 error.constraint.required={0}の値を指定して下さい。
+error.constraint.tokenRequired=ページ遷移が想定どおり行なわれなかったため、リクエストが正しく処理されませんでした。

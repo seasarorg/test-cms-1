@@ -18,6 +18,12 @@ public class PropertyTypeHint {
         array_ = array;
     }
 
+    @Override
+    public String toString() {
+        return "className=" + className_ + ", propertyName=" + propertyName_
+                + ", typeName=" + typeName_ + ", array=" + array_;
+    }
+
     public boolean isArray() {
         return array_;
     }

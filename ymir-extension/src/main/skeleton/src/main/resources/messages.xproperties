@@ -1,1 +1,2 @@
 error.constraint.required=Specify non-empty value: {0}
+error.constraint.tokenRequired=Request has not been processed correctly because of invalid page transition.

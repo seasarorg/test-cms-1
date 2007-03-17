@@ -393,7 +393,7 @@ public class AnalyzerContext extends ZptTemplateContext {
         if (hint != null) {
             typeDesc.setExplicit(true);
             typeDesc.setClassDesc(getTemporaryClassDescFromClassName(hint
-                    .getPropertyName()));
+                    .getTypeName()));
             typeDesc.setArray(hint.isArray());
         } else {
             if (array) {
