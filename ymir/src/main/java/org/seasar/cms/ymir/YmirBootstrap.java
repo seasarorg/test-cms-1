@@ -37,7 +37,7 @@ public class YmirBootstrap {
         ComponentDef cd = getContainer().getComponentDef(
                 LocalHotdeployS2Container.class);
         Application application = new SingleApplication(servletContext,
-                getConfiguration(), landmark, cd.getContainer(),
+                getConfiguration(), landmark, getContainer(),
                 (LocalHotdeployS2Container) cd.getComponent(),
                 (PathMappingProvider) getContainer().getComponent(
                         PathMappingProvider.class));

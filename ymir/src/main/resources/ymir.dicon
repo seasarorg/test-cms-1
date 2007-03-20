@@ -2,6 +2,7 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
   "http://www.seasar.org/dtd/components24.dtd">
 <components>
+  <include path="app.dicon" />
   <include path="ymir-convention.dicon" />
   <include path="mapping.dicon" />
   <component
@@ -23,14 +24,6 @@
     </initMethod>
     <initMethod name="addIgnoreClassPattern">
       <arg>"org.seasar.cms.ymir.response.scheme.impl"</arg>
-      <arg>"Abstract.*"</arg>
-    </initMethod>
-    <initMethod name="addClassPattern">
-      <arg>"org.seasar.cms.ymir.exception"</arg>
-      <arg>".*Handler"</arg>
-    </initMethod>
-    <initMethod name="addIgnoreClassPattern">
-      <arg>"org.seasar.cms.ymir.exception"</arg>
       <arg>"Abstract.*"</arg>
     </initMethod>
     <initMethod name="registerAll" />
