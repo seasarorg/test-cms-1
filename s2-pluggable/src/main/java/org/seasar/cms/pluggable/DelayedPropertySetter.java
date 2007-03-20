@@ -3,6 +3,7 @@ package org.seasar.cms.pluggable;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.container.ComponentDef;
+import org.seasar.framework.container.InstanceDef;
 import org.seasar.framework.container.MetaDef;
 import org.seasar.framework.container.PropertyDef;
 import org.seasar.framework.container.S2Container;
@@ -43,18 +44,23 @@ public class DelayedPropertySetter {
             // SimpleComponentDefは大抵のメソッドがUnsupportedOperationException
             // なので、何もしない。
             return;
+        } else if (!InstanceDef.SINGLETON_NAME.equals(componentDef
+                .getInstanceDef().getName())) {
+            // singletonなcomponent以外は事前にコンポーネントが生成されない、または
+            // 事前にコンポーネントを生成できないので処理対象外にしている。
+            return;
         }
         Object component = componentDef.getComponent();
         BeanDesc beanDesc = BindingUtil.getBeanDesc(componentDef, component);
         int size = componentDef.getPropertyDefSize();
         for (int i = 0; i < size; i++) {
             setDelayedProperties(componentDef, componentDef.getPropertyDef(i),
-                beanDesc, component);
+                    beanDesc, component);
         }
     }
 
     void setDelayedProperties(ComponentDef componentDef,
-        PropertyDef propertyDef, BeanDesc beanDesc, Object component) {
+            PropertyDef propertyDef, BeanDesc beanDesc, Object component) {
 
         int size = propertyDef.getMetaDefSize();
         for (int i = 0; i < size; i++) {
@@ -63,7 +69,7 @@ public class DelayedPropertySetter {
                 continue;
             }
             PropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyDef
-                .getPropertyName());
+                    .getPropertyName());
             if (!propertyDesc.hasWriteMethod()) {
                 continue;
             }
