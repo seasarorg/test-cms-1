@@ -2,4 +2,10 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
   "http://www.seasar.org/dtd/components24.dtd">
 <components>
+  <component name="pageNotFoundExceptionHandler"
+    class="org.seasar.cms.ymir.handler.impl.PageNotFoundExceptionHandler"
+    instance="request" />
+  <component name="permissionDeniedExceptionHandler"
+    class="org.seasar.cms.ymir.handler.impl.PermissionDeniedExceptionHandler"
+    instance="request" />
 </components>
