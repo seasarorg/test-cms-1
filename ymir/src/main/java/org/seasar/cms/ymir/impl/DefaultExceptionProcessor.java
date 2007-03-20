@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.seasar.cms.ymir.ExceptionProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Updater;
+import org.seasar.cms.ymir.WrappingRuntimeException;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.handler.ExceptionHandler;
 import org.seasar.cms.ymir.response.ForwardResponse;
@@ -59,6 +60,21 @@ public class DefaultExceptionProcessor implements ExceptionProcessor {
             }
         } while ((exceptionClass = exceptionClass.getSuperclass()) != Object.class);
 
+        if (handler == null) {
+            // 見つからなかった場合はデフォルトのハンドラを探す。
+            // こうしているのは、(ExceptionHandler)Creatorで定義したコンポーネントは
+            // あらゆるコンポーネント定義よりも優先順位が低くなってしまうため。
+            exceptionClass = t.getClass();
+            do {
+                try {
+                    handler = (ExceptionHandler) getS2Container().getComponent(
+                            "default_" + getComponentName(exceptionClass));
+                    break;
+                } catch (ComponentNotFoundRuntimeException ignore) {
+                }
+            } while ((exceptionClass = exceptionClass.getSuperclass()) != Object.class);
+        }
+
         if (handler != null) {
             Response response = constructResponse(handler.handle(t));
             if (response.getType() == Response.TYPE_PASSTHROUGH) {
@@ -74,7 +90,7 @@ public class DefaultExceptionProcessor implements ExceptionProcessor {
             } else if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {
-                throw new RuntimeException(t);
+                throw new WrappingRuntimeException(t);
             }
         }
     }

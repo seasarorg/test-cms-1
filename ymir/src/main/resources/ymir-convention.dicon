@@ -23,4 +23,10 @@
     class="org.seasar.cms.ymir.impl.MessagesImpl">
     <arg>"messages.xproperties"</arg>
   </component>
+  <component name="default_pageNotFoundExceptionHandler"
+    class="org.seasar.cms.ymir.handler.impl.PageNotFoundExceptionHandler"
+    instance="request" />
+  <component name="default_permissionDeniedExceptionHandler"
+    class="org.seasar.cms.ymir.handler.impl.PermissionDeniedExceptionHandler"
+    instance="request" />
 </components>
