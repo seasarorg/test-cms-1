@@ -163,7 +163,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     public Response process(Request request) throws PageNotFoundException,
-            PermissionDeniedException {
+            PermissionDeniedException, InvocationTargetException {
 
         if (request.isDenied()) {
             throw new PageNotFoundException(request.getPath());
@@ -328,7 +328,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Response invokeAction(Object component, Method action, Request request,
-            boolean confirmConstraints) throws PermissionDeniedException {
+            boolean confirmConstraints) throws PermissionDeniedException,
+            InvocationTargetException {
 
         Response response = PassthroughResponse.INSTANCE;
         Object[] params = new Object[0];
@@ -380,15 +381,6 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 throw new RuntimeException(ex);
             } catch (IllegalAccessException ex) {
                 throw new RuntimeException(ex);
-            } catch (InvocationTargetException ex) {
-                Throwable cause = ex.getCause();
-                if (cause instanceof Error) {
-                    throw (Error) cause;
-                } else if (cause instanceof RuntimeException) {
-                    throw (RuntimeException) cause;
-                } else {
-                    throw new RuntimeException(cause);
-                }
             }
             response = constructResponse(component, action.getReturnType(),
                     returnValue);

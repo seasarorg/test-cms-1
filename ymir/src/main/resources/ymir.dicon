@@ -54,6 +54,7 @@
     </property>
   </component>
   <component class="org.seasar.cms.ymir.impl.DefaultResponseProcessor" />
+  <component class="org.seasar.cms.ymir.impl.DefaultExceptionProcessor" />
   <component
     class="org.seasar.cms.ymir.response.constructor.impl.ResponseConstructorSelectorImpl" />
   <component

@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.impl;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Map;
 
@@ -107,7 +108,8 @@ public class YmirImpl implements Ymir {
     }
 
     public Response processRequest(Request request)
-            throws PageNotFoundException, PermissionDeniedException {
+            throws PageNotFoundException, PermissionDeniedException,
+            InvocationTargetException {
 
         return requestProcessor_.process(request);
     }

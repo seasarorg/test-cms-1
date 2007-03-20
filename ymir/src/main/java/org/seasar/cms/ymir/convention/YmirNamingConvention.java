@@ -10,8 +10,6 @@ public class YmirNamingConvention extends PluggableNamingConventionImpl {
 
     public static final String SUFFIX_EXCEPTIONHANDLER = "Handler";
 
-    public static final String PACKAGE_EXCEPTIONHANDLER = "exception";
-
     public String fromClassNameToComponentName(final String className) {
         if (StringUtil.isEmpty(className)) {
             throw new EmptyRuntimeException("className");
@@ -52,14 +50,6 @@ public class YmirNamingConvention extends PluggableNamingConventionImpl {
             return "_" + partOfClassName;
         } else {
             return partOfClassName;
-        }
-    }
-
-    public String fromSuffixToPackageName(String suffix) {
-        if (SUFFIX_EXCEPTIONHANDLER.equals(suffix)) {
-            return PACKAGE_EXCEPTIONHANDLER;
-        } else {
-            return super.fromSuffixToPackageName(suffix);
         }
     }
 }

@@ -1,10 +1,10 @@
-package org.seasar.cms.ymir.exception;
+package org.seasar.cms.ymir.handler.impl;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.seasar.cms.ymir.ExceptionHandler;
+import org.seasar.cms.ymir.handler.ExceptionHandler;
 import org.seasar.kvasir.util.io.IORuntimeException;
 
 public class PageNotFoundExceptionHandler implements ExceptionHandler {
