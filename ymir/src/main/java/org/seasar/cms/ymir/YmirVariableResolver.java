@@ -37,6 +37,8 @@ public class YmirVariableResolver extends VariableResolverImpl {
 
     private Messages messages_;
 
+    private Token token_;
+
     public YmirVariableResolver(Request ymirRequest,
             HttpServletRequest request, S2Container container) {
         this(ymirRequest, request, container, null);
@@ -188,9 +190,28 @@ public class YmirVariableResolver extends VariableResolverImpl {
         return null;
     }
 
-    String getToken() {
-        TokenUtils.saveToken(request_, false);
-        return TokenUtils.getToken(request_);
+    Token getToken() {
+        if (token_ == null) {
+            token_ = new Token();
+        }
+        return token_;
+    }
+
+    public class Token {
+        private String value_;
+
+        public Token() {
+            TokenUtils.saveToken(request_, false);
+            value_ = TokenUtils.getToken(request_);
+        }
+
+        public String getName() {
+            return TokenUtils.KEY_TOKEN;
+        }
+
+        public String getValue() {
+            return value_;
+        };
     }
 
     class TokenEntry implements Entry {
@@ -205,7 +226,7 @@ public class YmirVariableResolver extends VariableResolverImpl {
         }
 
         public Class getType() {
-            return String.class;
+            return Token.class;
         }
 
         public Object getValue() {
