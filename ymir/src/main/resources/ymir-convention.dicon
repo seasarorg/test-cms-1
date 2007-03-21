@@ -29,4 +29,7 @@
   <component name="default_permissionDeniedExceptionHandler"
     class="org.seasar.cms.ymir.handler.impl.PermissionDeniedExceptionHandler"
     instance="request" />
+  <component name="default_throwableHandler"
+    class="org.seasar.cms.ymir.handler.impl.ThrowableHandler"
+    instance="request" />
 </components>

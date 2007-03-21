@@ -17,13 +17,12 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeContainer;
-import org.seasar.cms.ymir.Note;
-import org.seasar.cms.ymir.Notes;
-import org.seasar.cms.ymir.ScopeAttribute;
 import org.seasar.cms.ymir.Constraint;
 import org.seasar.cms.ymir.ConstraintViolatedException;
 import org.seasar.cms.ymir.FormFile;
 import org.seasar.cms.ymir.MatchedPathMapping;
+import org.seasar.cms.ymir.Note;
+import org.seasar.cms.ymir.Notes;
 import org.seasar.cms.ymir.PageNotFoundException;
 import org.seasar.cms.ymir.PathMapping;
 import org.seasar.cms.ymir.PermissionDeniedException;
@@ -31,8 +30,10 @@ import org.seasar.cms.ymir.RedirectionPathResolver;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
+import org.seasar.cms.ymir.ScopeAttribute;
 import org.seasar.cms.ymir.Updater;
 import org.seasar.cms.ymir.ValidationFailedException;
+import org.seasar.cms.ymir.WrappingRuntimeException;
 import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
@@ -163,7 +164,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     public Response process(Request request) throws PageNotFoundException,
-            PermissionDeniedException, InvocationTargetException {
+            PermissionDeniedException {
 
         if (request.isDenied()) {
             throw new PageNotFoundException(request.getPath());
@@ -328,8 +329,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
     }
 
     Response invokeAction(Object component, Method action, Request request,
-            boolean confirmConstraints) throws PermissionDeniedException,
-            InvocationTargetException {
+            boolean confirmConstraints) throws PermissionDeniedException {
 
         Response response = PassthroughResponse.INSTANCE;
         Object[] params = new Object[0];
@@ -381,6 +381,9 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 throw new RuntimeException(ex);
             } catch (IllegalAccessException ex) {
                 throw new RuntimeException(ex);
+            } catch (InvocationTargetException ex) {
+                throw new WrappingRuntimeException(ex.getCause() != null ? ex
+                        .getCause() : ex);
             }
             response = constructResponse(component, action.getReturnType(),
                     returnValue);

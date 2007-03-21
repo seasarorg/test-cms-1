@@ -1,7 +1,5 @@
 package org.seasar.cms.ymir.impl;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.seasar.cms.ymir.ExceptionProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Updater;
@@ -15,6 +13,8 @@ import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 
 public class DefaultExceptionProcessor implements ExceptionProcessor {
+
+    private static final String NAMEPREFIX_DEFAULT = "default_";
 
     private static final String SUFFIX_HANDLER = "Handler";
 
@@ -42,11 +42,8 @@ public class DefaultExceptionProcessor implements ExceptionProcessor {
 
     public Response process(Throwable t) {
 
-        if (t instanceof InvocationTargetException) {
-            Throwable cause = ((InvocationTargetException) t).getCause();
-            if (cause != null) {
-                t = cause;
-            }
+        if (t instanceof WrappingRuntimeException) {
+            t = ((WrappingRuntimeException) t).getCause();
         }
 
         ExceptionHandler handler = null;
@@ -68,31 +65,21 @@ public class DefaultExceptionProcessor implements ExceptionProcessor {
             do {
                 try {
                     handler = (ExceptionHandler) getS2Container().getComponent(
-                            "default_" + getComponentName(exceptionClass));
+                            NAMEPREFIX_DEFAULT
+                                    + getComponentName(exceptionClass));
                     break;
                 } catch (ComponentNotFoundRuntimeException ignore) {
                 }
             } while ((exceptionClass = exceptionClass.getSuperclass()) != Object.class);
         }
 
-        if (handler != null) {
-            Response response = constructResponse(handler.handle(t));
-            if (response.getType() == Response.TYPE_PASSTHROUGH) {
-                response = new ForwardResponse(PATH_EXCEPTION_TEMPLATE
-                        + getClassShortName(exceptionClass)
-                        + SUFFIX_EXCEPTION_TEMPLATE);
-            }
-            return response;
-        } else {
-            // ハンドラが見つからなかったので再スローする。
-            if (t instanceof Error) {
-                throw (Error) t;
-            } else if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            } else {
-                throw new WrappingRuntimeException(t);
-            }
+        Response response = constructResponse(handler.handle(t));
+        if (response.getType() == Response.TYPE_PASSTHROUGH) {
+            response = new ForwardResponse(PATH_EXCEPTION_TEMPLATE
+                    + getClassShortName(exceptionClass)
+                    + SUFFIX_EXCEPTION_TEMPLATE);
         }
+        return response;
     }
 
     Response constructResponse(String returnValue) {

@@ -1,6 +1,5 @@
 package org.seasar.cms.ymir;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Map;
 
@@ -24,7 +23,7 @@ public interface RequestProcessor {
             Locale locale);
 
     Response process(Request request) throws PageNotFoundException,
-            PermissionDeniedException, InvocationTargetException;
+            PermissionDeniedException;
 
     Object backupForInclusion(AttributeContainer attributeContainer);
 
