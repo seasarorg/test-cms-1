@@ -7,8 +7,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.cms.ymir.Messages;
 import org.seasar.cms.ymir.Notes;
+import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
+import org.seasar.cms.ymir.Token;
+import org.seasar.cms.ymir.YmirVariableResolver;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.FormDesc;
 import org.seasar.cms.ymir.extension.creator.PropertyDesc;
@@ -17,6 +21,7 @@ import org.seasar.cms.ymir.extension.creator.PropertyTypeHintBag;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.impl.ClassDescImpl;
+import org.seasar.framework.container.S2Container;
 
 import net.skirnir.freyja.VariableResolver;
 import net.skirnir.freyja.zpt.ZptTemplateContext;
@@ -206,6 +211,14 @@ public class AnalyzerContext extends ZptTemplateContext {
             // をしている場合、classNameはnullになり得ることに注意。
         } else if (RequestProcessor.ATTR_NOTES.equals(componentName)) {
             className = Notes.class.getName();
+        } else if (YmirVariableResolver.NAME_YMIRREQUEST.equals(componentName)) {
+            className = Request.class.getName();
+        } else if (YmirVariableResolver.NAME_CONTAINER.equals(componentName)) {
+            className = S2Container.class.getName();
+        } else if (YmirVariableResolver.NAME_MESSAGES.equals(componentName)) {
+            className = Messages.class.getName();
+        } else if (YmirVariableResolver.NAME_TOKEN.equals(componentName)) {
+            className = Token.class.getName();
         } else {
             className = sourceCreator_.getClassName(componentName);
         }
