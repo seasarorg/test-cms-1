@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>SYSTEM NOTIFICATION</title>
+  </head>
+  <body>
+<h1>SYSTEM NOTIFICATION</h1>
+<p>メッセージ<span tal:replace="messageKey">MESSAGE_KEY</span>が使われていますが、このメッセージを保持するためのメッセージリソースファイル<span tal:replace="messagesName">MESSAGES_NAME</span>.xpropertiesが存在しませんので作成します。</p>
+<p>よろしければ「作成」ボタンを押して下さい。作成しない場合は「戻る」ボタンを押して下さい。</p>
+<form tal:attributes="action request/absolutePath" method="post">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="hidden" name="__ymir__task" value="createMessages" />
+  <input type="hidden" name="__ymir__subTask" value="create" />
+  <input type="hidden" name="__ymir__method" tal:attributes="value request/method" />
+  <p><input type="submit" value="作成" />
+  <input type="button" value="戻る" onclick="history.back()" /></p>
+</form>
+  </body>
+</html>

@@ -17,9 +17,10 @@ import org.seasar.cms.ymir.extension.creator.ClassDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDescBag;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
 import org.seasar.cms.ymir.extension.creator.impl.LazyPathMetaData;
 
-public class SystemConsoleAction extends AbstractUpdateAction {
+public class SystemConsoleAction extends AbstractAction implements UpdateAction {
 
     private static final String PARAM_APPLY = SourceCreator.PARAM_PREFIX
             + "apply";

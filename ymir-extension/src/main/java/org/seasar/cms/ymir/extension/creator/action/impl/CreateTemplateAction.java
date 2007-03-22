@@ -16,10 +16,12 @@ import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
+import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
 import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 
-public class CreateTemplateAction extends AbstractUpdateAction {
+public class CreateTemplateAction extends AbstractAction implements
+        UpdateAction {
 
     private static final String PARAM_TEMPLATE = PARAM_PREFIX + "template";
 

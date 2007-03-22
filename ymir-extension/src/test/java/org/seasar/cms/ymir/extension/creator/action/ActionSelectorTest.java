@@ -6,9 +6,9 @@ import org.seasar.cms.ymir.extension.creator.PathMetaData;
 
 import junit.framework.TestCase;
 
-public class UpdateActionSelectorTest extends TestCase {
+public class ActionSelectorTest extends TestCase {
 
-    private UpdateActionSelector target_ = new UpdateActionSelector();
+    private ActionSelector<UpdateAction> target_ = new ActionSelector<UpdateAction>();
 
     public void testGetAction() throws Exception {
         UpdateAction updateAction = new UpdateAction() {
@@ -17,25 +17,25 @@ public class UpdateActionSelectorTest extends TestCase {
             }
         };
         target_.register(new Condition(State.ANY, State.ANY, State.ANY, null),
-            updateAction);
+                updateAction);
 
         assertSame(updateAction, target_.getAction(new Condition(State.FALSE,
-            State.FALSE, State.FALSE, null)));
+                State.FALSE, State.FALSE, null)));
         assertSame(updateAction, target_.getAction(new Condition(State.FALSE,
-            State.FALSE, State.TRUE, null)));
+                State.FALSE, State.TRUE, null)));
         assertSame(updateAction, target_.getAction(new Condition(State.FALSE,
-            State.TRUE, State.FALSE, null)));
+                State.TRUE, State.FALSE, null)));
         assertSame(updateAction, target_.getAction(new Condition(State.FALSE,
-            State.TRUE, State.TRUE, null)));
+                State.TRUE, State.TRUE, null)));
         assertSame(updateAction, target_.getAction(new Condition(State.TRUE,
-            State.FALSE, State.FALSE, null)));
+                State.FALSE, State.FALSE, null)));
         assertSame(updateAction, target_.getAction(new Condition(State.TRUE,
-            State.FALSE, State.TRUE, null)));
+                State.FALSE, State.TRUE, null)));
         assertSame(updateAction, target_.getAction(new Condition(State.TRUE,
-            State.TRUE, State.FALSE, null)));
+                State.TRUE, State.FALSE, null)));
         assertSame(updateAction, target_.getAction(new Condition(State.TRUE,
-            State.TRUE, State.TRUE, null)));
+                State.TRUE, State.TRUE, null)));
         assertNull(target_.getAction(new Condition(State.ANY, State.ANY,
-            State.ANY, null)));
+                State.ANY, null)));
     }
 }

@@ -214,4 +214,8 @@ public class MockSourceCreator implements SourceCreator {
         httpServletRequest_ = httpServletRequest;
         return this;
     }
+
+    public Response updateByException(Request request, Throwable t) {
+        return null;
+    }
 }

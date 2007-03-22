@@ -3,12 +3,11 @@ package org.seasar.cms.ymir.extension.creator.action;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpdateActionSelector {
+public class ActionSelector<T> {
 
-    private Map<Object, UpdateAction> strategyMap_ = new HashMap<Object, UpdateAction>();
+    private Map<Object, T> strategyMap_ = new HashMap<Object, T>();
 
-    public UpdateActionSelector register(Condition condition,
-        UpdateAction updateAction) {
+    public ActionSelector<T> register(Condition condition, T action) {
 
         State classBound = condition.getClassBound();
         State classExists = condition.getClassExists();
@@ -16,35 +15,35 @@ public class UpdateActionSelector {
         String method = condition.getMethod();
         if (classBound == State.ANY) {
             register(new Condition(State.FALSE, classExists, templateExists,
-                method), updateAction);
+                    method), action);
             register(new Condition(State.TRUE, classExists, templateExists,
-                method), updateAction);
+                    method), action);
         } else if (classExists == State.ANY) {
             register(new Condition(classBound, State.FALSE, templateExists,
-                method), updateAction);
+                    method), action);
             register(new Condition(classBound, State.TRUE, templateExists,
-                method), updateAction);
+                    method), action);
         } else if (templateExists == State.ANY) {
             register(
-                new Condition(classBound, classExists, State.FALSE, method),
-                updateAction);
+                    new Condition(classBound, classExists, State.FALSE, method),
+                    action);
             register(
-                new Condition(classBound, classExists, State.TRUE, method),
-                updateAction);
+                    new Condition(classBound, classExists, State.TRUE, method),
+                    action);
         } else {
-            strategyMap_.put(condition, updateAction);
+            strategyMap_.put(condition, action);
         }
         return this;
     }
 
-    public UpdateActionSelector register(Object condition, UpdateAction strategy) {
+    public ActionSelector<T> register(Object condition, T action) {
 
-        strategyMap_.put(condition, strategy);
+        strategyMap_.put(condition, action);
         return this;
     }
 
-    public UpdateAction getAction(Object condition) {
+    public T getAction(Object condition) {
 
-        return (UpdateAction) strategyMap_.get(condition);
+        return (T) strategyMap_.get(condition);
     }
 }

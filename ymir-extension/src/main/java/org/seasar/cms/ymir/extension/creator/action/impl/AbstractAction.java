@@ -7,17 +7,16 @@ import java.util.Map;
 
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
-import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
 import org.seasar.cms.ymir.extension.creator.impl.SourceCreatorImpl;
 
-abstract public class AbstractUpdateAction implements UpdateAction {
+abstract public class AbstractAction {
 
     public static final String PARAM_SUBTASK = SourceCreator.PARAM_PREFIX
             + "subTask";
 
     private SourceCreator sourceCreator_;
 
-    public AbstractUpdateAction(SourceCreator sourceCreator) {
+    public AbstractAction(SourceCreator sourceCreator) {
 
         sourceCreator_ = sourceCreator;
     }

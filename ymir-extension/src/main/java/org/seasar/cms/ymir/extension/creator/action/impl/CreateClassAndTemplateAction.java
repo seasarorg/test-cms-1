@@ -12,11 +12,13 @@ import org.seasar.cms.ymir.extension.creator.InvalidClassDescException;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
 import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 
-public class CreateClassAndTemplateAction extends AbstractUpdateAction {
+public class CreateClassAndTemplateAction extends AbstractAction implements
+        UpdateAction {
 
     private static final String PARAM_REDIRECTPATH = SourceCreator.PARAM_PREFIX
             + "redirectPath";

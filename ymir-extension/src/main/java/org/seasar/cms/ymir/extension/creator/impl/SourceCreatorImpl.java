@@ -42,10 +42,13 @@ import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
 import org.seasar.cms.ymir.MatchedPathMapping;
+import org.seasar.cms.ymir.MessageNotFoundRuntimeException;
+import org.seasar.cms.ymir.MessagesNotFoundRuntimeException;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseCreator;
+import org.seasar.cms.ymir.WrappingRuntimeException;
 import org.seasar.cms.ymir.extension.creator.AnnotationDesc;
 import org.seasar.cms.ymir.extension.creator.BodyDesc;
 import org.seasar.cms.ymir.extension.creator.ClassDesc;
@@ -66,13 +69,16 @@ import org.seasar.cms.ymir.extension.creator.TemplateAnalyzer;
 import org.seasar.cms.ymir.extension.creator.TemplateProvider;
 import org.seasar.cms.ymir.extension.creator.TypeDesc;
 import org.seasar.cms.ymir.extension.creator.DescValidator.Result;
+import org.seasar.cms.ymir.extension.creator.action.ActionSelector;
 import org.seasar.cms.ymir.extension.creator.action.Condition;
 import org.seasar.cms.ymir.extension.creator.action.State;
 import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
-import org.seasar.cms.ymir.extension.creator.action.UpdateActionSelector;
+import org.seasar.cms.ymir.extension.creator.action.UpdateByExceptionAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateClassAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateClassAndTemplateAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateConfigurationAction;
+import org.seasar.cms.ymir.extension.creator.action.impl.CreateMessageAction;
+import org.seasar.cms.ymir.extension.creator.action.impl.CreateMessagesAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.CreateTemplateAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.DoEditTemplateAction;
 import org.seasar.cms.ymir.extension.creator.action.impl.DoUpdateTemplateAction;
@@ -90,6 +96,8 @@ import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
 import org.seasar.kvasir.util.StringUtils;
 import org.seasar.kvasir.util.collection.MapProperties;
+
+import net.skirnir.freyja.EvaluationRuntimeException;
 
 public class SourceCreatorImpl implements SourceCreator {
 
@@ -129,7 +137,7 @@ public class SourceCreatorImpl implements SourceCreator {
     private TemplateProvider templateProvider_ = new DefaultTemplateProvider(
             this);
 
-    private UpdateActionSelector actionSelector_ = new UpdateActionSelector()
+    private ActionSelector<UpdateAction> actionSelector_ = new ActionSelector<UpdateAction>()
             .register(
                     new Condition(State.ANY, State.ANY, State.FALSE,
                             Request.METHOD_GET), new CreateTemplateAction(this))
@@ -157,6 +165,14 @@ public class SourceCreatorImpl implements SourceCreator {
                     "resource", new ResourceAction(this)).register(
                     "editTemplate.do", new DoEditTemplateAction(this))
             .register("updateTemplate.do", new DoUpdateTemplateAction(this));
+
+    private ActionSelector<UpdateByExceptionAction> byExceptionActionSelector_ = new ActionSelector<UpdateByExceptionAction>()
+            .register(MessagesNotFoundRuntimeException.class,
+                    new CreateMessagesAction(this)).register("createMessages",
+                    new CreateMessagesAction(this)).register(
+                    MessageNotFoundRuntimeException.class,
+                    new CreateMessageAction(this)).register("createMessage",
+                    new CreateMessageAction(this));
 
     public Logger logger_ = Logger.getLogger(getClass());
 
@@ -228,6 +244,36 @@ public class SourceCreatorImpl implements SourceCreator {
             }
         }
         return response;
+    }
+
+    public Response updateByException(Request request, Throwable t) {
+
+        if ((t instanceof WrappingRuntimeException || t instanceof EvaluationRuntimeException)
+                && t.getCause() != null) {
+            t = t.getCause();
+        }
+        String path = request.getPath();
+        Object condition = null;
+        if (request.getParameter(PARAM_TASK) != null) {
+            condition = request.getParameter(PARAM_TASK);
+        } else if (path.startsWith(PATH_PREFIX)) {
+            int slash = path.indexOf('/', PATH_PREFIX.length());
+            if (slash >= 0) {
+                condition = path.substring(PATH_PREFIX.length(), slash);
+            } else {
+                condition = path.substring(PATH_PREFIX.length());
+            }
+        } else {
+            condition = t.getClass();
+        }
+
+        UpdateByExceptionAction action = byExceptionActionSelector_
+                .getAction(condition);
+        if (action == null) {
+            return null;
+        } else {
+            return action.act(request, t);
+        }
     }
 
     String getOriginalMethod(Request request) {
@@ -331,8 +377,9 @@ public class SourceCreatorImpl implements SourceCreator {
         String className = pathMetaData.getClassName();
         analyzer_
                 .analyze(getServletContext(), getHttpServletRequest(),
-                getHttpServletResponse(), path, method, classDescMap,
-                pathMetaData.getTemplate(), className, hintBag, ignoreVariables);
+                        getHttpServletResponse(), path, method, classDescMap,
+                        pathMetaData.getTemplate(), className, hintBag,
+                        ignoreVariables);
 
         ClassDesc classDesc = classDescMap.get(className);
         if (classDesc == null && method.equalsIgnoreCase(Request.METHOD_POST)) {

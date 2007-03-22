@@ -12,10 +12,11 @@ import org.seasar.cms.ymir.extension.creator.InvalidClassDescException;
 import org.seasar.cms.ymir.extension.creator.MethodDesc;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
 import org.seasar.cms.ymir.extension.creator.impl.BodyDescImpl;
 import org.seasar.cms.ymir.extension.creator.impl.MethodDescImpl;
 
-public class CreateClassAction extends AbstractUpdateAction {
+public class CreateClassAction extends AbstractAction implements UpdateAction {
 
     private static final String PARAM_TRANSITION = SourceCreator.PARAM_PREFIX
             + "transition";

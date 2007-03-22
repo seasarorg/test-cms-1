@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>SYSTEM NOTIFICATION</title>
+  </head>
+  <body>
+<h1>SYSTEM NOTIFICATION</h1>
+<p>メッセージリソースファイル<span tal:replace="messagesName">MESSAGES_NAME</span>.xpropertiesを作成しました。
+アプリケーションのdiconファイル（app.diconなど）に以下のエントリを追加した後、EclipseでプロジェクトルートをRefreshし、
+サーブレットコンテナでこのWebアプリケーションをリロードしてから、以下の「OK」ボタンを押して下さい。</p>
+<pre>
+  &lt;component name="<span tal:replace="messagesName">MESSAGES_NAME</span>"
+    class="org.seasar.cms.ymir.impl.MessagesImpl"&gt;
+    &lt;arg&gt;"<span tal:replace="messagesName">MESSAGES_NAME</span>.xproperties"&lt;/arg&gt;
+  &lt;/component&gt;
+</pre>
+<form tal:attributes="method method; action request/absolutePath">
+  <input type="hidden" tal:repeat="parameter parameters" tal:attributes="name parameter/name; value parameter/value" />
+  <input type="submit" value=" OK " />
+</form>
+  </body>
+</html>

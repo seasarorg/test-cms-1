@@ -22,10 +22,11 @@ import org.seasar.cms.ymir.extension.creator.PropertyTypeHint;
 import org.seasar.cms.ymir.extension.creator.PropertyTypeHintBag;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
 import org.seasar.cms.ymir.extension.creator.Template;
+import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
 import org.seasar.cms.ymir.impl.DefaultRequestProcessor;
 import org.seasar.kvasir.util.PropertyUtils;
 
-public class UpdateClassesAction extends AbstractUpdateAction {
+public class UpdateClassesAction extends AbstractAction implements UpdateAction {
 
     protected static final String PARAM_APPLY = SourceCreator.PARAM_PREFIX
             + "apply";

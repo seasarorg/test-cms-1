@@ -8,10 +8,10 @@ import junit.framework.TestCase;
 import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
-import org.seasar.cms.ymir.extension.creator.action.impl.AbstractUpdateAction.Parameter;
+import org.seasar.cms.ymir.extension.creator.action.impl.AbstractAction.Parameter;
 import org.seasar.cms.ymir.impl.RequestImpl;
 
-public class AbstractUpdateActionTest extends TestCase {
+public class AbstractActionTest extends TestCase {
 
     public void testGetParameters() throws Exception {
 
@@ -23,7 +23,7 @@ public class AbstractUpdateActionTest extends TestCase {
         parameterMap.put("test2", new String[] { "value3" });
         request.setParameterMap(parameterMap);
 
-        Parameter[] parameters = new AbstractUpdateAction(null) {
+        Parameter[] parameters = new AbstractAction(null) {
 
             public Response act(Request request, PathMetaData pathMetaData) {
                 return null;

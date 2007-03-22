@@ -14,9 +14,11 @@ import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.extension.creator.PathMetaData;
 import org.seasar.cms.ymir.extension.creator.SourceCreator;
+import org.seasar.cms.ymir.extension.creator.action.UpdateAction;
 import org.seasar.cms.ymir.impl.SingleApplication;
 
-public class CreateConfigurationAction extends AbstractUpdateAction {
+public class CreateConfigurationAction extends AbstractAction implements
+        UpdateAction {
 
     private static final String PARAMPREFIX_KEY = SourceCreator.PARAM_PREFIX
             + "key_";
