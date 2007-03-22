@@ -192,8 +192,7 @@ public class YmirVariableResolver extends VariableResolverImpl {
 
     Token getToken() {
         if (token_ == null) {
-            TokenUtils.saveToken(request_, false);
-            token_ = new Token(TokenUtils.getToken(request_));
+            token_ = new TokenImpl();
         }
         return token_;
     }
@@ -215,6 +214,22 @@ public class YmirVariableResolver extends VariableResolverImpl {
 
         public Object getValue() {
             return getToken();
+        }
+    }
+
+    class TokenImpl implements Token {
+
+        public boolean exists() {
+            return (TokenUtils.getToken(request_) != null);
+        };
+
+        public String getName() {
+            return TokenUtils.KEY_TOKEN;
+        }
+
+        public String getValue() {
+            TokenUtils.saveToken(request_, false);
+            return TokenUtils.getToken(request_);
         }
     }
 }
