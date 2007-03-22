@@ -93,21 +93,19 @@ public class YmirFilter implements Filter {
         try {
             Response response = ymir_.processRequest(request);
 
+            String contentType = response.getContentType();
+            if (contentType != null) {
+                httpRequest.setAttribute(
+                        FreyjaServlet.ATTR_RESPONSECONTENTTYPE, contentType);
+            }
+
+            httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,
+                    new YmirVariableResolver(request, httpRequest,
+                            getContainer()));
+
             HttpServletResponseFilter responseFilter = ymir_.processResponse(
                     context_, httpRequest, httpResponse, request, response);
             if (responseFilter != null) {
-                String contentType = response.getContentType();
-                if (contentType != null) {
-                    httpRequest
-                            .setAttribute(
-                                    FreyjaServlet.ATTR_RESPONSECONTENTTYPE,
-                                    contentType);
-                }
-
-                httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,
-                        new YmirVariableResolver(request, httpRequest,
-                                getContainer()));
-
                 chain.doFilter(httpRequest, responseFilter);
                 responseFilter.commit();
             }
