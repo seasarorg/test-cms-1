@@ -111,7 +111,7 @@ public class YmirFilter implements Filter {
             }
         } catch (Throwable t) {
             ymir_.processResponse(context_, httpRequest, httpResponse, request,
-                    ymir_.processException(t));
+                    ymir_.processException(request, t));
         } finally {
             if (Request.DISPATCHER_INCLUDE.equals(dispatcher_)) {
                 httpRequest.setAttribute(FreyjaServlet.ATTR_VARIABLERESOLVER,

@@ -13,7 +13,6 @@ import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.YmirContext;
 import org.seasar.cms.ymir.YmirVariableResolver;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
-import org.seasar.framework.container.S2Container;
 import org.seasar.kvasir.util.collection.AttributeReader;
 import org.seasar.kvasir.util.collection.I18NPropertyReader;
 import org.seasar.kvasir.util.collection.PropertyReader;
@@ -51,12 +50,27 @@ public class YmirPathResolver implements PathResolver {
             }
         } else if (obj instanceof I18NPropertyReader) {
             I18NPropertyReader reader = (I18NPropertyReader) obj;
+            String messageKey;
+            String value;
             if (child.startsWith("%")) {
-                return reader.getProperty(child.substring(1), findLocale(
-                        context, varResolver));
+                messageKey = child.substring(1);
+                value = reader.getProperty(messageKey, findLocale(context,
+                        varResolver));
             } else {
-                return reader.getProperty(child);
+                messageKey = child;
+                value = reader.getProperty(messageKey);
             }
+            if (value == null && obj instanceof Messages) {
+                throw new MessageNotFoundRuntimeException(
+                        "Message corresponding key ('" + messageKey
+                                + "') does not exist in default Messages ("
+                                + Globals.MESSAGES + ")").setMessageKey(
+                        messageKey)
+                        .setLocale(
+                                child.startsWith("%") ? findLocale(context,
+                                        varResolver) : new Locale(""));
+            }
+            return value;
         } else if (obj instanceof PropertyReader) {
             return ((PropertyReader) obj).getProperty(child);
         } else if (obj instanceof AttributeReader) {
@@ -78,7 +92,7 @@ public class YmirPathResolver implements PathResolver {
             messagesName = noteValue.substring(0, slash);
             noteValue = noteValue.substring(slash + 1);
         } else {
-            messagesName = null;
+            messagesName = Globals.NAME_MESSAGES;
         }
 
         Messages messages;
@@ -93,7 +107,7 @@ public class YmirPathResolver implements PathResolver {
             throw new MessagesNotFoundRuntimeException(
                     "Messages object not found: messages' name may be incorrect: key="
                             + noteValue + ", messages' name=" + messagesName,
-                    ex).setMessagesName(messagesName);
+                    ex).setMessagesName(messagesName).setMessageKey(noteValue);
         }
 
         if (messages != null) {
@@ -136,12 +150,8 @@ public class YmirPathResolver implements PathResolver {
             return null;
         }
 
-        S2Container container = ymir.getApplication().getS2Container();
-        if (messagesName != null) {
-            return (Messages) container.getComponent(messagesName);
-        } else {
-            return (Messages) container.getComponent(Globals.NAME_MESSAGES);
-        }
+        return (Messages) ymir.getApplication().getS2Container().getComponent(
+                messagesName);
     }
 
     Locale findLocale(TemplateContext context, VariableResolver varResolver) {

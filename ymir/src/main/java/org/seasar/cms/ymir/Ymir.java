@@ -47,5 +47,5 @@ public interface Ymir {
      */
     boolean isUnderDevelopment();
 
-    Response processException(Throwable t);
+    Response processException(Request request, Throwable t);
 }

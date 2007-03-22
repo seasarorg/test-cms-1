@@ -1,6 +1,7 @@
 package org.seasar.cms.ymir.impl;
 
 import org.seasar.cms.ymir.ExceptionProcessor;
+import org.seasar.cms.ymir.Request;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.Updater;
 import org.seasar.cms.ymir.WrappingRuntimeException;
@@ -40,10 +41,19 @@ public class DefaultExceptionProcessor implements ExceptionProcessor {
         updaters_ = updaters;
     }
 
-    public Response process(Throwable t) {
+    public Response process(Request request, Throwable t) {
 
         if (t instanceof WrappingRuntimeException) {
             t = ((WrappingRuntimeException) t).getCause();
+        }
+
+        if (ymir_.isUnderDevelopment()) {
+            for (int i = 0; i < updaters_.length; i++) {
+                Response response = updaters_[i].updateByException(request, t);
+                if (response != null) {
+                    return response;
+                }
+            }
         }
 
         ExceptionHandler handler = null;

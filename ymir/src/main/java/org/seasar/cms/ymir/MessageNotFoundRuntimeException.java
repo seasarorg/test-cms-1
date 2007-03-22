@@ -4,7 +4,7 @@ import java.util.Locale;
 
 public class MessageNotFoundRuntimeException extends RuntimeException {
 
-    private String messagesName_;
+    private String messagesName_ = Globals.NAME_MESSAGES;
 
     private String messageKey_;
 

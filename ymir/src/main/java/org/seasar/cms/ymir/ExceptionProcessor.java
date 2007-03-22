@@ -6,5 +6,5 @@ public interface ExceptionProcessor {
 
     String SUFFIX_EXCEPTION_TEMPLATE = ".html";
 
-    Response process(Throwable t);
+    Response process(Request request, Throwable t);
 }

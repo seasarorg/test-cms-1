@@ -6,6 +6,8 @@ public class MessagesNotFoundRuntimeException extends RuntimeException {
 
     private String messagesName_;
 
+    private String messageKey_;
+
     public MessagesNotFoundRuntimeException() {
     }
 
@@ -32,6 +34,17 @@ public class MessagesNotFoundRuntimeException extends RuntimeException {
     public MessagesNotFoundRuntimeException setMessagesName(String messagesName) {
 
         messagesName_ = messagesName;
+        return this;
+    }
+
+    public String getMessageKey() {
+
+        return messageKey_;
+    }
+
+    public MessagesNotFoundRuntimeException setMessageKey(String messageKey) {
+
+        messageKey_ = messageKey;
         return this;
     }
 }

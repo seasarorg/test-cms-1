@@ -177,8 +177,8 @@ public class YmirImpl implements Ymir {
                 && getApplication().isUnderDevelopment();
     }
 
-    public Response processException(Throwable t) {
+    public Response processException(Request request, Throwable t) {
 
-        return exceptionProcessor_.process(t);
+        return exceptionProcessor_.process(request, t);
     }
 }
