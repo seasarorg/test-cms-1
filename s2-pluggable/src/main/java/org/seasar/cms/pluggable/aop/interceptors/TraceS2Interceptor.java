@@ -16,7 +16,7 @@ public class TraceS2Interceptor extends AbstractInterceptor {
 
     public Object invoke(MethodInvocation invocation) throws Throwable {
 
-        if (!isSuitable(invocation)) {
+        if (!isSuitable(invocation) || !logger.isDebugEnabled()) {
             return invocation.proceed();
         }
 
@@ -26,9 +26,7 @@ public class TraceS2Interceptor extends AbstractInterceptor {
         StringBuffer sb = new StringBuffer("[TRACE] getComponent(");
         appendStringRepresentation(key, sb).append(") from ").append(
                 container.getPath());
-        if (logger.isDebugEnabled()) {
-            logger.debug(sb.toString());
-        }
+        logger.debug(sb.toString());
 
         Object ret = null;
         Throwable cause = null;
@@ -41,9 +39,7 @@ public class TraceS2Interceptor extends AbstractInterceptor {
                     .append(")");
             cause = t;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug(sb.toString());
-        }
+        logger.debug(sb.toString());
         if (cause == null) {
             return ret;
         }
