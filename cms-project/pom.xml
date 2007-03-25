@@ -6,7 +6,7 @@
   <groupId>org.seasar.cms</groupId>
   <artifactId>cms-project</artifactId>
   <packaging>pom</packaging>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.3</version>
   <name>CMS Project</name>
   <description>
     CMS Project is a subproject to develop common utilities and
