@@ -4,10 +4,10 @@
 
 (1) webdav-jp
 
-これらのプログラムはApache Software Licenceに従って配布されています。
+これらのプログラムはApache Software Licence 2.0に従って配布されています。
 Apache Software Licenseについては付属のLICENSE.apacheを参照して下さい。
 またライセンスの詳細については以下のURLを参照して下さい。
-  http://www.apache.org/LICENSE
+  http://www.apache.org/licenses/LICENSE-2.0
 
 This product includes software developed by the
         Apache Software Foundation (http://www.apache.org/).
@@ -16,7 +16,7 @@ This product includes software developed by the
 ■免責事項
 
 このプログラムは無保証です。本プログラムのバグあるいは本プログラムの実
-行等によって発生したいかなる損害についても責任を持ちません。 
+行等によって発生したいかなる損害についても責任を持ちません。
 
 
 以上

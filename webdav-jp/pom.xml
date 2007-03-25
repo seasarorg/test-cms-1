@@ -5,13 +5,13 @@
   <parent>
     <artifactId>cms-project</artifactId>
     <groupId>org.seasar.cms</groupId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms.webdav-jp</groupId>
   <artifactId>webdav-jp</artifactId>
   <name>WebDAV-jp</name>
-  <version>0.1.5-SNAPSHOT</version>
+  <version>0.1.6-SNAPSHOT</version>
   <description>
     Servlet filter to use Japanese characters on WebDAV Servlet
     correctly.

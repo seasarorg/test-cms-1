@@ -67,7 +67,7 @@ web.xml中の<filter>タグに書くことのできる初期パラメータ（in
 
 ■ライセンス
 
-このプログラムはApache Software License Version 1.1に従って配布されます。
+このプログラムはApache Software License Version 2.0に従って配布されます。
 
 
 ■その他
@@ -77,6 +77,8 @@ web.xml中の<filter>タグに書くことのできる初期パラメータ（in
 
 
 ■変更履歴
+
+0.1.6:
 
 0.1.5:
 ・URLに「;jsessionid=XXX」のような、セミコロンで区切られたパラメータが渡された
