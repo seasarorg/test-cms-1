@@ -3,12 +3,12 @@
   <parent>
     <groupId>org.seasar.cms</groupId>
     <artifactId>cms-project</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms.database</groupId>
   <artifactId>database</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
   <name>CMS-Database</name>
   <description>Database module for CMS system.</description>
   <build>
@@ -72,7 +72,7 @@
     <dependency>
       <groupId>org.seasar.cms.s2-pluggable</groupId>
       <artifactId>s2-pluggable</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>0.0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
