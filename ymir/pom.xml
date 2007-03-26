@@ -5,13 +5,13 @@
   <parent>
     <groupId>org.seasar.cms</groupId>
     <artifactId>cms-project</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms.ymir</groupId>
   <artifactId>ymir</artifactId>
   <name>Ymir</name>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.2</version>
   <description>
     Ymir is a framework for developing light-weight web application.
   </description>
@@ -113,7 +113,7 @@
     <dependency>
       <groupId>org.seasar.cms.s2-pluggable</groupId>
       <artifactId>s2-pluggable</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>0.0.2</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.dao</groupId>
@@ -123,12 +123,12 @@
     <dependency>
       <groupId>org.seasar.kvasir</groupId>
       <artifactId>kvasir-util</artifactId>
-      <version>3.0.0-EA4-SNAPSHOT</version>
+      <version>3.0.0-RC1</version>
     </dependency>
     <dependency>
       <groupId>net.skirnir.freyja</groupId>
       <artifactId>freyja</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <version>1.0.5</version>
     </dependency>
     <dependency>
       <groupId>commons-fileupload</groupId>
