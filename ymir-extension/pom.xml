@@ -5,13 +5,13 @@
   <parent>
     <groupId>org.seasar.cms</groupId>
     <artifactId>cms-project</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms.ymir</groupId>
   <artifactId>ymir-extension</artifactId>
   <name>Ymir Extension</name>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.2</version>
   <description>
     Ymir Extension is an extension for Ymir. It includes source code
     generator, bean-table mechanism, etc.
@@ -97,18 +97,18 @@
       <groupId>org.seasar.cms.ymir</groupId>
       <artifactId>ymir</artifactId>
       <classifier>tests</classifier>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>0.0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.seasar.cms.ymir</groupId>
       <artifactId>ymir</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>0.0.2</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.cms.s2-classbuilder</groupId>
       <artifactId>s2-classbuilder</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.container</groupId>
@@ -118,7 +118,7 @@
     <dependency>
       <groupId>net.skirnir.freyja</groupId>
       <artifactId>freyja</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <version>1.0.5</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -134,7 +134,7 @@
     <dependency>
       <groupId>org.seasar.cms.beantable</groupId>
       <artifactId>beantable</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>0.0.2</version>
     </dependency>
   </dependencies>
 </project>
