@@ -2,6 +2,9 @@ package org.seasar.cms.classbuilder.impl;
 
 import static org.seasar.cms.classbuilder.impl.RedefinableXmlS2ContainerBuilder.DELIMITER;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.seasar.cms.classbuilder.util.S2ContainerBuilderUtils;
 import org.seasar.framework.container.ArgDef;
 import org.seasar.framework.container.ComponentDef;
@@ -71,8 +74,15 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
         }
 
         String name = componentDef.getComponentName();
-        String diconPath = constructRedifinitionDiconPath(path, name);
-        if (!S2ContainerBuilderUtils.resourceExists(diconPath, builder)) {
+        String[] diconPaths = constructRedifinitionDiconPaths(path, name);
+        String diconPath = null;
+        for (int i = 0; i < diconPaths.length; i++) {
+            if (S2ContainerBuilderUtils.resourceExists(diconPaths[i], builder)) {
+                diconPath = diconPaths[i];
+                break;
+            }
+        }
+        if (diconPath == null) {
             return componentDef;
         }
 
@@ -89,8 +99,9 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
     }
 
 
-    protected String constructRedifinitionDiconPath(String path, String name)
+    protected String[] constructRedifinitionDiconPaths(String path, String name)
     {
+        List<String> pathList = new ArrayList<String>();
         String body;
         String suffix;
         int dot = path.lastIndexOf('.');
@@ -101,6 +112,13 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
             body = path.substring(0, dot);
             suffix = path.substring(dot);
         }
-        return body + DELIMITER + name + suffix;
+        String resourceBody = S2ContainerBuilderUtils
+            .fromJarURLToResourcePath(body);
+        if (resourceBody != null) {
+            // パスがJarのURLの場合はURLをリソースパスに変換した上で作成したパスを候補に含める。
+            pathList.add(resourceBody + DELIMITER + name + suffix);
+        }
+        pathList.add(body + DELIMITER + name + suffix);
+        return pathList.toArray(new String[0]);
     }
 }

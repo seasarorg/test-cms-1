@@ -1,5 +1,8 @@
 package org.seasar.cms.classbuilder.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.seasar.cms.classbuilder.util.S2ContainerBuilderUtils;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.S2ContainerFactory;
@@ -35,18 +38,23 @@ public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder
     {
         S2Container container = super.parse(parent, path);
 
-        String additionalDiconPath = constructAdditionalDiconPath(path);
-        if (S2ContainerBuilderUtils.resourceExists(additionalDiconPath, this)) {
-            S2ContainerBuilderUtils.mergeContainer(container,
-                S2ContainerFactory.create(additionalDiconPath));
+        String[] additionalDiconPaths = constructAdditionalDiconPaths(path);
+        for (int i = 0; i < additionalDiconPaths.length; i++) {
+            if (S2ContainerBuilderUtils.resourceExists(additionalDiconPaths[i],
+                this)) {
+                S2ContainerBuilderUtils.mergeContainer(container,
+                    S2ContainerFactory.create(additionalDiconPaths[i]));
+                break;
+            }
         }
 
         return container;
     }
 
 
-    protected String constructAdditionalDiconPath(String path)
+    protected String[] constructAdditionalDiconPaths(String path)
     {
+        List<String> pathList = new ArrayList<String>();
         String body;
         String suffix;
         int dot = path.lastIndexOf('.');
@@ -57,6 +65,13 @@ public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder
             body = path.substring(0, dot);
             suffix = path.substring(dot);
         }
-        return body + DELIMITER + suffix;
+        String resourceBody = S2ContainerBuilderUtils
+            .fromJarURLToResourcePath(body);
+        if (resourceBody != null) {
+            // パスがJarのURLの場合はURLをリソースパスに変換した上で作成したパスを候補に含める。
+            pathList.add(resourceBody + DELIMITER + suffix);
+        }
+        pathList.add(body + DELIMITER + suffix);
+        return pathList.toArray(new String[0]);
     }
 }

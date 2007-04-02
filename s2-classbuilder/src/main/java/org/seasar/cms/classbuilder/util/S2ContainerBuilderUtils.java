@@ -11,6 +11,11 @@ import org.seasar.framework.exception.IORuntimeException;
 
 public class S2ContainerBuilderUtils
 {
+    private static final String PREFIX_JAR = "jar:";
+
+    private static final String SUFFIX_JAR = "!/";
+
+
     protected S2ContainerBuilderUtils()
     {
     }
@@ -56,6 +61,23 @@ public class S2ContainerBuilderUtils
         size = merged.getComponentDefSize();
         for (int i = 0; i < size; i++) {
             container.register(merged.getComponentDef(i));
+        }
+    }
+
+
+    public static String fromJarURLToResourcePath(String path)
+    {
+        if (path == null) {
+            return null;
+        }
+        if (!path.startsWith(PREFIX_JAR)) {
+            return null;
+        }
+        int idx = path.indexOf(SUFFIX_JAR);
+        if (idx >= 0) {
+            return path.substring(idx + SUFFIX_JAR.length());
+        } else {
+            return null;
         }
     }
 }
