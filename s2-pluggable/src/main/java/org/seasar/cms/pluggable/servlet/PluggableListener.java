@@ -25,11 +25,16 @@ public class PluggableListener implements ServletContextListener {
                         new S2Container[0]);
             }
 
+            preInit(sce);
+
             SingletonPluggableContainerFactory.init();
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             throw ex;
         }
+    }
+
+    protected void preInit(ServletContextEvent sce) {
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

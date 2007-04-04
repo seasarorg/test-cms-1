@@ -57,6 +57,7 @@ public class SingletonPluggableContainerFactory {
 
     public static void prepareForContainer() {
         instance_.prepareForContainer();
+        SingletonS2ContainerFactory.setContainer(instance_.getRootContainer());
     }
 
     public static S2Container integrate(String configPath,
@@ -71,7 +72,6 @@ public class SingletonPluggableContainerFactory {
 
     public static void init() {
         instance_.init();
-        SingletonS2ContainerFactory.setContainer(instance_.getRootContainer());
     }
 
     public static void destroy() {
