@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <parent>
+    <relativePath>../cms-project/pom.xml</relativePath>
     <groupId>org.seasar.cms</groupId>
     <artifactId>cms-project</artifactId>
     <version>0.0.3</version>

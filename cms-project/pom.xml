@@ -214,4 +214,14 @@
       <url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
     </snapshotRepository>
   </distributionManagement>
+  <modules>
+    <module>../database</module>
+    <module>../beantable</module>
+    <module>../s2-classbuilder</module>
+    <module>../s2-pluggable</module>
+    <module>../webdav</module>
+    <module>../webdav-jp</module>
+    <module>../ymir</module>
+    <module>../ymir-extension</module>
+  </modules>
 </project>
