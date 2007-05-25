@@ -68,8 +68,10 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
     ComponentDef redefine(ComponentDef componentDef, String path,
         RedefinableXmlS2ContainerBuilder builder)
     {
-        if (path.indexOf(DELIMITER) >= 0) {
-            // 高速化のため。
+        int delimiter = path.lastIndexOf(DELIMITER);
+        int slash = path.lastIndexOf('/');
+        if (delimiter >= 0 && delimiter > slash) {
+            // リソース名に「+」が含まれている場合は特別な処理を行なわない。
             return componentDef;
         }
 

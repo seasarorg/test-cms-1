@@ -5,4 +5,5 @@
   <component name="dicon" class="org.seasar.cms.classbuilder.impl.RedefinableXmlS2ContainerBuilder" />
   <component name="class" class="org.seasar.cms.classbuilder.impl.ClassS2ContainerBuilder" />
   <component class="org.seasar.cms.classbuilder.impl.PluggableAssemblerProvider" />
+  <component class="org.seasar.cms.classbuilder.impl.RedefinableResourceResolver" />
 </components>

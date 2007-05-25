@@ -80,4 +80,41 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase
             + "testinjar2.dicon", cl);
         assertNotNull(container.getComponent(Hoe.class));
     }
+
+
+    public void test_diconファイル全体の置き換えができること()
+        throws Exception
+    {
+        include("test3.dicon");
+        Hoe hoe = (Hoe)getComponent(Hoe.class);
+        assertEquals("redefined", hoe.getName());
+    }
+
+
+    public void test_JARの外にある差分diconによってJARに入っているdiconファイル全体の置き換えができること()
+        throws Exception
+    {
+        ClassLoader cl = new URLClassLoader(new URL[] { new URL("jar:"
+            + ResourceUtil.getResource("testinjar3.jar").toExternalForm()
+            + "!/") }, getClass().getClassLoader());
+        S2Container container = S2ContainerFactory.create("testinjar3.dicon",
+            cl);
+        Hoe hoe = (Hoe)container.getComponent(Hoe.class);
+        assertEquals("redefined", hoe.getName());
+    }
+
+
+    public void test_diconのパスがURLであってもJARの外にある置き換えdiconによってJARに入っているdiconファイル全体の置き換えができること()
+        throws Exception
+    {
+        String jarPath = "jar:"
+            + ResourceUtil.getResource("testinjar3.jar").toExternalForm()
+            + "!/";
+        ClassLoader cl = new URLClassLoader(new URL[] { new URL(jarPath) },
+            getClass().getClassLoader());
+        S2Container container = S2ContainerFactory.create(jarPath
+            + "testinjar3.dicon", cl);
+        Hoe hoe = (Hoe)container.getComponent(Hoe.class);
+        assertEquals("redefined", hoe.getName());
+    }
 }

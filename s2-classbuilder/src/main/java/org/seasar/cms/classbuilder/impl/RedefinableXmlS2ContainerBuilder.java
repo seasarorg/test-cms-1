@@ -14,6 +14,8 @@ public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder
 {
     public static final String DELIMITER = "+";
 
+    private static final String NAME_ADDITIONAL = "+";
+
 
     public RedefinableXmlS2ContainerBuilder()
     {
@@ -54,6 +56,13 @@ public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder
 
     protected String[] constructAdditionalDiconPaths(String path)
     {
+        int delimiter = path.lastIndexOf(DELIMITER);
+        int slash = path.lastIndexOf('/');
+        if (delimiter >= 0 && delimiter > slash) {
+            // リソース名に「+」が含まれていない場合だけ特別な処理を行なう。
+            return new String[0];
+        }
+
         List<String> pathList = new ArrayList<String>();
         String body;
         String suffix;
@@ -69,9 +78,9 @@ public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder
             .fromJarURLToResourcePath(body);
         if (resourceBody != null) {
             // パスがJarのURLの場合はURLをリソースパスに変換した上で作成したパスを候補に含める。
-            pathList.add(resourceBody + DELIMITER + suffix);
+            pathList.add(resourceBody + DELIMITER + NAME_ADDITIONAL + suffix);
         }
-        pathList.add(body + DELIMITER + suffix);
+        pathList.add(body + DELIMITER + NAME_ADDITIONAL + suffix);
         return pathList.toArray(new String[0]);
     }
 }
