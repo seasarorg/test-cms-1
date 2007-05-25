@@ -9,9 +9,9 @@ import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.assembler.AutoConstructorAssembler;
 
 
-public class PluggableAutoConstructorAssembler extends AutoConstructorAssembler
+public class ClassAutoConstructorAssembler extends AutoConstructorAssembler
 {
-    public PluggableAutoConstructorAssembler(ComponentDef componentDef)
+    public ClassAutoConstructorAssembler(ComponentDef componentDef)
     {
         super(componentDef);
     }

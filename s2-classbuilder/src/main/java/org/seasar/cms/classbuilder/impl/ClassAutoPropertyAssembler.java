@@ -18,9 +18,9 @@ import org.seasar.framework.container.assembler.AbstractPropertyAssembler;
 import org.seasar.framework.container.assembler.BindingTypeDefFactory;
 
 
-public class PluggableAutoPropertyAssembler extends AbstractPropertyAssembler
+public class ClassAutoPropertyAssembler extends AbstractPropertyAssembler
 {
-    public PluggableAutoPropertyAssembler(ComponentDef componentDef)
+    public ClassAutoPropertyAssembler(ComponentDef componentDef)
     {
         super(componentDef);
     }

@@ -7,32 +7,32 @@ import org.seasar.framework.container.PropertyAssembler;
 import org.seasar.framework.container.assembler.AssemblerFactory.DefaultProvider;
 
 
-public class PluggableAssemblerProvider extends DefaultProvider
+public class ClassAssemblerProvider extends DefaultProvider
 {
     @Override
     public ConstructorAssembler createAutoConstructorAssembler(ComponentDef cd)
     {
-        return new PluggableAutoConstructorAssembler(cd);
+        return new ClassAutoConstructorAssembler(cd);
     }
 
 
     @Override
     public PropertyAssembler createAutoPropertyAssembler(ComponentDef cd)
     {
-        return new PluggableAutoPropertyAssembler(cd);
+        return new ClassAutoPropertyAssembler(cd);
     }
 
 
     @Override
     public MethodAssembler createInitMethodAssembler(ComponentDef cd)
     {
-        return new PluggableInitMethodAssembler(cd);
+        return new ClassInitMethodAssembler(cd);
     }
 
 
     @Override
     public MethodAssembler createDestroyMethodAssembler(ComponentDef cd)
     {
-        return new PluggableDestroyMethodAssembler(cd);
+        return new ClassDestroyMethodAssembler(cd);
     }
 }
