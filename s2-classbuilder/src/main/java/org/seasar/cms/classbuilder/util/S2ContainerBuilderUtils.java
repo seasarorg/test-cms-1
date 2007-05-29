@@ -1,6 +1,5 @@
 package org.seasar.cms.classbuilder.util;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,28 +83,18 @@ public class S2ContainerBuilderUtils
                 return null;
             }
         } else if (path.startsWith(PREFIX_FILE)) {
-            File file;
-            try {
-                file = ResourceUtil.getFile(new URL(path));
-            } catch (MalformedURLException ex) {
-                return null;
-            }
-            if (file == null) {
-                return null;
-            }
-
             String filePath;
             try {
-                filePath = file.getCanonicalPath();
-            } catch (IOException ex) {
-                filePath = file.getAbsolutePath();
+                filePath = ResourceUtil.getFileName(new URL(encodeURL(path)));
+            } catch (MalformedURLException ex) {
+                return null;
             }
 
             ClassLoader cl = getClassLoader();
 
             int pre = 0;
             int idx;
-            while ((idx = filePath.indexOf(File.separatorChar, pre)) >= 0) {
+            while ((idx = filePath.indexOf('/', pre)) >= 0) {
                 pre = idx + 1;
                 String resourcePath = filePath.substring(pre);
                 if (cl.getResource(resourcePath) != null) {
@@ -120,6 +109,15 @@ public class S2ContainerBuilderUtils
             }
         }
         return null;
+    }
+
+
+    static String encodeURL(String path)
+    {
+        if (path == null) {
+            return null;
+        }
+        return path.replace("+", "%2B");
     }
 
 
