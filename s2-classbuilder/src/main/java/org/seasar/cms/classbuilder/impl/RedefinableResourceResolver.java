@@ -52,7 +52,7 @@ public class RedefinableResourceResolver extends ClassPathResourceResolver
             suffix = path.substring(dot);
         }
         String resourceBody = S2ContainerBuilderUtils
-            .fromJarURLToResourcePath(body);
+            .fromURLToResourcePath(body);
         if (resourceBody != null) {
             // パスがJarのURLの場合はURLをリソースパスに変換した上で作成したパスを候補に含める。
             pathList.add(resourceBody
