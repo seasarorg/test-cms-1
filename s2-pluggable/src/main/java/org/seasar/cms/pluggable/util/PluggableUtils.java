@@ -10,9 +10,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.seasar.cms.pluggable.classloader.CompositeClassLoader;
+import org.seasar.cms.pluggable.hotdeploy.DistributedHotdeployBehavior;
+import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.S2ContainerFactory;
+import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
 import org.seasar.framework.container.util.Traversal;
 import org.seasar.framework.exception.IORuntimeException;
 
@@ -97,5 +101,26 @@ public class PluggableUtils {
 
     static synchronized String newPath() {
         return PATH_PREFIX + String.valueOf(++id);
+    }
+
+    public static ClassLoader adjustClassLoader(
+            DistributedHotdeployBehavior behavior, ClassLoader parent) {
+
+        LocalHotdeployS2Container[] containers = behavior
+                .getLocalHotdeployS2Containers();
+        List classLoaderList = new ArrayList();
+        for (int i = 0; i < containers.length; i++) {
+            HotdeployClassLoader classLoader = containers[i]
+                    .getHotdeployClassLoader();
+            if (classLoader != null) {
+                classLoaderList.add(classLoader);
+            }
+        }
+        if (classLoaderList.size() > 0) {
+            return new CompositeClassLoader((ClassLoader[]) classLoaderList
+                    .toArray(new ClassLoader[0]), parent);
+        } else {
+            return parent;
+        }
     }
 }
