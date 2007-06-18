@@ -11,7 +11,7 @@
   </parent>
   <groupId>org.seasar.cms.s2-pluggable</groupId>
   <artifactId>s2-pluggable</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.4</version>
   <name>S2-Pluggable</name>
   <description>
     S2-Pluggable is an extension for Seasar2 to add pluggable
