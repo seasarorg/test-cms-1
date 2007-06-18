@@ -11,7 +11,7 @@
   </parent>
   <groupId>org.seasar.cms.s2-classbuilder</groupId>
   <artifactId>s2-classbuilder</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4-SNAPSHOT</version>
   <name>S2-ClassBuilder</name>
   <description>
     S2-ClassBuilder enables you to write container settings as Java
