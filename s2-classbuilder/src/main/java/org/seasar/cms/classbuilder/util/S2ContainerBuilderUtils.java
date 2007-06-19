@@ -97,8 +97,13 @@ public class S2ContainerBuilderUtils
             while ((idx = filePath.indexOf('/', pre)) >= 0) {
                 pre = idx + 1;
                 String resourcePath = filePath.substring(pre);
-                if (cl.getResource(resourcePath) != null) {
-                    return resourcePath;
+                try {
+                    if (cl.getResource(resourcePath) != null) {
+                        return resourcePath;
+                    }
+                } catch (RuntimeException ignore) {
+                    // resourcePathが不正の場合はClassLoader#getResource()が
+                    // IllegalArgumentExceptionなどをスローすることがあるのでこうしている。
                 }
             }
             if (pre < filePath.length()) {
