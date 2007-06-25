@@ -329,7 +329,6 @@ public class LocalHotdeployS2Container implements ClassHandler {
                 if (cd != null) {
                     register(cd);
                     S2ContainerUtil.putRegisterLog(cd);
-                    cd.init();
                 }
             }
         } finally {
