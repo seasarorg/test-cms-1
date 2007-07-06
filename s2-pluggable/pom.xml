@@ -18,6 +18,18 @@
     functionality.
   </description>
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <encoding>UTF-8</encoding>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>

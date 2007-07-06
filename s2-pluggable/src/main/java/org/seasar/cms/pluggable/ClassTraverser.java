@@ -17,13 +17,13 @@ import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
 public class ClassTraverser {
 
-    private List classPatterns = new ArrayList();
+    private List<ClassPattern> classPatterns = new ArrayList<ClassPattern>();
 
-    private List ignoreClassPatterns = new ArrayList();
+    private List<ClassPattern> ignoreClassPatterns = new ArrayList<ClassPattern>();
 
-    protected List referenceClasses = new ArrayList();
+    protected List<Class<?>> referenceClasses = new ArrayList<Class<?>>();
 
-    protected Map strategies = new HashMap();
+    protected Map<String, Strategy> strategies = new HashMap<String, Strategy>();
 
     protected ClassHandler classHandler;
 
@@ -38,7 +38,7 @@ public class ClassTraverser {
     }
 
     public ClassPattern getClassPattern(int index) {
-        return (ClassPattern) classPatterns.get(index);
+        return classPatterns.get(index);
     }
 
     public void addClassPattern(String packageName, String shortClassNames) {
@@ -120,7 +120,7 @@ public class ClassTraverser {
     }
 
     boolean isMatched(String packageName, String shortClassName,
-            List classPatternList) {
+            List<ClassPattern> classPatternList) {
 
         if (classPatternList.isEmpty()) {
             return false;

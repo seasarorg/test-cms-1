@@ -4,7 +4,7 @@ import org.seasar.framework.container.impl.SimpleComponentDef;
 
 public class ThreadLocalComponentDef extends SimpleComponentDef {
 
-    private ThreadLocal component_ = new ThreadLocal();
+    private ThreadLocal<Object> component_ = new ThreadLocal<Object>();
 
     public ThreadLocalComponentDef(Class componentClass) {
         super(componentClass);

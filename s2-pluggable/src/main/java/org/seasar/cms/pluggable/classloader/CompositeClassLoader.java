@@ -32,20 +32,21 @@ public class CompositeClassLoader extends ClassLoader {
     }
 
     ClassLoader[] normalizeClassLoaders(ClassLoader[] classLoaders) {
-        Set set = new LinkedHashSet();
+        Set<ClassLoader> set = new LinkedHashSet<ClassLoader>();
         for (int i = 0; i < classLoaders.length; i++) {
             if (set.contains(classLoaders[i])) {
                 continue;
             }
             set.add(classLoaders[i]);
         }
-        return (ClassLoader[]) set.toArray(new ClassLoader[0]);
+        return set.toArray(new ClassLoader[0]);
     }
 
     /*
      * Object
      */
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("C{ ");
@@ -65,6 +66,7 @@ public class CompositeClassLoader extends ClassLoader {
      * OverriddenClassLoader
      */
 
+    @Override
     public URL getResource(String name) {
         for (int i = 0; i < classLoaders_.length; i++) {
             URL url = classLoaders_[i].getResource(name);
@@ -79,16 +81,17 @@ public class CompositeClassLoader extends ClassLoader {
         }
     }
 
-    public Enumeration getResources(String name) throws IOException {
-        Set set = new LinkedHashSet();
+    @Override
+    public Enumeration<URL> getResources(String name) throws IOException {
+        Set<URL> set = new LinkedHashSet<URL>();
         for (int i = 0; i < classLoaders_.length; i++) {
-            for (Enumeration enm = classLoaders_[i].getResources(name); enm
+            for (Enumeration<URL> enm = classLoaders_[i].getResources(name); enm
                     .hasMoreElements();) {
                 set.add(enm.nextElement());
             }
         }
         if (getParent() != null) {
-            for (Enumeration enm = super.getResources(name); enm
+            for (Enumeration<URL> enm = super.getResources(name); enm
                     .hasMoreElements();) {
                 set.add(enm.nextElement());
             }
@@ -96,7 +99,8 @@ public class CompositeClassLoader extends ClassLoader {
         return Collections.enumeration(set);
     }
 
-    public synchronized Class loadClass(String name)
+    @Override
+    public synchronized Class<?> loadClass(String name)
             throws ClassNotFoundException {
         for (int i = 0; i < classLoaders_.length; i++) {
             try {

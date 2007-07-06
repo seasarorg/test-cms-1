@@ -267,7 +267,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     }
 
     void includeChildren(S2Container container, S2Container target) {
-        Set childSet = new HashSet();
+        Set<S2Container> childSet = new HashSet<S2Container>();
         int size = container.getChildSize();
         for (int i = 0; i < size; i++) {
             childSet.add(container.getChild(i));
@@ -318,13 +318,13 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     }
 
     void include(S2Container parent, S2Container child) {
-        if (!isCircular(child, parent, new LinkedList())) {
+        if (!isCircular(child, parent, new LinkedList<String>())) {
             parent.include(child);
         }
     }
 
     boolean isCircular(final S2Container container, final S2Container target,
-            LinkedList paths) {
+            LinkedList<String> paths) {
         paths.addFirst(container.getPath());
         try {
             if (container == target) {

@@ -42,17 +42,17 @@ public class PluggableUtils {
         if (classLoader == null) {
             classLoader = PluggableUtils.class.getClassLoader();
         }
-        Enumeration enm;
+        Enumeration<URL> enm;
         try {
             enm = classLoader.getResources(path);
         } catch (IOException ex) {
             throw new IORuntimeException(ex);
         }
-        Set urlSet = new LinkedHashSet();
+        Set<URL> urlSet = new LinkedHashSet<URL>();
         for (; enm.hasMoreElements();) {
             urlSet.add(enm.nextElement());
         }
-        return (URL[]) urlSet.toArray(new URL[0]);
+        return urlSet.toArray(new URL[0]);
     }
 
     public static Object[] findAscendantComponents(S2Container container,
@@ -79,7 +79,7 @@ public class PluggableUtils {
             final S2Container container, final Object componentKey) {
 
         synchronized (container.getRoot()) {
-            final List componentDefs = new ArrayList();
+            final List<ComponentDef> componentDefs = new ArrayList<ComponentDef>();
             Traversal.forEachParentContainer(container,
                     new Traversal.S2ContainerHandler() {
                         public Object processContainer(S2Container container) {
@@ -88,7 +88,7 @@ public class PluggableUtils {
                             return null;
                         }
                     });
-            return (ComponentDef[]) componentDefs.toArray(new ComponentDef[0]);
+            return componentDefs.toArray(new ComponentDef[0]);
         }
     }
 
@@ -108,7 +108,7 @@ public class PluggableUtils {
 
         LocalHotdeployS2Container[] containers = behavior
                 .getLocalHotdeployS2Containers();
-        List classLoaderList = new ArrayList();
+        List<ClassLoader> classLoaderList = new ArrayList<ClassLoader>();
         for (int i = 0; i < containers.length; i++) {
             HotdeployClassLoader classLoader = containers[i]
                     .getHotdeployClassLoader();

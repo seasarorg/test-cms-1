@@ -4,7 +4,7 @@ import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.S2ContainerFactory.DefaultProvider;
 
 public class PluggableProvider extends DefaultProvider {
-    private static ThreadLocal usingPluggableRoot_ = new ThreadLocal();
+    private static ThreadLocal<Boolean> usingPluggableRoot_ = new ThreadLocal<Boolean>();
 
     public static boolean isUsingPluggableRoot() {
         Boolean usingPluggableRoot = (Boolean) usingPluggableRoot_.get();

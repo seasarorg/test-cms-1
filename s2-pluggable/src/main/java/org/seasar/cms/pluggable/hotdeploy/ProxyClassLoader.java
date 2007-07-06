@@ -24,23 +24,28 @@ public class ProxyClassLoader extends ClassLoader {
         classLoader_ = classLoader;
     }
 
+    @Override
     public URL getResource(String name) {
         return classLoader_.getResource(name);
     }
 
+    @Override
     public InputStream getResourceAsStream(String name) {
         return classLoader_.getResourceAsStream(name);
     }
 
-    public Enumeration getResources(String name) throws IOException {
+    @Override
+    public Enumeration<URL> getResources(String name) throws IOException {
         return classLoader_.getResources(name);
     }
 
-    public Class loadClass(String name) throws ClassNotFoundException {
+    @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         return classLoader_.loadClass(name);
     }
 
-    protected synchronized Class loadClass(String name, boolean resolve)
+    @Override
+    protected synchronized Class<?> loadClass(String name, boolean resolve)
             throws ClassNotFoundException {
         Class clazz = classLoader_.loadClass(name);
         if (resolve) {

@@ -24,15 +24,18 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
 
     private ClassLoader classLoader_;
 
-    private List listeners_ = new ArrayList();
+    private List<HotdeployListener> listeners_ = new ArrayList<HotdeployListener>();
 
     private File classesDirectory_;
 
-    private Map classCache_ = Collections.synchronizedMap(new HashMap());
+    private Map<String, Class<?>> classCache_ = Collections
+            .synchronizedMap(new HashMap<String, Class<?>>());
 
-    private Map resourceCache_ = Collections.synchronizedMap(new HashMap());
+    private Map<String, URL> resourceCache_ = Collections
+            .synchronizedMap(new HashMap<String, URL>());
 
-    private Map resourcesCache_ = Collections.synchronizedMap(new HashMap());
+    private Map<String, Vector<URL>> resourcesCache_ = Collections
+            .synchronizedMap(new HashMap<String, Vector<URL>>());
 
     private static Logger logger = Logger.getLogger(HotdeployClassLoader.class);
 
@@ -47,7 +50,7 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
     }
 
     public HotdeployListener getHotdeployListener(int index) {
-        return (HotdeployListener) listeners_.get(index);
+        return listeners_.get(index);
     }
 
     public int getHotdeployListenerSize() {
@@ -62,21 +65,23 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
         classesDirectory_ = classesDirectory;
     }
 
+    @Override
     public URL getResource(String name) {
         if (resourceCache_.containsKey(name)) {
-            return (URL) resourceCache_.get(name);
+            return resourceCache_.get(name);
         }
         URL resource = classLoader_.getResource(name);
         resourceCache_.put(name, resource);
         return resource;
     }
 
-    public Enumeration getResources(String name) throws IOException {
+    @Override
+    public Enumeration<URL> getResources(String name) throws IOException {
         if (resourcesCache_.containsKey(name)) {
-            return ((Vector) resourcesCache_.get(name)).elements();
+            return resourcesCache_.get(name).elements();
         }
-        Vector resources = new Vector();
-        for (Enumeration enm = classLoader_.getResources(name); enm
+        Vector<URL> resources = new Vector<URL>();
+        for (Enumeration<URL> enm = classLoader_.getResources(name); enm
                 .hasMoreElements();) {
             resources.add(enm.nextElement());
         }
@@ -99,14 +104,16 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
         }
     }
 
-    public Class loadClass(String className) throws ClassNotFoundException {
+    @Override
+    public Class<?> loadClass(String className) throws ClassNotFoundException {
         return loadClass(className, false);
     }
 
-    public synchronized Class loadClass(String className, boolean resolve)
+    @Override
+    public synchronized Class<?> loadClass(String className, boolean resolve)
             throws ClassNotFoundException {
         if (classCache_.containsKey(className)) {
-            Class clazz = (Class) classCache_.get(className);
+            Class clazz = classCache_.get(className);
             if (clazz != null) {
                 if (resolve) {
                     resolveClass(clazz);
@@ -117,7 +124,7 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
             }
         }
 
-        Class clazz = null;
+        Class<?> clazz = null;
         try {
             if (isTargetClass(className)) {
                 if (logger.isDebugEnabled()) {

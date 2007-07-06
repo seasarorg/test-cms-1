@@ -35,11 +35,11 @@ public class LocalHotdeployS2Container implements ClassHandler {
 
     private PluggableHotdeployClassLoader hotdeployClassLoader_;
 
-    private List referenceClassNames_ = new ArrayList();
+    private List<String> referenceClassNames_ = new ArrayList<String>();
 
-    private Map strategies_ = new HashMap();
+    private Map<String, Strategy> strategies_ = new HashMap<String, Strategy>();
 
-    private Map componentDefCache_ = new HashMap();
+    private Map<Object, ComponentDef> componentDefCache_ = new HashMap<Object, ComponentDef>();
 
     public static final String namingConvention_BINDING = "bindingType=must";
 
@@ -74,11 +74,11 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     public String getReferenceClassName(int index) {
-        return (String) referenceClassNames_.get(index);
+        return referenceClassNames_.get(index);
     }
 
     public String[] getReferenceClassNames() {
-        return (String[]) referenceClassNames_.toArray(new String[0]);
+        return referenceClassNames_.toArray(new String[0]);
     }
 
     public int getReferenceClassNameSize() {
@@ -260,7 +260,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
     ReferenceResource[] getReferenceResources() {
 
         ClassLoader classLoader = container_.getClassLoader();
-        List resourceList = new ArrayList();
+        List<ReferenceResource> resourceList = new ArrayList<ReferenceResource>();
         if (referenceClassNames_.size() == 0) {
             // リファレンスクラス名が無指定の場合はコンテナに対応するdiconファイルを
             // 読み込んだクラスローダを基準とする。
