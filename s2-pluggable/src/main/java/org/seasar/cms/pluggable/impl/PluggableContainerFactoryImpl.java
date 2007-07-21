@@ -29,7 +29,7 @@ import org.seasar.framework.util.DisposableUtil;
 
 public class PluggableContainerFactoryImpl implements PluggableContainerFactory {
 
-    private String configPath = ROOT_DICON;
+    private String configPath_ = ROOT_DICON;
 
     private ExternalContext externalContext_;
 
@@ -47,11 +47,11 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     }
 
     public String getConfigPath() {
-        return configPath;
+        return configPath_;
     }
 
     public void setConfigPath(String path) {
-        configPath = path;
+        configPath_ = path;
     }
 
     public ExternalContext getExternalContext() {
@@ -84,7 +84,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             return;
         }
         initializeComponentDeployerProvider();
-        rootContainer_ = createS2Container(configPath);
+        rootContainer_ = createS2Container(configPath_);
         prepareForExternalContext();
     }
 
