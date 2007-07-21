@@ -241,6 +241,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
     }
 
 
+    @SuppressWarnings("unchecked")
     Class<? extends S2ContainerPreparer> getPreparerClass(String path)
     {
         ClassLoader classLoader = getClassLoaderForLoadingPreparer();
