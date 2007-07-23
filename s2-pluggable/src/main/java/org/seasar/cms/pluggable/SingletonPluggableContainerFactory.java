@@ -42,9 +42,9 @@ public class SingletonPluggableContainerFactory {
     }
 
     public static void setExternalContextComponentDefRegister(
-        ExternalContextComponentDefRegister extCtxComponentDefRegister) {
+            ExternalContextComponentDefRegister extCtxComponentDefRegister) {
         instance_
-            .setExternalContextComponentDefRegister(extCtxComponentDefRegister);
+                .setExternalContextComponentDefRegister(extCtxComponentDefRegister);
     }
 
     public static Object getApplication() {
@@ -61,12 +61,12 @@ public class SingletonPluggableContainerFactory {
     }
 
     public static S2Container integrate(String configPath,
-        S2Container[] dependencies) {
+            S2Container[] dependencies) {
         return instance_.integrate(configPath, dependencies);
     }
 
     public static S2Container integrate(String configPath,
-        ClassLoader classLoader, S2Container[] dependencies) {
+            ClassLoader classLoader, S2Container[] dependencies) {
         return instance_.integrate(configPath, classLoader, dependencies);
     }
 
@@ -76,6 +76,7 @@ public class SingletonPluggableContainerFactory {
 
     public static void destroy() {
         instance_.destroy();
+        SingletonS2ContainerFactory.setContainer(null);
     }
 
     public static S2Container getRootContainer() {
