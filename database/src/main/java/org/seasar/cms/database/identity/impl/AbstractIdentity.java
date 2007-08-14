@@ -169,6 +169,7 @@ abstract public class AbstractIdentity implements Identity {
         String tableName = table.getName();
         ColumnMetaData[] columns = table.getColumns();
         ConstraintMetaData[] constraints = table.getConstraints();
+        String[] details = table.getDetails();
 
         StringBuffer sb = new StringBuffer();
         sb.append("CREATE TABLE ").append(tableName).append(" (");
@@ -197,6 +198,11 @@ abstract public class AbstractIdentity implements Identity {
                 sb.append(names[j]);
             }
             sb.append(")");
+        }
+        for (int i = 0; i < details.length; i++) {
+            sb.append(delim);
+            delim = ", ";
+            sb.append(details[i]);
         }
         sb.append(")");
         sqlList.add(sb.toString());
@@ -392,6 +398,10 @@ abstract public class AbstractIdentity implements Identity {
             sb.append(" PRIMARY KEY");
         } else if (column.isUnique()) {
             sb.append(" UNIQUE");
+        }
+        String detail = column.getDetail();
+        if (detail != null && detail.length() > 0) {
+            sb.append(" ").append(detail);
         }
 
         return sb.toString();

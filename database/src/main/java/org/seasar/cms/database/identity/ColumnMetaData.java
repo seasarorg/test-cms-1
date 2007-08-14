@@ -10,7 +10,6 @@ import java.beans.PropertyDescriptor;
  * @author YOKOTA Takehiko
  */
 public class ColumnMetaData {
-
     private String name_;
 
     private String jdbcTypeName_;
@@ -32,6 +31,8 @@ public class ColumnMetaData {
     private PropertyDescriptor propertyDescriptor_;
 
     private boolean versionNo_;
+
+    private String detail_;
 
     public String getDefault() {
         return default_;
@@ -119,5 +120,13 @@ public class ColumnMetaData {
 
     public void setVersionNo(boolean versionNo) {
         versionNo_ = versionNo;
+    }
+
+    public String getDetail() {
+        return detail_;
+    }
+
+    public void setDetail(String detail) {
+        detail_ = detail;
     }
 }
