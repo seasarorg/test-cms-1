@@ -43,6 +43,7 @@ import org.seasar.cms.beantable.annotation.ColumnDetail;
 import org.seasar.cms.beantable.annotation.Constraint;
 import org.seasar.cms.beantable.annotation.Index;
 import org.seasar.cms.beantable.annotation.PrimaryKey;
+import org.seasar.cms.beantable.annotation.TableDetail;
 import org.seasar.cms.beantable.annotation.Unique;
 import org.seasar.cms.beantable.handler.BeantableHandler;
 import org.seasar.cms.beantable.handler.BeantableListHandler;
@@ -65,7 +66,6 @@ import org.seasar.framework.log.Logger;
  * @author YOKOTA Takehiko
  */
 public class BeantableImpl<T> implements Beantable<T> {
-
     private DataSource ds_;
 
     private Identity identity_;
@@ -232,6 +232,7 @@ public class BeantableImpl<T> implements Beantable<T> {
         table.setColumns(gatherColumnMetaData(gatherNoPersistentProperties()));
         table.setConstraints(gatherConstraintMetaData());
         table.setIndexes(gatherIndexMetaData());
+        table.setDetails(gatherDetails());
         return table;
     }
 
@@ -328,14 +329,19 @@ public class BeantableImpl<T> implements Beantable<T> {
         }
         ColumnDetail column = getColumnAnnotation(method);
         if (column != null) {
+            String value = column.value();
+            if (value.length() > 0) {
+                columnMetaData.setDetail(value);
+            }
+
             String columnName = column.name();
-            if (columnName != null) {
+            if (columnName.length() > 0) {
                 columnMetaData.setName(columnName);
             }
 
             String jdbcTypeName = null;
             JDBCType jdbcType = column.type();
-            if (jdbcType != null) {
+            if (jdbcType != JDBCType.NONE) {
                 jdbcTypeName = actualJdbcTypeNameByTypeMap_.get(jdbcType);
             }
             if (jdbcTypeName != null) {
@@ -343,7 +349,7 @@ public class BeantableImpl<T> implements Beantable<T> {
             }
 
             String defaultValue = column.defaultValue();
-            if (defaultValue != null) {
+            if (defaultValue.length() > 0) {
                 columnMetaData.setDefault(defaultValue);
             }
 
@@ -407,16 +413,20 @@ public class BeantableImpl<T> implements Beantable<T> {
                     .getAnnotation(org.seasar.dao.annotation.tiger.Column.class);
             if (s2DaoColumn != null) {
                 column = new ColumnDetail() {
+                    public String value() {
+                        return "";
+                    }
+
                     public String name() {
                         return s2DaoColumn.value();
                     }
 
                     public JDBCType type() {
-                        return null;
+                        return JDBCType.NONE;
                     }
 
                     public String defaultValue() {
-                        return null;
+                        return "";
                     }
 
                     public Constraint[] constraint() {
@@ -438,6 +448,10 @@ public class BeantableImpl<T> implements Beantable<T> {
             if (s2DaoColumn != null) {
                 final ColumnDetail origColumn = column;
                 column = new ColumnDetail() {
+                    public String value() {
+                        return origColumn.value();
+                    }
+
                     public String name() {
                         return s2DaoColumn.value();
                     }
@@ -542,6 +556,15 @@ public class BeantableImpl<T> implements Beantable<T> {
         } while (false);
 
         return indexList.toArray(new IndexMetaData[0]);
+    }
+
+    String[] gatherDetails() {
+        TableDetail detail = beanClass_.getAnnotation(TableDetail.class);
+        if (detail == null) {
+            return new String[0];
+        } else {
+            return detail.value();
+        }
     }
 
     public TableMetaData getTableMetaData() {

@@ -26,7 +26,7 @@ public class BeantableImplTest extends S2TestCase {
         super.setUp();
 
         File dbDir = new File(ResourceUtil.getBuildDir(getClass())
-                .getCanonicalPath(), "hsqldb");
+                .getCanonicalPath(), "h2");
         delete(dbDir);
 
         include("j2ee.dicon");

@@ -3,6 +3,7 @@ package org.seasar.cms.beantable;
 import java.sql.Types;
 
 public enum JDBCType {
+    NONE(Types.NULL, null),
 
     ARRAY(Types.ARRAY, "ARRAY"),
 
@@ -76,7 +77,7 @@ public enum JDBCType {
     }
 
     public static JDBCType getInstance(int type) {
-        for (int i = 0; i < values().length; i++) {
+        for (int i = 1; i < values().length; i++) {
             if (type == values()[i].getType()) {
                 return values()[i];
             }
