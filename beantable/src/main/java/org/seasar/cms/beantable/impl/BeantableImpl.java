@@ -484,7 +484,9 @@ public class BeantableImpl<T> implements Beantable<T> {
             constraint.setName(ConstraintMetaData.PRIMARY_KEY);
             constraint.setColumnNames(toStringArray(value));
             constraintList.add(constraint);
+        } while (false);
 
+        do {
             Unique unique = beanClass_.getAnnotation(Unique.class);
             if (unique == null) {
                 break;
@@ -494,7 +496,7 @@ public class BeantableImpl<T> implements Beantable<T> {
                 break;
             }
             for (int i = 0; i < values.length; i++) {
-                constraint = new ConstraintMetaData();
+                ConstraintMetaData constraint = new ConstraintMetaData();
                 constraint.setName(ConstraintMetaData.UNIQUE);
                 constraint.setColumnNames(toStringArray(values[i]));
                 constraintList.add(constraint);
