@@ -19,9 +19,5 @@ public @interface ColumnDetail {
 
     JDBCType type() default JDBCType.NONE;
 
-    String defaultValue() default "";
-
-    Constraint[] constraint() default {};
-
     boolean index() default false;
 }

@@ -5,13 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
  * @author YOKOTA Takehiko
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface PrimaryKey
-{
-    String value();
+@Target( { ElementType.TYPE, ElementType.METHOD })
+public @interface PrimaryKey {
+    String value() default "";
 }

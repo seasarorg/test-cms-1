@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * @author YOKOTA Takehiko
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TableDetail {
-    String[] value();
+@Target(ElementType.METHOD)
+public @interface Default {
+    String value();
 }
