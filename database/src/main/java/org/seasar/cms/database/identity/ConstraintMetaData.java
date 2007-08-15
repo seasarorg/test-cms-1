@@ -12,9 +12,23 @@ public class ConstraintMetaData {
 
     public static final String UNIQUE = "UNIQUE";
 
-    private String[] columnNames_;
+    public static final String FOREIGN_KEY = "FOREIGN KEY";
+
+    public static final String CHECK = "CHECK";
 
     private String name_;
+
+    private String[] columnNames_;
+
+    private String rawBody_;
+
+    public String getName() {
+        return name_;
+    }
+
+    public void setName(String name) {
+        name_ = name;
+    }
 
     public String[] getColumnNames() {
         return columnNames_;
@@ -24,11 +38,11 @@ public class ConstraintMetaData {
         columnNames_ = columnNames;
     }
 
-    public String getName() {
-        return name_;
+    public String getRawBody() {
+        return rawBody_;
     }
 
-    public void setName(String name) {
-        name_ = name;
+    public void setRawBody(String rawBody) {
+        rawBody_ = rawBody;
     }
 }

@@ -14,24 +14,20 @@ public class TableMetaData {
 
     private IndexMetaData[] indexes_;
 
-    private String[] details_;
-
     public TableMetaData() {
         this(null);
     }
 
     public TableMetaData(String name) {
         this(name, new ColumnMetaData[0], new ConstraintMetaData[0],
-            new IndexMetaData[0], new String[0]);
+            new IndexMetaData[0]);
     }
 
     public TableMetaData(String name, ColumnMetaData[] columns,
-        ConstraintMetaData[] constraints, IndexMetaData[] indexes,
-        String[] details) {
+        ConstraintMetaData[] constraints, IndexMetaData[] indexes) {
         setName(name);
         setColumns(columns);
         setConstraints(constraints);
-        setDetails(details);
     }
 
     public ColumnMetaData[] getColumns() {
@@ -92,13 +88,5 @@ public class TableMetaData {
 
     public void setName(String name) {
         name_ = name;
-    }
-
-    public String[] getDetails() {
-        return details_;
-    }
-
-    public void setDetails(String[] details) {
-        details_ = details;
     }
 }

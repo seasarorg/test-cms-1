@@ -19,6 +19,7 @@ import org.seasar.cms.database.identity.ColumnMetaData;
 import org.seasar.cms.database.identity.ConstraintMetaData;
 import org.seasar.cms.database.identity.Identity;
 import org.seasar.cms.database.identity.IndexMetaData;
+import org.seasar.cms.database.identity.ReferencesMetaData;
 import org.seasar.cms.database.identity.TableMetaData;
 
 /**
@@ -169,7 +170,6 @@ abstract public class AbstractIdentity implements Identity {
         String tableName = table.getName();
         ColumnMetaData[] columns = table.getColumns();
         ConstraintMetaData[] constraints = table.getConstraints();
-        String[] details = table.getDetails();
 
         StringBuffer sb = new StringBuffer();
         sb.append("CREATE TABLE ").append(tableName).append(" (");
@@ -179,30 +179,30 @@ abstract public class AbstractIdentity implements Identity {
             delim = ", ";
             String columnName = columns[i].getName();
             sb.append(columnName).append(" ").append(
-                getDefinitionSQL(tableName, columns[i]));
-            sqlList.addAll(Arrays.asList(getAdditionalDefinitionSQLs(tableName,
-                columns[i])));
+                constructColumnDefinitionSQL(tableName, columns[i]));
+            sqlList.addAll(Arrays.asList(constructAdditionalDefinitionSQLs(
+                tableName, columns[i])));
         }
         for (int i = 0; i < constraints.length; i++) {
-            String[] names = constraints[i].getColumnNames();
-            if (names.length == 0) {
-                continue;
-            }
             sb.append(delim);
             delim = ", ";
-            sb.append(constraints[i].getName()).append(" (");
-            String delim2 = "";
-            for (int j = 0; j < names.length; j++) {
-                sb.append(delim2);
-                delim2 = ", ";
-                sb.append(names[j]);
+            String rawBody = constraints[i].getRawBody();
+            if (rawBody != null && rawBody.length() > 0) {
+                sb.append(rawBody);
+            } else {
+                sb.append(constraints[i].getName());
+
+                String[] columnNames = constraints[i].getColumnNames();
+                if (columnNames != null && columnNames.length > 0) {
+                    String delim2 = " (";
+                    for (int j = 0; j < columnNames.length; j++) {
+                        sb.append(delim2);
+                        delim2 = ", ";
+                        sb.append(columnNames[j]);
+                    }
+                    sb.append(")");
+                }
             }
-            sb.append(")");
-        }
-        for (int i = 0; i < details.length; i++) {
-            sb.append(delim);
-            delim = ", ";
-            sb.append(details[i]);
         }
         sb.append(")");
         sqlList.add(sb.toString());
@@ -270,8 +270,8 @@ abstract public class AbstractIdentity implements Identity {
 
         sqlList.add("DROP TABLE " + tableName);
         for (int i = 0; i < columns.length; i++) {
-            sqlList.addAll(Arrays
-                .asList(getDeletionSQLs(tableName, columns[i])));
+            sqlList.addAll(Arrays.asList(constructDeletionSQLs(tableName,
+                columns[i])));
         }
 
         return sqlList.toArray(new String[0]);
@@ -321,7 +321,7 @@ abstract public class AbstractIdentity implements Identity {
     protected String getSQLToAlterTableAddColumn(String tableName,
         ColumnMetaData column) {
         return "ALTER TABLE " + tableName + " ADD COLUMN " + column.getName()
-            + " " + getDefinitionSQL(tableName, column);
+            + " " + constructColumnDefinitionSQL(tableName, column);
     }
 
     /**
@@ -378,8 +378,8 @@ abstract public class AbstractIdentity implements Identity {
         return "_SEQ_" + tableName + "_" + columnName;
     }
 
-    protected String getDefinitionSQL(String tableName, ColumnMetaData column) {
-
+    protected String constructColumnDefinitionSQL(String tableName,
+        ColumnMetaData column) {
         if (column.isId()) {
             return getSQLToDefineIdColumn(tableName, column.getName(),
                 column.getSequenceName()).getColumnDefinitionSQL();
@@ -399,6 +399,22 @@ abstract public class AbstractIdentity implements Identity {
         } else if (column.isUnique()) {
             sb.append(" UNIQUE");
         }
+        String check = column.getCheck();
+        if (check != null && check.length() > 0) {
+            sb.append(" CHECK(").append(check).append(")");
+        }
+        ReferencesMetaData references = column.getReferences();
+        if (references != null) {
+            sb.append(" REFERENCES ").append(references.getTableName());
+            String columnName = references.getColumnName();
+            if (columnName != null && columnName.length() > 0) {
+                sb.append(" (").append(columnName).append(")");
+            }
+            String spec = references.getSpec();
+            if (spec != null && spec.length() > 0) {
+                sb.append(" ").append(spec);
+            }
+        }
         String detail = column.getDetail();
         if (detail != null && detail.length() > 0) {
             sb.append(" ").append(detail);
@@ -407,7 +423,7 @@ abstract public class AbstractIdentity implements Identity {
         return sb.toString();
     }
 
-    protected String[] getAdditionalDefinitionSQLs(String tableName,
+    protected String[] constructAdditionalDefinitionSQLs(String tableName,
         ColumnMetaData column) {
         if (column.isId()) {
             return getSQLToDefineIdColumn(tableName, column.getName(),
@@ -417,7 +433,8 @@ abstract public class AbstractIdentity implements Identity {
         }
     }
 
-    protected String[] getDeletionSQLs(String tableName, ColumnMetaData column) {
+    protected String[] constructDeletionSQLs(String tableName,
+        ColumnMetaData column) {
         if (column.isId()) {
             return getSQLToDeleteIdColumn(tableName, column.getName(),
                 column.getSequenceName()).getDeletionSQLs();

@@ -34,6 +34,10 @@ public class ColumnMetaData {
 
     private String detail_;
 
+    private String check_;
+
+    private ReferencesMetaData references_;
+
     public String getDefault() {
         return default_;
     }
@@ -128,5 +132,21 @@ public class ColumnMetaData {
 
     public void setDetail(String detail) {
         detail_ = detail;
+    }
+
+    public String getCheck() {
+        return check_;
+    }
+
+    public void setCheck(String check) {
+        check_ = check;
+    }
+
+    public ReferencesMetaData getReferences() {
+        return references_;
+    }
+
+    public void setReferences(ReferencesMetaData references) {
+        references_ = references;
     }
 }
