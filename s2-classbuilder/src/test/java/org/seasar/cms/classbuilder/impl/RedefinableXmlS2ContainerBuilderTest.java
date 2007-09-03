@@ -28,6 +28,14 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase
     }
 
 
+    public void test_コンポーネントの除去ができること()
+        throws Exception
+    {
+        include("test4.dicon");
+        assertFalse(getContainer().hasComponentDef(Hoe.class));
+    }
+
+
     public void test_JARの外にある差分diconによってJARに入っているdiconファイルのコンポーネントの再定義ができること()
         throws Exception
     {

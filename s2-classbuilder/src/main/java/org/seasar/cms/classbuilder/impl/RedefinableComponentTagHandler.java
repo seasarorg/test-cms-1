@@ -56,8 +56,10 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
                     (RedefinableXmlS2ContainerBuilder)context
                         .getParameter("builder"));
             }
-            S2Container container = (S2Container)context.peek();
-            container.register(componentDef);
+            if (componentDef != null) {
+                S2Container container = (S2Container)context.peek();
+                container.register(componentDef);
+            }
         } else {
             ArgDef argDef = (ArgDef)context.peek();
             argDef.setChildComponentDef(componentDef);
@@ -88,14 +90,12 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
             return componentDef;
         }
 
+        ComponentDef redefinition = null;
         S2Container container = S2ContainerFactory.create(diconPath);
-        if (!container.hasComponentDef(name)) {
-            throw new RuntimeException(
-                "Can't find component definition named '" + name + "' in "
-                    + diconPath);
+        if (container.hasComponentDef(name)) {
+            redefinition = container.getComponentDef(name);
+            redefinition.setContainer(componentDef.getContainer());
         }
-        ComponentDef redefinition = container.getComponentDef(name);
-        redefinition.setContainer(componentDef.getContainer());
 
         return redefinition;
     }
