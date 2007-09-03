@@ -1,6 +1,7 @@
 package org.seasar.cms.pluggable.hotdeploy;
 
 import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
+import org.seasar.cms.pluggable.util.HotdeployEventUtils;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.impl.S2ContainerBehavior.DefaultProvider;
@@ -79,6 +80,7 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
             for (int i = 0; i < localHotdeployS2Containers_.length; i++) {
                 localHotdeployS2Containers_[i].start();
             }
+            HotdeployEventUtils.start();
             if (logger_.isDebugEnabled()) {
                 logger_.debug("HOTDEPLOY BEHAVIOR STARTED");
             }
@@ -101,6 +103,7 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
             if (logger_.isDebugEnabled()) {
                 logger_.debug("HOTDEPLOY BEHAVIOR STOPPING...");
             }
+            HotdeployEventUtils.stop();
             DisposableUtil.dispose();
 
             for (int i = 0; i < localHotdeployS2Containers_.length; i++) {
