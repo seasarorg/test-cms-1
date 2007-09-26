@@ -20,6 +20,17 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase
     }
 
 
+    public void test_コンポーネント名が同じコンポーネント定義は再定義されてそれ以外のコンポーネント定義があれば追加されること()
+        throws Exception
+    {
+        include("test5.dicon");
+        Fuga fuga = (Fuga)getComponent(Fuga.class);
+        assertTrue(fuga instanceof FugaImpl2);
+        assertTrue(getContainer().hasComponentDef(Hoe.class));
+        assertNotNull("きちんとDIもされること", fuga.getHoe());
+    }
+
+
     public void test_コンポーネントの追加ができること()
         throws Exception
     {

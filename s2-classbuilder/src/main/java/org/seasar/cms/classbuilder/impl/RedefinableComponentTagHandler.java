@@ -50,14 +50,16 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
                 "class");
         }
         if (context.peek() instanceof S2Container) {
+            S2Container container = (S2Container)context.peek();
             if (componentDef.getComponentName() != null) {
-                componentDef = redefine(componentDef, (String)context
-                    .getParameter("path"),
+                ComponentDef[] redefined = redefine(componentDef,
+                    (String)context.getParameter("path"),
                     (RedefinableXmlS2ContainerBuilder)context
                         .getParameter("builder"));
-            }
-            if (componentDef != null) {
-                S2Container container = (S2Container)context.peek();
+                for (int i = 0; i < redefined.length; i++) {
+                    container.register(redefined[i]);
+                }
+            } else {
                 container.register(componentDef);
             }
         } else {
@@ -67,14 +69,14 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
     }
 
 
-    ComponentDef redefine(ComponentDef componentDef, String path,
+    ComponentDef[] redefine(ComponentDef componentDef, String path,
         RedefinableXmlS2ContainerBuilder builder)
     {
         int delimiter = path.lastIndexOf(DELIMITER);
         int slash = path.lastIndexOf('/');
         if (delimiter >= 0 && delimiter > slash) {
             // リソース名に「+」が含まれている場合は特別な処理を行なわない。
-            return componentDef;
+            return new ComponentDef[] { componentDef };
         }
 
         String name = componentDef.getComponentName();
@@ -87,17 +89,18 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
             }
         }
         if (diconPath == null) {
-            return componentDef;
+            return new ComponentDef[] { componentDef };
         }
 
-        ComponentDef redefinition = null;
         S2Container container = S2ContainerFactory.create(diconPath);
-        if (container.hasComponentDef(name)) {
-            redefinition = container.getComponentDef(name);
-            redefinition.setContainer(componentDef.getContainer());
+        int size = container.getComponentDefSize();
+        ComponentDef[] redefined = new ComponentDef[size];
+        for (int i = 0; i < size; i++) {
+            redefined[i] = container.getComponentDef(i);
+            redefined[i].setContainer(componentDef.getContainer());
         }
 
-        return redefinition;
+        return redefined;
     }
 
 
