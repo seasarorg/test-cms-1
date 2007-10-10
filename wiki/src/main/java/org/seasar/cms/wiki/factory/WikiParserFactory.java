@@ -13,9 +13,11 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.cms.wiki.engine;
+package org.seasar.cms.wiki.factory;
 
 import java.io.Reader;
+
+import org.seasar.cms.wiki.engine.WikiParser;
 
 public interface WikiParserFactory {
 	

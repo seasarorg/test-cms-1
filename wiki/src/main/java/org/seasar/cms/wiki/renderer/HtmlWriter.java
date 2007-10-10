@@ -21,19 +21,19 @@ import java.io.Writer;
 /**
  * @author someda
  */
-public class HtmlWriter extends AbstractContentsWriter{		
-	
+public class HtmlWriter extends AbstractContentsWriter {
+
 	private static final String NEWLINE = "\n";
-	
+
 	private StringBuffer buf;
-	
-	public HtmlWriter(Writer writer){
+
+	public HtmlWriter(Writer writer) {
 		super(writer);
 		buf = new StringBuffer();
-	}		
+	}
 
 	// ----- [Start] Abstract メソッドの実装 -----
-	
+
 	protected void doAppend(String character) {
 		buf.append(character);
 	}
@@ -42,26 +42,28 @@ public class HtmlWriter extends AbstractContentsWriter{
 		doAppend(" " + name + "=\"" + value + "\"");
 	}
 
-	protected void doAppendTag(String name, boolean start) {		
-		if(start){
+	protected void doAppendTag(String name, boolean start) {
+		if (start) {
 			doAppend("<" + name);
-		}else{
+		} else {
 			doAppend("</" + name);
 		}
 	}
 
 	protected void doAppendNewline() {
-		doAppend(NEWLINE);		
+		doAppend(NEWLINE);
 	}
-	
+
 	// ----- [End] Abstract メソッドの実装 -----
-	
+
 	/**
 	 * アンカーを追加する
+	 * 
 	 * @param linkUrl
 	 * @param linkLabel
-	 * @param mailCheck 真の場合、メールアドレスかどうかのチェック(@を含んでいるか)を行い、パスすれば"mailto:"がlinkUrlに付与される。
-	 */	
+	 * @param mailCheck
+	 *            真の場合、メールアドレスかどうかのチェック(@を含んでいるか)を行い、パスすれば"mailto:"がlinkUrlに付与される。
+	 */
 	public void appendAnchor(String linkUrl, String linkLabel, boolean mailCheck) {
 
 		if (mailCheck) {
@@ -69,38 +71,41 @@ public class HtmlWriter extends AbstractContentsWriter{
 				linkUrl = "mailto:" + linkUrl;
 			}
 		}
-		appendAnchor(linkUrl,linkLabel);
+		appendAnchor(linkUrl, linkLabel);
 	}
 
 	/**
 	 * アンカーを追加する
+	 * 
 	 * @param linkUrl
 	 * @param linkLabel
 	 */
-	public void appendAnchor(String linkUrl, String linkLabel) {		
+	public void appendAnchor(String linkUrl, String linkLabel) {
 		appendStartTag("a");
-		appendAttribute("href",linkUrl);
+		appendAttribute("href", linkUrl);
 		appendBody(linkLabel);
-		endTag();		
+		endTag();
 	}
-	
+
 	/**
 	 * テーブルのセルを追加する
+	 * 
 	 * @param value
 	 * @param header
 	 */
-	public void appendTableCell(String value, boolean header){		
-		if(header){
+	public void appendTableCell(String value, boolean header) {
+		if (header) {
 			appendStartTag("th");
-		}else{
+		} else {
 			appendStartTag("td");
 		}
 		appendBody(value);
-		endTag();				
+		endTag();
 	}
-	
+
 	/**
 	 * 見出しを追加する
+	 * 
 	 * @param level
 	 * @param body
 	 */
@@ -110,11 +115,11 @@ public class HtmlWriter extends AbstractContentsWriter{
 		appendBody(body);
 		endTag();
 	}
-	
+
 	/**
 	 * <br/> を追加する
 	 */
-	public void appendBr(){
+	public void appendBr() {
 		appendBody("<br/>");
 	}
 
@@ -124,26 +129,35 @@ public class HtmlWriter extends AbstractContentsWriter{
 	}
 
 	/**
-	 * 指定した範囲の文字列を切り出し返す。
-	 * なお、切り出された文字列はバッファから削除される。
+	 * 指定した範囲の文字列を切り出し返す。 なお、切り出された文字列はバッファから削除される。
 	 */
 	public String cut(int start, int end) {
 		String s = buf.substring(start, end);
-		buf.delete(start, end);		
+		buf.delete(start, end);
 		return s;
 	}
 
 	/**
 	 * バッファの内容を Writer へ書き込み処理を行う。書き込み後バッファはクリアされる。
-	 * @throws IllegalStateException タグが閉じていない状態で書き込みを行った場合
+	 * 
+	 * @throws IllegalStateException
+	 *             タグが閉じていない状態で書き込みを行った場合
 	 */
 	public void write() throws IOException {
-		
-		if(!closed){
-			throw new IllegalStateException("Cannot write until current element will be closed.");			
-		}		
+
+		if (!closed) {
+			throw new IllegalStateException(
+					"Cannot write until current element will be closed.");
+		}
 		writer.write(buf.toString());
 		buf = new StringBuffer();
 	}
-	
+
+	public void setNewline(boolean flag) {
+		// TODO どのように実装するか考え中
+	}
+
+	public void setTab(boolean flag) {
+		// TODO どのように実装するか考え中
+	}
 }

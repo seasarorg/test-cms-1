@@ -17,7 +17,7 @@ package org.seasar.cms.wiki.parser;
 
 import java.io.Reader;
 
-import org.seasar.cms.wiki.engine.WikiParserFactory;
+import org.seasar.cms.wiki.factory.WikiParserFactory;
 import org.seasar.cms.wiki.util.WikiTestUtils;
 import org.seasar.extension.unit.S2TestCase;
 
