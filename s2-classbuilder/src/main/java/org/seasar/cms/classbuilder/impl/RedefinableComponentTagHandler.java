@@ -117,11 +117,11 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler
             body = path.substring(0, dot);
             suffix = path.substring(dot);
         }
-        String resourceBody = S2ContainerBuilderUtils
-            .fromURLToResourcePath(body);
-        if (resourceBody != null) {
+        String resourcePath = S2ContainerBuilderUtils
+            .fromURLToResourcePath(body + DELIMITER + name + suffix);
+        if (resourcePath != null) {
             // パスがJarのURLの場合はURLをリソースパスに変換した上で作成したパスを候補に含める。
-            pathList.add(resourceBody + DELIMITER + name + suffix);
+            pathList.add(resourcePath);
         }
         pathList.add(body + DELIMITER + name + suffix);
         return pathList.toArray(new String[0]);

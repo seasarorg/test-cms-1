@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.AbstractS2ContainerBuilder;
 import org.seasar.framework.exception.IORuntimeException;
@@ -65,7 +66,9 @@ public class S2ContainerBuilderUtils
 
         size = merged.getComponentDefSize();
         for (int i = 0; i < size; i++) {
-            container.register(merged.getComponentDef(i));
+            ComponentDef componentDef = merged.getComponentDef(i);
+            componentDef.setContainer(container);
+            container.register(componentDef);
         }
     }
 

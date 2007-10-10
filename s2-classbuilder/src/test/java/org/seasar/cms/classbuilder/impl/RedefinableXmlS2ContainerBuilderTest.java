@@ -1,5 +1,6 @@
 package org.seasar.cms.classbuilder.impl;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -135,5 +136,20 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase
             + "testinjar3.dicon", cl);
         Hoe hoe = (Hoe)container.getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
+    }
+
+
+    public void test_違うディレクトリにある差分diconによってdiconの追加定義ができること()
+        throws Exception
+    {
+        URL url = new File(ResourceUtil.getBuildDir(
+            RedefinableXmlS2ContainerBuilderTest.class).getParentFile()
+            .getParentFile(), "src/test/resources2").toURI().toURL();
+        ClassLoader cl = new URLClassLoader(new URL[] { url }, getClass()
+            .getClassLoader());
+
+        S2Container container = S2ContainerFactory.create(cl.getResource(
+            "test6.dicon").toExternalForm(), cl);
+        assertTrue(container.hasComponentDef("fuga2"));
     }
 }
