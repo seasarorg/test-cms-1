@@ -2,5 +2,5 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container//EN"
 "http://www.seasar.org/dtd/components.dtd">
 <components>
-  <component name="wikiParserFactory" class="org.seasar.cms.wiki.engine.WikiParserFactoryImpl"/>
+  <component name="wikiParserFactory" class="org.seasar.cms.wiki.factory.impl.WikiParserFactoryImpl"/>
 </components>

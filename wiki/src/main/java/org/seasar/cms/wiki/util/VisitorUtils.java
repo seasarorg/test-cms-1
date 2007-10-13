@@ -15,10 +15,6 @@
  */
 package org.seasar.cms.wiki.util;
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.SimpleNode;
 import org.seasar.cms.wiki.parser.WikiArgs;
@@ -47,10 +43,6 @@ public class VisitorUtils {
 	private static final int ITALIC_NUM = 3;
 
 	private static final int BOLDITALIC_NUM = 5;
-
-	private static final String[] TAG_ESCAPE = { "<", "&lt;", ">", "&gt;" };
-
-	private static final String[] OTHER_ESCAPE = { "&", "&amp;" };
 
 	// ----- [Start] Excerpt related methods -----
 
@@ -151,64 +143,21 @@ public class VisitorUtils {
 		return (level == ITALIC_NUM || level == BOLDITALIC_NUM) ? true : false;
 	}
 
-	// ----- [End] StrongItalic related methods -----
-
-	// ----- [Start] BlockPlugin/InlinePlugin related methods -----
-
 	public static String[] getArgs(Node node) {
-		String args[] = null;
 		if (node.jjtGetNumChildren() > 0
 				&& node.jjtGetChild(0) instanceof WikiArgs) {
 			WikiArgs child = (WikiArgs) node.jjtGetChild(0);
-			args = child.args;
+			return child.args;
 		}
-		return args;
-	}
-
-	// ----- [End] BlockPlugin/InlinePlugin related methods -----
-
-	// ----- HTMLWikiVisitor related
-	public static String escape(String letter) {
-		return replaceArray(letter, TAG_ESCAPE, true);
+		return null;
 	}
 
 	public static String getAnchorId(SimpleNode node) {
-		String anchor = null;
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			if (node.jjtGetChild(i) instanceof WikiLetters) {
-				WikiLetters l = (WikiLetters) node.jjtGetChild(i);
-				if (l.isAnchor) {
-					anchor = l.letter;
-					break;
-				}
+		for (WikiLetters l : NodeUtils.find(node, WikiLetters.class)) {
+			if (l.isAnchor) {
+				return l.letter;
 			}
 		}
-		return anchor;
+		return null;
 	}
-
-	// -- TextWikiVisitor related
-	public static String unescape(String letter) {
-		letter = replaceArray(letter, TAG_ESCAPE, false);
-		letter = replaceArray(letter, OTHER_ESCAPE, false);
-		return letter;
-	}
-
-	private static String replaceArray(String letter, String[] array,
-			boolean forward) {
-
-		if (letter == null)
-			return "";
-		String ret = letter;
-		if (forward) {
-			for (int i = 0; i < array.length - 1; i += 2) {
-				ret = ret.replaceAll(array[i], array[i + 1]);
-			}
-		} else {
-			for (int i = 1; i < array.length; i += 2) {
-				ret = ret.replaceAll(array[i], array[i - 1]);
-			}
-		}
-		return ret;
-	}
-
 }

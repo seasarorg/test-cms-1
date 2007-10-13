@@ -48,16 +48,9 @@ public class WikiHelper {
 
 	public static final String ALIAS_DELIMITER = ">";
 
-	private static final Pattern NEWLINE = Pattern.compile("\n");
-
-	private static final Pattern ANCHOR = Pattern
-			.compile(".*\\[#[a-zA-Z][0-9a-zA-Z]+\\]$");
 
 	private static final Pattern CR = Pattern.compile("\r");
 
-	public static final String ANCHOR_PREFIX = "[#tg";
-
-	public static final String ANCHOR_SUFFIX = "]";
 
 	// private static final String[] IMAGE_SUFFIX =
 	// {".jpg",".jpeg",".gif",".bmp",".png"};
@@ -116,45 +109,6 @@ public class WikiHelper {
 			}
 		}
 		return (ridx > lidx) ? image.substring(lidx, ridx) : "";
-	}
-
-	// public static String beforeSavePage(String contentType, String content) {
-	// if (CmsConstants.CONTENTTYPE_XWIKI.equals(contentType)) {
-	// return setAnchorToHeading(content);
-	// } else if (CmsConstants.CONTENTTYPE_HTML.equals(contentType)) {
-	// return removeCarriageReturn(content);
-	// } else if(CmsConstants.CONTENTTYPE_DFORM.equals(contentType)){
-	// //return toVTL(content);
-	// return toJSP(content);
-	// }
-	// return content;
-	// }
-
-	/**
-	 * generate anchor data from object hashcode
-	 * 
-	 * @param contents
-	 *            wiki contents
-	 * @return contents with anchor data
-	 */
-	public static String setAnchorToHeading(String contents) {
-		String mod = removeCarriageReturn(contents);
-		String[] s = NEWLINE.split(mod);
-
-		StringBuffer buf = new StringBuffer();
-		int hashcode = contents.hashCode();
-		for (int i = 0; i < s.length; i++) {
-			buf.append(s[i]);
-
-			Matcher m = ANCHOR.matcher(s[i]);
-			if (s[i].indexOf("*") == 0 && !m.matches()) {
-				buf.append(ANCHOR_PREFIX + Integer.toHexString(hashcode)
-						+ ANCHOR_SUFFIX);
-				hashcode++;
-			}
-			buf.append("\n");
-		}
-		return buf.toString();
 	}
 
 	/**

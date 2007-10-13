@@ -9,8 +9,12 @@ import java.io.Writer;
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.WikiEngine;
 import org.seasar.cms.wiki.engine.WikiParser;
+import org.seasar.cms.wiki.engine.plugin.PluginExecuter;
+import org.seasar.cms.wiki.engine.plugin.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiLinkFactory;
 import org.seasar.cms.wiki.factory.WikiParserFactory;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
+import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.WikiParserVisitor;
 
 public class WikiEngineImpl implements WikiEngine {
@@ -19,12 +23,42 @@ public class WikiEngineImpl implements WikiEngine {
 
 	private WikiVisitorFactory visitorFactory;
 
+	private WikiLinkFactory linkFactory;
+
+	private WikiBodyEvaluator bodyEvaluator;
+
+	private PluginExecuter pluginExecuter;
+
 	public void setParserFactory(WikiParserFactory parserFactory) {
 		this.parserFactory = parserFactory;
 	}
 
 	public void setVisitorFactory(WikiVisitorFactory visitorFactory) {
 		this.visitorFactory = visitorFactory;
+	}
+
+	public void setPluginExecuter(PluginExecuter pluginExecuter) {
+		this.pluginExecuter = pluginExecuter;
+	}
+
+	public void setBodyEvaluator(WikiBodyEvaluator bodyEvaluator) {
+		this.bodyEvaluator = bodyEvaluator;
+	}
+
+	public PluginExecuter getPluginExecuter() {
+		return pluginExecuter;
+	}
+
+	public WikiBodyEvaluator getBodyEvaluator() {
+		return bodyEvaluator;
+	}
+
+	public void setLinkFactory(WikiLinkFactory linkFactory) {
+		this.linkFactory = linkFactory;
+	}
+
+	public WikiLinkFactory getLinkFactory() {
+		return linkFactory;
 	}
 
 	public String evaluate(String text, WikiContext context) {
@@ -38,9 +72,8 @@ public class WikiEngineImpl implements WikiEngine {
 	}
 
 	public void merge(Reader reader, WikiContext context, Writer writer) {
-		WikiParser parser = parserFactory.getWikiParser(reader);
 		WikiParserVisitor visitor = visitorFactory.create(context, writer);
-		parser.parse().jjtAccept(visitor, null);
+		doExecute(reader, context, visitor);
 	}
 
 	public void merge(String text, WikiContext context, Writer writer) {
@@ -48,7 +81,20 @@ public class WikiEngineImpl implements WikiEngine {
 	}
 
 	public void merge(Reader reader, WikiContext context, OutputStream os) {
-		// TODO Auto-generated method stub
+		WikiParserVisitor visitor = visitorFactory.create(context, os);
+		doExecute(reader, context, visitor);
+	}
 
+	private void doExecute(Reader reader, WikiContext context,
+			WikiParserVisitor visitor) {
+		WikiParser parser = parserFactory.getWikiParser(reader);
+		Node root = parser.parse();
+
+		// setup context
+		context.setEngine(this);
+		context.setRoot(root);
+		context.setVisitor(visitor);
+
+		root.jjtAccept(visitor, null);
 	}
 }
