@@ -26,35 +26,36 @@ import java.util.Stack;
 public abstract class AbstractContentsWriter {
 
 	protected Writer writer;
-	
+
 	protected boolean appendTab;
-	
+
 	protected boolean appendNewline;
-	
+
 	protected boolean closed = true;
-	
+
 	protected Stack elementStack = new Stack();
-	
-	public AbstractContentsWriter(Writer writer){
-		this(writer,false,false);
+
+	public AbstractContentsWriter(Writer writer) {
+		this(writer, false, false);
 	}
-	
-	public AbstractContentsWriter(Writer writer, boolean appendTab, boolean appendNewline){
+
+	public AbstractContentsWriter(Writer writer, boolean appendTab,
+			boolean appendNewline) {
 		this.writer = writer;
 		this.appendTab = appendTab;
 		this.appendNewline = appendNewline;
 	}
-		
-	public void flush() throws IOException{
+
+	public void flush() throws IOException {
 		writer.flush();
-	}	
-	
+	}
+
 	public void appendAttribute(String name, String value) {
 		if (value != null) {
-			doAppendAttribute(name,value);
+			doAppendAttribute(name, value);
 		}
 	}
-	
+
 	public void appendBody(String body) {
 		if (body == null) {
 			return;
@@ -66,7 +67,7 @@ public abstract class AbstractContentsWriter {
 
 	public void appendStartTag(String name) {
 		assertBody();
-		doAppendTag(name,true);
+		doAppendTag(name, true);
 		closed = false;
 		doTagPush(name);
 	}
@@ -75,7 +76,7 @@ public abstract class AbstractContentsWriter {
 		String name = doTagPop();
 		if (closed) {
 			doTab();
-			doAppendTag(name,false);
+			doAppendTag(name, false);
 			closeTag(true);
 		} else {
 			closeTag(false);
@@ -97,10 +98,10 @@ public abstract class AbstractContentsWriter {
 	}
 
 	protected void doTab() {
-		if(appendTab){
+		if (appendTab) {
 			for (int i = 0; i < elementStack.size(); i++) {
 				doAppend("\t");
-			}			
+			}
 		}
 	}
 
@@ -109,9 +110,9 @@ public abstract class AbstractContentsWriter {
 	}
 
 	private String doTagPop() {
-		if(elementStack.size()>0){
+		if (elementStack.size() > 0) {
 			return (String) elementStack.pop();
-		}else{
+		} else {
 			return null;
 		}
 	}
@@ -128,29 +129,29 @@ public abstract class AbstractContentsWriter {
 		doAppend(">");
 		appendNewLine();
 	}
-	
+
 	public boolean isTagEmpty() {
 		return elementStack.empty();
 	}
-	
-	public void appendNewLine(){
-		if(appendNewline){
-			doAppendNewline();			
+
+	public void appendNewLine() {
+		if (appendNewline) {
+			doAppendNewline();
 		}
 	}
-	
+
 	protected abstract void doAppend(String character);
-	
+
 	protected abstract void doAppendAttribute(String name, String value);
 
 	protected abstract void doAppendTag(String name, boolean start);
-			
+
 	protected abstract void doAppendNewline();
 
 	public abstract int nextIndex();
-	
+
 	public abstract String cut(int start, int end);
-	
+
 	public abstract void write() throws IOException;
 
 }

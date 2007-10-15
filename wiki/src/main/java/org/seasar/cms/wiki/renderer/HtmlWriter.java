@@ -154,10 +154,10 @@ public class HtmlWriter extends AbstractContentsWriter {
 	}
 
 	public void setNewline(boolean flag) {
-		// TODO どのように実装するか考え中
+		this.appendNewline = flag;
 	}
 
 	public void setTab(boolean flag) {
-		// TODO どのように実装するか考え中
+		this.appendNewline = flag;
 	}
 }

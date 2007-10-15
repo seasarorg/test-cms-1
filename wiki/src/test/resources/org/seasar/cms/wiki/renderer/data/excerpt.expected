@@ -1,0 +1,7 @@
+<blockquote>一段目<blockquote>二段目<blockquote>三段目</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>一段目まだ一段目ここまで一段目</blockquote>
+<blockquote>一段目これは入れ子にはならない</blockquote>
+<blockquote>二段目だけど、普通の引用<blockquote>これは増える減るのはそのまま</blockquote>
+</blockquote>
