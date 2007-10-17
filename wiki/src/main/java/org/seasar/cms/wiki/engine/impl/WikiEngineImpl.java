@@ -10,8 +10,8 @@ import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.WikiEngine;
 import org.seasar.cms.wiki.engine.WikiParser;
 import org.seasar.cms.wiki.engine.plugin.PluginExecuter;
-import org.seasar.cms.wiki.engine.plugin.WikiBodyEvaluator;
-import org.seasar.cms.wiki.factory.WikiLinkFactory;
+import org.seasar.cms.wiki.factory.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
 import org.seasar.cms.wiki.factory.WikiParserFactory;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 import org.seasar.cms.wiki.parser.Node;
@@ -23,7 +23,7 @@ public class WikiEngineImpl implements WikiEngine {
 
 	private WikiVisitorFactory visitorFactory;
 
-	private WikiLinkFactory linkFactory;
+	private WikiPageLinkFactory linkFactory;
 
 	private WikiBodyEvaluator bodyEvaluator;
 
@@ -45,6 +45,18 @@ public class WikiEngineImpl implements WikiEngine {
 		this.bodyEvaluator = bodyEvaluator;
 	}
 
+	public void setLinkFactory(WikiPageLinkFactory linkFactory) {
+		this.linkFactory = linkFactory;
+	}
+	
+	public WikiVisitorFactory getVisitorFactory() {
+		return visitorFactory;
+	}
+	
+	public WikiParserFactory getParserFactory() {
+		return parserFactory;
+	}
+
 	public PluginExecuter getPluginExecuter() {
 		return pluginExecuter;
 	}
@@ -53,11 +65,7 @@ public class WikiEngineImpl implements WikiEngine {
 		return bodyEvaluator;
 	}
 
-	public void setLinkFactory(WikiLinkFactory linkFactory) {
-		this.linkFactory = linkFactory;
-	}
-
-	public WikiLinkFactory getLinkFactory() {
+	public WikiPageLinkFactory getLinkFactory() {
 		return linkFactory;
 	}
 
@@ -78,6 +86,10 @@ public class WikiEngineImpl implements WikiEngine {
 
 	public void merge(String text, WikiContext context, Writer writer) {
 		merge(new StringReader(text), context, writer);
+	}
+
+	public void merge(String text, WikiContext context, OutputStream os) {
+		merge(new StringReader(text), context, os);
 	}
 
 	public void merge(Reader reader, WikiContext context, OutputStream os) {

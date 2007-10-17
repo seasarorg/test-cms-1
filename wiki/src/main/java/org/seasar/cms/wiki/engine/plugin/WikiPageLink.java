@@ -6,12 +6,13 @@ public class WikiPageLink {
 
 	private String url;
 
-	private String creationMark;
+	private String preMsg;
 
-	public WikiPageLink(String body, String url, String creationMark) {
+	private String postMsg;
+
+	public WikiPageLink(String body, String url) {
 		this.body = body;
 		this.url = url;
-		this.creationMark = creationMark;
 	}
 
 	public String getBody() {
@@ -22,8 +23,11 @@ public class WikiPageLink {
 		return url;
 	}
 
-	public String getCreationMark() {
-		return creationMark;
+	public boolean hasPreMsg() {
+		if (preMsg == null || preMsg.length() == 0) {
+			return false;
+		}
+		return true;
 	}
 
 	public boolean hasBody() {
@@ -33,11 +37,26 @@ public class WikiPageLink {
 		return true;
 	}
 
-	public boolean hasCreationMark() {
-		if (creationMark == null || creationMark.length() == 0) {
+	public boolean hasPostMsg() {
+		if (postMsg == null || postMsg.length() == 0) {
 			return false;
 		}
 		return true;
 	}
 
+	public String getPreMsg() {
+		return preMsg;
+	}
+
+	public void setPreMsg(String preMsg) {
+		this.preMsg = preMsg;
+	}
+
+	public String getPostMsg() {
+		return postMsg;
+	}
+
+	public void setPostMsg(String postMsg) {
+		this.postMsg = postMsg;
+	}
 }

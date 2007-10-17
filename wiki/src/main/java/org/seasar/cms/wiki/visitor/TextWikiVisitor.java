@@ -56,7 +56,7 @@ import org.seasar.cms.wiki.parser.WikiTablecolumn;
 import org.seasar.cms.wiki.parser.WikiTablemember;
 import org.seasar.cms.wiki.renderer.TextWriter;
 import org.seasar.cms.wiki.util.VisitorUtils;
-import org.seasar.cms.wiki.util.WikiHelper;
+import org.seasar.cms.wiki.util.GenerateNodeHelper;
 
 /**
  * @author someda
@@ -210,7 +210,7 @@ public class TextWikiVisitor implements WikiParserVisitor {
 
 		buf.setNewlineHeading(getRepeatedString(INDENT, node.level * 2));
 		buf.appendNewline();
-		if (node.type == WikiHelper.LIST_TYPE_NUMERICAL) {
+		if (node.type == GenerateNodeHelper.LIST_TYPE_NUMERICAL) {
 			for (int i = 0; i < node.level - 1; i++) {
 				if (listIndex[i] != 0)
 					buf.append(listIndex[i] + ".");
@@ -394,20 +394,23 @@ public class TextWikiVisitor implements WikiParserVisitor {
 
 	public Object visit(WikiLink node, Object data) {
 
-		String[] s = WikiHelper.split(node.image, WikiHelper.LINK_DELIMITER);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.LINK_DELIMITER);
 		buf.appendLink(s[0], s[1]);
 		return null;
 	}
 
 	public Object visit(WikiAlias node, Object data) {
-		String[] s = WikiHelper.split(node.image, WikiHelper.ALIAS_DELIMITER);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.ALIAS_DELIMITER);
 
 		if (node.islink) {
 			buf.appendLink(s[0], s[1]);
 		} else {
-			String[] t = WikiHelper.split(s[1], WikiHelper.ANCHOR_MARK);
+			String[] t = GenerateNodeHelper.split(s[1],
+					GenerateNodeHelper.ANCHOR_MARK);
 			if (t[0] == null || t[0].equals("")) {
-				buf.appendLink(s[0], WikiHelper.ANCHOR_MARK + t[1]);
+				buf.appendLink(s[0], GenerateNodeHelper.ANCHOR_MARK + t[1]);
 			} else {
 				processSecurityLink(t[0], s[0], t[1]);
 			}
@@ -416,7 +419,8 @@ public class TextWikiVisitor implements WikiParserVisitor {
 	}
 
 	public Object visit(WikiPagename node, Object data) {
-		String[] s = WikiHelper.split(node.image, WikiHelper.ANCHOR_MARK);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.ANCHOR_MARK);
 		processSecurityLink(s[0], s[0], s[1]);
 		return null;
 	}
@@ -481,7 +485,7 @@ public class TextWikiVisitor implements WikiParserVisitor {
 		// buf.appendLink(body, url.toString());
 		// } else {
 		// buf.appendLink(body, url.toString()
-		// + WikiHelper.ANCHOR_MARK + anchor);
+		// + GenerateNodeHelper.ANCHOR_MARK + anchor);
 		// }
 		// } else {
 		// URL url = ctx.getCreatePageURL(pagename, request);
@@ -497,7 +501,7 @@ public class TextWikiVisitor implements WikiParserVisitor {
 	}
 
 	private void endList(int type, int level) {
-		if (type == WikiHelper.LIST_TYPE_NUMERICAL) {
+		if (type == GenerateNodeHelper.LIST_TYPE_NUMERICAL) {
 			listIndex[level - 1] = 0;
 		}
 	}
@@ -510,12 +514,12 @@ public class TextWikiVisitor implements WikiParserVisitor {
 	}
 
 	private String getChildString(SimpleNode node, Object data, int idx) {
-		int start = buf.nextIndex();
+		int start = 0; // buf.nextIndex();
 		String childstr = null;
 		for (int i = idx; i < node.jjtGetNumChildren(); i++) {
 			node.jjtGetChild(i).jjtAccept(this, data);
 		}
-		int end = buf.nextIndex();
+		int end = 0; // buf.nextIndex();
 		if (start != end)
 			childstr = buf.cut(start, end);
 		return childstr;
@@ -525,15 +529,15 @@ public class TextWikiVisitor implements WikiParserVisitor {
 
 		VisitorUtils.prepareWikiTable(node, data);
 		int prenum = 0;
-		int start = buf.nextIndex();
-		int end = buf.nextIndex();
+		int start = 0; // buf.nextIndex();
+		int end = 0; // buf.nextIndex();
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			if (node.jjtGetChild(i) instanceof WikiTablemember) {
 				if (node.jjtGetChild(i).jjtGetNumChildren() != prenum) {
 					if (prenum != 0) {
 						adjust(start, end);
 					}
-					start = buf.nextIndex();
+					// start = buf.nextIndex();
 
 				}
 			} else { // in case WikiError
@@ -543,7 +547,7 @@ public class TextWikiVisitor implements WikiParserVisitor {
 			}
 			prenum = node.jjtGetChild(i).jjtGetNumChildren();
 			node.jjtGetChild(i).jjtAccept(this, data);
-			end = buf.nextIndex();
+			// end = buf.nextIndex();
 		}
 		adjust(start, end);
 	}

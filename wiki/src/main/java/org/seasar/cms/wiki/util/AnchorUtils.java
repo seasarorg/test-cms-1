@@ -26,7 +26,7 @@ public class AnchorUtils {
 	 * @return contents with anchor data
 	 */
 	public static String setToHeading(String contents) {
-		String mod = WikiHelper.removeCarriageReturn(contents);
+		String mod = WikiStringUtils.removeCarriageReturn(contents);
 		String[] lines = NEWLINE.split(mod);
 
 		StringBuffer buf = new StringBuffer();

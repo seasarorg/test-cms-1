@@ -8,10 +8,11 @@ import java.util.List;
 /**
  * @author someda
  * 
- * GenerateNodeHelper class provides utility method for wiki parser and other wiki
- * related object during parsing wiki contents. Basically, it does not provide node 
- * related tasks for WikiParser but provides only static method which is useful 
- * during parsing phase. Also this might be useful for plugin execution phase.  
+ * GenerateNodeHelper class provides utility method for wiki parser and other
+ * wiki related object during parsing wiki contents. Basically, it does not
+ * provide node related tasks for WikiParser but provides only static method
+ * which is useful during parsing phase. Also this might be useful for plugin
+ * execution phase.
  */
 public class GenerateNodeHelper {
 
@@ -33,12 +34,12 @@ public class GenerateNodeHelper {
 
 	public static final String ANCHOR_SUFFIX = "]";
 
-	private GenerateNodeHelper(){		
-	}	
-	
+	private GenerateNodeHelper() {
+	}
+
 	public static boolean isEmail(String image) {
 		return (image.indexOf("@") != -1);
-	}	
+	}
 
 	public static int getListType(String image) {
 		int type = 0;
@@ -157,5 +158,5 @@ public class GenerateNodeHelper {
 		}
 		return type;
 	}
-	
+
 }

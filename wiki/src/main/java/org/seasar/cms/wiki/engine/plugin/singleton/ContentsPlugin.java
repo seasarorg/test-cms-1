@@ -24,9 +24,9 @@ import org.seasar.cms.wiki.parser.WikiInlinePlugin;
 import org.seasar.cms.wiki.parser.WikiLetters;
 import org.seasar.cms.wiki.parser.WikiLink;
 import org.seasar.cms.wiki.parser.WikiPagename;
+import org.seasar.cms.wiki.util.GenerateNodeHelper;
 import org.seasar.cms.wiki.util.NodeUtils;
 import org.seasar.cms.wiki.util.VisitorUtils;
-import org.seasar.cms.wiki.util.WikiHelper;
 
 /**
  * @author someda
@@ -96,11 +96,13 @@ public class ContentsPlugin implements SingletonWikiPlugin {
 				buf.append(l.letter);
 		} else if (node instanceof WikiLink) {
 			WikiLink l = (WikiLink) node;
-			String[] s = WikiHelper.split(l.image, WikiHelper.LINK_DELIMITER);
+			String[] s = GenerateNodeHelper.split(l.image,
+					GenerateNodeHelper.LINK_DELIMITER);
 			buf.append(s[0]);
 		} else if (node instanceof WikiAlias) {
 			WikiAlias l = (WikiAlias) node;
-			String[] s = WikiHelper.split(l.image, WikiHelper.ALIAS_DELIMITER);
+			String[] s = GenerateNodeHelper.split(l.image,
+					GenerateNodeHelper.ALIAS_DELIMITER);
 			buf.append(s[0]);
 		} else if (node instanceof WikiPagename) {
 			WikiPagename l = (WikiPagename) node;

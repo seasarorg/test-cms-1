@@ -5,8 +5,10 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.seasar.cms.wiki.engine.plugin.PluginExecuter;
-import org.seasar.cms.wiki.engine.plugin.WikiBodyEvaluator;
-import org.seasar.cms.wiki.factory.WikiLinkFactory;
+import org.seasar.cms.wiki.factory.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
+import org.seasar.cms.wiki.factory.WikiParserFactory;
+import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 
 public interface WikiEngine {
 
@@ -37,12 +39,28 @@ public interface WikiEngine {
 	 */
 	public void merge(Reader reader, WikiContext context, OutputStream os);
 
-	/**
-	 * @return プラグイン実行環境
-	 */
+	public void merge(String text, WikiContext context, OutputStream os);
+
+	// ---- Setter Getter -------------------
+
+	public WikiPageLinkFactory getLinkFactory();
+
+	public WikiVisitorFactory getVisitorFactory();
+
+	public WikiParserFactory getParserFactory();
+
 	public PluginExecuter getPluginExecuter();
 
 	public WikiBodyEvaluator getBodyEvaluator();
 
-	public WikiLinkFactory getLinkFactory();
+	public void setLinkFactory(WikiPageLinkFactory linkFactory);
+
+	public void setVisitorFactory(WikiVisitorFactory visitorFactory);
+
+	public void setParserFactory(WikiParserFactory parserFactory);
+
+	public void setPluginExecuter(PluginExecuter pluginExecuter);
+
+	public void setBodyEvaluator(WikiBodyEvaluator bodyEvaluator);
+
 }

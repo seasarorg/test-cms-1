@@ -8,7 +8,7 @@ import java.util.Map;
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.plugin.AbstractChildPluginExecuter;
 import org.seasar.cms.wiki.engine.plugin.SingletonWikiPlugin;
-import org.seasar.cms.wiki.visitor.HtmlVisitor;
+import org.seasar.cms.wiki.renderer.HtmlVisitor;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 

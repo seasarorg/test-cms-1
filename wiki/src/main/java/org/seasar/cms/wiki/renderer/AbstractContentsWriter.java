@@ -15,17 +15,15 @@
  */
 package org.seasar.cms.wiki.renderer;
 
-import java.io.IOException;
 import java.io.Writer;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
 
 /**
  * @author someda
  */
-public abstract class AbstractContentsWriter {
-
-	protected Writer writer;
+public abstract class AbstractContentsWriter<E> extends WriterWrapper {
 
 	protected boolean appendTab;
 
@@ -33,7 +31,7 @@ public abstract class AbstractContentsWriter {
 
 	protected boolean closed = true;
 
-	protected Stack elementStack = new Stack();
+	protected Stack<String> elementStack = new Stack<String>();
 
 	public AbstractContentsWriter(Writer writer) {
 		this(writer, false, false);
@@ -41,38 +39,44 @@ public abstract class AbstractContentsWriter {
 
 	public AbstractContentsWriter(Writer writer, boolean appendTab,
 			boolean appendNewline) {
-		this.writer = writer;
+		super(writer);
 		this.appendTab = appendTab;
 		this.appendNewline = appendNewline;
 	}
 
-	public void flush() throws IOException {
-		writer.flush();
-	}
-
-	public void appendAttribute(String name, String value) {
+	public E attr(String name, String value) {
 		if (value != null) {
 			doAppendAttribute(name, value);
 		}
+		return (E) this;
 	}
 
-	public void appendBody(String body) {
+	public E attrs(Map<String, String> attrs) {
+		for (String key : attrs.keySet()) {
+			attr(key, attrs.get(key));
+		}
+		return (E) this;
+	}
+
+	public E body(String body) {
 		if (body == null) {
-			return;
+			return (E) this;
 		}
 		assertBody();
 		doAppend(body);
 		appendNewLine();
+		return (E) this;
 	}
 
-	public void appendStartTag(String name) {
+	public E start(String name) {
 		assertBody();
 		doAppendTag(name, true);
 		closed = false;
 		doTagPush(name);
+		return (E) this;
 	}
 
-	public void endTag() {
+	public E end() {
 		String name = doTagPop();
 		if (closed) {
 			doTab();
@@ -81,21 +85,18 @@ public abstract class AbstractContentsWriter {
 		} else {
 			closeTag(false);
 		}
+		return (E) this;
 	}
 
-	public void endAllTags() {
+	public E endAll() {
 		Iterator itr = elementStack.iterator();
 		while (itr.hasNext()) {
-			endTag();
+			end();
 		}
+		return (E) this;
 	}
 
-	private void assertBody() {
-		if (!closed) {
-			closeTag(true);
-		}
-		doTab();
-	}
+	// ----------- protected method ---------------
 
 	protected void doTab() {
 		if (appendTab) {
@@ -103,6 +104,15 @@ public abstract class AbstractContentsWriter {
 				doAppend("\t");
 			}
 		}
+	}
+
+	// ---------- Private Method --------
+
+	private void assertBody() {
+		if (!closed) {
+			closeTag(true);
+		}
+		doTab();
 	}
 
 	private void doTagPush(String tag) {
@@ -147,11 +157,5 @@ public abstract class AbstractContentsWriter {
 	protected abstract void doAppendTag(String name, boolean start);
 
 	protected abstract void doAppendNewline();
-
-	public abstract int nextIndex();
-
-	public abstract String cut(int start, int end);
-
-	public abstract void write() throws IOException;
 
 }

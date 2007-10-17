@@ -1,11 +1,13 @@
 package org.seasar.cms.wiki.engine.plugin.singleton;
 
 import org.seasar.cms.wiki.engine.WikiContext;
+import org.seasar.cms.wiki.engine.impl.WikiEngineTestFramework;
 
-public class BrPluginTest extends PluginTestFramework {
+public class BrPluginTest extends WikiEngineTestFramework {
 
 	public void testEval() {
-		assertEquals("<p><br/></p>", engine.evaluate("&br;", new WikiContext()));
+		assertWikiEquals("<p><br/></p>", engine.evaluate("&br;",
+				new WikiContext()));
 	}
 
 }

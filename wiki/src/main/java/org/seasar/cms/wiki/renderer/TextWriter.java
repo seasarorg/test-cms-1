@@ -21,7 +21,7 @@ import java.io.Writer;
 /**
  * @author someda
  */
-public class TextWriter extends AbstractContentsWriter {
+public class TextWriter extends WriterWrapper {
 
 	private static final String NEWLINE = "\n";
 
@@ -111,10 +111,10 @@ public class TextWriter extends AbstractContentsWriter {
 	 * @param linkLabel
 	 */
 	public void appendAnchor(String linkUrl, String linkLabel) {
-		appendStartTag("a");
-		appendAttribute("href", linkUrl);
-		appendBody(linkLabel);
-		endTag();
+		// appendStartTag("a");
+		// appendAttribute("href", linkUrl);
+		// appendBody(linkLabel);
+		// endTag();
 	}
 
 	/**
@@ -125,12 +125,12 @@ public class TextWriter extends AbstractContentsWriter {
 	 */
 	public void appendTableCell(String value, boolean header) {
 		if (header) {
-			appendStartTag("th");
+			// appendStartTag("th");
 		} else {
-			appendStartTag("td");
+			// appendStartTag("td");
 		}
-		appendBody(value);
-		endTag();
+		// appendBody(value);
+		// endTag();
 	}
 
 	/**
@@ -141,21 +141,16 @@ public class TextWriter extends AbstractContentsWriter {
 	 */
 	public void appendHeading(int level, String body) {
 		String tag = "h" + level;
-		appendStartTag(tag);
-		appendBody(body);
-		endTag();
+		// appendStartTag(tag);
+		// appendBody(body);
+		// endTag();
 	}
 
 	/**
 	 * <br/> を追加する
 	 */
 	public void appendBr() {
-		appendBody("<br/>");
-	}
-
-	public int nextIndex() {
-		int idx = buf.length();
-		return (closed) ? idx : idx + 1;
+		// appendBody("<br/>");
 	}
 
 	/**
@@ -174,11 +169,6 @@ public class TextWriter extends AbstractContentsWriter {
 	 *             タグが閉じていない状態で書き込みを行った場合
 	 */
 	public void write() throws IOException {
-
-		if (!closed) {
-			throw new IllegalStateException(
-					"Cannot write until current element will be closed.");
-		}
 		writer.write(buf.toString());
 		buf = new StringBuffer();
 	}

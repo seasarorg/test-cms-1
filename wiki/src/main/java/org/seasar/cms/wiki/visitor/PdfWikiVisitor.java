@@ -65,8 +65,9 @@ import org.seasar.cms.wiki.parser.WikiTable;
 import org.seasar.cms.wiki.parser.WikiTablecolumn;
 import org.seasar.cms.wiki.parser.WikiTablemember;
 import org.seasar.cms.wiki.util.ColorUtils;
+import org.seasar.cms.wiki.util.GenerateNodeHelper;
+import org.seasar.cms.wiki.util.ImageUtils;
 import org.seasar.cms.wiki.util.VisitorUtils;
-import org.seasar.cms.wiki.util.WikiHelper;
 import org.seasar.cms.wiki.visitor.pdf.CJKSplitCharacter;
 import org.seasar.cms.wiki.visitor.pdf.PdfCmsPageEvents;
 import org.seasar.cms.wiki.visitor.pdf.PdfUtils;
@@ -422,17 +423,17 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 
 	private com.lowagie.text.List startList(int type) {
 		com.lowagie.text.List e = null;
-		if (type == WikiHelper.LIST_TYPE_NORMAL) {
+		if (type == GenerateNodeHelper.LIST_TYPE_NORMAL) {
 			e = new com.lowagie.text.List(false, LIST_INDENT);
-		} else if (type == WikiHelper.LIST_TYPE_NUMERICAL) {
+		} else if (type == GenerateNodeHelper.LIST_TYPE_NUMERICAL) {
 			e = new com.lowagie.text.List(true, LIST_INDENT);
 		}
 		return e;
 	}
 
 	private boolean isSametype(com.lowagie.text.List list, int type) {
-		return (!list.isNumbered() && type == WikiHelper.LIST_TYPE_NORMAL)
-				|| (list.isNumbered() && type == WikiHelper.LIST_TYPE_NUMERICAL);
+		return (!list.isNumbered() && type == GenerateNodeHelper.LIST_TYPE_NORMAL)
+				|| (list.isNumbered() && type == GenerateNodeHelper.LIST_TYPE_NUMERICAL);
 	}
 
 	public Object visit(WikiListMember node, Object data) {
@@ -654,7 +655,7 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 			Table t = (Table) data;
 			for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 				Properties p = PdfUtils.getDefaultfontProperties(defaultFont_);
-				if (node.type == WikiHelper.TABLE_TYPE_HEADER) {
+				if (node.type == GenerateNodeHelper.TABLE_TYPE_HEADER) {
 					p.setProperty(ElementTags.STYLE, MarkupTags.CSS_BOLD);
 					p.setProperty(ElementTags.BACKGROUNDCOLOR, "#C0C0C0");
 				}
@@ -762,7 +763,8 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 		// PluginRequest prequest = VisitorUtils.createPluginRequest(node);
 		// String childStr = getChildAsString(node, data, 0);
 		// if (childStr != null && !Constants.LINEBREAK_CODE.equals(childStr)) {
-		// prequest.setChild(WikiHelper.deleteParenthesis(childStr, "{", "}"));
+		// prequest.setChild(GenerateNodeHelper.deleteParenthesis(childStr, "{",
+		// "}"));
 		// }
 		//
 		// if (config_.isPluginLoaded(name)) {
@@ -803,7 +805,7 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 
 		Element e = null;
 
-		if (node.isURL && !WikiHelper.isImage(node.letter)) {
+		if (node.isURL && !ImageUtils.isImage(node.letter)) {
 			e = new Anchor(node.letter);
 			((Anchor) e).setReference(node.letter);
 		}
@@ -832,7 +834,7 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 			e = Chunk.NEWLINE;
 		}
 
-		if (node.isURL && WikiHelper.isImage(node.letter)) {
+		if (node.isURL && ImageUtils.isImage(node.letter)) {
 			try {
 				Image img = Image.getInstance(new URL(node.letter));
 				img.setAlignment(Image.MIDDLE | Image.TEXTWRAP);
@@ -921,31 +923,34 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 	}
 
 	public Object visit(WikiLink node, Object data) {
-		String[] s = WikiHelper.split(node.image, WikiHelper.LINK_DELIMITER);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.LINK_DELIMITER);
 		Anchor a = new Anchor(s[0], defaultFont_);
 		a.setReference(s[1]);
 		return a;
 	}
 
 	public Object visit(WikiAlias node, Object data) {
-		String[] s = WikiHelper.split(node.image, WikiHelper.ALIAS_DELIMITER);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.ALIAS_DELIMITER);
 
 		Element e = null;
 		if (node.islink) { // URL case, same as WikiLink
 			e = new Anchor(s[0], defaultFont_);
 			((Anchor) e).setReference(s[1]);
 		} else {
-			String[] t = WikiHelper.split(s[1], WikiHelper.ANCHOR_MARK);
+			String[] t = GenerateNodeHelper.split(s[1],
+					GenerateNodeHelper.ANCHOR_MARK);
 			// try {
 			// if (t[0] == null || t[0].equals("")) {// only anchors, local
 			// // reference
 			// e = new Anchor(s[0], defaultFont_);
-			// ((Anchor) e).setReference(WikiHelper.ANCHOR_MARK + t[1]);
+			// ((Anchor) e).setReference(GenerateNodeHelper.ANCHOR_MARK + t[1]);
 			// } else if (ctx.isPageExist(t[0], request_)) {
 			// URL url = ctx.getURLByName(t[0], request_);
 			// String ref = url.toString();
 			// if (t[1] != null && !t[1].equals(""))
-			// ref += WikiHelper.ANCHOR_MARK + t[1];
+			// ref += GenerateNodeHelper.ANCHOR_MARK + t[1];
 			//
 			// e = new Anchor(s[0], defaultFont_);
 			// ((Anchor) e).setReference(ref);
@@ -961,7 +966,8 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 	}
 
 	public Object visit(WikiPagename node, Object data) {
-		String[] s = WikiHelper.split(node.image, WikiHelper.ANCHOR_MARK);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.ANCHOR_MARK);
 		Element e = null;
 		// try {
 		// if (ctx.isPageExist(s[0], request_)) {
@@ -969,7 +975,7 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 		// e = new Anchor(s[0], defaultFont_);
 		// String ref = url.toString();
 		// if (s[1] != null && !s[1].equals(""))
-		// ref = ref + WikiHelper.ANCHOR_MARK + s[1];
+		// ref = ref + GenerateNodeHelper.ANCHOR_MARK + s[1];
 		// ((Anchor) e).setReference(ref);
 		// }
 		// } catch (TgwSecurityException tse) {

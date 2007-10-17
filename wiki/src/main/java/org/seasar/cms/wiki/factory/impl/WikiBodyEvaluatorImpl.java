@@ -1,9 +1,9 @@
-package org.seasar.cms.wiki.engine.plugin.impl;
+package org.seasar.cms.wiki.factory.impl;
 
 import java.util.List;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiBodyEvaluator;
 
 public class WikiBodyEvaluatorImpl implements WikiBodyEvaluator {
 

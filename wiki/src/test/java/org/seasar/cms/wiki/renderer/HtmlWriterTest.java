@@ -27,130 +27,129 @@ import org.xml.sax.SAXException;
  * @author someda
  */
 public class HtmlWriterTest extends XMLTestCase {
-	
+
 	private HtmlWriter htmlWriter;
-	
+
 	private StringWriter stringWriter;
-	
-	protected void setUp(){
+
+	protected void setUp() {
 		init();
-	}	
-	
-	private void init(){
-		stringWriter = new StringWriter();
-		htmlWriter = new HtmlWriter(stringWriter);		
 	}
 
-	public void testBr(){		
-		htmlWriter.appendBr();
-		
-		String expected = "<br/>";
-		doTest(expected);		
+	private void init() {
+		stringWriter = new StringWriter();
+		htmlWriter = new HtmlWriter(stringWriter);
 	}
-	
-	public void testStrong(){
-		
-		htmlWriter.appendStartTag("strong");
-		htmlWriter.appendBody("emphasis");
-		htmlWriter.endTag();
-		
+
+	public void testBr() {
+		htmlWriter.appendBr();
+
+		String expected = "<br/>";
+		doTest(expected);
+	}
+
+	public void testStrong() {
+
+		htmlWriter.start("strong");
+		htmlWriter.body("emphasis");
+		htmlWriter.end();
+
 		String expected = "<strong>emphasis</strong>";
 		doTest(expected);
 	}
-	
-	public void testImage(){
-		
-		htmlWriter.appendStartTag("img");
-		htmlWriter.appendAttribute("src","/images/test.gif");
-		htmlWriter.endTag();
-		
-		String expected = "<img src=\"/images/test.gif\"/>";		
+
+	public void testImage() {
+
+		htmlWriter.start("img");
+		htmlWriter.attr("src", "/images/test.gif");
+		htmlWriter.end();
+
+		String expected = "<img src=\"/images/test.gif\"/>";
 		doTest(expected);
 	}
-	
-	public void testAnchor(){
-				
-		htmlWriter.appendAnchor("http://www.google.co.jp/","google");
+
+	public void testAnchor() {
+
+		htmlWriter.appendAnchor("http://www.google.co.jp/", "google");
 		String expected = "<a href=\"http://www.google.co.jp/\">google</a>";
 		doTest(expected);
-		
-		htmlWriter.appendAnchor("someda@isenshi.com","someda",true);	
-		expected = "<a href=\"mailto:someda@isenshi.com\">someda</a>";		
+
+		htmlWriter.appendAnchor("someda@isenshi.com", "someda", true);
+		expected = "<a href=\"mailto:someda@isenshi.com\">someda</a>";
 		doTest(expected);
 	}
-	
-	public void testHeading(){
-		
-		htmlWriter.appendHeading(2,"heading2");
-		String expected =  "<h2>heading2</h2>";		
-		doTest(expected);		
-		
-		htmlWriter.appendHeading(3,"heading3");
+
+	public void testHeading() {
+
+		htmlWriter.appendHeading(2, "heading2");
+		String expected = "<h2>heading2</h2>";
+		doTest(expected);
+
+		htmlWriter.appendHeading(3, "heading3");
 		expected = "<h3>heading3</h3>";
-		doTest(expected);		
-		
-		htmlWriter.appendHeading(4,"heading4");	
-		expected ="<h4>heading4</h4>";		
-		doTest(expected);		
-	}
-	
-	public void testList(){
-		
-		htmlWriter.appendStartTag("ul");
-		htmlWriter.appendStartTag("li");
-		htmlWriter.appendBody("list1");
-		htmlWriter.endAllTags();
-		
-		String expected = "<ul><li>list1</li></ul>";		
+		doTest(expected);
+
+		htmlWriter.appendHeading(4, "heading4");
+		expected = "<h4>heading4</h4>";
 		doTest(expected);
 	}
-	
-	public void testTable(){
-		
-		htmlWriter.appendStartTag("table");						
-		htmlWriter.appendStartTag("tr");		
-		htmlWriter.appendTableCell("cell1",true);
-		htmlWriter.appendTableCell("cell2",true);
-		htmlWriter.endTag();
-		htmlWriter.appendStartTag("tr");
-		htmlWriter.appendTableCell("cell3",false);
-		htmlWriter.appendTableCell("cell4",false);
-		htmlWriter.endAllTags();
-		
+
+	public void testList() {
+
+		htmlWriter.start("ul");
+		htmlWriter.start("li");
+		htmlWriter.body("list1");
+		htmlWriter.endAll();
+
+		String expected = "<ul><li>list1</li></ul>";
+		doTest(expected);
+	}
+
+	public void testTable() {
+
+		htmlWriter.start("table");
+		htmlWriter.start("tr");
+		htmlWriter.appendTableCell("cell1", true);
+		htmlWriter.appendTableCell("cell2", true);
+		htmlWriter.end();
+		htmlWriter.start("tr");
+		htmlWriter.appendTableCell("cell3", false);
+		htmlWriter.appendTableCell("cell4", false);
+		htmlWriter.endAll();
+
 		String expected = "<table><tr><th>cell1</th><th>cell2</th></tr><tr><td>cell3</td><td>cell4</td></tr></table>";
 		doTest(expected);
-	}	
-	
-	public void testParagraph(){
-		
-		htmlWriter.appendStartTag("p");
-		htmlWriter.appendBody("段落の始まりの途中で");
-		htmlWriter.appendStartTag("span");
-		htmlWriter.appendAttribute("style","color:red;");
-		htmlWriter.appendBody("赤い文字になり");
-		htmlWriter.endTag();
-		htmlWriter.appendBody("また戻る。");
-		htmlWriter.endTag();
-		
+	}
+
+	public void testParagraph() {
+
+		htmlWriter.start("p");
+		htmlWriter.body("段落の始まりの途中で");
+		htmlWriter.start("span");
+		htmlWriter.attr("style", "color:red;");
+		htmlWriter.body("赤い文字になり");
+		htmlWriter.end();
+		htmlWriter.body("また戻る。");
+		htmlWriter.end();
+
 		String expected = "<p>段落の始まりの途中で<span style=\"color:red;\">赤い文字になり</span>また戻る。</p>";
 		doTest(expected);
 	}
-		
-	private void doTest(String expected){
-		try{
-			htmlWriter.write();
-			htmlWriter.flush();			
+
+	private void doTest(String expected) {
+		try {
+			htmlWriter.flush();
 			String generated = stringWriter.toString();
-			System.out.println(generated);			
-			assertXMLEqual(expected,generated);			
-		}catch(IOException e){
+			// System.out.println(generated);
+			assertXMLEqual(expected, generated);
+		} catch (IOException e) {
 			fail();
-		}catch(ParserConfigurationException e){
+		} catch (ParserConfigurationException e) {
 			fail();
-		}catch(SAXException e){
+		} catch (SAXException e) {
 			fail();
 		}
-		init();		
+		init();
 	}
 
 }

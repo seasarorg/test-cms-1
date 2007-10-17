@@ -13,9 +13,9 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.cms.wiki.visitor;
+package org.seasar.cms.wiki.renderer;
 
-import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,9 +23,9 @@ import java.util.Map;
 
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.plugin.PluginExecuter;
-import org.seasar.cms.wiki.engine.plugin.WikiBodyEvaluator;
 import org.seasar.cms.wiki.engine.plugin.WikiPageLink;
-import org.seasar.cms.wiki.factory.WikiLinkFactory;
+import org.seasar.cms.wiki.factory.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.SimpleNode;
 import org.seasar.cms.wiki.parser.WikiAlias;
@@ -61,11 +61,11 @@ import org.seasar.cms.wiki.parser.WikiSyntaxError;
 import org.seasar.cms.wiki.parser.WikiTable;
 import org.seasar.cms.wiki.parser.WikiTablecolumn;
 import org.seasar.cms.wiki.parser.WikiTablemember;
-import org.seasar.cms.wiki.renderer.HtmlWriter;
-import org.seasar.cms.wiki.util.WikiStringUtils;
+import org.seasar.cms.wiki.util.GenerateNodeHelper;
+import org.seasar.cms.wiki.util.ImageUtils;
 import org.seasar.cms.wiki.util.NodeUtils;
 import org.seasar.cms.wiki.util.VisitorUtils;
-import org.seasar.cms.wiki.util.WikiHelper;
+import org.seasar.cms.wiki.util.WikiStringUtils;
 
 /**
  * @author someda
@@ -100,7 +100,7 @@ public class HtmlVisitor implements WikiParserVisitor {
 	}
 
 	public Object visit(WikiSkipToNewline node, Object data) {
-		writer.appendBody(WikiStringUtils.escape(node.letter));
+		writer.body(WikiStringUtils.escape(node.letter));
 		return null;
 	}
 
@@ -111,22 +111,12 @@ public class HtmlVisitor implements WikiParserVisitor {
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			node.jjtGetChild(i).jjtAccept(this, data);
 		}
-
 		processAnnotations(node, data);
-
-		try {
-			writer.write();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return writer.toString();
+		return null;
 	}
 
 	public Object visit(WikiParagraph node, Object data) {
-		writer.appendStartTag("p");
-		processChildren(node, data);
-		writer.endTag();
+		processBlockElement("p", node, data);
 		return null;
 	}
 
@@ -135,7 +125,7 @@ public class HtmlVisitor implements WikiParserVisitor {
 		boolean isTagNeed = VisitorUtils.isExcerptStartNeeded(node);
 
 		if (isTagNeed) {
-			writer.appendStartTag("blockquote");
+			writer.start("blockquote");
 		}
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			// if child is paragraph, not generate <p> tag
@@ -148,7 +138,7 @@ public class HtmlVisitor implements WikiParserVisitor {
 		}
 		changeTabAndNewlineState(true);
 		if (isTagNeed)
-			writer.endTag();
+			writer.end();
 		return null;
 	}
 
@@ -172,17 +162,17 @@ public class HtmlVisitor implements WikiParserVisitor {
 				} else if (curlevel < prelevel) { // downward level change
 					for (int j = curlevel; j < prelevel; j++) {
 						if (level[j] != 0) {
-							writer.endTag();
+							writer.end();
 							level[j] = 0;
 						}
 					}
 					if (level[curlevel - 1] != curtype) {
-						writer.endTag();
+						writer.end();
 						startListTag(curtype);
 					}
 				} else { // if (curtype != pretype) {
 					// not level change but type change
-					writer.endTag();
+					writer.end();
 					startListTag(curtype);
 				}
 				level[curlevel - 1] = curtype;
@@ -197,29 +187,27 @@ public class HtmlVisitor implements WikiParserVisitor {
 		// close all list related tag
 		for (int i = 0; i < level.length; i++) {
 			if (level[i] != 0) {
-				writer.endTag();
+				writer.end();
 			}
 		}
 		return null;
 	}
 
 	public Object visit(WikiDefineList node, Object data) {
-		writer.appendStartTag("dl");
-		processChildren(node, data);
-		writer.endTag();
+		processBlockElement("dl", node, data);
 		return null;
 	}
 
 	public Object visit(WikiPreshaped node, Object data) {
-		writer.appendStartTag("pre");
+		writer.start("pre");
 		changeTabAndNewlineState(false);
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			node.jjtGetChild(i).jjtAccept(this, data);
-			writer.appendBody("\n");
+			writer.body("\n");
 		}
-		writer.setNewline(true);
-		writer.endTag();
-		writer.setTab(true);
+		writer.enableLineBreak();
+		writer.end();
+		writer.enableTab();
 		return null;
 	}
 
@@ -234,7 +222,6 @@ public class HtmlVisitor implements WikiParserVisitor {
 	}
 
 	public Object visit(WikiTablecolumn node, Object data) {
-
 		if (!node.iscolspan && !node.isrowspan) {
 			Map<String, String> attrs = new HashMap<String, String>();
 			String str = getChildString(node, data, 0);
@@ -264,12 +251,7 @@ public class HtmlVisitor implements WikiParserVisitor {
 				attrs.put("rowspan", ++node.rowspannum + "");
 			}
 
-			writer.appendStartTag("td");
-			for (String key : attrs.keySet()) {
-				writer.appendAttribute(key, attrs.get(key));
-			}
-			writer.appendBody(str);
-			writer.endTag();
+			writer.start("td").attrs(attrs).body(str).end();
 		}
 		return null;
 	}
@@ -312,24 +294,19 @@ public class HtmlVisitor implements WikiParserVisitor {
 	}
 
 	public Object visit(WikiAlign node, Object data) {
-
 		String align = node.image.toLowerCase().substring(0,
 				node.image.length() - 1);
-		writer.appendStartTag("div");
-		writer.appendAttribute("align", align);
-		processChildren(node, data);
-		writer.endTag();
+		processBlockElement("div", "align", align, node, data);
 		return null;
 	}
 
 	public Object visit(WikiFloatAlign node, Object data) {
-
 		String align = node.image.toLowerCase().substring(1,
 				node.image.length() - 1);
 		int idx = 0;
 		String widthStr = null;
 		if ((idx = align.indexOf("(")) != -1) {
-			widthStr = WikiHelper.deleteParenthesis(align, "(", ")");
+			widthStr = GenerateNodeHelper.deleteParenthesis(align, "(", ")");
 			align = align.substring(0, idx);
 		}
 		String style = "float:" + align + ";";
@@ -337,16 +314,12 @@ public class HtmlVisitor implements WikiParserVisitor {
 			style += "width: " + widthStr + "px;";
 		}
 
-		writer.appendStartTag("div");
-		writer.appendAttribute("style", style);
-		processChildren(node, data);
-		writer.endTag();
+		processBlockElement("div", "style", style, node, data);
 		return null;
 	}
 
 	public Object visit(WikiHorizontalline node, Object data) {
-		writer.appendStartTag("hr");
-		writer.endTag();
+		writer.start("hr").end();
 		return null;
 	}
 
@@ -364,35 +337,32 @@ public class HtmlVisitor implements WikiParserVisitor {
 
 	public Object visit(WikiLetters node, Object data) {
 		changeTabAndNewlineState(false);
-		String letters = (node.isHTMLescape) ? WikiStringUtils.escape(node.letter)
-				: node.letter;
+		String letters = (node.isHTMLescape) ? WikiStringUtils
+				.escape(node.letter) : node.letter;
 
 		WikiBodyEvaluator evaluator = context.getEngine().getBodyEvaluator();
-		String bodyString = evaluator.eval(context, letters);
+		String body = evaluator.eval(context, letters);
+		String letter = node.letter;
+
 		if (node.isEmail) {
-			writer.appendAnchor("mailto:" + node.letter, bodyString);
+			writer.appendAnchor("mailto:" + node.letter, body);
 		} else if (node.isURL) {
-			if (WikiHelper.isImage(node.letter)) {
-				writer.appendStartTag("a");
-				writer.appendAttribute("href", node.letter);
-				writer.appendStartTag("img");
-				writer.appendAttribute("src", node.letter);
-				writer.appendAttribute("alt", bodyString);
-				writer.endTag();
-				writer.endTag();
+			if (ImageUtils.isImage(node.letter)) {
+				writer.start("a").attr("href", letter);
+				writer.start("img").attr("src", letter).attr("alt", body);
+				writer.end().end();
 			} else {
-				writer.appendAnchor(node.letter, bodyString);
+				writer.appendAnchor(node.letter, body);
 			}
 		} else if (node.isAnchor) {
-			String id = (node.letter.startsWith("#")) ? node.letter
-					.substring(1) : node.letter;
-			appendSuper(writer, id, "anchor_super", bodyString, "&nbsp;");
+			String id = (letter.startsWith("#")) ? letter.substring(1) : letter;
+			appendSuper(writer, id, "anchor_super", body, "&nbsp;");
 		} else if (node.isWikiname) {
-			processLink(node.letter, bodyString, null);
+			processLink(node.letter, body, null);
 		} else if (node.isNewline) {
 			writer.appendBr();
 		} else {
-			writer.appendBody(bodyString);
+			writer.body(body);
 		}
 		changeTabAndNewlineState(true);
 		return null;
@@ -404,12 +374,12 @@ public class HtmlVisitor implements WikiParserVisitor {
 		changeTabAndNewlineState(false);
 
 		if (VisitorUtils.isBold(node)) {
-			writer.appendStartTag("strong");
+			writer.start("strong");
 			tag++;
 		}
 
 		if (VisitorUtils.isItalic(node)) {
-			writer.appendStartTag("em");
+			writer.start("em");
 			tag++;
 		}
 
@@ -417,7 +387,7 @@ public class HtmlVisitor implements WikiParserVisitor {
 		String post = VisitorUtils.getAppendString(node, false);
 
 		if (pre != null) {
-			writer.appendBody(pre);
+			writer.body(pre);
 		}
 
 		processChildren(node, data);
@@ -425,10 +395,10 @@ public class HtmlVisitor implements WikiParserVisitor {
 		changeTabAndNewlineState(false);
 
 		if (post != null) {
-			writer.appendBody(post);
+			writer.body(post);
 		}
 		for (int i = 0; i < tag; i++) {
-			writer.endTag();
+			writer.end();
 		}
 		return null;
 	}
@@ -454,38 +424,44 @@ public class HtmlVisitor implements WikiParserVisitor {
 	}
 
 	public Object visit(WikiAnnotation node, Object data) {
-		writer.setNewline(false);
-		writer.appendStartTag("a");
-		writer.appendAttribute("id", ANNOTATION_TEXT_PREFIX + node.num);
-		writer.appendAttribute("class", ANNOTATION_NOTE_CLASS);
-		writer.appendAttribute("href", "#" + ANNOTATION_FOOT_PREFIX + node.num);
-		writer.appendBody("*" + node.num);
-		writer.endTag();
-		writer.setNewline(true);
+		String id = ANNOTATION_TEXT_PREFIX + node.num;
+		String href = "#" + ANNOTATION_FOOT_PREFIX + node.num;
+		String clazz = ANNOTATION_NOTE_CLASS;
+		String body = "*" + node.num;
+
+		writer.disableLineBreak();
+		writer.start("a").attr("id", id).attr("class", clazz)
+				.attr("href", href).body(body).end();
+		writer.enableLineBreak();
 		return null;
 	}
 
 	// interwiki not implemented...
 	public Object visit(WikiInterwiki node, Object data) {
-		writer.appendBody("[[" + node.image + "]]");
+		writer.body("[[" + node.image + "]]");
 		return null;
 	}
 
 	public Object visit(WikiLink node, Object data) {
-		String[] s = WikiHelper.split(node.image, WikiHelper.LINK_DELIMITER);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.LINK_DELIMITER);
 		writer.appendAnchor(s[1], s[0], true);
 		return null;
 	}
 
 	public Object visit(WikiAlias node, Object data) {
-		String[] s = WikiHelper.split(node.image, WikiHelper.ALIAS_DELIMITER);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.ALIAS_DELIMITER);
 		changeTabAndNewlineState(false);
 		if (node.islink) {
 			writer.appendAnchor(s[1], s[0], true);
 		} else {
-			String[] t = WikiHelper.split(s[1], WikiHelper.ANCHOR_MARK);
+			String[] t = GenerateNodeHelper.split(s[1],
+					GenerateNodeHelper.ANCHOR_MARK);
 			if (t[0] == null || t[0].equals("")) {
-				writer.appendAnchor(WikiHelper.ANCHOR_MARK + t[1], s[0]);
+				writer
+						.appendAnchor(GenerateNodeHelper.ANCHOR_MARK + t[1],
+								s[0]);
 			} else {
 				processLink(t[0], s[0], t[1]);
 			}
@@ -495,7 +471,8 @@ public class HtmlVisitor implements WikiParserVisitor {
 	}
 
 	public Object visit(WikiPagename node, Object data) {
-		String[] s = WikiHelper.split(node.image, WikiHelper.ANCHOR_MARK);
+		String[] s = GenerateNodeHelper.split(node.image,
+				GenerateNodeHelper.ANCHOR_MARK);
 		changeTabAndNewlineState(false);
 		processLink(s[0], s[0], s[1]);
 		changeTabAndNewlineState(true);
@@ -527,12 +504,12 @@ public class HtmlVisitor implements WikiParserVisitor {
 
 	public Object visit(WikiAnyOther node, Object data) {
 		changeTabAndNewlineState(false);
-		writer.appendBody(node.letter);
+		writer.body(node.letter);
 		return null;
 	}
 
 	public void write(String body) {
-		writer.appendBody(body);
+		writer.body(body);
 	}
 
 	// ------------- private methods --------------------------
@@ -542,19 +519,16 @@ public class HtmlVisitor implements WikiParserVisitor {
 			return;
 		}
 
-		writer.appendStartTag("hr");
-		writer.appendAttribute("class", "note_hr");
-		writer.appendAttribute("align", "left");
-		writer.endTag();
+		writer.start("hr").attr("class", "note_hr").attr("align", "left").end();
 		Iterator itr = node.annotation.iterator();
 		int idx = 1;
-		writer.setNewline(false);
+		writer.disableLineBreak();
 		while (itr.hasNext()) {
-			writer.setTab(false);
+			writer.disableTab();
 			appendSuper(writer, ANNOTATION_FOOT_PREFIX + idx,
-					ANNOTATION_NOTE_CLASS, WikiHelper.ANCHOR_MARK
+					ANNOTATION_NOTE_CLASS, GenerateNodeHelper.ANCHOR_MARK
 							+ ANNOTATION_TEXT_PREFIX + idx, "*" + idx);
-			writer.setTab(true);
+			writer.enableTab();
 
 			SimpleNode n = (SimpleNode) itr.next();
 			for (int i = 0; i < n.jjtGetNumChildren(); i++) {
@@ -563,24 +537,42 @@ public class HtmlVisitor implements WikiParserVisitor {
 			writer.appendBr();
 			idx++;
 		}
-		writer.setNewline(true);
+		writer.enableLineBreak();
+	}
+
+	private void processBlockElement(String tag, Node node, Object data) {
+		processBlockElement(tag, null, null, node, data);
+	}
+
+	private void processBlockElement(String tag, String attrKey,
+			String attrValue, Node node, Object data) {
+		writer.start(tag);
+		if (attrKey != null) {
+			writer.attr(attrKey, attrValue);
+		}
+		processChildren(node, data);
+		writer.end();
 	}
 
 	private void processElement(String tag, Node node, Object data) {
 		if (node.jjtGetNumChildren() == 0) {
 			return;
 		}
-		writer.appendStartTag(tag);
+		writer.start(tag);
 		processChildren(node, data);
-		writer.setTab(false);
-		writer.endTag();
-		writer.setTab(true);
+		writer.disableTab();
+		writer.end();
+		writer.enableTab();
+	}
+
+	private void processChildren(Node node, Object data, int fromIndex) {
+		for (int i = fromIndex; i < node.jjtGetNumChildren(); i++) {
+			node.jjtGetChild(i).jjtAccept(this, data);
+		}
 	}
 
 	private void processChildren(Node node, Object data) {
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			node.jjtGetChild(i).jjtAccept(this, data);
-		}
+		processChildren(node, data, 0);
 	}
 
 	// shared by WikiTable and WikiCSVTable
@@ -592,27 +584,26 @@ public class HtmlVisitor implements WikiParserVisitor {
 		boolean isBody = false;
 
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-
 			try {
 				WikiTablemember child = (WikiTablemember) node.jjtGetChild(i);
 				if (child.jjtGetNumChildren() != prenum) { // start table
 					if (prenum != 0) {
 						if (isBody)
-							writer.endTag();
-						writer.endTag();
+							writer.end();
+						writer.end();
 						isBody = false;
 						open--;
 					}
-					writer.appendStartTag("table");
+					writer.start("table");
 					open++;
 				}
 				if (!isBody) {
-					if (child.type == WikiHelper.TABLE_TYPE_HEADER) {
-						writer.appendStartTag("thead");
-					} else if (child.type == WikiHelper.TABLE_TYPE_FOOTER) {
-						writer.appendStartTag("tfooter");
+					if (child.type == GenerateNodeHelper.TABLE_TYPE_HEADER) {
+						writer.start("thead");
+					} else if (child.type == GenerateNodeHelper.TABLE_TYPE_FOOTER) {
+						writer.start("tfooter");
 					} else {
-						writer.appendStartTag("tbody");
+						writer.start("tbody");
 						isBody = true;
 					}
 				}
@@ -621,92 +612,94 @@ public class HtmlVisitor implements WikiParserVisitor {
 				child.jjtAccept(this, data);
 
 				if (!isBody) {
-					writer.endTag();
+					writer.end();
 				}
 			} catch (ClassCastException cce) {// in-case wikierror
 				while (open > 0) {
 					if (isBody)
-						writer.endTag();
-					writer.endTag();
+						writer.end();
+					writer.end();
 					open--;
 					prenum = 0;
 					isBody = false;
 				}
 				node.jjtGetChild(i).jjtAccept(this, data);
-				writer.setNewline(true);
+				writer.enableLineBreak();
 			}
 		}
 		while (open > 0) {
 			if (isBody)
-				writer.endTag();
-			writer.endTag();
+				writer.end();
+			writer.end();
 			open--;
 		}
 	}
 
-	private String getChildString(SimpleNode node, Object data, int idx) {
-		int start = writer.nextIndex();
-		String childstr = null;
-		writer.setTab(false);
-		for (int i = idx; i < node.jjtGetNumChildren(); i++) {
-			node.jjtGetChild(i).jjtAccept(this, data);
+	private String getChildString(SimpleNode node, Object data, int fromIndex) {
+		HtmlWriter currentWriter = writer;
+		StringWriter sw = new StringWriter();
+		writer = new HtmlWriter(sw);
+		processChildren(node, data, fromIndex);
+		writer = currentWriter;
+		String child = sw.toString();
+		if (child == null || child.equals("")) {
+			return "";
 		}
-		int end = writer.nextIndex();
-		if (start != end)
-			childstr = writer.cut(start, end);
-		writer.setTab(true);
-
-		return childstr;
+		return child;
 	}
 
 	private void processLink(String pagename, String body, String anchor) {
-		WikiLinkFactory linkFactory = context.getEngine().getLinkFactory();
-		WikiPageLink link = linkFactory.create(pagename, body, anchor);
+		WikiPageLinkFactory linkFactory = context.getEngine().getLinkFactory();
+		WikiPageLink link = linkFactory.create(context, pagename, body, anchor);
 		if (!link.hasBody()) {
 			return;
-		} else if (link.hasCreationMark()) {
-			writer.appendAnchor(link.getUrl(), link.getCreationMark());
-			writer.appendStartTag("span");
-			writer.appendAttribute("class", NOTEXIST_CLASS);
-			writer.appendBody(link.getBody());
-			writer.endTag();
-		} else {
-			writer.appendAnchor(link.getUrl(), link.getBody());
+		}
+		if (link.hasPreMsg()) {
+			String msg = link.getPreMsg();
+			writer.start("span").attr("class", NOTEXIST_CLASS).body(msg).end();
+		}
+		writer.appendAnchor(link.getUrl(), link.getBody());
+		if (link.hasPostMsg()) {
+			String msg = link.getPostMsg();
+			writer.start("span").attr("class", NOTEXIST_CLASS).body(msg).end();
 		}
 	}
 
 	private void startListTag(int type) {
-		if (type == WikiHelper.LIST_TYPE_NORMAL) {
-			writer.appendStartTag("ul");
-		} else if (type == WikiHelper.LIST_TYPE_NUMERICAL) {
-			writer.appendStartTag("ol");
+		if (type == GenerateNodeHelper.LIST_TYPE_NORMAL) {
+			writer.start("ul");
+		} else if (type == GenerateNodeHelper.LIST_TYPE_NUMERICAL) {
+			writer.start("ol");
 		}
 	}
 
 	private Object appendError(String str) {
-		writer.setNewline(false);
-		writer.appendStartTag("span");
-		writer.appendAttribute("style", "color:" + FONTCOLOR_ERROR + ";");
-		writer.appendBody(str);
-		writer.endTag();
-		writer.setNewline(true);
+		String style = "color:" + FONTCOLOR_ERROR + ";";
+		writer.disableLineBreak();
+		writer.start("span").attr("style", style).body(str).end();
+		writer.enableLineBreak();
 		return null;
 	}
 
 	private void changeTabAndNewlineState(boolean flag) {
-		writer.setNewline(flag);
-		writer.setTab(flag);
+		if (flag) {
+			writer.enableLineBreak();
+			writer.enableTab();
+		} else {
+			writer.disableTab();
+			writer.disableLineBreak();
+		}
 	}
 
 	private void appendSuper(HtmlWriter buf, String styleId, String styleClass,
 			String href, String body) {
-		buf.appendStartTag("a");
+		buf.start("a");
 		if (styleId != null)
-			buf.appendAttribute("id", styleId);
+			buf.attr("id", styleId);
 		if (styleClass != null)
-			buf.appendAttribute("class", styleClass);
-		buf.appendAttribute("href", href);
-		buf.appendBody(body);
-		buf.endTag();
+			buf.attr("class", styleClass);
+		buf.attr("href", href);
+		buf.body(body);
+		buf.end();
 	}
 }

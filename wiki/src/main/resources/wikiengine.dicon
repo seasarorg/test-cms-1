@@ -5,10 +5,7 @@
 <components>
 
 	<include path="wikiplugin-singleton.dicon"/>
-
-	<component name="wikiLinkFactory" class="org.seasar.cms.wiki.factory.impl.WikiLinkFactoryImpl"/>
-	<component name="wikiBodyEvaluator" class="org.seasar.cms.wiki.engine.plugin.impl.WikiBodyEvaluatorImpl"/>
-	
+        	
 	<component name="pluginExecuter" class="org.seasar.cms.wiki.engine.plugin.impl.PluginExecuterImpl">
 		<initMethod name="addChildExecuter">
 			<arg>
@@ -19,8 +16,11 @@
 		</initMethod>
 	</component>
 
+	<component name="wikiPageLinkFactory" class="org.seasar.cms.wiki.factory.impl.WikiPageLinkFactoryImpl"/>
+	<component name="wikiBodyEvaluator" class="org.seasar.cms.wiki.factory.impl.WikiBodyEvaluatorImpl"/>
     <component name="wikiVisitFactory" class="org.seasar.cms.wiki.factory.impl.WikiVisitorFactoryImpl"/>
     <component name="wikiParserFactory" class="org.seasar.cms.wiki.factory.impl.WikiParserFactoryImpl"/>
+
     <component name="wikiEngine" class="org.seasar.cms.wiki.engine.impl.WikiEngineImpl"/>
 
 </components>

@@ -18,24 +18,33 @@ package org.seasar.cms.wiki.renderer;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.seasar.framework.exception.IORuntimeException;
+
 /**
  * @author someda
  */
-public class HtmlWriter extends AbstractContentsWriter {
+public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 
 	private static final String NEWLINE = "\n";
 
-	private StringBuffer buf;
+	private IOException error = null;
 
 	public HtmlWriter(Writer writer) {
 		super(writer);
-		buf = new StringBuffer();
 	}
 
 	// ----- [Start] Abstract メソッドの実装 -----
 
 	protected void doAppend(String character) {
-		buf.append(character);
+		try {
+			super.write(character);
+		} catch (IOException e) {
+			throw new IORuntimeException(e);
+		}
+	}
+
+	public IOException getError() {
+		return error;
 	}
 
 	protected void doAppendAttribute(String name, String value) {
@@ -65,7 +74,6 @@ public class HtmlWriter extends AbstractContentsWriter {
 	 *            真の場合、メールアドレスかどうかのチェック(@を含んでいるか)を行い、パスすれば"mailto:"がlinkUrlに付与される。
 	 */
 	public void appendAnchor(String linkUrl, String linkLabel, boolean mailCheck) {
-
 		if (mailCheck) {
 			if (linkUrl.indexOf("@") != -1) {
 				linkUrl = "mailto:" + linkUrl;
@@ -81,10 +89,10 @@ public class HtmlWriter extends AbstractContentsWriter {
 	 * @param linkLabel
 	 */
 	public void appendAnchor(String linkUrl, String linkLabel) {
-		appendStartTag("a");
-		appendAttribute("href", linkUrl);
-		appendBody(linkLabel);
-		endTag();
+		start("a");
+		attr("href", linkUrl);
+		body(linkLabel);
+		end();
 	}
 
 	/**
@@ -95,12 +103,12 @@ public class HtmlWriter extends AbstractContentsWriter {
 	 */
 	public void appendTableCell(String value, boolean header) {
 		if (header) {
-			appendStartTag("th");
+			start("th");
 		} else {
-			appendStartTag("td");
+			start("td");
 		}
-		appendBody(value);
-		endTag();
+		body(value);
+		end();
 	}
 
 	/**
@@ -111,30 +119,16 @@ public class HtmlWriter extends AbstractContentsWriter {
 	 */
 	public void appendHeading(int level, String body) {
 		String tag = "h" + level;
-		appendStartTag(tag);
-		appendBody(body);
-		endTag();
+		start(tag);
+		body(body);
+		end();
 	}
 
 	/**
 	 * <br/> を追加する
 	 */
 	public void appendBr() {
-		appendBody("<br/>");
-	}
-
-	public int nextIndex() {
-		int idx = buf.length();
-		return (closed) ? idx : idx + 1;
-	}
-
-	/**
-	 * 指定した範囲の文字列を切り出し返す。 なお、切り出された文字列はバッファから削除される。
-	 */
-	public String cut(int start, int end) {
-		String s = buf.substring(start, end);
-		buf.delete(start, end);
-		return s;
+		body("<br/>");
 	}
 
 	/**
@@ -143,21 +137,40 @@ public class HtmlWriter extends AbstractContentsWriter {
 	 * @throws IllegalStateException
 	 *             タグが閉じていない状態で書き込みを行った場合
 	 */
-	public void write() throws IOException {
-
+	public void close() throws IOException {
 		if (!closed) {
 			throw new IllegalStateException(
 					"Cannot write until current element will be closed.");
 		}
-		writer.write(buf.toString());
-		buf = new StringBuffer();
+		super.close();
 	}
 
-	public void setNewline(boolean flag) {
+	private void setNewline(boolean flag) {
 		this.appendNewline = flag;
 	}
 
-	public void setTab(boolean flag) {
+	private void setTab(boolean flag) {
 		this.appendNewline = flag;
 	}
+
+	public HtmlWriter enableTab() {
+		setTab(true);
+		return this;
+	}
+
+	public HtmlWriter disableTab() {
+		setTab(false);
+		return this;
+	}
+
+	public HtmlWriter enableLineBreak() {
+		setNewline(true);
+		return this;
+	}
+
+	public HtmlWriter disableLineBreak() {
+		setNewline(false);
+		return this;
+	}
+
 }
