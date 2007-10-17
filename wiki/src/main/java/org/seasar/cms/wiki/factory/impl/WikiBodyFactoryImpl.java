@@ -10,7 +10,7 @@ public class WikiBodyFactoryImpl implements WikiBodyFactory {
 	private static final String TAG_SPAN_HIGHLIGHT = "<span class=\"highlight\">%s</span>";
 
 	public String eval(WikiContext context, String body) {
-		if (!"html".equals(context.getOutputType())) {
+		if (!"html".equals(context.getNamespace())) {
 			return body;
 		}
 

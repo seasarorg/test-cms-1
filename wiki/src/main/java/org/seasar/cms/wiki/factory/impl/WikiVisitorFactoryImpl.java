@@ -6,24 +6,22 @@ import java.io.Writer;
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 import org.seasar.cms.wiki.parser.WikiParserVisitor;
-import org.seasar.cms.wiki.renderer.HtmlWikiVisitor;
+import org.seasar.cms.wiki.renderer.WikiOutputStreamVisitor;
 import org.seasar.cms.wiki.renderer.WikiWriterVisitor;
+import org.seasar.framework.container.S2Container;
 
 public class WikiVisitorFactoryImpl implements WikiVisitorFactory {
 
-	enum Type {
-		html, pdf, txt
+	private S2Container container;
+
+	public void setContainer(S2Container container) {
+		this.container = container;
 	}
 
 	public WikiParserVisitor create(WikiContext context, Writer writer) {
-		WikiWriterVisitor visitor = null;
-		switch (Type.valueOf(context.getOutputType())) {
-		case html:
-			visitor = new HtmlWikiVisitor();
-		case txt:
-		case pdf:
-			break;
-		}
+		String visitorName = context.getNamespace() + "Visitor";
+		WikiWriterVisitor visitor = (WikiWriterVisitor) container
+				.getComponent(visitorName);
 		if (visitor != null) {
 			visitor.init(context, writer);
 		}
@@ -31,13 +29,12 @@ public class WikiVisitorFactoryImpl implements WikiVisitorFactory {
 	}
 
 	public WikiParserVisitor create(WikiContext context, OutputStream stream) {
-		switch (Type.valueOf(context.getOutputType())) {
-		case pdf:
-			//return new PdfWikiVisitor(stream);
-		case txt:
-		case html:
-			break;
+		String visitorName = context.getNamespace() + "Visitor";
+		WikiOutputStreamVisitor visitor = (WikiOutputStreamVisitor) container
+				.getComponent(visitorName);
+		if (visitor != null) {
+			visitor.init(context, stream);
 		}
-		return null;
+		return visitor;
 	}
 }

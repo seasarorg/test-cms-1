@@ -80,6 +80,7 @@ public abstract class AbstractContentsWriter<E> extends WriterWrapper {
 		return (E) this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public E end() {
 		String name = doTagPop();
 		if (closed) {
@@ -92,6 +93,7 @@ public abstract class AbstractContentsWriter<E> extends WriterWrapper {
 		return (E) this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public E endAll() {
 		Iterator itr = elementStack.iterator();
 		while (itr.hasNext()) {

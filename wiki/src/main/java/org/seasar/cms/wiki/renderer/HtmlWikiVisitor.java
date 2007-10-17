@@ -68,6 +68,7 @@ import org.seasar.cms.wiki.util.WikiStringUtils;
 
 /**
  * @author someda
+ * @author nishioka
  */
 public class HtmlWikiVisitor implements WikiWriterVisitor {
 
@@ -339,7 +340,6 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		String href = "#" + getProperty("id.note.foot.prefix") + node.num;
 		String clazz = getProperty("class.note_super");
 		String body = "*" + node.num;
-
 		writer.disableNewline();
 		writer.start("a").attr("id", id).attr("class", clazz)
 				.attr("href", href).body(body).end();
@@ -394,6 +394,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		}
 		String child = getChildString(node, data, inlinestart);
 		PluginExecuter executer = context.getEngine().getPluginExecuter();
+		writer.body(""); // 閉じていないタグを閉じておく
 		executer.block(context, node.name, args, child);
 		return null;
 	}
@@ -410,7 +411,6 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		writer.inline();
 		writer.body(""); // 閉じていないタグを閉じておく
 		executer.inline(context, node.name, args, child);
-
 		return null;
 	}
 

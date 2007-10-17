@@ -7,7 +7,7 @@ import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.impl.WikiEngineTestFramework;
 import org.seasar.cms.wiki.factory.WikiBodyFactory;
 
-public class WikiBodyEvaluatorImplTest extends WikiEngineTestFramework {
+public class WikiBodyFactoryImplTest extends WikiEngineTestFramework {
 
 	public void testEval() {
 		WikiContext context = new WikiContext();

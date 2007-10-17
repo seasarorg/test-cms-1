@@ -38,7 +38,7 @@ public class PluginExecuterImpl implements PluginExecuter {
 	}
 
 	public void inline(WikiContext ctx, String name, String[] args, String child) {
-		String namespace = ctx.getOutputType();
+		String namespace = ctx.getNamespace();
 		PluginExecuter executer = getExecuter(namespace, name);
 		if (executer == null) {
 			return;
@@ -47,7 +47,7 @@ public class PluginExecuterImpl implements PluginExecuter {
 	}
 
 	public void block(WikiContext ctx, String name, String[] args, String child) {
-		PluginExecuter executer = getExecuter(ctx.getOutputType(), name);
+		PluginExecuter executer = getExecuter(ctx.getNamespace(), name);
 		if (executer == null) {
 			return;
 		}

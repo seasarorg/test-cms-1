@@ -11,7 +11,7 @@ public class WikiContext {
 
 	private Date modificationDate;
 
-	private String outputType = "html";
+	private String namespace = "html";
 
 	private WikiEngine engine;
 
@@ -45,12 +45,12 @@ public class WikiContext {
 		return engine;
 	}
 
-	public void setOutputType(String outputType) {
-		this.outputType = outputType;
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
 	}
 
-	public String getOutputType() {
-		return outputType;
+	public String getNamespace() {
+		return namespace;
 	}
 
 	public void setModificationDate(Date modificationDate) {

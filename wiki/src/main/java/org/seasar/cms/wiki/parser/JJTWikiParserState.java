@@ -40,7 +40,8 @@ class JJTWikiParserState {
   }
 
   /* Pushes a node on to the stack. */
-  void pushNode(Node n) {
+  @SuppressWarnings("unchecked")
+void pushNode(Node n) {
     nodes.push(n);
     ++sp;
   }
@@ -74,7 +75,8 @@ class JJTWikiParserState {
   }
 
 
-  void openNodeScope(Node n) {
+  @SuppressWarnings("unchecked")
+void openNodeScope(Node n) {
     marks.push(new Integer(mk));
     mk = sp;
     n.jjtOpen();

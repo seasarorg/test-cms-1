@@ -118,9 +118,7 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 	 */
 	public void appendHeading(int level, String body) {
 		String tag = "h" + level;
-		start(tag);
-		body(body);
-		end();
+		start(tag).body(body).end();
 	}
 
 	/**
