@@ -55,6 +55,7 @@ import org.seasar.cms.wiki.parser.WikiTable;
 import org.seasar.cms.wiki.parser.WikiTablecolumn;
 import org.seasar.cms.wiki.parser.WikiTablemember;
 import org.seasar.cms.wiki.renderer.TextWriter;
+import org.seasar.cms.wiki.util.TableNodeUtils;
 import org.seasar.cms.wiki.util.VisitorUtils;
 import org.seasar.cms.wiki.util.GenerateNodeHelper;
 
@@ -527,7 +528,7 @@ public class TextWikiVisitor implements WikiParserVisitor {
 
 	private void processTable(SimpleNode node, Object data) {
 
-		VisitorUtils.prepareWikiTable(node, data);
+		TableNodeUtils.prepareWikiTable(node, data);
 		int prenum = 0;
 		int start = 0; // buf.nextIndex();
 		int end = 0; // buf.nextIndex();

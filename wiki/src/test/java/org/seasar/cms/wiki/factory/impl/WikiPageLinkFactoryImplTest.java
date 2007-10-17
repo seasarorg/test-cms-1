@@ -2,8 +2,8 @@ package org.seasar.cms.wiki.factory.impl;
 
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.impl.WikiEngineTestFramework;
-import org.seasar.cms.wiki.engine.plugin.WikiPageLink;
 import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
+import org.seasar.cms.wiki.plugin.WikiPageLink;
 
 public class WikiPageLinkFactoryImplTest extends WikiEngineTestFramework {
 
@@ -20,6 +20,7 @@ public class WikiPageLinkFactoryImplTest extends WikiEngineTestFramework {
 	}
 
 	public void testCreate() {
+		assertEquals("notexist", engine.getProperty("class.notexist"));
 		engine.setLinkFactory(new CreationLinkFactory());
 		String actual = engine.evaluate("[[a]]", new WikiContext());
 		String expected = "<p><a href=\"creationLink\">?</a><span class=\"notexist\">a</span></p>";

@@ -67,6 +67,7 @@ import org.seasar.cms.wiki.parser.WikiTablemember;
 import org.seasar.cms.wiki.util.ColorUtils;
 import org.seasar.cms.wiki.util.GenerateNodeHelper;
 import org.seasar.cms.wiki.util.ImageUtils;
+import org.seasar.cms.wiki.util.TableNodeUtils;
 import org.seasar.cms.wiki.util.VisitorUtils;
 import org.seasar.cms.wiki.visitor.pdf.CJKSplitCharacter;
 import org.seasar.cms.wiki.visitor.pdf.PdfCmsPageEvents;
@@ -546,7 +547,7 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 
 	private Object processTable(SimpleNode node, Object data) {
 
-		VisitorUtils.prepareWikiTable(node, data);
+		TableNodeUtils.prepareWikiTable(node, data);
 		int prenum = 0;
 		Table t = null;
 

@@ -1,4 +1,4 @@
-package org.seasar.cms.wiki.engine.plugin;
+package org.seasar.cms.wiki.plugin;
 
 public abstract class AbstractChildPluginExecuter implements
 		ChildPluginExecuter {

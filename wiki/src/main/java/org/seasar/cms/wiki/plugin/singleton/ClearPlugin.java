@@ -13,14 +13,17 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.cms.wiki.engine.plugin.singleton;
+package org.seasar.cms.wiki.plugin.singleton;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.SingletonWikiPlugin;
+import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
 
-public class BrPlugin implements SingletonWikiPlugin {
+/**
+ * @author nishioka
+ */
+public class ClearPlugin implements SingletonWikiPlugin {
 
 	public String render(WikiContext context, String[] args, String child) {
-		return "<br/>";
+		return "<div style=\"clear:both;padding-bottom:1px;\"></div>";
 	}
 }

@@ -1,4 +1,4 @@
-package org.seasar.cms.wiki.engine.plugin.impl;
+package org.seasar.cms.wiki.plugin.impl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.ChildPluginExecuter;
-import org.seasar.cms.wiki.engine.plugin.PluginExecuter;
+import org.seasar.cms.wiki.plugin.ChildPluginExecuter;
+import org.seasar.cms.wiki.plugin.PluginExecuter;
 
 public class PluginExecuterImpl implements PluginExecuter {
 

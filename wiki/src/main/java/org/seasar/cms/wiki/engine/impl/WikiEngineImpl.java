@@ -1,21 +1,24 @@
 package org.seasar.cms.wiki.engine.impl;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Properties;
 
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.WikiEngine;
 import org.seasar.cms.wiki.engine.WikiParser;
-import org.seasar.cms.wiki.engine.plugin.PluginExecuter;
-import org.seasar.cms.wiki.factory.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiBodyFactory;
 import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
 import org.seasar.cms.wiki.factory.WikiParserFactory;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.WikiParserVisitor;
+import org.seasar.cms.wiki.plugin.PluginExecuter;
+import org.seasar.framework.util.ResourceUtil;
 
 public class WikiEngineImpl implements WikiEngine {
 
@@ -25,9 +28,28 @@ public class WikiEngineImpl implements WikiEngine {
 
 	private WikiPageLinkFactory linkFactory;
 
-	private WikiBodyEvaluator bodyEvaluator;
+	private WikiBodyFactory bodyEvaluator;
 
 	private PluginExecuter pluginExecuter;
+
+	private Properties props = new Properties();
+
+	public WikiEngineImpl() {
+		try {
+			props.load(ResourceUtil
+					.getResourceAsStream("wikiengine.properties"));
+		} catch (IOException e) {
+			throw new IllegalStateException("WikiEngine Initialization Fails");
+		}
+	}
+
+	public void setProperties(Properties props) {
+		this.props.putAll(props);
+	}
+
+	public String getProperty(String key) {
+		return props.getProperty(key);
+	}
 
 	public void setParserFactory(WikiParserFactory parserFactory) {
 		this.parserFactory = parserFactory;
@@ -41,18 +63,18 @@ public class WikiEngineImpl implements WikiEngine {
 		this.pluginExecuter = pluginExecuter;
 	}
 
-	public void setBodyEvaluator(WikiBodyEvaluator bodyEvaluator) {
+	public void setBodyEvaluator(WikiBodyFactory bodyEvaluator) {
 		this.bodyEvaluator = bodyEvaluator;
 	}
 
 	public void setLinkFactory(WikiPageLinkFactory linkFactory) {
 		this.linkFactory = linkFactory;
 	}
-	
+
 	public WikiVisitorFactory getVisitorFactory() {
 		return visitorFactory;
 	}
-	
+
 	public WikiParserFactory getParserFactory() {
 		return parserFactory;
 	}
@@ -61,7 +83,7 @@ public class WikiEngineImpl implements WikiEngine {
 		return pluginExecuter;
 	}
 
-	public WikiBodyEvaluator getBodyEvaluator() {
+	public WikiBodyFactory getBodyEvaluator() {
 		return bodyEvaluator;
 	}
 

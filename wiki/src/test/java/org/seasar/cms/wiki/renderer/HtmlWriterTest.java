@@ -41,6 +41,20 @@ public class HtmlWriterTest extends XMLTestCase {
 		htmlWriter = new HtmlWriter(stringWriter);
 	}
 
+	public void testInline() {
+		String actual = new HtmlWriter().inline().start("test").attr("style",
+				"bstyle").body("body").end().toString();
+		String expected = "<test style=\"bstyle\">body</test>";
+		assertEquals(expected, actual);
+	}
+
+	public void testBlock() {
+		String actual = new HtmlWriter().block().start("test").attr("style",
+				"bstyle").body("body").end().toString();
+		String expected = "<test style=\"bstyle\">\nbody\n</test>\n";
+		assertEquals(expected, actual);
+	}
+
 	public void testBr() {
 		htmlWriter.appendBr();
 

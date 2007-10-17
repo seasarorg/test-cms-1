@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.impl.WikiEngineTestFramework;
-import org.seasar.cms.wiki.factory.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiBodyFactory;
 
 public class WikiBodyEvaluatorImplTest extends WikiEngineTestFramework {
 
@@ -13,7 +13,7 @@ public class WikiBodyEvaluatorImplTest extends WikiEngineTestFramework {
 		WikiContext context = new WikiContext();
 		List<String> keys = new ArrayList<String>();
 		keys.add("test");
-		context.put(WikiBodyEvaluator.KEY, keys);
+		context.put(WikiBodyFactory.KEY, keys);
 		String actual = engine.evaluate("test", context);
 		String expected = "<p><span class=\"highlight\">test</span></p>";
 		assertWikiEquals(expected, actual);

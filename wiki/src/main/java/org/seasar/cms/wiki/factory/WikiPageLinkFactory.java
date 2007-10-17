@@ -1,7 +1,7 @@
 package org.seasar.cms.wiki.factory;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.WikiPageLink;
+import org.seasar.cms.wiki.plugin.WikiPageLink;
 
 /**
  * リンクを生成する Factory

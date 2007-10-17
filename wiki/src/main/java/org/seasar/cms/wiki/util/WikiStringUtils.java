@@ -16,7 +16,7 @@ public class WikiStringUtils {
 
 	private static final Pattern CR = Pattern.compile("\r");
 
-	private static final Pattern LB = Pattern.compile("\n");
+	private static final Pattern LF = Pattern.compile("\n");
 
 	/**
 	 * エスケープ処理を行う
@@ -57,12 +57,10 @@ public class WikiStringUtils {
 	 * @param contents
 	 *            html contents
 	 */
-	public static String removeLineBreak(String contents) {
-		return LB.matcher(contents).replaceAll("");
+	public static String removeLineFeed(String contents) {
+		return LF.matcher(contents).replaceAll("");
 	}
 
-	
-	
 	// ----------- private method ---------------------------
 
 	private static String replaceArray(String letter, String[] array,

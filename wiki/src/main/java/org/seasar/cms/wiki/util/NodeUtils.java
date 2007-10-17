@@ -22,4 +22,13 @@ public class NodeUtils {
 		}
 		return list;
 	}
+
+	public static List<Node> children(Node node) {
+		List<Node> list = new ArrayList<Node>();
+		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+			list.add((Node) node.jjtGetChild(i));
+		}
+		return list;
+	}
+
 }

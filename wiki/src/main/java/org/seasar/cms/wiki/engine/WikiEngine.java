@@ -3,14 +3,31 @@ package org.seasar.cms.wiki.engine;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Properties;
 
-import org.seasar.cms.wiki.engine.plugin.PluginExecuter;
-import org.seasar.cms.wiki.factory.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiBodyFactory;
 import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
 import org.seasar.cms.wiki.factory.WikiParserFactory;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
+import org.seasar.cms.wiki.plugin.PluginExecuter;
 
 public interface WikiEngine {
+
+	/**
+	 * プロパティの設定。同じキーのプロパティが設定されていれば上書き。
+	 * 
+	 * @param props
+	 * @return
+	 */
+	public void setProperties(Properties props);
+
+	/**
+	 * プロパティの取得
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public String getProperty(String key);
 
 	/**
 	 * @param text
@@ -51,7 +68,7 @@ public interface WikiEngine {
 
 	public PluginExecuter getPluginExecuter();
 
-	public WikiBodyEvaluator getBodyEvaluator();
+	public WikiBodyFactory getBodyEvaluator();
 
 	public void setLinkFactory(WikiPageLinkFactory linkFactory);
 
@@ -61,6 +78,6 @@ public interface WikiEngine {
 
 	public void setPluginExecuter(PluginExecuter pluginExecuter);
 
-	public void setBodyEvaluator(WikiBodyEvaluator bodyEvaluator);
+	public void setBodyEvaluator(WikiBodyFactory bodyEvaluator);
 
 }

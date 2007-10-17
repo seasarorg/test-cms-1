@@ -13,10 +13,9 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.cms.wiki.engine.plugin.singleton;
+package org.seasar.cms.wiki.plugin.singleton;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.SingletonWikiPlugin;
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.WikiAlias;
 import org.seasar.cms.wiki.parser.WikiHeading;
@@ -24,6 +23,7 @@ import org.seasar.cms.wiki.parser.WikiInlinePlugin;
 import org.seasar.cms.wiki.parser.WikiLetters;
 import org.seasar.cms.wiki.parser.WikiLink;
 import org.seasar.cms.wiki.parser.WikiPagename;
+import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
 import org.seasar.cms.wiki.util.GenerateNodeHelper;
 import org.seasar.cms.wiki.util.NodeUtils;
 import org.seasar.cms.wiki.util.VisitorUtils;

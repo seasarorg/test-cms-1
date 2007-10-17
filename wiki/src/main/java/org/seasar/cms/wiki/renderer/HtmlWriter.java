@@ -16,6 +16,7 @@
 package org.seasar.cms.wiki.renderer;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 
 import org.seasar.framework.exception.IORuntimeException;
@@ -25,9 +26,11 @@ import org.seasar.framework.exception.IORuntimeException;
  */
 public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 
-	private static final String NEWLINE = "\n";
+	private String newline = "\n";
 
-	private IOException error = null;
+	public HtmlWriter() {
+		super(new StringWriter());
+	}
 
 	public HtmlWriter(Writer writer) {
 		super(writer);
@@ -43,10 +46,6 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 		}
 	}
 
-	public IOException getError() {
-		return error;
-	}
-
 	protected void doAppendAttribute(String name, String value) {
 		doAppend(" " + name + "=\"" + value + "\"");
 	}
@@ -60,7 +59,7 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 	}
 
 	protected void doAppendNewline() {
-		doAppend(NEWLINE);
+		doAppend(newline);
 	}
 
 	// ----- [End] Abstract メソッドの実装 -----
@@ -145,32 +144,64 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 		super.close();
 	}
 
+	/**
+	 * 新規タグ追加時にタブを挿入
+	 * 
+	 * @return
+	 */
+	public HtmlWriter enableTab() {
+		setTab(true);
+		return this;
+	}
+
+	/**
+	 * 新規タグ追加時にタブを挿入せず
+	 * 
+	 * @return
+	 */
+	public HtmlWriter disableTab() {
+		setTab(false);
+		return this;
+	}
+
+	/**
+	 * 新規タグ追加時、Body追加時、タグ閉じ追加時、改行コードを挿入
+	 * 
+	 * @return
+	 */
+	public HtmlWriter enableNewline() {
+		setNewline(true);
+		return this;
+	}
+
+	/**
+	 * 新規タグ追加時、Body追加時、タグ閉じ追加時、改行コードを挿入せず
+	 */
+	public HtmlWriter disableNewline() {
+		setNewline(false);
+		return this;
+	}
+
+	public HtmlWriter inline() {
+		disableNewline();
+		disableTab();
+		return this;
+	}
+
+	public HtmlWriter block() {
+		enableNewline();
+		enableTab();
+		return this;
+	}
+
+	// ---------- private methods -----------------
+
 	private void setNewline(boolean flag) {
 		this.appendNewline = flag;
 	}
 
 	private void setTab(boolean flag) {
 		this.appendNewline = flag;
-	}
-
-	public HtmlWriter enableTab() {
-		setTab(true);
-		return this;
-	}
-
-	public HtmlWriter disableTab() {
-		setTab(false);
-		return this;
-	}
-
-	public HtmlWriter enableLineBreak() {
-		setNewline(true);
-		return this;
-	}
-
-	public HtmlWriter disableLineBreak() {
-		setNewline(false);
-		return this;
 	}
 
 }

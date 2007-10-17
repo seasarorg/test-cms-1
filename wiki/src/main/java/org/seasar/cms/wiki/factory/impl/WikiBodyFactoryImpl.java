@@ -3,9 +3,9 @@ package org.seasar.cms.wiki.factory.impl;
 import java.util.List;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.factory.WikiBodyEvaluator;
+import org.seasar.cms.wiki.factory.WikiBodyFactory;
 
-public class WikiBodyEvaluatorImpl implements WikiBodyEvaluator {
+public class WikiBodyFactoryImpl implements WikiBodyFactory {
 
 	private static final String TAG_SPAN_HIGHLIGHT = "<span class=\"highlight\">%s</span>";
 

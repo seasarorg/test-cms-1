@@ -1,4 +1,4 @@
-package org.seasar.cms.wiki.engine.plugin;
+package org.seasar.cms.wiki.plugin;
 
 import org.seasar.cms.wiki.engine.WikiContext;
 

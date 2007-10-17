@@ -1,7 +1,7 @@
-package org.seasar.cms.wiki.engine.plugin.singleton;
+package org.seasar.cms.wiki.plugin.singleton;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.SingletonWikiPlugin;
+import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
 
 public class NewpagePlugin implements SingletonWikiPlugin {
 

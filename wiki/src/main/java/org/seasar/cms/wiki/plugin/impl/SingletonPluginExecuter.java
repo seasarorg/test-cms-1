@@ -1,4 +1,4 @@
-package org.seasar.cms.wiki.engine.plugin.impl;
+package org.seasar.cms.wiki.plugin.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.AbstractChildPluginExecuter;
-import org.seasar.cms.wiki.engine.plugin.SingletonWikiPlugin;
-import org.seasar.cms.wiki.renderer.HtmlVisitor;
+import org.seasar.cms.wiki.plugin.AbstractChildPluginExecuter;
+import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
+import org.seasar.cms.wiki.renderer.WikiWriterVisitor;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 
@@ -51,8 +51,12 @@ public class SingletonPluginExecuter extends AbstractChildPluginExecuter {
 
 	private void doService(WikiContext ctx, String name, String[] args,
 			String child) {
-		String result = plugins.get(name).render(ctx, args, child);
-		HtmlVisitor visitor = (HtmlVisitor) ctx.getVisitor();
-		visitor.write(result);
+		try {
+			String result = plugins.get(name).render(ctx, args, child);
+			WikiWriterVisitor visitor = (WikiWriterVisitor) ctx.getVisitor();
+			visitor.getWriter().write(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

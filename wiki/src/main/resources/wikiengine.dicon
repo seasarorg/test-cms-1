@@ -6,10 +6,11 @@
 
 	<include path="wikiplugin-singleton.dicon"/>
         	
-	<component name="pluginExecuter" class="org.seasar.cms.wiki.engine.plugin.impl.PluginExecuterImpl">
+        	
+	<component name="pluginExecuter" class="org.seasar.cms.wiki.plugin.impl.PluginExecuterImpl">
 		<initMethod name="addChildExecuter">
 			<arg>
-				<component class="org.seasar.cms.wiki.engine.plugin.impl.SingletonPluginExecuter">
+				<component class="org.seasar.cms.wiki.plugin.impl.SingletonPluginExecuter">
 					<property name="container">EmbededSingletonPlugin.container</property>
 				</component>
 			</arg>
@@ -17,7 +18,7 @@
 	</component>
 
 	<component name="wikiPageLinkFactory" class="org.seasar.cms.wiki.factory.impl.WikiPageLinkFactoryImpl"/>
-	<component name="wikiBodyEvaluator" class="org.seasar.cms.wiki.factory.impl.WikiBodyEvaluatorImpl"/>
+	<component name="wikiBodyEvaluator" class="org.seasar.cms.wiki.factory.impl.WikiBodyFactoryImpl"/>
     <component name="wikiVisitFactory" class="org.seasar.cms.wiki.factory.impl.WikiVisitorFactoryImpl"/>
     <component name="wikiParserFactory" class="org.seasar.cms.wiki.factory.impl.WikiParserFactoryImpl"/>
 

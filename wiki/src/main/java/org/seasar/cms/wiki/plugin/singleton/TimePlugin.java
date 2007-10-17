@@ -1,10 +1,10 @@
-package org.seasar.cms.wiki.engine.plugin.singleton;
+package org.seasar.cms.wiki.plugin.singleton;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.SingletonWikiPlugin;
+import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
 
 public class TimePlugin implements SingletonWikiPlugin {
 

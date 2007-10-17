@@ -18,13 +18,10 @@ package org.seasar.cms.wiki.util;
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.SimpleNode;
 import org.seasar.cms.wiki.parser.WikiArgs;
-import org.seasar.cms.wiki.parser.WikiCSVTable;
 import org.seasar.cms.wiki.parser.WikiExcerpt;
+import org.seasar.cms.wiki.parser.WikiFloatAlign;
 import org.seasar.cms.wiki.parser.WikiLetters;
 import org.seasar.cms.wiki.parser.WikiStrongItalic;
-import org.seasar.cms.wiki.parser.WikiTable;
-import org.seasar.cms.wiki.parser.WikiTablecolumn;
-import org.seasar.cms.wiki.parser.WikiTablemember;
 
 /**
  * VisitorUtils class Provides node object related tasks which is common during
@@ -44,8 +41,6 @@ public class VisitorUtils {
 
 	private static final int BOLDITALIC_NUM = 5;
 
-	// ----- [Start] Excerpt related methods -----
-
 	public static boolean isExcerptStartNeeded(WikiExcerpt node) {
 		Node parent = node.jjtGetParent();
 		if (parent instanceof WikiExcerpt) {
@@ -57,72 +52,14 @@ public class VisitorUtils {
 		return true;
 	}
 
-	// ----- [Start] Table related methods -----
-	/**
-	 * Before accepting node tree, need to set node properties for colspan,
-	 * rowspan.
-	 * 
-	 * The value of colspan or rowspan which might be set after trailing should
-	 * be incremented before being used in visitor.
-	 */
-	public static void prepareWikiTable(SimpleNode node, Object data) {
-
-		if (!(node instanceof WikiTable) && !(node instanceof WikiCSVTable))
-			throw new IllegalArgumentException(
-					"The class other than WikiTable or WikiCSVTable cannot be accepted.");
-
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			if (!(node.jjtGetChild(i) instanceof WikiTablemember)) {
-				continue;
-			}
-			WikiTablemember member = (WikiTablemember) node.jjtGetChild(i);
-			int colspannum = 0;
-			for (int j = 0; j < member.jjtGetNumChildren(); j++) {
-				WikiTablecolumn column = (WikiTablecolumn) member
-						.jjtGetChild(j);
-				if (column.iscolspan) {
-					colspannum++;
-				} else if (column.isrowspan) {
-					int rowspannum = 1;
-					for (int k = i - 1; k >= 0; k--) {
-						// Access to previous WikiTablemember object to set
-						// rowspan
-						if (node.jjtGetChild(k) instanceof WikiTablemember) {
-							WikiTablecolumn leftcolumn = (WikiTablecolumn) node
-									.jjtGetChild(k).jjtGetChild(j);
-							if (leftcolumn.isrowspan) {
-								rowspannum++;
-								continue;
-							} else {
-								leftcolumn.rowspannum = rowspannum;
-								break;
-							}
-						} else { // in case WikiError
-							break;
-						}
-					}
-				} else {
-					if (colspannum > 0) {
-						column.colspannum = colspannum;
-						colspannum = 0;
-					}
-				}
-			}
-		}
-	}
-
-	// ----- [End] Table related methods -----
-
-	// ----- [Start] StrongItalic related methods -----
-
 	public static String getAppendString(WikiStrongItalic node, boolean pre) {
 		int num = node.prelevel - node.postlevel;
 		if (!pre) {
 			num = 0 - num;
 		}
-		if (num <= 0)
+		if (num <= 0) {
 			return null;
-
+		}
 		StringBuffer buf = new StringBuffer();
 		while (num > 0) {
 			buf.append(STRONGITALIC_MARK);
@@ -159,5 +96,21 @@ public class VisitorUtils {
 			}
 		}
 		return null;
+	}
+
+	public static String getFloatStyle(WikiFloatAlign node) {
+		String align = node.image.toLowerCase().substring(1,
+				node.image.length() - 1);
+		int idx = 0;
+		String widthStr = null;
+		if ((idx = align.indexOf("(")) != -1) {
+			widthStr = GenerateNodeHelper.deleteParenthesis(align, "(", ")");
+			align = align.substring(0, idx);
+		}
+		String style = "float:" + align + ";";
+		if (widthStr != null) {
+			style += "width: " + widthStr + "px;";
+		}
+		return style;
 	}
 }

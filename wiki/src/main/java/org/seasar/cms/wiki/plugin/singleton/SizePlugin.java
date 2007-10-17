@@ -13,30 +13,28 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.cms.wiki.engine.plugin.singleton;
+package org.seasar.cms.wiki.plugin.singleton;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.SingletonWikiPlugin;
+import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
 
 /**
  * @author someda
  */
-public class ColorPlugin implements SingletonWikiPlugin {
+public class SizePlugin implements SingletonWikiPlugin {
 
 	public String render(WikiContext context, String[] args, String child) {
-		String childstr = null;
-		if (args == null) {
+		if (args == null || args.length == 0) {
 			return child;
 		}
-		StringBuffer buf = new StringBuffer("<span style=\"");
-		if (args.length >= 1) {
-			buf.append("color:" + args[0]);
-		}
-		if (args.length >= 2) {
-			buf.append("; background-color:" + args[1]);
+		String size = args[0];
+
+		StringBuffer buf = new StringBuffer("<span style=\"font-size:" + size);
+		if (size.indexOf("px") == -1 || size.indexOf("PX") == -1) {
+			buf.append("px");
 		}
 		buf.append("\">");
-		buf.append(childstr);
+		buf.append(child);
 		buf.append("</span>");
 		return buf.toString();
 	}

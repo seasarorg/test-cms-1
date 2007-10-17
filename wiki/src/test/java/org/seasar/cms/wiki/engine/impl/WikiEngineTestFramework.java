@@ -17,12 +17,18 @@ public class WikiEngineTestFramework extends S2TestCase {
 		System.out.println("fake");
 	}
 
+	/**
+	 * 改行は無視をしたマッチングを行う
+	 * 
+	 * @param expected
+	 * @param actual
+	 */
 	public void assertWikiEquals(String expected, String actual) {
 		expected = WikiStringUtils.removeCarriageReturn(expected);
-		expected = WikiStringUtils.removeLineBreak(expected);
+		expected = WikiStringUtils.removeLineFeed(expected);
 		expected = expected.trim();
 		actual = WikiStringUtils.removeCarriageReturn(actual);
-		actual = WikiStringUtils.removeLineBreak(actual);
+		actual = WikiStringUtils.removeLineFeed(actual);
 		actual = actual.trim();
 		assertEquals(expected, actual);
 	}

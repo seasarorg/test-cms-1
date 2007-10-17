@@ -17,11 +17,11 @@
       </component>
     </property>
     <initMethod name="addClassPattern">
-      <arg>"org.seasar.cms.wiki.engine.plugin.singleton"</arg>
+      <arg>"org.seasar.cms.wiki.plugin.singleton"</arg>
       <arg>".+Plugin"</arg>
     </initMethod>
    	<initMethod name="addReferenceClass">
-		<arg>@org.seasar.cms.wiki.engine.plugin.impl.SingletonPluginExecuter@class</arg>
+		<arg>@org.seasar.cms.wiki.plugin.impl.SingletonPluginExecuter@class</arg>
 	</initMethod>
   </component>
 

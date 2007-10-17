@@ -13,17 +13,15 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.cms.wiki.engine.plugin.singleton;
+package org.seasar.cms.wiki.plugin.impl;
 
-import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.engine.plugin.SingletonWikiPlugin;
+import org.seasar.cms.wiki.plugin.singleton.BrPlugin;
 
-/**
- * @author nishioka
- */
-public class ClearPlugin implements SingletonWikiPlugin {
+import com.lowagie.text.Chunk;
 
-	public String render(WikiContext context, String[] args, String child) {
-		return "<div style=\"clear:both;padding-bottom:1px;\"></div>";
+public class PdfBrPlugin extends BrPlugin {
+
+	public Object doPDFView() {				
+		return Chunk.NEWLINE;
 	}
 }

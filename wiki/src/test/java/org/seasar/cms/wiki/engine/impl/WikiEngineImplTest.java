@@ -2,12 +2,25 @@ package org.seasar.cms.wiki.engine.impl;
 
 import java.io.File;
 import java.io.Reader;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.util.WikiTestUtils;
 
 public class WikiEngineImplTest extends WikiEngineTestFramework {
+
+	public void testGetProperty() {
+		String value = engine.getProperty("class.note_super");
+		assertEquals("note_super", value);
+
+		Properties props = new Properties();
+		props.put("class.note_super", "replace");
+		engine.setProperties(props);
+
+		value = engine.getProperty("class.note_super");
+		assertEquals("replace", value);
+	}
 
 	public void testAll() throws Exception {
 		File[] files = WikiTestUtils.getDataDirectory().listFiles();

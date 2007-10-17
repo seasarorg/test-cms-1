@@ -13,15 +13,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.cms.wiki.engine.plugin.impl;
+package org.seasar.cms.wiki.plugin.singleton;
 
-import org.seasar.cms.wiki.engine.plugin.singleton.BrPlugin;
+import org.seasar.cms.wiki.engine.WikiContext;
+import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
 
-import com.lowagie.text.Chunk;
+public class BrPlugin implements SingletonWikiPlugin {
 
-public class PdfBrPlugin extends BrPlugin {
-
-	public Object doPDFView() {				
-		return Chunk.NEWLINE;
+	public String render(WikiContext context, String[] args, String child) {
+		return "<br/>";
 	}
 }

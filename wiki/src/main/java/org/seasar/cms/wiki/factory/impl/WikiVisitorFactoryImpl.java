@@ -6,7 +6,8 @@ import java.io.Writer;
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 import org.seasar.cms.wiki.parser.WikiParserVisitor;
-import org.seasar.cms.wiki.renderer.HtmlVisitor;
+import org.seasar.cms.wiki.renderer.HtmlWikiVisitor;
+import org.seasar.cms.wiki.renderer.WikiWriterVisitor;
 import org.seasar.cms.wiki.visitor.PdfWikiVisitor;
 
 public class WikiVisitorFactoryImpl implements WikiVisitorFactory {
@@ -16,14 +17,18 @@ public class WikiVisitorFactoryImpl implements WikiVisitorFactory {
 	}
 
 	public WikiParserVisitor create(WikiContext context, Writer writer) {
+		WikiWriterVisitor visitor = null;
 		switch (Type.valueOf(context.getOutputType())) {
 		case html:
-			return new HtmlVisitor(context, writer);
+			visitor = new HtmlWikiVisitor();
 		case txt:
 		case pdf:
 			break;
 		}
-		return null;
+		if (visitor != null) {
+			visitor.init(context, writer);
+		}
+		return visitor;
 	}
 
 	public WikiParserVisitor create(WikiContext context, OutputStream stream) {

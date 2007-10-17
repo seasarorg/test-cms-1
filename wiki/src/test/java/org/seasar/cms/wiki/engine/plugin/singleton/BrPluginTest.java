@@ -8,6 +8,8 @@ public class BrPluginTest extends WikiEngineTestFramework {
 	public void testEval() {
 		assertWikiEquals("<p><br/></p>", engine.evaluate("&br;",
 				new WikiContext()));
+		assertWikiEquals("<br/>", engine.evaluate("#br",
+				new WikiContext()));
 	}
 
 }
