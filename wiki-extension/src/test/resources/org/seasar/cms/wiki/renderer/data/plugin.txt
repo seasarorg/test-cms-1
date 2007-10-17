@@ -1,0 +1,14 @@
+|&color( blue , , fff){aaa};|
+
+&size(9){&color(#000,#bdf){ページ作成方針};};
+&size(9){複数のインライン要素が%%子要素%%に};
+
+&calc(+,&calc(-,5,3),1);~
+&calc(+,&calc(-,5,&calc(+,1,2)),1);
+
+&color(blue){1行に二つのプラグイン}; &size(12){1行に二つのプラグイン};
+
+#contents
+
+#clear
+

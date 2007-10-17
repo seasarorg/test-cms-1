@@ -1,0 +1,16 @@
+%%取り消し線%%
+''強調''
+'''斜体'''
+((注釈))ここは注釈
+someda@isenshi.com
+http://www.isenshi.com
+[[メール:someda@isenshi.com]]
+[[twigaa:http://www.isenshi.com/]]
+//WikiName siteConfig が null なのでテストは失敗する。
+
+[[メール>someda@isenshi.com]]
+[[URL>https://www.isenshi.com]]
+
+改行~
+~
+~

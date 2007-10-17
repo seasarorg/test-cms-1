@@ -1,0 +1,11 @@
+<p><del>取り消し線</del><strong>強調</strong><em>斜体</em><a id="notetext_1" class="note_super" href="#notefoot_1">*1</a>ここは注釈<a href="mailto:someda@isenshi.com">someda@isenshi.com</a><a href="http://www.isenshi.com">http://www.isenshi.com</a><a href="mailto:someda@isenshi.com">
+メール
+</a>
+<a href="http://www.isenshi.com/">
+twigaa
+</a>
+</p>
+<p><a href="mailto:someda@isenshi.com">メール</a><a href="https://www.isenshi.com">URL</a></p>
+<p>改行<br/><br/><br/></p>
+<hr class="note_hr" align="left"/>
+<a id="notefoot_1" class="note_super" href="#notetext_1">*1</a>注釈<br/>

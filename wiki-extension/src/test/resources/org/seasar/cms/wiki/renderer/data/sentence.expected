@@ -1,0 +1,123 @@
+<h2>
+  平成17年度上期未踏ソフトウェア創造事業 千葉PM 成果報告会<a id="tg227b625b" class="anchor_super" href="#tg227b625b">&nbsp;</a>
+</h2>
+<p>未踏千葉PM採択の4案件について、事業の最終成果報告を行う。形式はスクール形式の会場において、プレゼンテーションおよび質疑応答とする。4案件は、次世代Ruby実装「YARV」、生物化学情報Rubyライブラリ「BioRuby/ChemRuby」、Java製WEBアプリケーション環境「Tuigwaa」、Java製WEBテンプレートエンジン「Mayaa」である。</p>
+<p>今回4案件は、2件がRuby関連で2件がJava/Seasarファウンデーション関連のものとなっている。その縁よりRuby創始者である<strong>まつもとゆきひろ</strong>氏およびSeasarファウンデーション創立者の<strong>ひがやすを</strong>氏に特別講演として登壇いただくことを承諾いただいた。千葉PMの講演と併せ、現在最新の技術潮流を解説していく。</p>
+<div style="float:left;">
+<dl>
+<dt>主催</dt><dd>千葉滋</dd><dt>協賛</dt><dd>株式会社 電通国際情報サービス<br/>
+ネットワーク応用通信研究所<br/>
+特定非営利活動法人 Seasarファウンデーション<br/>
+サンマイクロシステムズ株式会社</dd><dt>開催日</dt><dd>2006年02月24日(金) 10:00-17:30</dd><dt>場所</dt><dd>株式会社 電通国際情報サービス<br/>
+<a href="http://ecust.isid.co.jp/public/training/kaijo/shinagawa.html">品川本社ホール</a> (右図参照)</dd><dt>参加費用</dt><dd>無料 (登録フォームは<a href="フォーム/一般登録フォーム">こちら</a>)</dd><dt>参加定員</dt><dd>200名 </dd><dt>お問い合わせ</dt><dd><a href="mailto:chiba20060224@event.seasar.org">chiba20060224@event.seasar.org</a></dd></dl>
+</div>
+<div style="float:right;width: 410px;"></div>
+<div style="clear:both;padding-bottom:1px;"></div>
+<div style="page-break-after:always;"></div>
+<p>タイムテーブル - <a href="各プロジェクト紹介">各プロジェクト紹介</a></p>
+<table>
+<tbody>
+<tr><td>
+10:00-10:20
+</td>
+<td colspan="2">
+開場
+</td>
+</tr><tr><td>
+10:20-10:30
+</td>
+<td colspan="2">
+会場案内/開会
+</td>
+</tr><tr><td>
+10:30-11:10
+</td>
+<td>
+特別講演
+</td>
+<td>
+「演題未定」<br/>
+ひが やすを （Seasarファウンデーション チーフコミッタ / 株式会社電通国際情報サービス）
+</td>
+</tr><tr><td>
+11:10-11:50
+</td>
+<td>
+成果発表
+</td>
+<td>
+「Ruby言語による生物化学情報基盤ライブラリの開発」<br/>
+片山 俊明 （東京大学 医科学研究所 ヒトゲノム解析センター ゲノムデータベース分野助手)<br/>
+田中 伸也 （京都大学 化学研究所 バイオインフォマティクスセンター 研究員）
+</td>
+</tr><tr><td>
+11:50-13:00
+</td>
+<td colspan="2">
+昼食
+</td>
+</tr><tr><td>
+13:00-13:40
+</td>
+<td>
+成果発表
+</td>
+<td>
+「ユーザ主導型 Web アプリケーション作成ツールの開発」<br/>
+西岡 悠平 （フリーランス）
+</td>
+</tr><tr><td>
+13:40-14:20
+</td>
+<td>
+特別講演
+</td>
+<td>
+「演題未定」<br/>
+まつもと ゆきひろ （株式会社ネットワーク応用通信研究所）
+</td>
+</tr><tr><td>
+14:20-14:40
+</td>
+<td colspan="2">
+休憩
+</td>
+</tr><tr><td>
+14:40-15:20
+</td>
+<td>
+成果発表
+</td>
+<td>
+「オブジェクト指向スクリプト言語Rubyの処理系の刷新」<br/>
+笹田 耕一 （東京農工大学大学院 工学部 博士後期課程）
+</td>
+</tr><tr><td>
+15:20-16:00
+</td>
+<td>
+成果発表
+</td>
+<td>
+「JavaServer Templates 「Maya」の開発と世界発信」<br/>
+栗原 傑享 （Seasarファウンデーション 代表理事 / 株式会社グルージェント 代表取締役社長）
+</td>
+</tr><tr><td>
+16:00-16:20
+</td>
+<td colspan="2">
+休憩
+</td>
+</tr><tr><td>
+16:20-17:30
+</td>
+<td>
+特別講演<br/>
+総括・講評
+</td>
+<td>
+「演題未定」<br/>
+千葉 滋 （東京工業大学大学院 情報理工学研究科 助教授）
+</td>
+</tr></tbody>
+</table>

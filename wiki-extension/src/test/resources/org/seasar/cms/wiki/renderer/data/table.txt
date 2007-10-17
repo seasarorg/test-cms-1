@@ -1,0 +1,35 @@
+|テスト|テスト|テスト|
+|テスト2|テスト2|テスト2|
+|テスト3|テスト3|
+
+|テスト|テスト|漢字|
+|~|テスト2|テスト2|
+|~|テスト3|~|
+
+|テスト|>|テスト|テスト2|>|>|テスト2|
+
+|BGCOLOR(RED):テスト|COLOR(BLUE):テスト|LEFT:テスト|
+
+|BGCOLOR(RED):COLOR(BLUE):CENTER:LEFT:テスト|
+
+|テストh|テスト|テスト|h
+|テスト2|テスト2f|テスト2|f
+|テスト3|テストf|テスト|
+|テスト4h|テスト4|テスト4|
+
+,テスト,テスト,テスト,
+,==,テスト,テスト,
+
+| T |test|
+|:test(this colon is lexical error point, ignore.)|test|
+|-test|test|
+|>test|test|
+
+|test(ms)|test(ms)|test(ms)|
+|test|test|test|
+
+|%%test%%|''test''|'''test'''|
+|&calc(+,2,3);|&calc(-,5,1);|&calc(*,2,3);|
+
+|h|h|h
+|f|f|f

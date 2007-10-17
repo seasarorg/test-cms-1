@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="Shift_JIS"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container//EN"
+"http://www.seasar.org/dtd/components.dtd">
+  
+<components>
+
+	<include path="wikiplugin-singleton.dicon"/>
+        	
+        	
+	<component name="pluginExecuter" class="org.seasar.cms.wiki.plugin.impl.PluginExecuterImpl">
+		<initMethod name="addChildExecuter">
+			<arg>
+				<component class="org.seasar.cms.wiki.plugin.impl.SingletonPluginExecuter">
+					<property name="container">EmbededSingletonPlugin.container</property>
+				</component>
+			</arg>
+		</initMethod>
+	</component>
+
+	<component name="wikiPageLinkFactory" class="org.seasar.cms.wiki.factory.impl.WikiPageLinkFactoryImpl"/>
+	<component name="wikiBodyEvaluator" class="org.seasar.cms.wiki.factory.impl.WikiBodyFactoryImpl"/>
+    <component name="wikiVisitFactory" class="org.seasar.cms.wiki.factory.impl.WikiVisitorFactoryImpl"/>
+    <component name="wikiParserFactory" class="org.seasar.cms.wiki.factory.impl.WikiParserFactoryImpl"/>
+
+    <component name="wikiEngine" class="org.seasar.cms.wiki.engine.impl.WikiEngineImpl"/>
+
+</components>

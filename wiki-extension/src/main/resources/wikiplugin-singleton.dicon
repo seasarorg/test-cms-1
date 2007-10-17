@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="Shift_JIS"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container//EN"
+"http://www.seasar.org/dtd/components.dtd">
+
+<components namespace="EmbededSingletonPlugin">
+
+  <component
+    class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
+    <property name="instanceDef">
+      @org.seasar.framework.container.deployer.InstanceDefFactory@PROTOTYPE
+    </property>
+    <property name="autoNaming">
+      <component class="org.seasar.framework.container.autoregister.DefaultAutoNaming">
+        <initMethod name="addIgnoreClassSuffix">
+          <arg>"Plugin"</arg>
+        </initMethod>
+      </component>
+    </property>
+    <initMethod name="addClassPattern">
+      <arg>"org.seasar.cms.wiki.plugin.singleton"</arg>
+      <arg>".+Plugin"</arg>
+    </initMethod>
+   	<initMethod name="addReferenceClass">
+		<arg>@org.seasar.cms.wiki.plugin.impl.SingletonPluginExecuter@class</arg>
+	</initMethod>
+  </component>
+
+</components>
