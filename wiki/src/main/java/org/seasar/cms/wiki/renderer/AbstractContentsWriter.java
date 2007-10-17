@@ -44,6 +44,7 @@ public abstract class AbstractContentsWriter<E> extends WriterWrapper {
 		this.appendNewline = appendNewline;
 	}
 
+	@SuppressWarnings("unchecked")
 	public E attr(String name, String value) {
 		if (value != null) {
 			doAppendAttribute(name, value);
@@ -51,6 +52,7 @@ public abstract class AbstractContentsWriter<E> extends WriterWrapper {
 		return (E) this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public E attrs(Map<String, String> attrs) {
 		for (String key : attrs.keySet()) {
 			attr(key, attrs.get(key));
@@ -58,6 +60,7 @@ public abstract class AbstractContentsWriter<E> extends WriterWrapper {
 		return (E) this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public E body(String body) {
 		if (body == null) {
 			return (E) this;
@@ -68,6 +71,7 @@ public abstract class AbstractContentsWriter<E> extends WriterWrapper {
 		return (E) this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public E start(String name) {
 		assertBody();
 		doAppendTag(name, true);

@@ -110,7 +110,7 @@ public class GenerateNodeHelper {
 		String s = deleteParenthesis(image, "(", ")");
 
 		StringBuffer buf = new StringBuffer();
-		List argsList = new ArrayList();
+		List<String> argsList = new ArrayList<String>();
 		int cnt = 0;
 		int parenthesis = 0;
 		for (int i = 0; i < s.length(); i++) {
