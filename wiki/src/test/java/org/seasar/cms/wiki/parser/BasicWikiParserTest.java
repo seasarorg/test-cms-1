@@ -22,82 +22,79 @@ import org.seasar.cms.wiki.util.WikiTestUtils;
 import org.seasar.extension.unit.S2TestCase;
 
 /**
- * WikiParser Test class
- * if you want to debug the actitivies of lexer and parser,
- * set
- *   DEBUG_PARSER = true;
- *   DEBUG_TOKEN_MANAGER = true;
- * in Wiki.jjt and re-run jjtree (mvn compile).
- * These settings shows detail information about them.
+ * WikiParser Test class if you want to debug the actitivies of lexer and
+ * parser, set DEBUG_PARSER = true; DEBUG_TOKEN_MANAGER = true; in Wiki.jjt and
+ * re-run jjtree (mvn compile). These settings shows detail information about
+ * them.
  * 
  * @author someda
  */
-public class BasicWikiParserTest extends S2TestCase{
-	
+public class BasicWikiParserTest extends S2TestCase {
+
 	private static final String PATH = "BasicWikiParserTest.dicon";
-	
-	private WikiParserFactory wikiParserFactory;	
-	
-	public BasicWikiParserTest(String name){
+
+	private WikiParserFactory wikiParserFactory;
+
+	public BasicWikiParserTest(String name) {
 		super(name);
 	}
-	
-	protected void setUp(){
+
+	protected void setUp() {
 		include(PATH);
 	}
-	
-	protected void tearDown(){		
+
+	protected void tearDown() {
 	}
-	
-	public void testHeading(){
+
+	public void testHeading() {
 		doTest("heading.txt");
 	}
 
-	public void testList(){
-		doTest("list.txt");				
+	public void testList() {
+		doTest("list.txt");
 	}
-	
-	public void testTable(){
+
+	public void testTable() {
 		doTest("table.txt");
 	}
-		
-	public void testPlugin(){
+
+	public void testPlugin() {
 		doTest("plugin.txt");
 	}
-	
-	public void testParagraph(){
+
+	public void testParagraph() {
 		doTest("paragraph.txt");
 	}
-	
-	public void testExcerpt(){
+
+	public void testExcerpt() {
 		doTest("excerpt.txt");
 	}
-	
-	public void testDefineList(){
+
+	public void testDefineList() {
 		doTest("dlist.txt");
 	}
 
-	public void testInline(){
+	public void testInline() {
 		doTest("inline.txt");
 	}
-	
-	public void testError(){
-		doTest("error.txt",2);
+
+	public void testError() {
+		doTest("error.txt", 2);
 	}
-	
-	public void testSentence(){
+
+	public void testSentence() {
 		doTest("sentence.txt");
 	}
-	
-	private void doTest(String fileName){
-		doTest(fileName,0);
-	}	
-	
-	private void doTest(String fileName, int errorNum){
-		Reader reader = WikiTestUtils.getFileReader(fileName);
-		org.seasar.cms.wiki.engine.WikiParser parser = wikiParserFactory.getWikiParser(reader);
-		parser.parse();
-		assertEquals(parser.getNParseErrors(),errorNum);		
+
+	private void doTest(String fileName) {
+		doTest(fileName, 0);
 	}
-		
+
+	private void doTest(String fileName, int errorNum) {
+		Reader reader = WikiTestUtils.getFileReader(fileName);
+		org.seasar.cms.wiki.engine.WikiParser parser = wikiParserFactory
+				.getWikiParser(reader);
+		parser.parse();
+		assertEquals(errorNum, parser.getNParseErrors());
+	}
 }

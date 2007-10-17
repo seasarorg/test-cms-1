@@ -55,13 +55,6 @@ public class HtmlWriterTest extends XMLTestCase {
 		assertEquals(expected, actual);
 	}
 
-	public void testBr() {
-		htmlWriter.appendBr();
-
-		String expected = "<br/>";
-		doTest(expected);
-	}
-
 	public void testStrong() {
 
 		htmlWriter.start("strong");
@@ -82,32 +75,6 @@ public class HtmlWriterTest extends XMLTestCase {
 		doTest(expected);
 	}
 
-	public void testAnchor() {
-
-		htmlWriter.appendAnchor("http://www.google.co.jp/", "google");
-		String expected = "<a href=\"http://www.google.co.jp/\">google</a>";
-		doTest(expected);
-
-		htmlWriter.appendAnchor("someda@isenshi.com", "someda", true);
-		expected = "<a href=\"mailto:someda@isenshi.com\">someda</a>";
-		doTest(expected);
-	}
-
-	public void testHeading() {
-
-		htmlWriter.appendHeading(2, "heading2");
-		String expected = "<h2>heading2</h2>";
-		doTest(expected);
-
-		htmlWriter.appendHeading(3, "heading3");
-		expected = "<h3>heading3</h3>";
-		doTest(expected);
-
-		htmlWriter.appendHeading(4, "heading4");
-		expected = "<h4>heading4</h4>";
-		doTest(expected);
-	}
-
 	public void testList() {
 
 		htmlWriter.start("ul");
@@ -116,22 +83,6 @@ public class HtmlWriterTest extends XMLTestCase {
 		htmlWriter.endAll();
 
 		String expected = "<ul><li>list1</li></ul>";
-		doTest(expected);
-	}
-
-	public void testTable() {
-
-		htmlWriter.start("table");
-		htmlWriter.start("tr");
-		htmlWriter.appendTableCell("cell1", true);
-		htmlWriter.appendTableCell("cell2", true);
-		htmlWriter.end();
-		htmlWriter.start("tr");
-		htmlWriter.appendTableCell("cell3", false);
-		htmlWriter.appendTableCell("cell4", false);
-		htmlWriter.endAll();
-
-		String expected = "<table><tr><th>cell1</th><th>cell2</th></tr><tr><td>cell3</td><td>cell4</td></tr></table>";
 		doTest(expected);
 	}
 

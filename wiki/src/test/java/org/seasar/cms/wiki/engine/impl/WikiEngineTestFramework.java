@@ -14,7 +14,7 @@ public class WikiEngineTestFramework extends S2TestCase {
 	}
 
 	public void testTest() {
-		System.out.println("fake");
+		// System.out.println("fake");
 	}
 
 	/**

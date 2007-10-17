@@ -11,4 +11,6 @@ public interface WikiWriterVisitor extends WikiParserVisitor {
 
 	public Writer getWriter();
 
+	public void write(String body);
+
 }

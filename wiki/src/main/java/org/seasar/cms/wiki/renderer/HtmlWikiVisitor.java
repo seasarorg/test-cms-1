@@ -88,6 +88,10 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		return writer;
 	}
 
+	public void write(String body) {
+		writer.body(body);
+	}
+
 	public Object visit(SimpleNode node, Object data) {
 		return null;
 	}
@@ -213,8 +217,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 					.toString();
 			childstr += anchor;
 		}
-
-		writer.appendHeading(node.level + 1, childstr);
+		writer.start("h" + (node.level + 1)).body(childstr).end();
 		return null;
 	}
 
@@ -245,14 +248,15 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		String letter = node.letter;
 
 		if (node.isEmail) {
-			writer.appendAnchor("mailto:" + node.letter, body);
+			writer.start("a").attr("href", "mailto:" + node.letter).body(body)
+					.end();
 		} else if (node.isURL) {
 			if (ImageUtils.isImage(node.letter)) {
 				writer.start("a").attr("href", letter);
 				writer.start("img").attr("src", letter).attr("alt", body);
 				writer.end().end();
 			} else {
-				writer.appendAnchor(node.letter, body);
+				writer.start("a").attr("href", node.letter).body(body).end();
 			}
 		} else if (node.isAnchor) {
 			String id = (letter.startsWith("#")) ? letter.substring(1) : letter;
@@ -260,7 +264,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		} else if (node.isWikiname) {
 			processLink(node.letter, body, null);
 		} else if (node.isNewline) {
-			writer.appendBr();
+			writer.start("br").end();
 		} else {
 			writer.body(body);
 		}
@@ -343,7 +347,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 	public Object visit(WikiLink node, Object data) {
 		String[] s = GenerateNodeHelper.split(node.image,
 				GenerateNodeHelper.LINK_DELIMITER);
-		writer.appendAnchor(s[1], s[0], true);
+		appendEmail(s[1], s[0]);
 		return null;
 	}
 
@@ -353,11 +357,11 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 
 		writer.inline();
 		if (node.islink) {
-			writer.appendAnchor(s[1], s[0], true);
+			appendEmail(s[1], s[0]);
 		} else {
 			String[] t = GenerateNodeHelper.split(s[1], "#");
 			if (t[0] == null || t[0].equals("")) {
-				writer.appendAnchor("#" + t[1], s[0]);
+				writer.start("a").attr("href", "#" + t[1]).body(s[0]).end();
 			} else {
 				processLink(t[0], s[0], t[1]);
 			}
@@ -428,13 +432,14 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		writer.disableNewline();
 		while (itr.hasNext()) {
 			writer.disableTab();
-			appendSuper(getProperty("id.note.text.prefix") + idx,
+			appendSuper(getProperty("id.note.foot.prefix") + idx,
 					getProperty("class.note_super"), "#"
-							+ getProperty("notefoot_") + idx, "*" + idx);
+							+ getProperty("id.note.text.prefix") + idx, "*"
+							+ idx);
 			writer.enableTab();
 			SimpleNode n = (SimpleNode) itr.next();
 			processChildren(n, data);
-			writer.appendBr();
+			writer.start("br").end();
 			idx++;
 		}
 		writer.enableNewline();
@@ -541,7 +546,11 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		writer = new HtmlWriter(sw);
 		processChildren(node, data, fromIndex);
 		writer = currentWriter;
-		return sw.toString();
+		String child = sw.toString();
+		if (child.length() == 0) {
+			return null;
+		}
+		return child;
 	}
 
 	private void processLink(String pagename, String body, String anchor) {
@@ -556,7 +565,8 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 			String msg = link.getPreMsg();
 			writer.start("span").attr("class", notclass).body(msg).end();
 		}
-		writer.appendAnchor(link.getUrl(), link.getBody());
+		writer.start("a").attr("href", link.getUrl()).body(link.getBody())
+				.end();
 		if (link.hasPostMsg()) {
 			String msg = link.getPostMsg();
 			writer.start("span").attr("class", notclass).body(msg).end();
@@ -623,4 +633,19 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 	private String getProperty(String key) {
 		return context.getEngine().getProperty(key);
 	}
+
+	/**
+	 * メールアドレスかどうかのチェック(@を含んでいるか)を行い、パスすれば"mailto:"がlinkUrlに付与される。
+	 * 
+	 * @param linkUrl
+	 * @param linkLabel
+	 *            真の場合、
+	 */
+	private void appendEmail(String linkUrl, String linkLabel) {
+		if (linkUrl.indexOf("@") != -1) {
+			linkUrl = "mailto:" + linkUrl;
+		}
+		writer.start("a").attr("href", linkUrl).body(linkLabel).end();
+	}
+
 }

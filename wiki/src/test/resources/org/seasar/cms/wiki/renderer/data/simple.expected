@@ -1,3 +1,10 @@
 <p>
 <br/>
-</p><ul><li>a</li></ul>
+</p>
+<ul>
+<li>a<a id="notetext_1" class="note_super" href="#notefoot_1">*1</a></li></ul>
+
+<hr class="note_hr" align="left"/>
+<a id="notefoot_1" class="note_super" href="#notetext_1">*1</a>description
+
+<br/>

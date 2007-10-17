@@ -24,6 +24,11 @@
 			<name>SOMEDA Takashi</name>
 			<email>someda@isenshi.com</email>
 		</developer>
+		<developer>
+			<id>nishioka</id>
+			<name>NISHIOKA Yuhei</name>
+			<email>nishiokaisenshi.com</email>
+		</developer>
 	</developers>
 	<scm>
 		<connection>
@@ -76,8 +81,24 @@
 					</outputDirectory>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<encoding>UTF8</encoding>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav</artifactId>
+			</extension>
+		</extensions>
 	</build>
+
+
 	<repositories>
 		<repository>
 			<id>maven.seasar.org</id>
@@ -112,16 +133,43 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>itext</groupId>
-			<artifactId>itext</artifactId>
-			<version>1.3</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>codehaus-snapshot-plugins</id>
+			<name>codehaus-shapshot-plugins</name>
+			<url>http://snapshots.repository.codehaus.org/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+	
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>maven.seasar.org</id>
+			<name>The Seasar Foundation Maven2 Repository</name>
+			<url>dav:https://www.seasar.org/maven/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>true</uniqueVersion>
+			<id>maven.seasar.org</id>
+			<name>
+				The Seasar Foundation Maven2 Snapshot Repository
+			</name>
+			<url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
 </project>
 

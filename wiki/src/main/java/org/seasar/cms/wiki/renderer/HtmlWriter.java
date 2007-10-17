@@ -18,15 +18,26 @@ package org.seasar.cms.wiki.renderer;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Stack;
 
 import org.seasar.framework.exception.IORuntimeException;
 
 /**
  * @author someda
  */
-public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
+public class HtmlWriter extends WriterWrapper {
 
 	private String newline = "\n";
+
+	protected boolean appendTab = false;
+
+	protected boolean appendNewline = false;
+
+	protected boolean closed = true;
+
+	protected Stack<String> elementStack = new Stack<String>();
 
 	public HtmlWriter() {
 		super(new StringWriter());
@@ -36,96 +47,9 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 		super(writer);
 	}
 
-	// ----- [Start] Abstract メソッドの実装 -----
-
-	protected void doAppend(String character) {
-		try {
-			super.write(character);
-		} catch (IOException e) {
-			throw new IORuntimeException(e);
-		}
-	}
-
-	protected void doAppendAttribute(String name, String value) {
-		doAppend(" " + name + "=\"" + value + "\"");
-	}
-
-	protected void doAppendTag(String name, boolean start) {
-		if (start) {
-			doAppend("<" + name);
-		} else {
-			doAppend("</" + name);
-		}
-	}
-
-	protected void doAppendNewline() {
-		doAppend(newline);
-	}
-
-	// ----- [End] Abstract メソッドの実装 -----
-
-	/**
-	 * アンカーを追加する
-	 * 
-	 * @param linkUrl
-	 * @param linkLabel
-	 * @param mailCheck
-	 *            真の場合、メールアドレスかどうかのチェック(@を含んでいるか)を行い、パスすれば"mailto:"がlinkUrlに付与される。
-	 */
-	public void appendAnchor(String linkUrl, String linkLabel, boolean mailCheck) {
-		if (mailCheck) {
-			if (linkUrl.indexOf("@") != -1) {
-				linkUrl = "mailto:" + linkUrl;
-			}
-		}
-		appendAnchor(linkUrl, linkLabel);
-	}
-
-	/**
-	 * アンカーを追加する
-	 * 
-	 * @param linkUrl
-	 * @param linkLabel
-	 */
-	public void appendAnchor(String linkUrl, String linkLabel) {
-		start("a");
-		attr("href", linkUrl);
-		body(linkLabel);
-		end();
-	}
-
-	/**
-	 * テーブルのセルを追加する
-	 * 
-	 * @param value
-	 * @param header
-	 */
-	public void appendTableCell(String value, boolean header) {
-		if (header) {
-			start("th");
-		} else {
-			start("td");
-		}
-		body(value);
-		end();
-	}
-
-	/**
-	 * 見出しを追加する
-	 * 
-	 * @param level
-	 * @param body
-	 */
-	public void appendHeading(int level, String body) {
-		String tag = "h" + level;
-		start(tag).body(body).end();
-	}
-
-	/**
-	 * <br/> を追加する
-	 */
-	public void appendBr() {
-		body("<br/>");
+	public HtmlWriter(Writer writer, String linebreakcode) {
+		super(writer);
+		this.newline = linebreakcode;
 	}
 
 	/**
@@ -134,6 +58,7 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 	 * @throws IllegalStateException
 	 *             タグが閉じていない状態で書き込みを行った場合
 	 */
+	@Override
 	public void close() throws IOException {
 		if (!closed) {
 			throw new IllegalStateException(
@@ -143,12 +68,82 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 	}
 
 	/**
+	 * add xml attribute
+	 */
+	public HtmlWriter attr(String name, String value) {
+		if (value != null) {
+			doWrite(" " + name + "=\"" + value + "\"");
+		}
+		return this;
+	}
+
+	/**
+	 * add xml attributes
+	 */
+	public HtmlWriter attrs(Map<String, String> attrs) {
+		for (String key : attrs.keySet()) {
+			attr(key, attrs.get(key));
+		}
+		return this;
+	}
+
+	/**
+	 * add body
+	 */
+	public HtmlWriter body(String body) {
+		if (body == null) {
+			return this;
+		}
+		assertBody();
+		doWrite(body);
+		doAppendNewLine();
+		return this;
+	}
+
+	/**
+	 * open tag
+	 */
+	public HtmlWriter start(String name) {
+		assertBody();
+		doAppendTag(name, true);
+		closed = false;
+		doTagPush(name);
+		return this;
+	}
+
+	/**
+	 * close tag
+	 */
+	public HtmlWriter end() {
+		String name = doTagPop();
+		if (closed) {
+			doTab();
+			doAppendTag(name, false);
+			closeTag(true);
+		} else {
+			closeTag(false);
+		}
+		return this;
+	}
+
+	/**
+	 * close all tags which is opened.
+	 */
+	public HtmlWriter endAll() {
+		Iterator itr = elementStack.iterator();
+		while (itr.hasNext()) {
+			end();
+		}
+		return this;
+	}
+
+	/**
 	 * 新規タグ追加時にタブを挿入
 	 * 
 	 * @return
 	 */
 	public HtmlWriter enableTab() {
-		setTab(true);
+		this.appendNewline = true;
 		return this;
 	}
 
@@ -158,7 +153,7 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 	 * @return
 	 */
 	public HtmlWriter disableTab() {
-		setTab(false);
+		this.appendNewline = false;
 		return this;
 	}
 
@@ -168,7 +163,7 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 	 * @return
 	 */
 	public HtmlWriter enableNewline() {
-		setNewline(true);
+		this.appendNewline = true;
 		return this;
 	}
 
@@ -176,16 +171,22 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 	 * 新規タグ追加時、Body追加時、タグ閉じ追加時、改行コードを挿入せず
 	 */
 	public HtmlWriter disableNewline() {
-		setNewline(false);
+		this.appendNewline = false;
 		return this;
 	}
 
+	/**
+	 * write contens without linebreak or tab
+	 */
 	public HtmlWriter inline() {
 		disableNewline();
 		disableTab();
 		return this;
 	}
 
+	/**
+	 * write content with linebreak or tab
+	 */
 	public HtmlWriter block() {
 		enableNewline();
 		enableTab();
@@ -194,12 +195,65 @@ public class HtmlWriter extends AbstractContentsWriter<HtmlWriter> {
 
 	// ---------- private methods -----------------
 
-	private void setNewline(boolean flag) {
-		this.appendNewline = flag;
+	private void assertBody() {
+		if (!closed) {
+			closeTag(true);
+		}
+		doTab();
 	}
 
-	private void setTab(boolean flag) {
-		this.appendNewline = flag;
+	private void doTagPush(String tag) {
+		elementStack.push(tag);
 	}
 
+	private String doTagPop() {
+		if (elementStack.size() > 0) {
+			return (String) elementStack.pop();
+		} else {
+			return null;
+		}
+	}
+
+	public void closeTag() {
+		closeTag(true);
+	}
+
+	private void closeTag(boolean onlyClose) {
+		if (!onlyClose) {
+			doWrite("/");
+		}
+		closed = true;
+		doWrite(">");
+		doAppendNewLine();
+	}
+
+	private void doWrite(String character) {
+		try {
+			super.write(character);
+		} catch (IOException e) {
+			throw new IORuntimeException(e);
+		}
+	}
+
+	private void doAppendTag(String name, boolean start) {
+		if (start) {
+			doWrite("<" + name);
+		} else {
+			doWrite("</" + name);
+		}
+	}
+
+	private void doTab() {
+		if (appendTab) {
+			for (int i = 0; i < elementStack.size(); i++) {
+				doWrite("\t");
+			}
+		}
+	}
+
+	private void doAppendNewLine() {
+		if (appendNewline) {
+			doWrite(newline);
+		}
+	}
 }
