@@ -1,4 +1,4 @@
-package org.seasar.cms.wiki.plugin;
+package org.seasar.cms.wiki.factory;
 
 public class WikiPageLink {
 

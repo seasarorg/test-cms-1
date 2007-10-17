@@ -1,8 +1,8 @@
 package org.seasar.cms.wiki.factory.impl;
 
 import org.seasar.cms.wiki.engine.WikiContext;
+import org.seasar.cms.wiki.factory.WikiPageLink;
 import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
-import org.seasar.cms.wiki.plugin.WikiPageLink;
 
 public class WikiPageLinkFactoryImpl implements WikiPageLinkFactory {
 
@@ -14,4 +14,9 @@ public class WikiPageLinkFactoryImpl implements WikiPageLinkFactory {
 		}
 		return new WikiPageLink(body, url);
 	}
+
+	public WikiPageLink createEditLink(WikiContext context, String anchor) {
+		return null;
+	}
+
 }

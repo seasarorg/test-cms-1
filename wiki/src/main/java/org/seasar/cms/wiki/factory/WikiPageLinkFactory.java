@@ -1,7 +1,6 @@
 package org.seasar.cms.wiki.factory;
 
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.plugin.WikiPageLink;
 
 /**
  * リンクを生成する Factory
@@ -10,7 +9,17 @@ import org.seasar.cms.wiki.plugin.WikiPageLink;
  */
 public interface WikiPageLinkFactory {
 
+	/**
+	 * 指定したページに対するリンク
+	 * 
+	 * @param context
+	 * @param pagename
+	 * @param body
+	 * @param anchor
+	 * @return
+	 */
 	public WikiPageLink create(WikiContext context, String pagename,
 			String body, String anchor);
 
+	public WikiPageLink createEditLink(WikiContext context, String anchor);
 }

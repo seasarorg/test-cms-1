@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.factory.WikiBodyFactory;
+import org.seasar.cms.wiki.factory.WikiPageLink;
 import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.SimpleNode;
@@ -58,7 +59,6 @@ import org.seasar.cms.wiki.parser.WikiTable;
 import org.seasar.cms.wiki.parser.WikiTablecolumn;
 import org.seasar.cms.wiki.parser.WikiTablemember;
 import org.seasar.cms.wiki.plugin.PluginExecuter;
-import org.seasar.cms.wiki.plugin.WikiPageLink;
 import org.seasar.cms.wiki.util.GenerateNodeHelper;
 import org.seasar.cms.wiki.util.ImageUtils;
 import org.seasar.cms.wiki.util.NodeUtils;
@@ -102,7 +102,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 	}
 
 	/**
-	 * ルートノードの解析
+	 * Analyze of the root node.
 	 */
 	public Object visit(WikiGenerateTree node, Object data) {
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
@@ -201,32 +201,19 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 
 	public Object visit(WikiHeading node, Object data) {
 		String childstr = getChildString(node, data, 0);
-		// Resource resource = request_.getPage().getResource();
-		// String lockuser =
-		// resource.getProperty(CmsConstants.PROPERTY_LOCKUSER);
-		// if (lockuser == null) {
-		// String anchorid = VisitorUtils.getAnchorId(node);
-		// if (anchorid != null && !"".equals(anchorid)) {
-		// String pagename = resource.getPath();
-		// if (hasCreatePermission) {
-		// try {
-		// URL url = ctx.getEditPageURL(pagename, request_);
-		// String href = url.toString();
-		// href += "&amp;" + Constants.PARAM_PAGESECTIONID + "="
-		// + anchorid.substring(1);
-		// href += request_.getURLEncodedQuery();
-		// HtmlBuffer anchorbuf = new HtmlBuffer();
-		// anchorbuf.setNewline(false);
-		// anchorbuf.setTab(false);
-		// appendSuper(anchorbuf, null, "anchor_super", href,
-		// " edit");
-		// childstr += anchorbuf.toString();
-		// } catch (TgwSecurityException tse) {
-		// hasCreatePermission = false;
-		// }
-		// }
-		// }
-		// }
+
+		String anchorId = VisitorUtils.getAnchorId(node);
+		WikiPageLink pageLink = context.getEngine().getLinkFactory()
+				.createEditLink(context, anchorId);
+		if (pageLink != null) {
+			String body = pageLink.getBody();
+			String href = pageLink.getUrl();
+			String anchor = new HtmlWriter().start("a").attr("class",
+					"anchor_super").attr("href", href).body(body).end()
+					.toString();
+			childstr += anchor;
+		}
+
 		writer.appendHeading(node.level + 1, childstr);
 		return null;
 	}
@@ -554,11 +541,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		writer = new HtmlWriter(sw);
 		processChildren(node, data, fromIndex);
 		writer = currentWriter;
-		String child = sw.toString();
-		if (child == null || child.equals("")) {
-			return "";
-		}
-		return child;
+		return sw.toString();
 	}
 
 	private void processLink(String pagename, String body, String anchor) {

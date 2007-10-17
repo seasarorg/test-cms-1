@@ -2,8 +2,8 @@ package org.seasar.cms.wiki.factory.impl;
 
 import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.engine.impl.WikiEngineTestFramework;
+import org.seasar.cms.wiki.factory.WikiPageLink;
 import org.seasar.cms.wiki.factory.WikiPageLinkFactory;
-import org.seasar.cms.wiki.plugin.WikiPageLink;
 
 public class WikiPageLinkFactoryImplTest extends WikiEngineTestFramework {
 
@@ -27,12 +27,28 @@ public class WikiPageLinkFactoryImplTest extends WikiEngineTestFramework {
 		assertWikiEquals(expected, actual);
 	}
 
+	public void testCreateHeading() {
+		String actual = engine.evaluate("*h2", new WikiContext());
+		String expected = "<h2>h2</h2>";
+		assertWikiEquals(expected, actual);
+
+		engine.setLinkFactory(new CreationLinkFactory());
+		actual = engine.evaluate("*h2", new WikiContext());
+		expected = "<h2>h2<a class=\"anchor_super\" href=\"url://edit\">edit</a></h2>";
+		assertWikiEquals(expected, actual);
+	}
+
 	public static class CreationLinkFactory implements WikiPageLinkFactory {
+
 		public WikiPageLink create(WikiContext context, String pagename,
 				String body, String anchor) {
 			WikiPageLink link = new WikiPageLink("?", "creationLink");
 			link.setPostMsg(pagename);
 			return link;
+		}
+
+		public WikiPageLink createEditLink(WikiContext context, String anchor) {
+			return new WikiPageLink("edit", "url://edit");
 		}
 	}
 }
