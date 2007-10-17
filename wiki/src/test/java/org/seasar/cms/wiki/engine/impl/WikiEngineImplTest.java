@@ -8,7 +8,7 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.seasar.cms.wiki.engine.WikiContext;
-import org.seasar.cms.wiki.renderer.HtmlWriter;
+import org.seasar.cms.wiki.renderer.XmlWriter;
 import org.seasar.cms.wiki.util.WikiTestUtils;
 import org.seasar.framework.util.ResourceUtil;
 
@@ -75,7 +75,7 @@ public class WikiEngineImplTest extends WikiEngineTestFramework {
 	private void writeHtml(String name, String actual) throws Exception {
 		File file = new File(target, name + ".html");
 
-		HtmlWriter hw = new HtmlWriter();
+		XmlWriter hw = new XmlWriter();
 		hw.block().start("html").start("head");
 		hw.start("meta").attr("http-equiv", "Content-Type").attr("content",
 				"text/html; charset=UTF-8").end();

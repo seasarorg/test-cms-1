@@ -76,7 +76,7 @@ import org.seasar.cms.wiki.util.WikiStringUtils;
 public class HtmlWikiVisitor implements WikiWriterVisitor,
 		WikiOutputStreamVisitor {
 
-	private HtmlWriter writer;
+	private XmlWriter writer;
 
 	private WikiContext context;
 
@@ -97,7 +97,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 
 	public void init(WikiContext context, Writer writer) {
 		this.context = context;
-		this.writer = new HtmlWriter(writer);
+		this.writer = new XmlWriter(writer);
 	}
 
 	public void write(byte[] bytes) {
@@ -242,7 +242,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 		if (pageLink != null) {
 			String body = pageLink.getBody();
 			String href = pageLink.getUrl();
-			String anchor = new HtmlWriter().start("a").attr("class",
+			String anchor = new XmlWriter().start("a").attr("class",
 					getProperty("class.anchor_super")).attr("href", href).body(
 					body).end().toString();
 			childstr += anchor;
@@ -571,9 +571,9 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 	}
 
 	private String getChildString(SimpleNode node, Object data, int fromIndex) {
-		HtmlWriter currentWriter = writer;
+		XmlWriter currentWriter = writer;
 		StringWriter sw = new StringWriter();
-		writer = new HtmlWriter(sw);
+		writer = new XmlWriter(sw);
 		processChildren(node, data, fromIndex);
 		writer = currentWriter;
 		String child = sw.toString();

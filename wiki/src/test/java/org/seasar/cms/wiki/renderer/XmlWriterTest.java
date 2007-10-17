@@ -26,9 +26,9 @@ import org.xml.sax.SAXException;
 /**
  * @author someda
  */
-public class HtmlWriterTest extends XMLTestCase {
+public class XmlWriterTest extends XMLTestCase {
 
-	private HtmlWriter htmlWriter;
+	private XmlWriter htmlWriter;
 
 	private StringWriter stringWriter;
 
@@ -38,18 +38,18 @@ public class HtmlWriterTest extends XMLTestCase {
 
 	private void init() {
 		stringWriter = new StringWriter();
-		htmlWriter = new HtmlWriter(stringWriter);
+		htmlWriter = new XmlWriter(stringWriter);
 	}
 
 	public void testInline() {
-		String actual = new HtmlWriter().inline().start("test").attr("style",
+		String actual = new XmlWriter().inline().start("test").attr("style",
 				"bstyle").body("body").end().toString();
 		String expected = "<test style=\"bstyle\">body</test>";
 		assertEquals(expected, actual);
 	}
 
 	public void testBlock() {
-		String actual = new HtmlWriter().block().start("test").attr("style",
+		String actual = new XmlWriter().block().start("test").attr("style",
 				"bstyle").body("body").end().toString();
 		String expected = "<test style=\"bstyle\">\nbody\n</test>\n";
 		assertEquals(expected, actual);

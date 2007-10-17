@@ -27,7 +27,7 @@ import org.seasar.framework.exception.IORuntimeException;
 /**
  * @author someda
  */
-public class HtmlWriter extends WriterWrapper {
+public class XmlWriter extends WriterWrapper {
 
 	private String newline = "\n";
 
@@ -39,15 +39,15 @@ public class HtmlWriter extends WriterWrapper {
 
 	protected Stack<String> elementStack = new Stack<String>();
 
-	public HtmlWriter() {
+	public XmlWriter() {
 		super(new StringWriter());
 	}
 
-	public HtmlWriter(Writer writer) {
+	public XmlWriter(Writer writer) {
 		super(writer);
 	}
 
-	public HtmlWriter(Writer writer, String linebreakcode) {
+	public XmlWriter(Writer writer, String linebreakcode) {
 		super(writer);
 		this.newline = linebreakcode;
 	}
@@ -70,7 +70,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * add xml attribute
 	 */
-	public HtmlWriter attr(String name, String value) {
+	public XmlWriter attr(String name, String value) {
 		if (value != null) {
 			doWrite(" " + name + "=\"" + value + "\"");
 		}
@@ -80,7 +80,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * add xml attributes
 	 */
-	public HtmlWriter attrs(Map<String, String> attrs) {
+	public XmlWriter attrs(Map<String, String> attrs) {
 		for (String key : attrs.keySet()) {
 			attr(key, attrs.get(key));
 		}
@@ -90,7 +90,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * add body
 	 */
-	public HtmlWriter body(String body) {
+	public XmlWriter body(String body) {
 		if (body == null) {
 			return this;
 		}
@@ -103,7 +103,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * open tag
 	 */
-	public HtmlWriter start(String name) {
+	public XmlWriter start(String name) {
 		assertBody();
 		doAppendTag(name, true);
 		closed = false;
@@ -114,7 +114,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * close tag
 	 */
-	public HtmlWriter end() {
+	public XmlWriter end() {
 		String name = doTagPop();
 		if (closed) {
 			doTab();
@@ -129,7 +129,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * close all tags which is opened.
 	 */
-	public HtmlWriter endAll() {
+	public XmlWriter endAll() {
 		Iterator itr = elementStack.iterator();
 		while (itr.hasNext()) {
 			end();
@@ -142,7 +142,7 @@ public class HtmlWriter extends WriterWrapper {
 	 * 
 	 * @return
 	 */
-	public HtmlWriter enableTab() {
+	public XmlWriter enableTab() {
 		this.appendNewline = true;
 		return this;
 	}
@@ -152,7 +152,7 @@ public class HtmlWriter extends WriterWrapper {
 	 * 
 	 * @return
 	 */
-	public HtmlWriter disableTab() {
+	public XmlWriter disableTab() {
 		this.appendNewline = false;
 		return this;
 	}
@@ -162,7 +162,7 @@ public class HtmlWriter extends WriterWrapper {
 	 * 
 	 * @return
 	 */
-	public HtmlWriter enableNewline() {
+	public XmlWriter enableNewline() {
 		this.appendNewline = true;
 		return this;
 	}
@@ -170,7 +170,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * 新規タグ追加時、Body追加時、タグ閉じ追加時、改行コードを挿入せず
 	 */
-	public HtmlWriter disableNewline() {
+	public XmlWriter disableNewline() {
 		this.appendNewline = false;
 		return this;
 	}
@@ -178,7 +178,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * write contens without linebreak or tab
 	 */
-	public HtmlWriter inline() {
+	public XmlWriter inline() {
 		disableNewline();
 		disableTab();
 		return this;
@@ -187,7 +187,7 @@ public class HtmlWriter extends WriterWrapper {
 	/**
 	 * write content with linebreak or tab
 	 */
-	public HtmlWriter block() {
+	public XmlWriter block() {
 		enableNewline();
 		enableTab();
 		return this;
