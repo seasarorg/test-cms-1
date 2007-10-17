@@ -15,7 +15,10 @@
  */
 package org.seasar.cms.wiki.renderer;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.Map;
@@ -70,13 +73,26 @@ import org.seasar.cms.wiki.util.WikiStringUtils;
  * @author someda
  * @author nishioka
  */
-public class HtmlWikiVisitor implements WikiWriterVisitor {
+public class HtmlWikiVisitor implements WikiWriterVisitor,
+		WikiOutputStreamVisitor {
 
 	private HtmlWriter writer;
 
 	private WikiContext context;
 
+	private boolean needWriterClose = false;
+
 	public HtmlWikiVisitor() {
+	}
+
+	public void init(WikiContext context, OutputStream os) {
+		try {
+			needWriterClose = true;
+			init(context, new OutputStreamWriter(os, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			// UTF-8 always supported
+			throw new IllegalStateException(e);
+		}
 	}
 
 	public void init(WikiContext context, Writer writer) {
@@ -84,8 +100,13 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 		this.writer = new HtmlWriter(writer);
 	}
 
-	public Writer getWriter() {
-		return writer;
+	public void write(byte[] bytes) {
+		try {
+			write(new String(bytes, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			// UTF-8 always supported
+			throw new IllegalStateException(e);
+		}
 	}
 
 	public void write(String body) {
@@ -113,6 +134,15 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 			node.jjtGetChild(i).jjtAccept(this, data);
 		}
 		processAnnotations(node, data);
+
+		if (needWriterClose) {
+			try {
+				writer.close();
+			} catch (Exception e) {
+				// do nothing
+			}
+		}
+
 		return null;
 	}
 
@@ -213,8 +243,8 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 			String body = pageLink.getBody();
 			String href = pageLink.getUrl();
 			String anchor = new HtmlWriter().start("a").attr("class",
-					"anchor_super").attr("href", href).body(body).end()
-					.toString();
+					getProperty("class.anchor_super")).attr("href", href).body(
+					body).end().toString();
 			childstr += anchor;
 		}
 		writer.start("h" + (node.level + 1)).body(childstr).end();
@@ -260,7 +290,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor {
 			}
 		} else if (node.isAnchor) {
 			String id = (letter.startsWith("#")) ? letter.substring(1) : letter;
-			appendSuper(id, "anchor_super", body, "&nbsp;");
+			appendSuper(id, getProperty("class.anchor_super"), body, "&nbsp;");
 		} else if (node.isWikiname) {
 			processLink(node.letter, body, null);
 		} else if (node.isNewline) {

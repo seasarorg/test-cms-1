@@ -1,5 +1,6 @@
 package org.seasar.cms.wiki.factory.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
 import org.seasar.cms.wiki.engine.WikiContext;
@@ -23,4 +24,9 @@ public class WikiVisitorFactoryImplTest extends WikiEngineTestFramework {
 		assertNotSame(visitor2, visitor);
 	}
 
+	public void testCreateWithOutputStream() {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		WikiParserVisitor visitor = factory.create(new WikiContext(), bos);
+		assertNotNull(visitor);
+	}
 }

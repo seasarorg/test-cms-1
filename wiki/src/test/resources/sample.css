@@ -10,3 +10,8 @@ hr.note_hr{
 .notexist{
 	background-color: #ddd;
 }
+
+.anchor_super {
+	font-size:xx-small;
+	vertical-align:super;
+}

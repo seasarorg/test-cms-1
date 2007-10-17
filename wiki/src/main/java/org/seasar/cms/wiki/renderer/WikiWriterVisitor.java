@@ -9,8 +9,6 @@ public interface WikiWriterVisitor extends WikiParserVisitor {
 
 	public void init(WikiContext context, Writer writer);
 
-	public Writer getWriter();
-
 	public void write(String body);
 
 }

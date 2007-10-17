@@ -54,7 +54,7 @@ public class SingletonPluginExecuter extends AbstractChildPluginExecuter {
 		try {
 			String result = plugins.get(name).render(ctx, args, child);
 			WikiWriterVisitor visitor = (WikiWriterVisitor) ctx.getVisitor();
-			visitor.getWriter().write(result);
+			visitor.write(result);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

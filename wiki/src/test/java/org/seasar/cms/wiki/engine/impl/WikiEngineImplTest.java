@@ -1,5 +1,6 @@
 package org.seasar.cms.wiki.engine.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.Reader;
 import java.util.Properties;
@@ -38,6 +39,14 @@ public class WikiEngineImplTest extends WikiEngineTestFramework {
 
 		value = engine.getProperty("class.note_super");
 		assertEquals("replace", value);
+	}
+
+	public void testOutputStream() throws Exception {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		engine.merge("p", new WikiContext(), bos);
+		String actual = new String(bos.toByteArray(), "UTF-8");
+		String expected = "<p>p</p>";
+		assertWikiEquals(expected, actual);
 	}
 
 	public void testAll() throws Exception {

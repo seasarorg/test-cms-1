@@ -129,6 +129,7 @@ public class WikiEngineImpl implements WikiEngine {
 		context.setRoot(root);
 		context.setVisitor(visitor);
 
+		
 		root.jjtAccept(visitor, null);
 	}
 }

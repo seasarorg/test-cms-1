@@ -154,6 +154,31 @@
 		</pluginRepository>
 	</pluginRepositories>
 	
+	<reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+        <configuration>
+          <inputEncoding>UTF-8</inputEncoding>
+          <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>surefire-report-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>taglist-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>changelog-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+	
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
