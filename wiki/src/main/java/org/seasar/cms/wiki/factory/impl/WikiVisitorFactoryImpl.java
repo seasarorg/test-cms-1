@@ -8,7 +8,6 @@ import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 import org.seasar.cms.wiki.parser.WikiParserVisitor;
 import org.seasar.cms.wiki.renderer.HtmlWikiVisitor;
 import org.seasar.cms.wiki.renderer.WikiWriterVisitor;
-import org.seasar.cms.wiki.visitor.PdfWikiVisitor;
 
 public class WikiVisitorFactoryImpl implements WikiVisitorFactory {
 
@@ -34,7 +33,7 @@ public class WikiVisitorFactoryImpl implements WikiVisitorFactory {
 	public WikiParserVisitor create(WikiContext context, OutputStream stream) {
 		switch (Type.valueOf(context.getOutputType())) {
 		case pdf:
-			return new PdfWikiVisitor(stream);
+			//return new PdfWikiVisitor(stream);
 		case txt:
 		case html:
 			break;

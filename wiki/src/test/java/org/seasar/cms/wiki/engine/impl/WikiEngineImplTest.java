@@ -22,6 +22,7 @@ public class WikiEngineImplTest extends WikiEngineTestFramework {
 		assertEquals("replace", value);
 	}
 
+	/*
 	public void testAll() throws Exception {
 		File[] files = WikiTestUtils.getDataDirectory().listFiles();
 		for (File file : files) {
@@ -31,6 +32,7 @@ public class WikiEngineImplTest extends WikiEngineTestFramework {
 			}
 		}
 	}
+	*/
 
 	private void doEval(String fileName) throws Exception {
 		Reader reader = WikiTestUtils.getFileReader(fileName);
