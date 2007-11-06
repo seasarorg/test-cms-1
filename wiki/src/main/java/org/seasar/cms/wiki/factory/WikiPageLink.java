@@ -15,6 +15,12 @@ public class WikiPageLink {
 		this.url = url;
 	}
 
+	public WikiPageLink(String body, String url, String preMsg, String postMsg) {
+		this(body, url);
+		this.preMsg = preMsg;
+		this.postMsg = postMsg;
+	}
+
 	public String getBody() {
 		return body;
 	}
