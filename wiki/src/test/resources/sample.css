@@ -15,3 +15,27 @@ hr.note_hr{
 	font-size:xx-small;
 	vertical-align:super;
 }
+
+
+
+
+table{
+	border-collapse: collapse;
+	color : #000;
+	background-color : silver;
+}
+
+td,th{
+	border-right: 1px solid #ffffff;
+	border-bottom: 1px solid #ffffff;
+}
+
+th { 
+	font-weight : bold;
+	padding : 4px;
+}
+
+td{
+	background-color : #ddd;
+}
+	

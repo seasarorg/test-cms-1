@@ -1,0 +1,104 @@
+ ------
+Getting Started
+ ------
+NISHIOKA Yuhei
+ ------
+2007-11-11
+ ------
+
+#contents
+
+
+[[1のほうに>aaa/getting-started.html]]
+
+
+* Getting Started
+
+** How to use from program with Seasar &color(red){2.x};
+
+  First of all, add wiki-0.0.1-SNAPSHOT.jar to your classpath. &br(); &br(); &br(); &br(); &br(); &br;&br;&br;
+If you use RST from Maven2, you can download this jar file from [[maven.seasar.org>http://maven.seasar.org/maven2]] repository.
+To make Maven2 scan maven.seasar.org repository and get wiki jar file,
+simply add your pom.xml the folowing lines:
+
+#br
+#br
+#br
+
+#div(,source)
+  <repositories>
+ 
+    ...
+ 
+    <repository>
+      <id>www.seasar.org</id>
+      <name>The Seasar Foundation Maven2 Repository</name>
+      <url>http://maven.seasar.org/maven2</url>
+    </repository>
+  </repositories>
+ 
+  ...
+ 
+  <dependencies>
+ 
+    ...
+ 
+    <dependency>
+      <groupId>org.seasar.cms</groupId>
+      <artifactId>wiki</artifactId>
+      <version>0.1.1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+#divclose
+
+ To inject WikiEngine Object by Seasar Container, add wikiengine.dicon to your DICON file.
+
+#div(,source)
+ <include path="wikiengine.dicon"/>
+#divclose
+
+
+ To parse and convert , write like the following:
+
+#div(,source)
+  import org.seasar.cms.wiki.engine.WikiEngine;
+ 
+  ...
+  
+  WikiEngine engine = // <-- inject by S2Container
+  String html = engine.evaluate(reader);
+  
+  ...
+  
+#divclose
+
+  When a target text is invalid, RstParser throws
+net.skirnir.rst.IllegalFormatRuntimeException.
+
+  RstParser is thread-safe unless modifying the internal structure.
+
+  To convert net.skirnir.rst.element.Document object into HTML text,
+write like the following:
+
+
+  import net.skirnir.rst.element.Document;
+  import net.skirnir.rst.parser.RstParser;
+
+  ...
+
+  Document document = parser.parse(reader);
+  HTMLConverter converter = new HTMLConverter();
+  StringBuffer sb = new StringBuffer();
+  converter.convert(document, sb);
+  String html = sb.toString();
+  ...
+
+  HTMLconverter is also thread-safe unless modifying the internal structure.
+
+
+** How to use for building web site by Maven2
+
+  If you maintain Maven2 project and want to write site contents of the project
+with reStructuredText format, please try {{{http://www.skirnir.net/product/doxia-module-rst/} doxia-module-rst}}.
+

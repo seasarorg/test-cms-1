@@ -24,7 +24,7 @@ public class SingletonPluginExecuter extends AbstractChildPluginExecuter {
 		ComponentDef[] defs = container
 				.findComponentDefs(SingletonWikiPlugin.class);
 		for (ComponentDef def : defs) {
-			plugins.put(def.getComponentName(), (SingletonWikiPlugin) def
+			addPlugin(def.getComponentName(), (SingletonWikiPlugin) def
 					.getComponent());
 		}
 	}

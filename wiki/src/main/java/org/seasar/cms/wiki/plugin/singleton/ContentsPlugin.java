@@ -58,6 +58,7 @@ public class ContentsPlugin implements SingletonWikiPlugin {
 	private void writeLi(StringBuffer buf, WikiHeading heading) {
 		String href = String.format("<a href=\"%s\">", VisitorUtils
 				.getAnchorId(heading));
+
 		buf.append("<li>" + href);
 		accept(heading, buf);
 		buf.append("</li></a>");

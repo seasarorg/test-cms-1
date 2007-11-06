@@ -6,6 +6,9 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.cms.wiki.engine.WikiContext;
@@ -17,7 +20,16 @@ import org.seasar.cms.wiki.factory.WikiParserFactory;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.WikiParserVisitor;
+import org.seasar.cms.wiki.plugin.ChildPluginExecuter;
 import org.seasar.cms.wiki.plugin.PluginExecuter;
+import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
+import org.seasar.cms.wiki.plugin.impl.PluginExecuterImpl;
+import org.seasar.cms.wiki.plugin.impl.SingletonPluginExecuter;
+import org.seasar.cms.wiki.plugin.singleton.BrPlugin;
+import org.seasar.cms.wiki.plugin.singleton.ClearPlugin;
+import org.seasar.cms.wiki.plugin.singleton.ColorPlugin;
+import org.seasar.framework.container.ComponentDef;
+import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.util.ResourceUtil;
 
 public class WikiEngineImpl implements WikiEngine {
@@ -34,6 +46,40 @@ public class WikiEngineImpl implements WikiEngine {
 
 	private Properties props = new Properties();
 
+	public static final WikiEngine getInstance() {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(
+				WikiEngineImpl.class.getClassLoader());
+		WikiEngine engine = (WikiEngine) S2ContainerFactory.create(
+				"wikiengine.dicon").getComponent(WikiEngine.class);
+
+		Thread.currentThread().setContextClassLoader(cl);
+
+		PluginExecuterImpl executer = new PluginExecuterImpl();
+		SingletonPluginExecuter child = new SingletonPluginExecuter();
+
+		for (String name : new String[] { "br", "clear", "color", "contents",
+				"date", "div", "divclose", "newpage", "now", "size", "time" }) {
+			String className = name.substring(0, 1).toUpperCase()
+					+ name.substring(1);
+			try {
+				Class clazz = Class
+						.forName("org.seasar.cms.wiki.plugin.singleton."
+								+ className + "Plugin");
+				SingletonWikiPlugin plugin = (SingletonWikiPlugin) clazz
+						.newInstance();
+				child.addPlugin(name, plugin);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		executer.addChildExecuter(child);
+		engine.setPluginExecuter(executer);
+
+		return engine;
+	}
+
 	public WikiEngineImpl() {
 		try {
 			props.load(ResourceUtil
@@ -45,6 +91,10 @@ public class WikiEngineImpl implements WikiEngine {
 
 	public void setProperties(Properties props) {
 		this.props.putAll(props);
+	}
+
+	public void setProperty(String name, String value) {
+		this.props.put(name, value);
 	}
 
 	public String getProperty(String key) {
@@ -95,6 +145,14 @@ public class WikiEngineImpl implements WikiEngine {
 		return evaluate(new StringReader(text), context);
 	}
 
+	public String evaluate(String text) {
+		return evaluate(text, new WikiContext());
+	}
+
+	public String evaluate(Reader reader) {
+		return evaluate(reader, new WikiContext());
+	}
+
 	public String evaluate(Reader reader, WikiContext context) {
 		StringWriter writer = new StringWriter();
 		merge(reader, context, writer);
@@ -129,7 +187,6 @@ public class WikiEngineImpl implements WikiEngine {
 		context.setRoot(root);
 		context.setVisitor(visitor);
 
-		
 		root.jjtAccept(visitor, null);
 	}
 }

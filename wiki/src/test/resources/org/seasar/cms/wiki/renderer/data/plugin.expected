@@ -1,13 +1,13 @@
 <table><tbody><tr><td>
-<span style="color:blue; background-color:">null</span>
+<span style="color:blue; background-color:">aaa</span>
 
 </td>
 </tr></tbody>
 </table>
-<p><span style="font-size:9px"><span style="color:#000; background-color:#bdf">null</span>
+<p><span style="font-size:9px"><span style="color:#000; background-color:#bdf">ページ作成方針</span>
 </span>
 <span style="font-size:9px">複数のインライン要素が<del>子要素</del>に</span>
-</p><p><br/></p><p><span style="color:blue">null</span>
+</p><p><br/></p><p><span style="color:blue">1行に二つのプラグイン</span>
  <span style="font-size:12px">1行に二つのプラグイン</span>
 </p><div class="contents"></div>
 

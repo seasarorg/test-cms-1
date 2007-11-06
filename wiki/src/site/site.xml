@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Wiki Engine by Seasar CMS Project">
+
+	<bannerLeft>
+		<name>Wiki Engine by Seasar CMS Project</name>		
+		<href>http://aap.example.com/</href>
+	</bannerLeft>
+	<body>
+		<menu name="Menu">
+			<item name="Introduction" href="index.html"/>
+			<item name="Download" href="download.html"/>
+			<item name="Getting Started" href="getting-started.html"/>
+		</menu>
+		<menu ref="reports"/>
+	</body>
+	
+</project>
+

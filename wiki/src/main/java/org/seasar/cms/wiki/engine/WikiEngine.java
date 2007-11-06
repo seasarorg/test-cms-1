@@ -21,6 +21,8 @@ public interface WikiEngine {
 	 */
 	public void setProperties(Properties props);
 
+	public void setProperty(String name, String value);
+
 	/**
 	 * プロパティの取得
 	 * 
@@ -41,7 +43,21 @@ public interface WikiEngine {
 	 * @param context
 	 * @return 結果
 	 */
+	public String evaluate(String text);
+
+	/**
+	 * @param text
+	 * @param context
+	 * @return 結果
+	 */
 	public String evaluate(Reader reader, WikiContext context);
+
+	/**
+	 * @param text
+	 * @param context
+	 * @return 結果
+	 */
+	public String evaluate(Reader reader);
 
 	public void merge(Reader reader, WikiContext context, Writer writer);
 

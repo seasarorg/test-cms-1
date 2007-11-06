@@ -9,6 +9,6 @@ public class ContentsPluginTest extends WikiEngineTestFramework {
 
 	public void testEval() {
 		String actual = engine.evaluate(wiki, new WikiContext());
-
+		assertNotNull(actual);
 	}
 }

@@ -5,9 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.cms</groupId>
 	<artifactId>wiki</artifactId>
-	<name>CMS Wiki</name>
+	<name>Wiki Engine</name>
 	<version>0.1-SNAPSHOT</version>
-	<description>Wiki parsing and rendering engine</description>
+	<description>Wiki parsing and rendering engine.</description>
 	<ciManagement>
 		<system>continuum</system>
 		<notifiers>
@@ -27,7 +27,7 @@
 		<developer>
 			<id>nishioka</id>
 			<name>NISHIOKA Yuhei</name>
-			<email>nishiokaisenshi.com</email>
+			<email>nishioka@isenshi.com</email>
 		</developer>
 	</developers>
 	<scm>
@@ -89,8 +89,25 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-		</plugins>
-		<extensions>
+    	  <plugin>
+        	<groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-site-plugin</artifactId>
+			<configuration>
+				<locales>en,ja</locales>
+				<inputEncoding>UTF-8</inputEncoding>
+				<outputEncoding>UTF-8</outputEncoding>
+			</configuration>
+    	    <dependencies>
+        	  <dependency>
+            	<groupId>org.seasar.cms</groupId>
+	            <artifactId>doxia-module-wiki</artifactId>
+    	        <version>0.1-SNAPSHOT</version>
+        	  </dependency>
+	        </dependencies>
+    	  </plugin>
+      </plugins>
+		
+	<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-webdav</artifactId>
@@ -155,7 +172,9 @@
 	</pluginRepositories>
 	
 	<reporting>
-    <plugins>
+     <plugins>
+      
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jxr-maven-plugin</artifactId>

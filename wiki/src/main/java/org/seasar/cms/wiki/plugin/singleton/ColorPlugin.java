@@ -24,7 +24,6 @@ import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
 public class ColorPlugin implements SingletonWikiPlugin {
 
 	public String render(WikiContext context, String[] args, String child) {
-		String childstr = null;
 		if (args == null) {
 			return child;
 		}
@@ -36,7 +35,7 @@ public class ColorPlugin implements SingletonWikiPlugin {
 			buf.append("; background-color:" + args[1]);
 		}
 		buf.append("\">");
-		buf.append(childstr);
+		buf.append(child);
 		buf.append("</span>");
 		return buf.toString();
 	}
