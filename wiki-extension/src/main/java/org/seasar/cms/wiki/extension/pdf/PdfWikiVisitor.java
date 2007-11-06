@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.cms.wiki.engine.WikiContext;
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.SimpleNode;
 import org.seasar.cms.wiki.parser.WikiAlias;
@@ -64,10 +65,12 @@ import org.seasar.cms.wiki.parser.WikiSyntaxError;
 import org.seasar.cms.wiki.parser.WikiTable;
 import org.seasar.cms.wiki.parser.WikiTablecolumn;
 import org.seasar.cms.wiki.parser.WikiTablemember;
+import org.seasar.cms.wiki.renderer.WikiOutputStreamVisitor;
 import org.seasar.cms.wiki.util.GenerateNodeHelper;
 import org.seasar.cms.wiki.util.ImageUtils;
 import org.seasar.cms.wiki.util.TableNodeUtils;
 import org.seasar.cms.wiki.util.VisitorUtils;
+import org.seasar.framework.exception.IORuntimeException;
 
 import com.lowagie.text.Anchor;
 import com.lowagie.text.Annotation;
@@ -106,7 +109,7 @@ import com.lowagie.text.pdf.PdfWriter;
  * 
  * @author someda
  */
-public class PdfWikiVisitor implements WikiParserVisitor {
+public class PdfWikiVisitor implements WikiOutputStreamVisitor {
 
 	private static final float LIST_INDENT = 10;
 
@@ -136,6 +139,8 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 
 	protected OutputStream os;
 
+	private WikiContext context;
+
 	private List chapterList = null;
 
 	private Section currentSection_ = null;
@@ -152,7 +157,12 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 
 	private SplitCharacter split = new CJKSplitCharacter();
 
-	public PdfWikiVisitor(OutputStream os) {
+	public PdfWikiVisitor() {
+	}
+
+	public void init(WikiContext context, OutputStream os) {
+		this.context = context;
+		this.os = os;
 		try {
 			init();
 		} catch (DocumentException de) {
@@ -160,6 +170,14 @@ public class PdfWikiVisitor implements WikiParserVisitor {
 					.error("failed to initialize the document : "
 							+ de.getMessage());
 			throw new RuntimeException(de);
+		}
+	}
+
+	public void write(byte[] bytes) {
+		try {
+			os.write(bytes);
+		} catch (IOException e) {
+			throw new IORuntimeException(e);
 		}
 	}
 

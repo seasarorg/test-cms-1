@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>wiki-extension</name>
+	<name>cms-wiki-extension</name>
 	<comment>Wiki parsing and rendering engine</comment>
 	<projects>
 	</projects>

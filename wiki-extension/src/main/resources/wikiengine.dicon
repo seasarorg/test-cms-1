@@ -6,6 +6,10 @@
 
 	<include path="wikiplugin-singleton.dicon"/>
         	
+       
+   	<component name="htmlVisitor" class="org.seasar.cms.wiki.renderer.HtmlWikiVisitor" instance="prototype"/>
+   	<component name="pdfVisitor" class="org.seasar.cms.wiki.extension.pdf.PdfWikiVisitor" instance="prototype"/>
+        	
         	
 	<component name="pluginExecuter" class="org.seasar.cms.wiki.plugin.impl.PluginExecuterImpl">
 		<initMethod name="addChildExecuter">
