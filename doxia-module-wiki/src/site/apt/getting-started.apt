@@ -1,0 +1,58 @@
+ ------
+Getting Started
+ ------
+YOKOTA Takehiko
+ ------
+2006-07-23
+ ------
+
+Getting Started
+
+  This module is for Maven2, and is automatically downloaded
+in site building phase.
+
+  All you have to do is add the following setting to your pom.xml:
+
++--
+  <build>
+
+    ...
+
+    <plugins>
+
+      ...
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>net.skirnir.rst</groupId>
+            <artifactId>doxia-module-rst</artifactId>
+            <version>0.1.5-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+
+    ...
+
+  <repositories>
+
+    ...
+
+    <repository>
+      <id>www.seasar.org</id>
+      <name>The Seasar Foundation Maven2 Repository</name>
+      <url>http://maven.seasar.org/maven2</url>
+    </repository>
+  </repositories>
++--
+
+  Put all reStructuredText contents in a project's <<<src/site/rst>>> directory
+with '.txt' suffix, and just type:
+
++--
+  mvn site:site
++--
