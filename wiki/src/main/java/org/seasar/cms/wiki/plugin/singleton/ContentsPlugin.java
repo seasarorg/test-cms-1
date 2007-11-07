@@ -42,12 +42,14 @@ public class ContentsPlugin implements SingletonWikiPlugin {
 		StringBuffer buf = new StringBuffer();
 		buf.append("<div class=\"contents\">");
 
+		int i = 0;
 		for (WikiHeading heading : NodeUtils.find(context.getRoot(),
 				WikiHeading.class)) {
 			curlevel = heading.level;
 			updateUl(buf, curlevel, prelevel, level);
 			prelevel = curlevel;
-			writeLi(buf, heading);
+			i++;
+			writeLi(buf, heading, i);
 		}
 
 		closeUl(buf, level);
@@ -55,9 +57,15 @@ public class ContentsPlugin implements SingletonWikiPlugin {
 		return buf.toString();
 	}
 
-	private void writeLi(StringBuffer buf, WikiHeading heading) {
-		String href = String.format("<a href=\"%s\">", VisitorUtils
-				.getAnchorId(heading));
+	private void writeLi(StringBuffer buf, WikiHeading heading, int i) {
+		String anchorId = VisitorUtils.getAnchorId(heading);
+
+		if (anchorId == null) {
+			anchorId = "#tgwAnchor" + i;
+			VisitorUtils.setAnchor(heading, anchorId);
+		}
+
+		String href = String.format("<a href=\"%s\">", anchorId);
 
 		buf.append("<li>" + href);
 		accept(heading, buf);

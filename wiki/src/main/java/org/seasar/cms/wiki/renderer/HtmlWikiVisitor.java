@@ -154,7 +154,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 	public Object visit(WikiExcerpt node, Object data) {
 		boolean isTagNeed = VisitorUtils.isExcerptStartNeeded(node);
 		if (isTagNeed) {
-			writer.start("blockquote");
+			startTag("blockquote");
 		}
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			// if child is paragraph, not generate <p> tag
@@ -200,7 +200,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 	}
 
 	public Object visit(WikiPreshaped node, Object data) {
-		writer.start("pre").inline();
+		startTag("pre").inline();
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			node.jjtGetChild(i).jjtAccept(this, data);
 			writer.body("\n");
@@ -215,7 +215,13 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 	}
 
 	public Object visit(WikiTablemember node, Object data) {
-		processElement("tr", node, data);
+		String classValue = null;
+		if (rowNum % 2 == 0) {
+			classValue = getProperty("class.core.tr.even");
+		} else {
+			classValue = getProperty("class.core.tr.odd");
+		}
+		processElementWithClass("tr", node, data, classValue);
 		return null;
 	}
 
@@ -247,7 +253,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 					body).end().toString();
 			childstr += anchor;
 		}
-		writer.start("h" + (node.level + 1)).body(childstr).end();
+		startTag("h" + (node.level + 1)).body(childstr).end();
 		return null;
 	}
 
@@ -265,7 +271,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 	}
 
 	public Object visit(WikiHorizontalline node, Object data) {
-		writer.start("hr").end();
+		startTag("hr").end();
 		return null;
 	}
 
@@ -294,7 +300,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 		} else if (node.isWikiname) {
 			processLink(node.letter, body, null);
 		} else if (node.isNewline) {
-			writer.start("br").end();
+			startTag("br").end();
 		} else {
 			writer.body(body);
 		}
@@ -308,12 +314,12 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 
 		writer.inline();
 		if (VisitorUtils.isBold(node)) {
-			writer.start("strong");
+			startTag("strong");
 			tag++;
 		}
 
 		if (VisitorUtils.isItalic(node)) {
-			writer.start("em");
+			startTag("em");
 			tag++;
 		}
 
@@ -469,7 +475,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 			writer.enableTab();
 			SimpleNode n = (SimpleNode) itr.next();
 			processChildren(n, data);
-			writer.start("br").end();
+			startTag("br").end();
 			idx++;
 		}
 		writer.enableNewline();
@@ -481,7 +487,7 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 
 	private void processBlockElement(String tag, String attrKey,
 			String attrValue, Node node, Object data) {
-		writer.start(tag);
+		startTag(tag);
 		if (attrKey != null) {
 			writer.attr(attrKey, attrValue);
 		}
@@ -489,15 +495,25 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 		writer.end();
 	}
 
-	private void processElement(String tag, Node node, Object data) {
+	private void processElementWithClass(String tag, Node node, Object data,
+			String classValue) {
 		if (node.jjtGetNumChildren() == 0) {
 			return;
 		}
-		writer.start(tag);
+
+		if (classValue != null && classValue.length() > 0) {
+			writer.start(tag).attr("class", classValue);
+		} else {
+			startTag(tag);
+		}
 		processChildren(node, data);
 		writer.disableTab();
 		writer.end();
 		writer.enableTab();
+	}
+
+	private void processElement(String tag, Node node, Object data) {
+		processElementWithClass(tag, node, data, null);
 	}
 
 	private void processChildren(Node node, Object data, int fromIndex) {
@@ -510,12 +526,16 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 		processChildren(node, data, 0);
 	}
 
+	private int rowNum = 0;
+
 	// shared by WikiTable and WikiCSVTable
 	private void processTable(SimpleNode node, Object data) {
 		TableNodeUtils.prepareWikiTable(node, data);
 		int prenum = 0;
 		int open = 0;
 		boolean isBody = false;
+
+		rowNum = 0;
 
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			try {
@@ -528,25 +548,27 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 						isBody = false;
 						open--;
 					}
-					writer.start("table");
+					startTag("table");
 					open++;
 				}
 				if (!isBody) {
 					if (child.type == GenerateNodeHelper.TABLE_TYPE_HEADER) {
-						writer.start("thead");
+						startTag("thead");
 					} else if (child.type == GenerateNodeHelper.TABLE_TYPE_FOOTER) {
-						writer.start("tfooter");
+						startTag("tfooter");
 					} else {
-						writer.start("tbody");
+						startTag("tbody");
 						isBody = true;
 					}
 				}
 
 				prenum = child.jjtGetNumChildren();
-				child.jjtAccept(this, data);
 
+				child.jjtAccept(this, data);
 				if (!isBody) {
 					writer.end();
+				} else {
+					rowNum++;
 				}
 			} catch (ClassCastException cce) {// in-case wikierror
 				while (open > 0) {
@@ -678,4 +700,12 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 		writer.start("a").attr("href", linkUrl).body(linkLabel).end();
 	}
 
+	private XmlWriter startTag(String tagName) {
+		writer.start(tagName);
+		String className = getProperty("class.core." + tagName);
+		if (className != null && className.length() != 0) {
+			writer.attr("class", className);
+		}
+		return writer;
+	}
 }

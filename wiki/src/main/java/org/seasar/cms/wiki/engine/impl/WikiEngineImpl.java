@@ -6,9 +6,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.cms.wiki.engine.WikiContext;
@@ -20,15 +17,10 @@ import org.seasar.cms.wiki.factory.WikiParserFactory;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 import org.seasar.cms.wiki.parser.Node;
 import org.seasar.cms.wiki.parser.WikiParserVisitor;
-import org.seasar.cms.wiki.plugin.ChildPluginExecuter;
 import org.seasar.cms.wiki.plugin.PluginExecuter;
 import org.seasar.cms.wiki.plugin.SingletonWikiPlugin;
 import org.seasar.cms.wiki.plugin.impl.PluginExecuterImpl;
 import org.seasar.cms.wiki.plugin.impl.SingletonPluginExecuter;
-import org.seasar.cms.wiki.plugin.singleton.BrPlugin;
-import org.seasar.cms.wiki.plugin.singleton.ClearPlugin;
-import org.seasar.cms.wiki.plugin.singleton.ColorPlugin;
-import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.util.ResourceUtil;
 

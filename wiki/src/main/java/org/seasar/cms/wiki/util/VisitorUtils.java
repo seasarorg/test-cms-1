@@ -98,6 +98,13 @@ public class VisitorUtils {
 		return null;
 	}
 
+	public static void setAnchor(SimpleNode node, String letter) {
+		WikiLetters letters = new WikiLetters(-1);
+		letters.letter = letter;
+		letters.isAnchor = true;
+		node.jjtAddChild(letters, node.jjtGetNumChildren());
+	}
+
 	public static String getFloatStyle(WikiFloatAlign node) {
 		String align = node.image.toLowerCase().substring(1,
 				node.image.length() - 1);

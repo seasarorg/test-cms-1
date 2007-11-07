@@ -41,6 +41,14 @@ public class WikiEngineImplTest extends WikiEngineTestFramework {
 		assertEquals("replace", value);
 	}
 
+	public void testSetProperty() {
+		engine.setProperty("class.core.table", "testTable");
+		engine.setProperty("class.core.tr.odd", "odd");
+		engine.setProperty("class.core.tr.even", "even");
+		String actual = engine.evaluate("|a|b|\n|c|d|\n|e|f|");
+		assertNotNull(actual);
+	}
+
 	public void testOutputStream() throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		engine.merge("p", new WikiContext(), bos);
