@@ -98,10 +98,15 @@
 				<outputEncoding>UTF-8</outputEncoding>
 			</configuration>
             <dependencies>
-        	  <dependency>
+<!--        	  <dependency>
             	<groupId>org.seasar.cms</groupId>
 	            <artifactId>doxia-module-wiki</artifactId>
     	        <version>0.1-SNAPSHOT</version>
+        	  </dependency> -->
+        	  <dependency>
+            	<groupId>org.seasar.cms</groupId>
+	            <artifactId>doxia-module-wiki</artifactId>
+    	        <version>0.1</version>
         	  </dependency>
 	        </dependencies>
     	  </plugin>

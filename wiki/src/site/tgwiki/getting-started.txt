@@ -1,5 +1,5 @@
 
-&size(24){目次};
+&size(18){Contents};
 
 #contents
 
