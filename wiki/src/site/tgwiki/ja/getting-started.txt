@@ -1,0 +1,52 @@
+
+&size(24){目次};
+
+#contents
+
+* Getting Started
+
+** Seasar2.4 と組み合わせて使う方法
+
+ まず最初にクラスパスに　wiki-0.11-SNAPSHOT.jar を追加してください。
+Maven2 を使っている場合は、[[maven.seasar.org>http://maven.seasar.org/maven2]] レポジトリから使うことができます。
+ダウンロードするためには以下のように pom.xml に記述してください。
+
+#div(,source)
+  <repositories>
+    ...
+    <repository>
+      <id>www.seasar.org</id>
+      <name>The Seasar Foundation Maven2 Repository</name>
+      <url>http://maven.seasar.org/maven2</url>
+    </repository>
+  </repositories>
+  ...
+  <dependencies>
+    ...
+    <dependency>
+      <groupId>org.seasar.cms</groupId>
+      <artifactId>wiki</artifactId>
+      <version>0.1.1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+#divclose
+
+wikiengine.dicon を include すれば、WikiEngine オブジェクトをインジェクションすることができます。
+
+#div(,source)
+ <include path="wikiengine.dicon"/>
+#divclose
+
+最も簡単な Wiki から HTML への変換は以下のとおりです。
+
+#div(,source)
+  import org.seasar.cms.wiki.engine.WikiEngine;
+  ...
+  WikiEngine engine = // <-- inject by S2Container
+  String html = engine.evaluate(reader);
+  ...
+#divclose
+
+
+

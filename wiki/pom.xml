@@ -97,11 +97,11 @@
 				<inputEncoding>UTF-8</inputEncoding>
 				<outputEncoding>UTF-8</outputEncoding>
 			</configuration>
-    	    <dependencies>
+            <dependencies>
         	  <dependency>
             	<groupId>org.seasar.cms</groupId>
 	            <artifactId>doxia-module-wiki</artifactId>
-    	        <version>0.13-SNAPSHOT</version>
+    	        <version>0.1-SNAPSHOT</version>
         	  </dependency>
 	        </dependencies>
     	  </plugin>
