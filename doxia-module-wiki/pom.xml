@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <artifactId>doxia-modules</artifactId>
     <groupId>org.apache.maven.doxia</groupId>
+    <artifactId>doxia-modules</artifactId>
     <version>1.0-alpha-8</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms</groupId>
   <artifactId>doxia-module-wiki</artifactId>
+  <packaging>jar</packaging>
   <name>Doxia Module for Seasar CMS WikiEngine</name>
   <version>0.1-SNAPSHOT</version>
   <description>doxia-module-rst is a Doxia module for reStructuredText. It makes
@@ -96,11 +97,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.seasar.cms</groupId>
-      <artifactId>wiki</artifactId>
-      <version>0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-site-renderer</artifactId>
       <version>1.0-alpha-8</version>
@@ -109,6 +105,11 @@
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
       <version>1.0-alpha-8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seasar.cms</groupId>
+      <artifactId>wiki</artifactId>
+      <version>0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <reporting>
@@ -136,20 +137,25 @@
     </plugins>
   </reporting>
   <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>maven.seasar.org</id>
-      <name>The Seasar Foundation Maven2 Repository</name>
-      <url>dav:https://www.seasar.org/maven/maven2</url>
-    </repository>
-    <snapshotRepository>
-      <id>maven.seasar.org</id>
-      <name>The Seasar Foundation Maven2 Snapshot Repository</name>
-      <url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
-    </snapshotRepository>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>maven.seasar.org</id>
+			<name>The Seasar Foundation Maven2 Repository</name>
+			<url>dav:https://www.seasar.org/maven/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>true</uniqueVersion>
+			<id>maven.seasar.org</id>
+			<name>
+				The Seasar Foundation Maven2 Snapshot Repository
+			</name>
+			<url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
+		</snapshotRepository>
+<!--
     <site>
       <id>www.skirnir.net</id>
       <url>scp://www.skirnir.net/var/www/html/product/${pom.artifactId}/</url>
     </site>
+    -->
   </distributionManagement>
 </project>

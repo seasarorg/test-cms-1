@@ -1,4 +1,4 @@
-package org.seasar.cms.doxia;
+package org.seasar.cms.doxia.module.parser;
 
 import org.apache.maven.doxia.site.module.AbstractSiteModule;
 

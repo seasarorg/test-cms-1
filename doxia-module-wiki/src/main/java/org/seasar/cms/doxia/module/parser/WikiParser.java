@@ -1,6 +1,8 @@
-package org.seasar.cms.doxia;
+package org.seasar.cms.doxia.module.parser;
 
 import java.io.Reader;
+
+import javax.print.attribute.standard.MediaSize.Engineering;
 
 import org.apache.maven.doxia.parser.ParseException;
 import org.apache.maven.doxia.parser.Parser;
@@ -25,6 +27,9 @@ public class WikiParser
         throws ParseException
     {
 
+        engine.setProperty("class.core.table", "bodyTable");  
+        engine.setProperty("class.core.tr.odd", "a");
+        engine.setProperty("class.core.tr.even", "b");        
         sink.head();
 
         sink.head_();
