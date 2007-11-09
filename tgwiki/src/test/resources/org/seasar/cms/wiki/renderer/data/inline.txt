@@ -4,12 +4,16 @@
 ((注釈))ここは注釈
 someda@isenshi.com
 http://www.isenshi.com
+http://japan.cnet.com/news/ent/story/0,2000056022,20360651,00.htm
 [[メール:someda@isenshi.com]]
 [[twigaa:http://www.isenshi.com/]]
 //WikiName siteConfig が null なのでテストは失敗する。
 
 [[メール>someda@isenshi.com]]
 [[URL>https://www.isenshi.com]]
+[[CNET>http://japan.cnet.com/news/ent/story/0,2000056022,20360651,00.htm]]
+
+
 
 改行~
 ~
