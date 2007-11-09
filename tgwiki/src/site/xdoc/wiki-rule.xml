@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<document>
+
+<properties>
+<author email="nishioka@isenshi.com">NISHIOKA Yuhei</author>
+<author email="someda@isenshi.com">SOMEDA Takashi</author>
+<title>Wiki Rules</title>
+</properties>
+
+<body>
+
+
+<section name="Tuigwaaをもっと使う：コンテンツの書き方 － Wikiルール">
+
+<p>このページではTuigwaaでコンテンツを作成する方法について説明を行います。</p>
+
+<section name="Tuigwaaでコンテンツを用意するのはとても簡単">
+<p>
+Tuigwaaでは、コンテンツを作成する際にWiki文法というものに従って書いて作成します。ご存じない方のために簡単に説明しますと（すでにご存知の方はこの部分を飛ばしてください）、イメージとしてはブログに記事を書く場合と似ています。
+</p>
+
+<p>
+たとえばブログは難しいことを考えずにテキストを打ち込んで、ちょっと整えればちゃんと記事になってくれます。自分でHTMLを書く場合と比べると簡単です。
+Wiki文法でコンテンツを用意する場合も似たようなイメージです。
+</p>
+
+<ul>
+<li>書きたいことを普通のテキストとして書きたいように書く</li>
+<li>それがそのままウェブサイトとして表示される</li>
+<li>それだけですと文字が表示されるだけで何の芸もないページになってしまいます、そこで「単なるテキスト」にちょっと書き足すだけで、いろんな表示やいろんな機能を追加</li>
+<li>いろんな機能がそろった立派なウェブサイトが出来上がる</li>
+</ul>
+
+<p>上記の例での、「ちょっと書き足す」際の書き方のルールがWikiルールです。
+簡単な例で説明してみましょう。
+</p>
+
+<blockquote>
+<source>
+吾輩は猫である<br />
+<br />
+夏目漱石<br />
+<br />
+吾輩（わがはい）は猫である。名前はまだ無い。<br />
+<br />
+どこで生れたかとんと見当（けんとう）がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。
+</source>
+</blockquote>
+
+<p>
+と、キーボードから打ち込んだとしましょう。すると、
+</p>
+
+<blockquote>
+吾輩は猫である<br />
+<br />
+夏目漱石<br />
+<br />
+吾輩（わがはい）は猫である。名前はまだ無い。<br />
+<br />
+どこで生れたかとんと見当（けんとう）がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。
+</blockquote>
+
+<p>
+と表示されます。しかしそのまま表示したのでは面白くありませんので、以下のようにちょっと手を加えてみたいと思ったとします。
+</p>
+
+<ul>
+<li>「吾輩は猫である」を見出しとして大きく表示</li>
+<li>「夏目漱石」を画面中央揃えで表示</li>
+<li>本文との間に区切り線を挿入</li>
+</ul>
+
+
+
+<p>
+その場合にキーボードから入力するものは以下のようになります。少しだけ書き換わっていることに注意してください。
+</p>
+
+<blockquote>
+<source>
+*吾輩は猫である<br />
+<br />
+CENTER:夏目漱石<br />
+<br />
+----<br />
+<br />
+吾輩（わがはい）は猫である。名前はまだ無い。<br />
+<br />
+どこで生れたかとんと見当（けんとう）がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。
+</source>
+</blockquote>
+
+
+<p>
+説明は後ほど行いますので、今は「何かちょっと書き足すだけで何かが起こるらしい」という点に注目してください。
+</p>
+
+<p>
+表示すると以下のようになります、
+</p>
+
+<blockquote>
+<h2>吾輩は猫である</h2>
+<center>夏目漱石</center><br />
+<hr />
+<br />
+吾輩（わがはい）は猫である。名前はまだ無い。<br />
+<br />
+どこで生れたかとんと見当（けんとう）がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。
+</blockquote>
+
+<p>
+どうでしょうか、（このレイアウトのセンスがどうかという点はさておいて）ちょっと書き足しただけで簡単にそれなりのものが出来上がってしまいました。
+</p>
+
+</section>
+
+
+<section name="Tuigwaa Wiki ルールの簡単な一覧">
+
+<p>
+まずは詳細な説明をする前に、ルールを簡単に一覧にしてみたいと思います。
+</p>
+
+<p>
+難しいものではありませんので、これらを眺めながら実際に試していただければそれだけで覚えられると思います。
+</p>
+
+<subsection name="見出し">
+
+<source> 
+<![CDATA[
+* 大見出しとして表示されます<br />
+** 中見出しとして表示されます<br />
+*** 小見出しとして表示されます<br />
+]]>
+</source>
+
+<blockquote>
+<h2>大見出しとして表示されます</h2>
+<h3>中見出しとして表示されます</h3>
+<h4>小見出しとして表示されます</h4>
+</blockquote>
+
+</subsection>
+
+
+<subsection name="フォーマット変更">
+
+<source> 
+<![CDATA[
+LEFT:この文書は左揃えで表示されます。<br />
+CENTER:この文書は中央揃えで表示されます。<br />
+RIGHT:この文書は右揃えで表示されます。<br />
+''この部分は強調文字になります''<br />
+'''この部分は斜体になります'''<br />
+%%この部分は取り消し線表示されます%%<br />
+((この部分は注釈あつかいになり、その場所では表示されず文末に表示されます))<br />
+]]>
+</source> 
+
+<blockquote>
+<div align="left">この文書は左揃えで表示されます。</div><br />
+<div align="center">この文書は中央揃えで表示されます。</div><br />
+<div align="right">この文書は右揃えで表示されます。</div><br />
+<strong>この部分は強調文字になります</strong><br />
+<i>この部分は斜体になります</i><br />
+<strike>この部分は取り消し線表示されます</strike><br />
+</blockquote>
+
+</subsection>
+
+
+
+<subsection name="字下げ">
+
+<source>
+<![CDATA[
+> こうやって書くと字下げ（引用表現）されます<br />
+>> こうやって書くとさらに字下げされます<br />
+>>> こうやって書くとさらにさらに字下げされます<br />
+]]>
+</source>
+
+<blockquote>
+<blockquote> こうやって書くと字下げ（引用表現）されます
+<blockquote> こうやって書くとさらに字下げされます
+<blockquote> こうやって書くとさらにさらに字下げされます
+</blockquote></blockquote></blockquote></blockquote>
+
+</subsection>
+
+
+<subsection name="リスト">
+
+<source>
+<![CDATA[
+- リスト（項目が列挙されたもの）になります<br />
+-- リストの中にリストがあるもの（入れ子になったもの）になります<br />
+--- さらにその中のリストになります<br />
+]]>
+</source>
+
+<blockquote>
+<ul>
+<li>リスト（項目が列挙されたもの）になります</li>
+<ul><li>リストの中にリストがあるもの（入れ子になったもの）になります</li></ul>
+<ul><ul><li>さらにその中のリストになります</li></ul></ul>
+</ul>
+</blockquote>
+
+<source>
+<![CDATA[
++ 番号付きリストになります<br />
+++ 番号付きリストの中にある番号付きリストになります<br />
++++ さらにその中に番号つきリストになります<br />
+]]>
+</source>
+
+<blockquote>
+<ol>
+<li>リスト（項目が列挙されたもの）になります</li>
+<ol><li>リストの中にリストがあるもの（入れ子になったもの）になります</li></ol>
+<ol><ol><li>さらにその中のリストになります</li></ol></ol>
+</ol>
+</blockquote>
+
+<source>
+:見出し付きリスト|見出し付きのリスト内容
+</source>
+
+<blockquote>
+<dl>
+<dt>見出し付きリスト</dt>
+<dl>見出し付きリストの内容</dl>
+</dl>
+</blockquote>
+
+</subsection>
+
+
+<subsection name="ハイフン">
+
+<p>ハイフンを四つかくと水平線が（横に長い区切り線）が表示されます<br />
+<source>
+----
+</source>
+</p>
+
+<blockquote>
+<hr />
+</blockquote>
+
+</subsection>
+
+
+<subsection name="表を作る">
+
+<p>以下のように入力すれば表になって表示されます。</p>
+<source>
+|内容|内容|内容|内容|内容|<br />
+|内容|内容|内容|内容|内容|<br />
+|内容|内容|内容|内容|内容|<br />
+</source>
+
+<p>あるいはこのような入力も表として表示されます</p>
+<source>
+,内容,内容,内容,内容,内容,<br />
+,内容,内容,内容,内容,内容,<br />
+,内容,内容,内容,内容,内容,<br />
+</source>
+
+<blockquote>
+<table border="1">
+<tr><td>内容</td><td>内容</td><td>内容</td><td>内容</td><td>内容</td></tr>
+<tr><td>内容</td><td>内容</td><td>内容</td><td>内容</td><td>内容</td></tr>
+<tr><td>内容</td><td>内容</td><td>内容</td><td>内容</td><td>内容</td></tr>
+</table>
+</blockquote>
+
+</subsection>
+
+
+
+<subsection name="リンクを貼る">
+<p>いろいろな方法でリンクを貼ることが出来ます</p>
+
+<subsubsection name="一番単純なリンクの貼り方">
+
+<p>
+リンク先のURLもしくはEMAIL文字列をそのまま書いておけば、自動的に認識されてリンクが貼られます。たとえば、http://4dd.co.jp/ と書けば、<a href="http://4dd.co.jp/">http://4dd.co.jp/</a>となります。
+</p>
+
+</subsubsection>
+
+
+<subsubsection name="自分で指定してリンクを貼る方法">
+
+<p>
+リンク文字列として表示する文字列、リンク先を自分で設定してリンクを貼ることが出来ます。書式とその場合の処理結果は以下の通りです</p>
+<source><![CDATA[
+[[リンク名>URLもしくはEMAIL文字列]]
+]]></source>
+<blockquote><a href="http://www.4dd.co.jp">リンク名</a></blockquote>
+
+</subsubsection>
+
+
+<subsubsection name="内部リンク">
+
+<p>
+WikiにはWikiの内部ページに対してリンクを貼る機能があります。外部向けと違うのはWiki内部での「ページ名」あるいはWikiName（これについてはここでは知らなくても問題ありません）でリンクがれて便利な点です。</p>
+<source>
+<![CDATA[
+[[ページ名]]</br>
+]]>
+</source>
+<source>
+<![CDATA[
+[[別名>ページ名]]</br>
+]]>
+</source>
+<source>
+<![CDATA[
+WikiName文字列</br>
+]]>
+</source>
+
+</subsubsection>
+
+</subsection>
+
+
+<subsection name="プラグインの利用">
+
+<p>Tuigwaa独自の機能であるプラグインも、同様の方法で文章内に記述を行って埋めこみます。</p>
+<p>具体的にどのようなプラグインがあるかについては、プラグインのページを参照してください。以下には、プラグインの一般系だけを示しておきます。</p>
+
+<p>
+<source>
+<![CDATA[
+&プラグイン名(引数){インライン要素};<br />
+#プラグイン名(引数)<br />
+]]>
+</source>
+</p>
+</subsection>
+
+</section>
+
+
+<section name="Tuigwaa Wiki の文法（詳細）">
+<p>
+ここからは専門的な説明になります。理解できなくてもTuigwaaは十分に使えますので、解らなければ飛ばしてください。
+</p>
+<p>
+Tuigwaa Wiki の文法は、ブロック要素とインライン要素の二つに大別されます。
+ブロック要素は段落やリストなどの構文構造、インライン要素は強調やリンクなどの文修飾です。
+それ以外にはコメントがあり、これは行頭で<strong>//</strong>を指定する事により、
+その行をコメントすることが可能です。
+</p>
+<p>
+また拡張機能としてプラグインが提供されており、ブロック要素として利用可能な
+プラグインと、インライン要素として可能なプラグイン、両方で利用可能なプラグインがあります。
+プラグインに関しては<a href="./plugin.html">プラグインルール</a>をご覧下さい。
+</p>
+<p>
+尚、下記の説明文中のHTMLの例では、実際に出力される属性値等までは記述していませんので、ご注意下さい。
+</p>
+</section>
+
+<section name="ブロック要素">
+<p>
+ブロック要素は特に明記が無い場合には、他のブロック要素及び、インライン要素を子要素に持つことが出来ます。
+また、空行により、ブロック要素は区切られます。つまり、テーブルやリスト等の繰り返し構造を持つもの以外の
+段落や引用等は空行が出現するまで、一つのブロック要素と判別されます。
+</p>
+
+<subsection name="段落">
+<p>
+<source>インライン要素</source>
+指定の無いインライン要素は全て段落となります。また行頭で~を指定した場合には、他のブロック要素の開始文字
+(&gt;,-,+,:,|,#) をエスケープすることが可能です。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<p>インライン要素</p>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="引用">
+<p>
+<source>&gt; インライン要素</source>
+&gt;で始まる行は引用となります。引用は&gt;を三つまで重ねる事で三段階指定が可能です。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<blockquote>インライン要素</blockquote>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="リスト">
+<p>
+リストには、以下の三つのタイプがあります。
+<ul>
+<li>リスト (このリストのような修飾無しリスト)</li>
+<li>順序つきリスト</li>
+<li>定義リスト</li>
+</ul>
+</p>
+<hr/>
+<p>
+<source>- インライン要素</source>
+-で始まる行はリストとなります。リストは-を三つまで重ねる事で三段階指定が可能です。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<ul>
+<li>インライン要素</li>
+</ul>]]></span></source>
+</p>
+<hr/>
+<p>
+<source>+ インライン要素</source>
++で始まる行はリストとなります。リストは+を三つまで重ねる事で三段階指定が可能です。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<ol>
+<li>インライン要素</li>
+</ol>]]></span></source>
+</p>
+<p>
+-と+によるリストは複合指定も可能です。
+</p>
+<hr/>
+<p>
+<source>:インライン要素|インライン要素</source>
+上記の指定で、:と|で囲まれたインライン要素が定義語、|の後のインライン要素が説明文となる定義リストとなります。
+複数行の指定では定義語を省略する事が可能です。
+</p>
+<p>
+HTML　での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<dl>
+<dt>インライン要素</dt>
+<dd>インライン要素</dd>
+</dl>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="整形済みテキスト">
+<p>
+<source> テキスト</source>
+空白で始まる行は整形済みテキストとなります。空白以降はどのようなテキストであっても、そのまま表示されます。
+インライン要素を指定しても変換されないので、注意してください。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<pre>インライン要素</pre>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="見出し">
+<p>
+<source>* インライン要素</source>
+* で始まる行は見出しとなります。見出しは*を三つまで重ねることによって、三段階指定が可能です。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<h2>インライン要素</h2>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="テーブル">
+<p>
+テーブルの指定には二つの方式があります。
+</p>
+<p>
+<source>|インライン要素|インライン要素|インライン要素|</source>
+|と|で区切られたインライン要素は全体として一つのテーブルとなります。以下の拡張指定が可能です。また複数指定も可能です。
+<ul>
+<li>各要素の先頭に、LEFT:,CENTER:,RIGHT:を指定することで、カラム内の位置指定が可能です。</li>
+<li>各要素の先頭に、SIZE(サイズ)を指定することで、カラムの文字サイズ指定が可能です。</li>
+<li>各要素の先頭に、COLOR(色)を指定することで、カラムの文字色指定が可能です。</li>
+<li>各要素の先頭に、BGCOLOR(色)を指定することで、カラムの背景色指定が可能です。</li>
+</ul>
+サイズには数字が指定可能です。色には、アルファベットによる色指定もしくは、#で始まる16進数指定が可能です。<br/>
+また、インライン要素の変わりに以下の拡張指定が可能です。以下は単独で指定しなければなりません。
+<ul>
+<li>~を指定することで、上の行の要素と連結します。複数行のテーブルで同じ位置にこれを指定すると複数行の連結も可能です。</li>
+<li>>を指定することで、右の行の要素と連結します。連続してこれを指定すると複数行の連結も可能です。</li>
+<li>列の最後に h をつけるとヘッダ行 (thead)、f をつけるとフッタ行と判別されます。</li>
+</ul>
+</p>
+<hr/>
+<p>
+<source>,インライン要素,インライン要素,インライン要素,</source>
+,と,で区切られたインライン要素は全体として一つのテーブルとなります。以下の拡張指定が可能です。また複数指定も可能です。
+インライン要素の変わりに以下の拡張指定が可能です。以下は単独で指定しなければなりません。
+<ul>
+<li>==を指定することで、右の行の要素と連結します。連続してこれを指定すると複数行の連結も可能です。</li>
+</ul>
+</p>
+<hr/>
+<p>
+どちらの指定方式でも HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<table>
+<tbody>
+<tr>
+<td>インライン要素</td>
+<td>インライン要素</td>
+<td>インライン要素</td>
+</tr>
+</tbody>
+</table>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="罫線">
+<p>
+<source>----</source>
+四つ以上の-で始まる行は罫線となります。この後にどのようなテキストを書いても無視されます。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<hr/>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="位置指定">
+<p>
+<source>LEFT: インライン要素</source>
+<source>CENTER: インライン要素</source>
+<source>RIGHT: インライン要素</source>
+LEFT:,CENTER:,及び RIGHT:で始まる行は、位置指定テキストとなります。各々左寄せ、中央寄せ、及び右寄せとなります。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<div align="left">インライン要素</div>]]></span></source>
+<source><span style="color:blue"><![CDATA[<div align="center">インライン要素</div>]]></span></source>
+<source><span style="color:blue"><![CDATA[<div align="right">インライン要素</div>]]></span></source>
+</p>
+<p>
+<source>FLEFT(幅): ブロック要素</source>
+<source>FRIGHT(幅): ブロック要素</source>
+FLEFT,及び FRIGHT で始まる行は、位置指定テキストとなります。但し LEFT: 及び RIGHT: と異なるのは、
+CSS の float:left 及び float:right を出力する点となります。
+描画に大きな影響を与えますので、この利用の後は clear プラグインを利用して適切に float をクリアして下さい。
+また、幅は省略可能な引数で、ピクセル数にて幅指定が可能です。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<div style="float:left;">ブロック要素</div>]]></span></source>
+<source><span style="color:blue"><![CDATA[<div style="float:right;">ブロック要素</div>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="ブロックプラグイン">
+<p>
+<source>#プラグイン名(引数)</source>
+#で始まり、プラグイン名を指定すると、指定のプラグインが呼び出されます。()で囲む事により、引数を指定する事も可能です。
+()だけを指定し、引数を指定しない場合はプラグインとして処理されません。また、引数はカンマで区切る事で複数指定も可能です。
+引数がない場合に、()は省略可能です。
+</p>
+<p>
+引数に利用可能な文字は、",#,&amp;,(,),[,],&lt;,&gt;,カンマ,改行<strong>以外</strong>の文字です。
+各々のプラグインの機能については、<a href="./plugin.html">プラグインルール</a>のページをご覧下さい。
+尚、指定したプラグインが提供されていない場合には、そのまま入力したものが表示されます。
+</p>
+
+</subsection>
+
+</section>
+
+<section name="インライン要素">
+<p>
+インライン要素はブロック要素の構成要素となります。
+</p>
+
+<subsection name="テキスト">
+<p>
+<source>テキスト</source>
+特に文字修飾をしないテキストです。そのまま表示されます。
+</p>
+</subsection>
+
+<subsection name="強調、斜体">
+<p>
+<source>''インライン要素''</source>
+<source>'''インライン要素'''</source>
+''でインライン要素を囲むと強調に、'''で囲むと斜体になります。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<strong>インライン要素</strong>]]></span></source>
+<source><span style="color:blue"><![CDATA[<em>インライン要素</em>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="取り消し線">
+<p>
+<source>%%インライン要素%%</source>
+%%でインライン要素を囲むと取り消し線となります。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<del>インライン要素</del>]]></span></source>
+</p>
+</subsection>
+
+<subsection name="注釈">
+<p>
+<source>((インライン要素))</source>
+((と))でインライン要素を囲むと注釈となります。注釈は、本文中に注釈へのリンクを作成し、文末にまとめて注釈が表示されます。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<a href="#注釈のNAME">(*注釈番号)</a>
+: (本文)
+<hr/>
+<a id="注釈のNAME">インライン要素</a>
+]]></span></source>
+</p>
+</subsection>
+
+<subsection name="リンク">
+<p>
+リンクには以下の5つの指定が可能です。
+<ul>
+<li>ページ名</li>
+<li>ページ別名</li>
+<li>リンク</li>
+<li>WikiName</li>
+<li>URLもしくはEMAIL文字列</li>
+</ul>
+ただしページ名、ページ別名、及び WIkiName については、そのページ自体を
+閲覧しているユーザに、閲覧権限が無い場合にはリンクは表示されません。(セキュリティリンク)
+</p>
+<hr/>
+<p>
+<source>[[ページ名]]</source>
+[[と]]で囲まれた文字列はページ名となります。そのページ名のWikiページが存在すればそれに対するリンクが、
+なければ、?が表示された上で、そのページ名で新規ページを作成するリンクが生成されます。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<a href="ページ閲覧URL">ページ名</a>]]></span></source>
+</p>
+<hr/>
+<p>
+<source>[[別名>ページ名]]</source>
+上記のページ名に対し、別名を指定します。。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<a href="ページ閲覧URL">別名</a>]]></span></source>
+</p>
+<hr/>
+<p>
+<source>[[リンク名>URLもしくはEMAIL文字列]]</source>
+<source>[[リンク名:URLもしくはEMAIL文字列]]</source>
+URLもしくはEMAIL文字列に対して、リンク名を指定します。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<a href="URLもしくはEMAIL">リンク名</a>]]></span></source>
+EMAIL文字列の場合には、mailto:が付加されます。
+</p>
+<hr/>
+<p>
+<source>WikiName文字列</source>
+アルファベットの大文字一文字以上で始まり、その後にアルファベット小文字が続く文字列が連続するうような
+文字列はWikiNameとなります。
+そのWikiNameのページが存在すればそれに対するリンクが、なければ、?が表示された上で、そのWikiName
+で新規ページを作成するリンクが生成されます。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<a href="ページ閲覧URL">WikiName</a>]]></span></source>
+</p>
+<hr/>
+<p>
+<source>URLもしくはEMAIL文字列</source>
+URLもしくはEMAIL文字列を指定します。
+</p>
+<p>
+HTML での表示は以下のようになります。
+<source><span style="color:blue"><![CDATA[<a href="URLもしくはEMAIL">URLもしくはEMAIL</a>]]></span></source>
+EMAIL文字列の場合には、mailto:が付加されます。
+</p>
+</subsection>
+
+<subsection name="インラインプラグイン">
+<p>
+<source>&amp;プラグイン名(引数){インライン要素};</source>
+&amp;で始まり、プラグイン名を指定すると、指定のプラグインが呼び出されます。()で囲む事により、引数を指定する事も可能です。
+()だけを指定し、引数を指定しない場合はプラグインとして処理されません。また、引数はカンマで区切る事で複数指定も可能です。
+引数がない場合に、()は省略可能です。
+また、{}で囲む事により、インライン要素を子要素にする事も可能です。子要素がない場合に、{}は省略可能です。
+</p>
+<p>
+引数に利用可能な文字は、",#,&amp;,(,),[,],&lt;,&gt;,カンマ,改行<strong>以外</strong>の文字です。
+各々のプラグインの機能については、<a href="./plugin.html">プラグインルール</a>のページをご覧下さい。
+尚、指定したプラグインが提供されていない場合には、そのまま入力したものが表示されます。
+</p>
+</subsection>
+
+</section>
+
+</section>
+
+</body>
+
+</document>

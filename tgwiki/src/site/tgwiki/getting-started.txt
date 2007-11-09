@@ -1,20 +1,13 @@
 
-&size(18){Contents};
+&size(16){目次};
 
 #contents
 
 * Getting Started
 
-** How to use from program with Seasar &color(red){2.x};
-
-  First of all, add wiki-0.0.1-SNAPSHOT.jar to your classpath. &br(); &br(); &br(); &br(); &br(); &br;&br;&br;
-If you use RST from Maven2, you can download this jar file from [[maven.seasar.org>http://maven.seasar.org/maven2]] repository.
-To make Maven2 scan maven.seasar.org repository and get wiki jar file,
-simply add your pom.xml the folowing lines:
-
-#br
-#br
-#br
+ まず最初にクラスパスに　wiki-0.11-SNAPSHOT.jar を追加してください。
+Maven2 を使っている場合は、[[maven.seasar.org>http://maven.seasar.org/maven2]] レポジトリから使うことができます。
+ダウンロードするためには以下のように pom.xml に記述してください。
 
 #div(,source)
   <repositories>
@@ -37,36 +30,27 @@ simply add your pom.xml the folowing lines:
   </dependencies>
 #divclose
 
- To inject WikiEngine Object by Seasar Container, add wikiengine.dicon to your DICON file.
+S2 を使う場合は wikiengine.dicon を include すれば、WikiEngine オブジェクトをインジェクションすることができます。
 
 #div(,source)
  <include path="wikiengine.dicon"/>
 #divclose
 
+S2 を使わない場合は WikiEngineImpl.getInstance() で取得することができます。
 
- To parse and convert , write like the following:
+#div(,source)
+  WikiEngine engine = WikiEngineImpl.getInstance();
+#divclose
+
+
+最も簡単な Wiki から HTML への変換は以下のとおりです。
 
 #div(,source)
   import org.seasar.cms.wiki.engine.WikiEngine;
   ...
   WikiEngine engine = // <-- inject by S2Container
-  String html = engine.evaluate(reader);
+  String html = engine.evaluate(reader);　//reader には Wiki 
   ...
 #divclose
 
-  When a target text is invalid, RstParser throws
-net.skirnir.rst.IllegalFormatRuntimeException.
-
-  RstParser is thread-safe unless modifying the internal structure.
-
-  To convert net.skirnir.rst.element.Document object into HTML text,
-write like the following:
-
-
-* How to use for building web site by Maven2 
-
- If you maintain Maven2 project and want to write site contents of the project
-
-with reStructuredText format, please try {{{http://www.skirnir.net/product/doxia-module-rst/} doxia-module-rst}}.
-
-
+　WikiEngine の詳細な使い方は [[API Docs>apidocs/index.html]]を参考にしてください。

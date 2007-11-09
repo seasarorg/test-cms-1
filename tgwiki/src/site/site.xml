@@ -10,6 +10,8 @@
 			<item name="Introduction" href="index.html"/>
 			<item name="Download" href="download.html"/>
 			<item name="Getting Started" href="getting-started.html"/>
+			<item name="Wiki Rule" href="wiki-rules.html"/>
+			<item name="Plugin" href="plugin.html"/>
 		</menu>
 		<menu ref="reports"/>
 	</body>

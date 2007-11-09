@@ -1,7 +1,16 @@
 
 * Download Wiki Engine 0.11
 
-|JAR File|[[test]]|
-|Source File| |
+||アーカイブ|Checksum (MD5)	|Checksum (SHA-1)|h
+|JAR File|[[tgwiki-0.1.jar>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1.jar]]|[[tgwiki-0.1.jar.md5>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1.jar.md5]]|[[tgwiki-0.1.jar.sha1>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1.jar.sha1]]|
+|Source File|[[tgwiki-0.1-sources.jar>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1-sources.jar]]|[[tgwiki-0.1-sources.jar.md5>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1-sources.jar.md5]]|[[tgwiki-0.1-sources.jar.sha1>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1-sources.jar.sha1]]|
+
+* System Requirements 
+
+|JDK|1.5 or above|
+|Memory|No minimum requirement|
+|Disk|No minimum requirement|
+|Operating System|No minimum requirement.Tested on Windows Vista.|
+
 
 

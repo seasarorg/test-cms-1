@@ -1,0 +1,17 @@
+
+* ようこそ
+
+"Wiki Engine by Seasar CMS Project" は [[Tuigwaa>http://tuigwaa.sandbox.seasar.org/]]　内部で使われていた　
+Wiki の Engine をライブラリ化して、他の CMS などでも使えるようにしたものです。CMS 開発者で Wiki の Engine を作るのが面倒という方など、
+よろしければ使ってください。
+
+
+** 特徴
+
+- JavaCC　で作られたパーサーで Wiki　構文を解釈している　
+- 様々な拡張が可能である
+- 依存ライブラリは s2-extension.jar のみ
+
+** ニュース
+
+- 2007.11.11 11:11 ver.0.11 リリース
