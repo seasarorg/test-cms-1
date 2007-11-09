@@ -8,37 +8,43 @@
 	<name>Wiki Engine</name>
 	<version>0.1-SNAPSHOT</version>
 	<description>Wiki parsing and rendering engine.</description>
-	<ciManagement>
-		<system>continuum</system>
-		<notifiers>
-			<notifier>
-				<sendOnSuccess>false</sendOnSuccess>
-				<sendOnWarning>false</sendOnWarning>
-				<address>someda@isenshi.com</address>
-			</notifier>
-		</notifiers>
-	</ciManagement>
+	<url>http://cms.sandbox.seasar.org/tgwiki/</url>
+	<mailingLists>
+		<mailingList>
+			<name>CMS Developer Mailing List</name>
+			<post>cms-dev@ml.seasar.org</post>
+		</mailingList>
+	</mailingLists>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>/LICENSE.txt</url>
+		</license>
+	</licenses>
+	<issueManagement>
+		<url>https://www.seasar.org/issues/browse/CMS</url>
+	</issueManagement>
 	<developers>
 		<developer>
 			<id>someda</id>
 			<name>SOMEDA Takashi</name>
-			<email>someda@isenshi.com</email>
+			<email>someda at isenshi.com</email>
 		</developer>
 		<developer>
 			<id>nishioka</id>
 			<name>NISHIOKA Yuhei</name>
-			<email>nishioka@isenshi.com</email>
+			<email>nishioka at isenshi.com</email>
 		</developer>
 	</developers>
 	<scm>
 		<connection>
-			scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/wiki
+			scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/tgwiki
 		</connection>
 		<developerConnection>
-			scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/wiki
+			scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/tgwiki
 		</developerConnection>
 		<url>
-			http://svn.seasar.org/browse/trunk/wiki/?root=sandbox.cms
+			http://svn.seasar.org/browse/trunk/tgwiki/?root=sandbox.cms
 		</url>
 	</scm>
 	<build>
@@ -89,30 +95,30 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-    	  <plugin>
-        	<groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-site-plugin</artifactId>
-			<configuration>
-				<locales>en,ja</locales>
-				<inputEncoding>UTF-8</inputEncoding>
-				<outputEncoding>UTF-8</outputEncoding>
-			</configuration>
-            <dependencies>
-<!--        	  <dependency>
-            	<groupId>org.seasar.cms</groupId>
-	            <artifactId>doxia-module-wiki</artifactId>
-    	        <version>0.1-SNAPSHOT</version>
-        	  </dependency> -->
-        	  <dependency>
-            	<groupId>org.seasar.cms</groupId>
-	            <artifactId>doxia-module-wiki</artifactId>
-    	        <version>0.1</version>
-        	  </dependency>
-	        </dependencies>
-    	  </plugin>
-      </plugins>
-		
-		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<configuration>
+					<locales>ja</locales>
+					<inputEncoding>UTF-8</inputEncoding>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+				<dependencies>
+					<!--        	  <dependency>
+						<groupId>org.seasar.cms</groupId>
+						<artifactId>doxia-module-wiki</artifactId>
+						<version>0.1-SNAPSHOT</version>
+						</dependency> -->
+					<dependency>
+						<groupId>org.seasar.cms</groupId>
+						<artifactId>doxia-module-wiki</artifactId>
+						<version>0.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+
+
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
@@ -130,7 +136,7 @@
 		</repository>
 	</repositories>
 	<dependencies>
-      
+
 		<dependency>
 			<groupId>org.seasar.container</groupId>
 			<artifactId>s2-extension</artifactId>
@@ -162,7 +168,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>codehaus-snapshot-plugins</id>
@@ -176,36 +182,43 @@
 			</releases>
 		</pluginRepository>
 	</pluginRepositories>
-	
-	<reporting>
-     <plugins>
-      
 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jxr-maven-plugin</artifactId>
-        <configuration>
-          <inputEncoding>UTF-8</inputEncoding>
-          <outputEncoding>UTF-8</outputEncoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>surefire-report-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-      </plugin>
-      <!-- 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>changelog-maven-plugin</artifactId>
-      </plugin>      
-       -->
-    </plugins>
-  </reporting>
-	
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<docencoding>UTF-8</docencoding>
+					<charset>UTF-8</charset>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jxr-maven-plugin</artifactId>
+				<configuration>
+					<inputEncoding>UTF-8</inputEncoding>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>surefire-report-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>taglist-maven-plugin</artifactId>
+			</plugin>
+			<!-- 
+				<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>changelog-maven-plugin</artifactId>
+				</plugin>      
+			-->
+		</plugins>
+	</reporting>
+
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
@@ -222,6 +235,6 @@
 			<url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
 </project>
 
