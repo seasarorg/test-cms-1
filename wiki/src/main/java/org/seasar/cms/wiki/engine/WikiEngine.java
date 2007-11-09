@@ -72,6 +72,13 @@ public interface WikiEngine {
 	 */
 	public void merge(Reader reader, WikiContext context, OutputStream os);
 
+	/**
+	 * PDF を出力するときなどに使う
+	 * 
+	 * @param text
+	 * @param context
+	 * @param os
+	 */
 	public void merge(String text, WikiContext context, OutputStream os);
 
 	// ---- Setter Getter -------------------

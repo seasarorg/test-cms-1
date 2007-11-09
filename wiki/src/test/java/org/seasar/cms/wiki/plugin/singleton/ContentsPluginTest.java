@@ -8,8 +8,6 @@ public class ContentsPluginTest extends WikiEngineTestFramework {
 
 	public void testEval() {
 		String actual = engine.evaluate(wiki);
-
-		System.out.println(actual);
 		assertNotNull(actual);
 	}
 
