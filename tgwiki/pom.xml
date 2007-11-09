@@ -89,41 +89,30 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<configuration>
-					<locales>ja</locales>
-					<inputEncoding>UTF-8</inputEncoding>
-					<outputEncoding>UTF-8</outputEncoding>
-				</configuration>
-				<dependencies>
-					<!--        	  <dependency>
-						<groupId>org.seasar.cms</groupId>
-						<artifactId>doxia-module-wiki</artifactId>
-						<version>0.1-SNAPSHOT</version>
-						</dependency> -->
-					<dependency>
-						<groupId>org.seasar.cms</groupId>
-						<artifactId>doxia-module-wiki</artifactId>
-						<version>0.1</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-
-
+    	  <plugin>
+        	<groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-site-plugin</artifactId>
+			<configuration>
+				<locales>en,ja</locales>
+				<inputEncoding>UTF-8</inputEncoding>
+				<outputEncoding>UTF-8</outputEncoding>
+			</configuration>
+            <dependencies>
+<!--        	  <dependency>
+            	<groupId>org.seasar.cms</groupId>
+	            <artifactId>doxia-module-wiki</artifactId>
+    	        <version>0.1-SNAPSHOT</version>
+        	  </dependency> -->
+        	  <dependency>
+            	<groupId>org.seasar.cms</groupId>
+	            <artifactId>doxia-module-wiki</artifactId>
+    	        <version>0.1</version>
+        	  </dependency>
+	        </dependencies>
+    	  </plugin>
+      </plugins>
+		
+		
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
@@ -141,7 +130,7 @@
 		</repository>
 	</repositories>
 	<dependencies>
-
+      
 		<dependency>
 			<groupId>org.seasar.container</groupId>
 			<artifactId>s2-extension</artifactId>
@@ -173,7 +162,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>codehaus-snapshot-plugins</id>
@@ -187,41 +176,36 @@
 			</releases>
 		</pluginRepository>
 	</pluginRepositories>
-
+	
 	<reporting>
-		<plugins>
-         	<plugin>
-         		<groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-  				<configuration>
-          			  <encoding>UTF-8</encoding>
-			          <docencoding>UTF-8</docencoding>
-          			  <charset>UTF-8</charset>
-        		</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jxr-maven-plugin</artifactId>
-				<configuration>
-					<inputEncoding>UTF-8</inputEncoding>
-					<outputEncoding>UTF-8</outputEncoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>surefire-report-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>taglist-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>changelog-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</reporting>
+     <plugins>
+      
 
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+        <configuration>
+          <inputEncoding>UTF-8</inputEncoding>
+          <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>surefire-report-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>taglist-maven-plugin</artifactId>
+      </plugin>
+      <!-- 
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>changelog-maven-plugin</artifactId>
+      </plugin>      
+       -->
+    </plugins>
+  </reporting>
+	
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
@@ -238,6 +222,6 @@
 			<url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
-
+	
 </project>
 
