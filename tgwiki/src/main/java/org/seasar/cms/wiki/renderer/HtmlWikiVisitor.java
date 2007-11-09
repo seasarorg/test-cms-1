@@ -612,16 +612,18 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 		if (!link.hasBody()) {
 			return;
 		}
-		String notclass = getProperty("class.notexist");
+
 		if (link.hasPreMsg()) {
+			String classValue = getProperty("class.pagename.premsg");
 			String msg = link.getPreMsg();
-			writer.start("span").attr("class", notclass).body(msg).end();
+			writer.start("span").attr("class", classValue).body(msg).end();
 		}
 		writer.start("a").attr("href", link.getUrl()).body(link.getBody())
 				.end();
 		if (link.hasPostMsg()) {
+			String classValue = getProperty("class.pagename.postmsg");
 			String msg = link.getPostMsg();
-			writer.start("span").attr("class", notclass).body(msg).end();
+			writer.start("span").attr("class", classValue).body(msg).end();
 		}
 		writer.block();
 	}

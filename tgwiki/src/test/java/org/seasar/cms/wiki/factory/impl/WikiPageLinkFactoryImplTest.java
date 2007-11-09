@@ -20,10 +20,11 @@ public class WikiPageLinkFactoryImplTest extends WikiEngineTestFramework {
 	}
 
 	public void testCreate() {
-		assertEquals("notexist", engine.getProperty("class.notexist"));
+		assertEquals("pagename_postmsg", engine
+				.getProperty("class.pagename.postmsg"));
 		engine.setLinkFactory(new CreationLinkFactory());
-		String actual = engine.evaluate("[[a]]", new WikiContext());
-		String expected = "<p><a href=\"creationLink\">?</a><span class=\"notexist\">a</span></p>";
+		String actual = engine.evaluate("[[a]]");
+		String expected = "<p><a href=\"creationLink\">?</a><span class=\"pagename_postmsg\">a</span></p>";
 		assertWikiEquals(expected, actual);
 	}
 
