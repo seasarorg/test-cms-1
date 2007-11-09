@@ -53,8 +53,8 @@ public class WikiParser/*@bgen(jjtree)*/implements WikiParserTreeConstants, Wiki
         private static final int[] HORIZONTAL_KIND = {HORIZONTAL};
         private static final int[] BLOCKPLUGIN_KIND = {BLOCKPLUGIN};
 
-        private List toc_ = new ArrayList();
-        private List annotation_ = new ArrayList();
+        private List<SimpleNode> toc_ = new ArrayList<SimpleNode>();
+        private List<SimpleNode> annotation_ = new ArrayList<SimpleNode>();
         private int nParseErrors_ = 0;
         private int startpos_ = -1;
 
@@ -241,8 +241,8 @@ public class WikiParser/*@bgen(jjtree)*/implements WikiParserTreeConstants, Wiki
         private void processError(String msg, boolean inline,ParseException pe){
                 ++nParseErrors_;
                 WikiErrors enode = new WikiErrors(JJTERRORS);
-//		StringBuffer buf = new StringBuffer(getErrorLine());
-                StringBuffer buf = new StringBuffer();
+//		StringBuilder buf = new StringBuilder(getErrorLine());
+                StringBuilder buf = new StringBuilder();
                 buf.append(getToken(0).image);
                 jjtree.openNodeScope(enode);
 
@@ -270,7 +270,7 @@ public class WikiParser/*@bgen(jjtree)*/implements WikiParserTreeConstants, Wiki
      boolean jjtc000 = true;
      jjtree.openNodeScope(jjtn000);
      try {ParseException e = generateParseException();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(getToken(0));
         Token t;
         while(!isNewline(1)){
@@ -291,7 +291,7 @@ public class WikiParser/*@bgen(jjtree)*/implements WikiParserTreeConstants, Wiki
      WikiSkipToNewline jjtn000 = new WikiSkipToNewline(JJTSKIPTONEWLINE);
      boolean jjtc000 = true;
      jjtree.openNodeScope(jjtn000);
-     try {StringBuffer buf = new StringBuffer();
+     try {StringBuilder buf = new StringBuilder();
         while(!isNewline(1)){
                 Token t=getNextToken();
                 buf.append(t.image);

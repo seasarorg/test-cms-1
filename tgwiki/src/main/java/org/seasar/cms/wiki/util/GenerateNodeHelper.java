@@ -1,7 +1,5 @@
 package org.seasar.cms.wiki.util;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +35,13 @@ public class GenerateNodeHelper {
 	private GenerateNodeHelper() {
 	}
 
+	/**
+	 * 与えられた文字列が email アドレスかどうかを判別する。 このメソッドはパーサから呼ばれる為、引数の image で利用されている
+	 * 文字列が限定されている事を前提としているため、そのような前提が無い場合の 文字列に対しては使わないこと。
+	 * 
+	 * @param image
+	 * @return 与えられた文字列が email アドレスの場合「真」、そうでない場合「偽」
+	 */
 	public static boolean isEmail(String image) {
 		return (image.indexOf("@") != -1);
 	}
@@ -52,6 +57,13 @@ public class GenerateNodeHelper {
 		return type;
 	}
 
+	/**
+	 * 文字列を delimiter で二分割し、二要素の配列として返す
+	 * 
+	 * @param image
+	 * @param delimiter
+	 * @return
+	 */
 	public static String[] split(String image, String delimiter) {
 		String[] s = new String[2];
 		int idx = image.indexOf(delimiter);
@@ -65,13 +77,23 @@ public class GenerateNodeHelper {
 		return s;
 	}
 
+	/**
+	 * image から、左と右の括弧を取り外す left と right は異なる文字列である事を前提としている right の文字列が left
+	 * よりも早くあらわれた場合は空文字を返す
+	 * 
+	 * @param image
+	 * @param left
+	 * @param right
+	 * @return
+	 */
 	public static String deleteParenthesis(String image, String left,
 			String right) {
-		return deleteParenthesis(image, left, right, true);
-	}
 
-	public static String deleteParenthesis(String image, String left,
-			String right, boolean isWide) {
+		if (left.equals(right)) {
+			throw new IllegalArgumentException(
+					"The left must be another character to right");
+		}
+
 		int idx = 0;
 		int lidx = 0;
 		int ridx = image.length();
@@ -80,36 +102,22 @@ public class GenerateNodeHelper {
 			lidx = idx + 1;
 		}
 
-		if (isWide) {
-			if ((idx = image.lastIndexOf(right)) != -1) {
-				ridx = idx;
-			}
-		} else {
-			if ((idx = image.indexOf(right)) != -1) {
-				ridx = idx;
-			}
+		if ((idx = image.lastIndexOf(right)) != -1) {
+			ridx = idx;
 		}
 		return (ridx > lidx) ? image.substring(lidx, ridx) : "";
 	}
 
 	/**
-	 * Discriminates the specifid string represents URL or not.
+	 * 文字列を引数として分割する
+	 * 
+	 * @param image
+	 * @return
 	 */
-	public static boolean isURL(String s) {
-
-		try {
-			new URL(s);
-			return true;
-		} catch (MalformedURLException e) {
-			// do nothing
-		}
-		return false;
-	}
-
 	public static String[] splitArgs(String image) {
 		String s = deleteParenthesis(image, "(", ")");
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		List<String> argsList = new ArrayList<String>();
 		int cnt = 0;
 		int parenthesis = 0;
@@ -135,7 +143,7 @@ public class GenerateNodeHelper {
 			if (c == ',') {
 				if ((cnt > 0 && parenthesis == 0) || cnt == 0) {
 					argsList.add(buf.toString().trim());
-					buf = new StringBuffer();
+					buf = new StringBuilder();
 					cnt = 0;
 					continue;
 				}
@@ -151,9 +159,9 @@ public class GenerateNodeHelper {
 
 	public static int getTableType(String image) {
 		int type = 0;
-		if ("h".equals(image) || "H".equals(image)) {
+		if ("h".equalsIgnoreCase(image)) {
 			type = TABLE_TYPE_HEADER;
-		} else if ("f".equals(image) || "F".equals(image)) {
+		} else if ("f".equalsIgnoreCase(image)) {
 			type = TABLE_TYPE_FOOTER;
 		}
 		return type;

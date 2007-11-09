@@ -9,6 +9,10 @@ import org.seasar.cms.wiki.parser.WikiTable;
 import org.seasar.cms.wiki.parser.WikiTablecolumn;
 import org.seasar.cms.wiki.parser.WikiTablemember;
 
+
+/**
+ * @author nishioka
+ */
 public class TableNodeUtils {
 
 	public static Map<String, String> getTdAttributes(WikiTablecolumn node) {
@@ -24,23 +28,6 @@ public class TableNodeUtils {
 			attrs.put("rowspan", ++node.rowspannum + "");
 		}
 		return attrs;
-	}
-
-	public static String getTdStyle(WikiTablecolumn node) {
-		StringBuilder style = new StringBuilder();
-		if (node.align != null) {
-			style.append("text-align:" + node.align + ";");
-		}
-		if (node.bgcolor != null) {
-			style.append("background-color:" + node.bgcolor + ";");
-		}
-		if (node.color != null) {
-			style.append("color:" + node.color + ";");
-		}
-		if (node.size != null) {
-			style.append("font-size:" + node.size + ";");
-		}
-		return style.toString();
 	}
 
 	/**
@@ -95,4 +82,27 @@ public class TableNodeUtils {
 			}
 		}
 	}
+	
+	
+	// ----- [private method] -----
+	
+	
+	private static String getTdStyle(WikiTablecolumn node) {
+		StringBuilder style = new StringBuilder();
+		if (node.align != null) {
+			style.append("text-align:" + node.align + ";");
+		}
+		if (node.bgcolor != null) {
+			style.append("background-color:" + node.bgcolor + ";");
+		}
+		if (node.color != null) {
+			style.append("color:" + node.color + ";");
+		}
+		if (node.size != null) {
+			style.append("font-size:" + node.size + ";");
+		}
+		return style.toString();
+	}
+
+	
 }

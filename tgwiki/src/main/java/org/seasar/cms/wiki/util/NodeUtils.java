@@ -12,23 +12,47 @@ import org.seasar.cms.wiki.parser.Node;
  */
 public class NodeUtils {
 
-	@SuppressWarnings("unchecked")
+	private NodeUtils(){		
+	}
+	
+	/**
+	 * 与えられたノードの子要素で、引数のクラスに該当するもののみを
+	 * リストに追加して返す
+	 * @param <E>
+	 * @param node
+	 * @param clazz
+	 * @return
+	 */
 	public static <E> List<E> find(Node node, Class<E> clazz) {
 		List<E> list = new ArrayList<E>();
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			if (clazz.isInstance(node.jjtGetChild(i))) {
-				list.add((E) node.jjtGetChild(i));
+		for (int i = 0; i < node.jjtGetNumChildren(); i++) {			
+			Node child = node.jjtGetChild(i);			
+			if (clazz.isInstance(child)) {
+				list.add(clazz.cast(child));
 			}
 		}
 		return list;
 	}
+	
+	/**
+	 * 親が指定されたクラスである場合は、その親のクラスにキャストして返す
+	 * そうでない場合には null を返す
+	 * 
+	 * @param <E>
+	 * @param node
+	 * @param clazz
+	 * @return
+	 */
+	public static <E extends Node> E parent(Node node, Class<E> clazz) {
 
-	public static List<Node> children(Node node) {
-		List<Node> list = new ArrayList<Node>();
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			list.add((Node) node.jjtGetChild(i));
+		Node parent = node.jjtGetParent();
+		if (parent == null) {
+			return null;
 		}
-		return list;
+		if (clazz.isInstance(parent)) {
+			return clazz.cast(parent);
+		}
+		return null;
 	}
 
 }

@@ -29,7 +29,7 @@ public class AnchorUtils {
 		String mod = WikiStringUtils.removeCarriageReturn(contents);
 		String[] lines = NEWLINE.split(mod);
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		int hashcode = contents.hashCode();
 		for (String line : lines) {
 			buf.append(line);

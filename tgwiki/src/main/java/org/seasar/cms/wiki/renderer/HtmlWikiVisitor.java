@@ -229,7 +229,16 @@ public class HtmlWikiVisitor implements WikiWriterVisitor,
 		if (!node.iscolspan && !node.isrowspan) {
 			String str = getChildString(node, data, 0);
 			Map<String, String> attrs = TableNodeUtils.getTdAttributes(node);
-			writer.start("td").attrs(attrs).body(str).end();
+
+			WikiTablemember parent = NodeUtils.parent(node,
+					WikiTablemember.class);
+
+			
+			String tag = "td";
+			if(parent != null && parent.type == GenerateNodeHelper.TABLE_TYPE_HEADER){
+				tag = "th";
+			}			
+			writer.start(tag).attrs(attrs).body(str).end();
 		}
 		return null;
 	}
