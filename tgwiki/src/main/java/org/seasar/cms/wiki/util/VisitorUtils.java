@@ -41,17 +41,29 @@ public class VisitorUtils {
 
 	private static final int BOLDITALIC_NUM = 5;
 
+	private VisitorUtils(){		
+	}
+	
 	public static boolean isExcerptStartNeeded(WikiExcerpt node) {
-		Node parent = node.jjtGetParent();
-		if (parent instanceof WikiExcerpt) {
-			int plevel = ((WikiExcerpt) parent).level;
-			if (node.level <= plevel) {
+		WikiExcerpt parent = NodeUtils.parent(node, WikiExcerpt.class);
+		if (parent != null) {
+			if (node.level <= parent.level) {
 				return false;
 			}
 		}
 		return true;
 	}
 
+	/**
+	 * ボールドやイタリックの場合に、前後にマークアップ用以外の「'」がある場合に、
+	 * それを表示するためのメソッド
+	 * WikiStrongItalic の prelevel と postlevel は Wiki.jjt 
+	 * より、「2」か「3」か「5」が前提となる
+	 * 
+	 * @param node
+	 * @param pre
+	 * @return
+	 */
 	public static String getAppendString(WikiStrongItalic node, boolean pre) {
 		int num = node.prelevel - node.postlevel;
 		if (!pre) {
@@ -60,7 +72,7 @@ public class VisitorUtils {
 		if (num <= 0) {
 			return null;
 		}
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		while (num > 0) {
 			buf.append(STRONGITALIC_MARK);
 			num--;
@@ -68,12 +80,24 @@ public class VisitorUtils {
 		return buf.toString();
 	}
 
+	/**
+	 * WikiStrongItalic が強調であるかを返す
+	 * ノードの小さい方のマークアップの数にて判断する
+	 * @param node
+	 * @return
+	 */
 	public static boolean isBold(WikiStrongItalic node) {
 		int level = (node.prelevel > node.postlevel) ? node.postlevel
 				: node.prelevel;
 		return (level == BOLD_NUM || level == BOLDITALIC_NUM) ? true : false;
 	}
 
+	/**
+	 * WikiStrongItalic がイタリックであるかを返す
+	 * ノードの小さい方のマークアップの数にて判断する
+	 * @param node
+	 * @return
+	 */
 	public static boolean isItalic(WikiStrongItalic node) {
 		int level = (node.prelevel > node.postlevel) ? node.postlevel
 				: node.prelevel;
