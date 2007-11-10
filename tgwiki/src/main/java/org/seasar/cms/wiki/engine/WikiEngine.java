@@ -26,20 +26,44 @@ import org.seasar.cms.wiki.factory.WikiParserFactory;
 import org.seasar.cms.wiki.factory.WikiVisitorFactory;
 import org.seasar.cms.wiki.plugin.PluginExecuter;
 
+/**
+ * 与えられた Wiki コンテンツを解釈し、指定された処理方法にて出力を行うエンジン。
+ * 最も簡単な利用方法は以下のとおり。
+ * <pre>
+ *   WikiEngine engine;
+ *   String html = engine.evaluate("This is wiki text.");
+ * </pre>
+ * 
+ * WikiEngine の実装クラスは、独自に実装する事も可能であるし、標準のエンジンを
+ * 利用することも可能。
+ * 
+ * @see <a href="http://cms.sandbox.seasar.org/tgwiki/">Getting Started</a>
+ * 
+ * @author nishioka
+ * @author someda
+ */
 public interface WikiEngine {
 
 	/**
-	 * プロパティの設定。同じキーのプロパティが設定されていれば上書き。
+	 * Wiki エンジンのプロパティを設定する。 また同じキーのプロパティが設定されていれば上書きする。 デフォルトでは
+	 * wikiengine.properties の内容が設定されている。
 	 * 
 	 * @param props
 	 * @return
 	 */
 	public void setProperties(Properties props);
 
+	/**
+	 * Wiki エンジンのプロパティを設定する。 また同じキーのプロパティが設定されていれば上書きする。 デフォルトでは
+	 * wikiengine.properties の内容が設定されている。
+	 * 
+	 * @param props
+	 * @return
+	 */
 	public void setProperty(String name, String value);
 
 	/**
-	 * プロパティの取得
+	 * Wiki エンジンに設定されているプロパティを取得する。
 	 * 
 	 * @param key
 	 * @return
@@ -47,6 +71,8 @@ public interface WikiEngine {
 	public String getProperty(String key);
 
 	/**
+	 * 引数で与えられている Wiki コンテンツを評価し、 その結果を文字列として返す。
+	 * 
 	 * @param text
 	 * @param context
 	 * @return 結果
@@ -54,41 +80,61 @@ public interface WikiEngine {
 	public String evaluate(String text, WikiContext context);
 
 	/**
+	 * 引数で与えられている Wiki コンテンツを評価し、 その結果を文字列として返す。
+	 * 
 	 * @param text
-	 * @param context
 	 * @return 結果
 	 */
 	public String evaluate(String text);
 
 	/**
-	 * @param text
+	 * 引数で与えられている Wiki コンテンツを評価し、 その結果を文字列として返す。
+	 * 
+	 * @param reader
 	 * @param context
 	 * @return 結果
 	 */
 	public String evaluate(Reader reader, WikiContext context);
 
 	/**
-	 * @param text
-	 * @param context
+	 * 引数で与えられている Wiki コンテンツを評価し、 その結果を文字列として返す。
+	 * 
+	 * @param reader
 	 * @return 結果
 	 */
 	public String evaluate(Reader reader);
 
+	/**
+	 * 引数で与えられている Wiki コンテンツを評価し Writer に書き出す。 PDF などの通常の文字列出力以外などの場合に利用する。
+	 * 
+	 * @param reader
+	 * @param context
+	 * @param writer
+	 */
 	public void merge(Reader reader, WikiContext context, Writer writer);
 
+	/**
+	 * 引数で与えられている Wiki コンテンツを評価し Writer に書き出す。 PDF などの通常の文字列出力以外などの場合に利用する。
+	 * 
+	 * @param text
+	 * @param context
+	 * @param writer
+	 */
 	public void merge(String text, WikiContext context, Writer writer);
 
 	/**
-	 * PDF を出力するときなどに使う
+	 * 引数で与えられている Wiki コンテンツを評価し OutputStream に書き出す。 PDF
+	 * などの通常の文字列出力以外などの場合に利用する。
 	 * 
-	 * @param text
+	 * @param reader
 	 * @param context
 	 * @param os
 	 */
 	public void merge(Reader reader, WikiContext context, OutputStream os);
 
 	/**
-	 * PDF を出力するときなどに使う
+	 * 引数で与えられている Wiki コンテンツを評価し OutputStream に書き出す。 PDF
+	 * などの通常の文字列出力以外などの場合に利用する。
 	 * 
 	 * @param text
 	 * @param context
@@ -96,26 +142,64 @@ public interface WikiEngine {
 	 */
 	public void merge(String text, WikiContext context, OutputStream os);
 
-	// ---- Setter Getter -------------------
-
+	/**
+	 * WikiPageLinkFactory を取得する。
+	 * @return
+	 */
 	public WikiPageLinkFactory getLinkFactory();
 
+	/**
+	 * WikiVisitorFactory を取得する。
+	 * @return
+	 */
 	public WikiVisitorFactory getVisitorFactory();
 
+	/**
+	 * WikiParserFactory を取得する。
+	 * @return
+	 */
 	public WikiParserFactory getParserFactory();
 
+	/**
+	 * PluginExecuter を取得する。
+	 * @return
+	 */
 	public PluginExecuter getPluginExecuter();
 
+	/**
+	 * WikiBodyFactory を取得する。
+	 * @return
+	 */
 	public WikiBodyFactory getBodyEvaluator();
 
+	/**
+	 * WikiPageLinkFactory を設定する。
+	 * @param linkFactory
+	 */
 	public void setLinkFactory(WikiPageLinkFactory linkFactory);
 
+	/**
+	 * WikiVisitorFactory を設定する。
+	 * @param visitorFactory
+	 */
 	public void setVisitorFactory(WikiVisitorFactory visitorFactory);
 
+	/**
+	 * WikiParserFactory を設定する。
+	 * @param parserFactory
+	 */
 	public void setParserFactory(WikiParserFactory parserFactory);
 
+	/**
+	 * PluginExecuter を設定する。
+	 * @param pluginExecuter
+	 */
 	public void setPluginExecuter(PluginExecuter pluginExecuter);
 
+	/**
+	 * WikiBodyFactory を設定する。
+	 * @param bodyEvaluator
+	 */
 	public void setBodyEvaluator(WikiBodyFactory bodyEvaluator);
 
 }
