@@ -5,7 +5,7 @@
 
 * Getting Started
 
- まず最初にクラスパスに　wiki-0.11-SNAPSHOT.jar を追加してください。
+ まず最初にクラスパスに　tgwiki-0.11.jar を追加してください。
 Maven2 を使っている場合は、[[maven.seasar.org>http://maven.seasar.org/maven2]] レポジトリから使うことができます。
 ダウンロードするためには以下のように pom.xml に記述してください。
 
@@ -24,7 +24,7 @@ Maven2 を使っている場合は、[[maven.seasar.org>http://maven.seasar.org/
     <dependency>
       <groupId>org.seasar.cms</groupId>
       <artifactId>wiki</artifactId>
-      <version>0.1.1</version>
+      <version>0.11</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
