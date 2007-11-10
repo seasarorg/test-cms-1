@@ -44,6 +44,12 @@ public class VisitorUtils {
 	private VisitorUtils(){		
 	}
 	
+	/**
+	 * 引用のタグを開始するかを判断する為のメソッド
+	 * 自分の親ノードにて判断する
+	 * @param node
+	 * @return
+	 */
 	public static boolean isExcerptStartNeeded(WikiExcerpt node) {
 		WikiExcerpt parent = NodeUtils.parent(node, WikiExcerpt.class);
 		if (parent != null) {
@@ -104,6 +110,13 @@ public class VisitorUtils {
 		return (level == ITALIC_NUM || level == BOLDITALIC_NUM) ? true : false;
 	}
 
+	
+	/**
+	 * 子要素が WikiArgs の場合、その中身の引数を返す
+	 * WikiArgs は子要素の中の最初の子供であることを前提としている
+	 * @param node
+	 * @return
+	 */
 	public static String[] getArgs(Node node) {
 		if (node.jjtGetNumChildren() > 0
 				&& node.jjtGetChild(0) instanceof WikiArgs) {
@@ -113,6 +126,12 @@ public class VisitorUtils {
 		return null;
 	}
 
+	/**
+	 * 子要素に Anchor (WikiLetters) があれば、その値を返す
+	 * 複数の Anchor 要素があれば、最初のものを返す
+	 * @param node
+	 * @return
+	 */
 	public static String getAnchorId(SimpleNode node) {
 		for (WikiLetters l : NodeUtils.find(node, WikiLetters.class)) {
 			if (l.isAnchor) {
@@ -122,6 +141,11 @@ public class VisitorUtils {
 		return null;
 	}
 
+	/**
+	 * 子要素の一番最後に Anchor 要素を追加する
+	 * @param node
+	 * @param letter
+	 */
 	public static void setAnchor(SimpleNode node, String letter) {
 		WikiLetters letters = new WikiLetters(-1);
 		letters.letter = letter;
@@ -129,6 +153,12 @@ public class VisitorUtils {
 		node.jjtAddChild(letters, node.jjtGetNumChildren());
 	}
 
+	/**
+	 * FloatAlign 要素の HTML スタイルを返す
+	 * 必ず image に値が設定されていることを前提としている
+	 * @param node
+	 * @return
+	 */
 	public static String getFloatStyle(WikiFloatAlign node) {
 		String align = node.image.toLowerCase().substring(1,
 				node.image.length() - 1);
@@ -140,7 +170,7 @@ public class VisitorUtils {
 		}
 		String style = "float:" + align + ";";
 		if (widthStr != null) {
-			style += "width: " + widthStr + "px;";
+			style += "width:" + widthStr + "px;";
 		}
 		return style;
 	}
