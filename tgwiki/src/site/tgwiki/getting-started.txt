@@ -23,7 +23,7 @@ Maven2 を使っている場合は、[[maven.seasar.org>http://maven.seasar.org/
     ...
     <dependency>
       <groupId>org.seasar.cms</groupId>
-      <artifactId>wiki</artifactId>
+      <artifactId>tgwiki</artifactId>
       <version>0.11</version>
       <scope>compile</scope>
     </dependency>

@@ -2,8 +2,8 @@
 * Download Wiki Engine 0.11
 
 ||アーカイブ|Checksum (MD5)	|Checksum (SHA-1)|h
-|JAR File|[[tgwiki-0.1.jar>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1.jar]]|[[tgwiki-0.1.jar.md5>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1.jar.md5]]|[[tgwiki-0.1.jar.sha1>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1.jar.sha1]]|
-|Source File|[[tgwiki-0.1-sources.jar>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1-sources.jar]]|[[tgwiki-0.1-sources.jar.md5>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1-sources.jar.md5]]|[[tgwiki-0.1-sources.jar.sha1>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.1/tgwiki-0.1-sources.jar.sha1]]|
+|JAR File|[[tgwiki-0.11.jar>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.11/tgwiki-0.11.jar]]|[[tgwiki-0.11.jar.md5>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.11/tgwiki-0.11.jar.md5]]|[[tgwiki-0.11.jar.sha1>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.11/tgwiki-0.11.jar.sha1]]|
+|Source File|[[tgwiki-0.11-sources.jar>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.11/tgwiki-0.11-sources.jar]]|[[tgwiki-0.11-sources.jar.md5>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.11/tgwiki-0.11-sources.jar.md5]]|[[tgwiki-0.11-sources.jar.sha1>http://maven.seasar.org/maven2/org/seasar/cms/tgwiki/0.11/tgwiki-0.11-sources.jar.sha1]]|
 
 * System Requirements 
 
