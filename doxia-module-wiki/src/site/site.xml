@@ -1,23 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="doxia-module-rst">
-  <bannerRight>
-    <name>doxia-module-rst</name>
-    <src>http://www.skirnir.net/product/rst/images/rst.jpg</src>
-    <href>http://www.skirnir.net/product/doxia-module-rst/</href>
-  </bannerRight>
   <body>
     <links>
-      <item name="RST"
-        href="http://www.skirnir.net/product/rst/" />
-      <item name="doxia-module-rst"
-        href="http://www.skirnir.net/product/doxia-module-rst/" />
-      <item name="Freyja"
-        href="http://www.skirnir.net/product/freyja/" />
+      <item name="TgWiki Engine"
+        href="http://cms.sandbox.seasar.org/tgwiki" />
     </links>
-    <menu name="doxia-module-rst">
-      <item name="Introduction" href="index.html" />
-      <item name="Getting Started" href="getting-started.html" />
-      <item name="Release Notes" href="release-notes.html" />
+    <menu name="doxia-module-tgwiki">
+      <item name="Top" href="index.html" />
     </menu>
 
     ${reports}

@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.apache.maven.doxia</groupId>
     <artifactId>doxia-modules</artifactId>
@@ -7,13 +8,15 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms</groupId>
-  <artifactId>doxia-module-wiki</artifactId>
+  <artifactId>doxia-module-tgwiki</artifactId>
   <packaging>jar</packaging>
-  <name>Doxia Module for Seasar CMS WikiEngine</name>
-  <version>0.1-SNAPSHOT</version>
-  <description>doxia-module-rst is a Doxia module for reStructuredText. It makes
-    you possible to write your site contents with reStructuredText
-    format in Maven2 project.</description>
+  <name>Doxia Module for TgWiki</name>
+  <version>0.11</version>
+  <description>
+    doxia-module-tgwiki is a Doxia module for TgWiki. It makes
+    you possible to write your site contents with TgWiki
+    format in Maven2 project.
+  </description>
   <url>http://www.skirnir.net/product/${pom.artifactId}/</url>
   <developers>
     <developer>
@@ -26,7 +29,7 @@
       <timezone>+9</timezone>
     </developer>
     <developer>
-      <id>someda</id>
+      <id>nishioka</id>
       <name>SOMEDA Takashi</name>
       <email>someda at isenshi.com</email>
       <roles>
@@ -42,21 +45,26 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://www.skirnir.net/svn/repos/skirnir/${pom.artifactId}/trunk/</connection>
-    <developerConnection>scm:svn:http://www.skirnir.net/svn/repos/skirnir/${pom.artifactId}/trunk/</developerConnection>
+    <connection>
+		scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/doxia-module-wiki
+    </connection>
+    <developerConnection>
+		scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/doxia-module-wiki
+    </developerConnection>
+    <url>http://svn.seasar.org/browse/trunk/doxia-module-wiki/?root=sandbox.cms</url>
   </scm>
   <organization>
-    <name>The Skirnir Project</name>
-    <url>http://www.skirnir.net/</url>
+    <name>The Seasar CMS Project</name>
+    <url>http://cms.sandbox.seasar.org/</url>
   </organization>
   <build>
+    <defaultGoal>install</defaultGoal>
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav</artifactId>
       </extension>
     </extensions>
-    <defaultGoal>install</defaultGoal>
     <plugins>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
@@ -70,6 +78,7 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <encoding>UTF-8</encoding>
@@ -78,6 +87,7 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
         <executions>
           <execution>
@@ -106,10 +116,15 @@
       <artifactId>doxia-sink-api</artifactId>
       <version>1.0-alpha-8</version>
     </dependency>
+<!--    <dependency>
+      <groupId>net.skirnir.rst</groupId>
+      <artifactId>rst</artifactId>
+      <version>0.1.4</version>
+    </dependency> -->
     <dependency>
       <groupId>org.seasar.cms</groupId>
-      <artifactId>wiki</artifactId>
-      <version>0.1-SNAPSHOT</version>
+      <artifactId>tgwiki</artifactId>
+      <version>0.11</version>
     </dependency>
   </dependencies>
   <reporting>
@@ -134,28 +149,30 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>changelog-maven-plugin</artifactId>
       </plugin>
+      <!--
+        <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+        <locale>en</locale>
+        <charset>UTF-8</charset>
+        <encoding>UTF-8</encoding>
+        </configuration>
+        </plugin>
+      -->
     </plugins>
   </reporting>
   <distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>maven.seasar.org</id>
-			<name>The Seasar Foundation Maven2 Repository</name>
-			<url>dav:https://www.seasar.org/maven/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<uniqueVersion>true</uniqueVersion>
-			<id>maven.seasar.org</id>
-			<name>
-				The Seasar Foundation Maven2 Snapshot Repository
-			</name>
-			<url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
-		</snapshotRepository>
-<!--
-    <site>
-      <id>www.skirnir.net</id>
-      <url>scp://www.skirnir.net/var/www/html/product/${pom.artifactId}/</url>
-    </site>
-    -->
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>maven.seasar.org</id>
+      <name>The Seasar Foundation Maven2 Repository</name>
+      <url>dav:https://www.seasar.org/maven/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <uniqueVersion>true</uniqueVersion>
+      <id>maven.seasar.org</id>
+      <name>The Seasar Foundation Maven2 Snapshot Repository</name>
+      <url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
+    </snapshotRepository>
   </distributionManagement>
 </project>

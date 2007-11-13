@@ -1,10 +1,22 @@
  ------
-Getting Started
+Welcome
  ------
-YOKOTA Takehiko
+NISHIOKA Yuhei
  ------
-2006-07-23
+2007-11-11
  ------
+
+Welocome to doxia-module-tgwiki
+
+ doxia-module-tgwiki is a Doxia module for TgWiki. It makes
+you possible to write your site contents with TgWiki
+format in Maven2 project.
+
+News
+
+* (2007/11/11) version.0.11 Release 
+
+  This release is the first release.
 
 Getting Started
 
@@ -27,9 +39,9 @@ in site building phase.
         <artifactId>maven-site-plugin</artifactId>
         <dependencies>
           <dependency>
-            <groupId>net.skirnir.rst</groupId>
-            <artifactId>doxia-module-rst</artifactId>
-            <version>0.1.5-SNAPSHOT</version>
+            <groupId>org.seasar.cms</groupId>
+            <artifactId>doxia-module-tgwiki</artifactId>
+            <version>0.11</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -50,7 +62,7 @@ in site building phase.
   </repositories>
 +--
 
-  Put all reStructuredText contents in a project's <<<src/site/rst>>> directory
+  Put all wiki contents (tgwiki style) in a project's <<<src/site/tgwiki>>> directory
 with '.txt' suffix, and just type:
 
 +--

@@ -1,16 +1,18 @@
-package org.seasar.cms.doxia.module.parser;
+package org.seasar.cms.tgwiki.doxia.module.parser;
 
 import org.apache.maven.doxia.site.module.AbstractSiteModule;
 
+
 /**
+ * @author SOMEDA Takashi
  * @plexus.component role="org.apache.maven.doxia.site.module.SiteModule"
  * role-hint="tgwiki"
  */
-public class WikiSiteModule extends AbstractSiteModule
+public class TgWikiSiteModule extends AbstractSiteModule
 {
-
     public String getSourceDirectory()
     {
+        
         return "tgwiki";
     }
 
@@ -25,5 +27,4 @@ public class WikiSiteModule extends AbstractSiteModule
     {
         return "tgwiki";
     }
-
 }
