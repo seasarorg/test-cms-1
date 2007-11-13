@@ -37,6 +37,11 @@ in site building phase.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+            <locales>ja</locales>
+            <inputEncoding>UTF-8</inputEncoding>
+            <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
         <dependencies>
           <dependency>
             <groupId>org.seasar.cms</groupId>
