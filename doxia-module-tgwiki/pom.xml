@@ -17,7 +17,7 @@
     you possible to write your site contents with TgWiki
     format in Maven2 project.
   </description>
-  <url>http://www.skirnir.net/product/${pom.artifactId}/</url>
+  <url>http://cms.sandbox.seasar.org/${pom.artifactId}/</url>
   <developers>
     <developer>
       <id>nishioka</id>
@@ -29,7 +29,7 @@
       <timezone>+9</timezone>
     </developer>
     <developer>
-      <id>nishioka</id>
+      <id>someda</id>
       <name>SOMEDA Takashi</name>
       <email>someda at isenshi.com</email>
       <roles>
@@ -46,12 +46,12 @@
   </licenses>
   <scm>
     <connection>
-		scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/doxia-module-wiki
+		scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/doxia-module-tgwiki
     </connection>
     <developerConnection>
-		scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/doxia-module-wiki
+		scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/doxia-module-tgwiki
     </developerConnection>
-    <url>http://svn.seasar.org/browse/trunk/doxia-module-wiki/?root=sandbox.cms</url>
+    <url>http://svn.seasar.org/browse/trunk/doxia-module-tgwiki/?root=sandbox.cms</url>
   </scm>
   <organization>
     <name>The Seasar CMS Project</name>
