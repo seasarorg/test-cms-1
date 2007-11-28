@@ -59,8 +59,10 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
     }
 
     public void destroy() {
-        for (int i = 0; i < localHotdeployS2Containers_.length; i++) {
-            localHotdeployS2Containers_[i].destroy();
+        if (localHotdeployS2Containers_ != null) {
+            for (int i = 0; i < localHotdeployS2Containers_.length; i++) {
+                localHotdeployS2Containers_[i].destroy();
+            }
         }
         hotdeployEnabled_ = false;
     }
