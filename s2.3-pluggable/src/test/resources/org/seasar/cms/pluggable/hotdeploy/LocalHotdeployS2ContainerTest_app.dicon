@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
+  "http://www.seasar.org/dtd/components24.dtd">
+<components>
+  <include path="global.dicon" />
+  <component
+    class="org.seasar.cms.pluggable.impl.PluggableNamingConventionImpl">
+    <initMethod name="addRootPackageName">
+      <arg>"test1"</arg>
+    </initMethod>
+  </component>
+  <component
+    class="org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container">
+    <initMethod name="addReferenceClassName">
+      <arg>"test1.dto.HoeDto"</arg>
+    </initMethod>
+  </component>
+  <component class="org.seasar.framework.container.creator.DtoCreator" />
+</components>
