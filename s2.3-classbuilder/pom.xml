@@ -10,12 +10,11 @@
     <version>0.0.3</version>
   </parent>
   <groupId>org.seasar.cms.s2-classbuilder</groupId>
-  <artifactId>s2-classbuilder</artifactId>
+  <artifactId>s2.3-classbuilder</artifactId>
   <version>0.0.6-SNAPSHOT</version>
   <name>S2-ClassBuilder</name>
   <description>
-    S2-ClassBuilder enables you to write container settings as Java
-    source code.
+    S2.3-ClassBuilder is sub-set of S2-ClassBuilder for Seasar 2.3.
   </description>
   <build>
     <pluginManagement>
@@ -75,17 +74,17 @@
     <dependency>
       <groupId>org.seasar.container</groupId>
       <artifactId>s2-framework</artifactId>
-      <version>2.4.8</version>
+      <version>2.3.23</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.container</groupId>
       <artifactId>s2-tiger</artifactId>
-      <version>2.4.8</version>
+      <version>2.3.23</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.container</groupId>
       <artifactId>s2-extension</artifactId>
-      <version>2.4.8</version>
+      <version>2.3.23</version>
       <scope>test</scope>
     </dependency>
     <dependency>

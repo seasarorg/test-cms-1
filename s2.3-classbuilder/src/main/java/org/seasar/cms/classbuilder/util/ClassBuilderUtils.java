@@ -6,16 +6,11 @@ import org.seasar.cms.classbuilder.S2ContainerPreparer;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 
-
-public class ClassBuilderUtils
-{
-    protected ClassBuilderUtils()
-    {
+public class ClassBuilderUtils {
+    protected ClassBuilderUtils() {
     }
 
-
-    public static String toComponentName(String name)
-    {
+    public static String toComponentName(String name) {
         if (name.length() > 0) {
             // FIXME 正しいルールに置き換えよう。
             name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
@@ -23,29 +18,25 @@ public class ClassBuilderUtils
         return name;
     }
 
-
-    public static S2ContainerPreparer getPreparer(ComponentDef componentDef)
-    {
+    public static S2ContainerPreparer getPreparer(ComponentDef componentDef) {
         S2Container container = componentDef.getContainer();
-        ComponentDef[] componentDefs = container
-            .findLocalComponentDefs(S2ContainerPreparer.class);
+        ComponentDef[] componentDefs = ContainerUtils.findLocalComponentDefs(
+                container, S2ContainerPreparer.class);
         if (componentDefs.length == 0) {
             return null;
         }
 
-        return (S2ContainerPreparer)componentDefs[0].getComponent();
+        return (S2ContainerPreparer) componentDefs[0].getComponent();
     }
 
-
     public static Method findMethod(Class<?> clazz, String componentName,
-        String prefix)
-    {
+            String prefix) {
         Method[] methods = clazz.getMethods();
         for (int i = 0; i < methods.length; i++) {
             String methodName = methods[i].getName();
             if (methodName.startsWith(prefix)
-                && componentName.equals(toComponentName(methodName
-                    .substring(prefix.length())))) {
+                    && componentName.equals(toComponentName(methodName
+                            .substring(prefix.length())))) {
                 return methods[i];
             }
         }
