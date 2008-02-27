@@ -24,7 +24,7 @@ public class PluggableProvider extends DefaultProvider {
             S2Container root = SingletonPluggableContainerFactory
                     .getRootContainer();
             synchronized (root) {
-                final String realPath = pathResolver.resolvePath(parent
+                final String realPath = pathResolver_.resolvePath(parent
                         .getPath(), path);
                 S2Container child;
                 if (root.hasDescendant(realPath)) {

@@ -76,8 +76,9 @@ public class TraceS2Interceptor extends AbstractInterceptor {
                     componentDef.getComponentName()).append(", class=").append(
                     getClassNameSafely(componentDef.getComponentClass()))
                     .append(", belongs to \"").append(
-                            componentDef.getContainer().getPath())
-                    .append("\")");
+                            componentDef.getContainer() != null ? componentDef
+                                    .getContainer().getPath() : null).append(
+                            "\")");
         } else {
             sb.append(obj);
         }

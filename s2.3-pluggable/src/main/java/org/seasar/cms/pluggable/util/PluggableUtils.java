@@ -10,14 +10,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.seasar.cms.pluggable.classloader.CompositeClassLoader;
 import org.seasar.cms.pluggable.hotdeploy.DistributedHotdeployBehavior;
-import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.S2ContainerFactory;
-import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
 import org.seasar.framework.container.util.Traversal;
+import org.seasar.framework.container.util.Traversal24;
 import org.seasar.framework.exception.IORuntimeException;
 
 public class PluggableUtils {
@@ -80,11 +78,12 @@ public class PluggableUtils {
 
         synchronized (container.getRoot()) {
             final List<ComponentDef> componentDefs = new ArrayList<ComponentDef>();
-            Traversal.forEachParentContainer(container,
+            Traversal24.forEachParentContainer(container,
                     new Traversal.S2ContainerHandler() {
                         public Object processContainer(S2Container container) {
-                            componentDefs.addAll(Arrays.asList(container
-                                    .findLocalComponentDefs(componentKey)));
+                            componentDefs.addAll(Arrays.asList(ContainerUtils
+                                    .findLocalComponentDefs(container,
+                                            componentKey)));
                             return null;
                         }
                     });
@@ -105,22 +104,6 @@ public class PluggableUtils {
 
     public static ClassLoader adjustClassLoader(
             DistributedHotdeployBehavior behavior, ClassLoader parent) {
-
-        LocalHotdeployS2Container[] containers = behavior
-                .getLocalHotdeployS2Containers();
-        List<ClassLoader> classLoaderList = new ArrayList<ClassLoader>();
-        for (int i = 0; i < containers.length; i++) {
-            HotdeployClassLoader classLoader = containers[i]
-                    .getHotdeployClassLoader();
-            if (classLoader != null) {
-                classLoaderList.add(classLoader);
-            }
-        }
-        if (classLoaderList.size() > 0) {
-            return new CompositeClassLoader((ClassLoader[]) classLoaderList
-                    .toArray(new ClassLoader[0]), parent);
-        } else {
-            return parent;
-        }
+        return parent;
     }
 }

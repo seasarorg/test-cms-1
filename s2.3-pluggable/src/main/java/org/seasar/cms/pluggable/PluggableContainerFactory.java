@@ -1,7 +1,5 @@
 package org.seasar.cms.pluggable;
 
-import org.seasar.framework.container.ExternalContext;
-import org.seasar.framework.container.ExternalContextComponentDefRegister;
 import org.seasar.framework.container.S2Container;
 
 public interface PluggableContainerFactory {
@@ -17,15 +15,6 @@ public interface PluggableContainerFactory {
     String getConfigPath();
 
     void setConfigPath(String path);
-
-    ExternalContext getExternalContext();
-
-    void setExternalContext(ExternalContext extCtx);
-
-    ExternalContextComponentDefRegister getExternalContextComponentDefRegister();
-
-    void setExternalContextComponentDefRegister(
-            ExternalContextComponentDefRegister extCtxComponentDefRegister);
 
     Object getApplication();
 

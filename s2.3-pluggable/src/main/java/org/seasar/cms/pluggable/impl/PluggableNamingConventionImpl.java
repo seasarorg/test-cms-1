@@ -3,6 +3,7 @@ package org.seasar.cms.pluggable.impl;
 import org.seasar.cms.pluggable.PluggableNamingConvention;
 import org.seasar.framework.convention.impl.NamingConventionImpl;
 import org.seasar.framework.exception.EmptyRuntimeException;
+import org.seasar.framework.util.Class24Util;
 import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.StringUtil;
 
@@ -49,7 +50,7 @@ public class PluggableNamingConventionImpl extends NamingConventionImpl
         if (StringUtil.isEmpty(className)) {
             throw new EmptyRuntimeException("className");
         }
-        className = ClassUtil.getShortClassName(className);
+        className = Class24Util.getShortClassName(className);
         String implementationSuffix = getImplementationSuffix();
         if (className.endsWith(implementationSuffix)) {
             className = className.substring(0, className.length()

@@ -1,8 +1,6 @@
 package org.seasar.cms.pluggable;
 
 import org.seasar.cms.pluggable.impl.PluggableContainerFactoryImpl;
-import org.seasar.framework.container.ExternalContext;
-import org.seasar.framework.container.ExternalContextComponentDefRegister;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
@@ -27,24 +25,6 @@ public class SingletonPluggableContainerFactory {
 
     public static void setConfigPath(String path) {
         instance_.setConfigPath(path);
-    }
-
-    public static ExternalContext getExternalContext() {
-        return instance_.getExternalContext();
-    }
-
-    public static void setExternalContext(ExternalContext extCtx) {
-        instance_.setExternalContext(extCtx);
-    }
-
-    public static ExternalContextComponentDefRegister getExternalContextComponentDefRegister() {
-        return instance_.getExternalContextComponentDefRegister();
-    }
-
-    public static void setExternalContextComponentDefRegister(
-            ExternalContextComponentDefRegister extCtxComponentDefRegister) {
-        instance_
-                .setExternalContextComponentDefRegister(extCtxComponentDefRegister);
     }
 
     public static Object getApplication() {

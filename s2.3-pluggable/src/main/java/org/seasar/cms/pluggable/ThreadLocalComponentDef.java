@@ -11,7 +11,7 @@ public class ThreadLocalComponentDef extends SimpleComponentDef {
     }
 
     public ThreadLocalComponentDef(Class componentClass, String componentName) {
-        super(componentClass, componentName);
+        super(null, componentClass, componentName);
     }
 
     public Object getComponent() {

@@ -8,15 +8,13 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
-import org.seasar.cms.pluggable.hotdeploy.DistributedHotdeployBehavior;
-import org.seasar.cms.pluggable.util.PluggableUtils;
-import org.seasar.framework.container.ExternalContext;
-import org.seasar.framework.container.impl.S2ContainerBehavior;
+import org.seasar.framework.container.S2Container;
 
 public class PluggableFilter implements Filter {
-
     public void init(FilterConfig config) throws ServletException {
     }
 
@@ -25,29 +23,15 @@ public class PluggableFilter implements Filter {
 
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-
-        DistributedHotdeployBehavior behavior = (DistributedHotdeployBehavior) S2ContainerBehavior
-                .getProvider();
-        ClassLoader classLoader = Thread.currentThread()
-                .getContextClassLoader();
-        behavior.start();
+        S2Container container = SingletonPluggableContainerFactory
+                .getRootContainer();
+        container.setRequest((HttpServletRequest) request);
+        container.setResponse((HttpServletResponse) response);
         try {
-            Thread.currentThread().setContextClassLoader(
-                    PluggableUtils.adjustClassLoader(behavior, classLoader));
-
-            ExternalContext externalContext = SingletonPluggableContainerFactory
-                    .getRootContainer().getExternalContext();
-            externalContext.setRequest(request);
-            externalContext.setResponse(response);
-            try {
-                chain.doFilter(request, response);
-            } finally {
-                externalContext.setRequest(null);
-                externalContext.setResponse(null);
-            }
+            chain.doFilter(request, response);
         } finally {
-            Thread.currentThread().setContextClassLoader(classLoader);
-            behavior.stop();
+            container.setRequest(null);
+            container.setResponse(null);
         }
     }
 }

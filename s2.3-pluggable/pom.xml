@@ -10,12 +10,11 @@
     <version>0.0.3</version>
   </parent>
   <groupId>org.seasar.cms.s2-pluggable</groupId>
-  <artifactId>s2-pluggable</artifactId>
+  <artifactId>s2.3-pluggable</artifactId>
   <version>0.0.9-SNAPSHOT</version>
-  <name>S2-Pluggable</name>
+  <name>S2.3-Pluggable</name>
   <description>
-    S2-Pluggable is an extension for Seasar2 to add pluggable
-    functionality.
+    S2.3-Pluggable is sub-set of S2-Pluggable for Seasar 2.3.
   </description>
   <build>
     <pluginManagement>
@@ -75,7 +74,7 @@
     <dependency>
       <groupId>org.seasar.container</groupId>
       <artifactId>s2-framework</artifactId>
-      <version>2.4.8</version>
+      <version>2.3.23</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

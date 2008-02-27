@@ -8,6 +8,10 @@
   </component>
   <component
     class="org.seasar.cms.pluggable.ThreadContextComponentDefRegister">
+    <property name="componentDefs">
+      @org.seasar.cms.pluggable.util.ContainerUtils@findAllComponents(container,
+      @org.seasar.cms.pluggable.ThreadContextComponentDefFactory@class)
+    </property>
     <initMethod name="registerComponentDefs" />
     <destroyMethod name="destroy" />
   </component>

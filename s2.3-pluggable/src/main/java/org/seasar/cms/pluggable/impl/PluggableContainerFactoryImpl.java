@@ -5,20 +5,17 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
+
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.PluggableContainerFactory;
 import org.seasar.cms.pluggable.PluggableProvider;
 import org.seasar.cms.pluggable.hotdeploy.DistributedHotdeployBehavior;
 import org.seasar.cms.pluggable.util.PluggableUtils;
 import org.seasar.framework.container.ComponentDef;
-import org.seasar.framework.container.ExternalContext;
-import org.seasar.framework.container.ExternalContextComponentDefRegister;
 import org.seasar.framework.container.MetaDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.autoregister.AbstractAutoRegister;
-import org.seasar.framework.container.deployer.ComponentDeployerFactory;
-import org.seasar.framework.container.deployer.ExternalComponentDeployerProvider;
-import org.seasar.framework.container.external.servlet.HttpServletExternalContext;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.container.util.Traversal;
@@ -31,11 +28,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
 
     private String configPath_ = ROOT_DICON;
 
-    private ExternalContext externalContext_;
-
-    private ExternalContextComponentDefRegister externalContextComponentDefRegister_;
-
-    public Object application_;
+    public ServletContext application_;
 
     private S2Container rootContainer_;
 
@@ -54,36 +47,24 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         configPath_ = path;
     }
 
-    public ExternalContext getExternalContext() {
-        return externalContext_;
-    }
-
-    public void setExternalContext(ExternalContext extCtx) {
-        externalContext_ = extCtx;
-    }
-
-    public ExternalContextComponentDefRegister getExternalContextComponentDefRegister() {
-        return externalContextComponentDefRegister_;
-    }
-
-    public void setExternalContextComponentDefRegister(
-            ExternalContextComponentDefRegister extCtxComponentDefRegister) {
-        externalContextComponentDefRegister_ = extCtxComponentDefRegister;
-    }
-
     public Object getApplication() {
         return application_;
     }
 
     public void setApplication(Object application) {
-        application_ = application;
+        try {
+            application_ = (ServletContext) application;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException(
+                    "With S2.3-Pluggable, PllugableContainerFactory#setApplication(Object) only accepts a ServletContext object.",
+                    ex);
+        }
     }
 
     public void prepareForContainer() {
         if (rootContainer_ != null) {
             return;
         }
-        initializeComponentDeployerProvider();
         rootContainer_ = createS2Container(configPath_);
         prepareForExternalContext();
     }
@@ -112,30 +93,6 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         }
         if (initialized_) {
             throw new IllegalStateException("Already initialized");
-        }
-
-        if (rootContainer_.getExternalContext() == null) {
-            if (externalContext_ != null) {
-                rootContainer_.setExternalContext(externalContext_);
-            }
-        }
-        if (rootContainer_.getExternalContext().getApplication() == null) {
-            if (application_ != null) {
-                rootContainer_.getExternalContext()
-                        .setApplication(application_);
-            }
-        }
-        if (rootContainer_.getExternalContextComponentDefRegister() == null
-                && externalContextComponentDefRegister_ != null) {
-            rootContainer_
-                    .setExternalContextComponentDefRegister(externalContextComponentDefRegister_);
-        }
-    }
-
-    void initializeComponentDeployerProvider() {
-        if (ComponentDeployerFactory.getProvider() instanceof ComponentDeployerFactory.DefaultProvider) {
-            ComponentDeployerFactory
-                    .setProvider(new ExternalComponentDeployerProvider());
         }
     }
 
@@ -352,13 +309,8 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         initialized_ = true;
 
         if (application_ != null) {
-            if (rootContainer_.getExternalContext() == null) {
-                HttpServletExternalContext extCtx = new HttpServletExternalContext();
-                extCtx.setApplication(application_);
-                rootContainer_.setExternalContext(extCtx);
-            } else if (rootContainer_.getExternalContext().getApplication() == null) {
-                rootContainer_.getExternalContext()
-                        .setApplication(application_);
+            if (rootContainer_.getServletContext() == null) {
+                rootContainer_.setServletContext(application_);
             }
         }
 
