@@ -327,8 +327,17 @@ public class LocalHotdeployS2Container implements ClassHandler {
             if (namingConvention_.isTargetClassName(className)) {
                 ComponentDef cd = createComponentDef(clazz);
                 if (cd != null) {
-                    register(cd);
-                    S2ContainerUtil.putRegisterLog(cd);
+                    Class targetClass = namingConvention_
+                            .toCompleteClass(clazz);
+                    ComponentDef targetCd = getComponentDefFromCache(targetClass);
+                    if (targetCd == null) {
+                        // 例えばServiceとServiceImplがあると、前者はServiceImplに
+                        // 補正されてComponentDefが作られ、後者も普通にComponentDefが
+                        // 作られてしまう。これを防ぐため、既にComponentDefが登録済みである
+                        // 場合は多重登録しないようにしている。
+                        register(cd);
+                        S2ContainerUtil.putRegisterLog(cd);
+                    }
                 }
             }
         } finally {
