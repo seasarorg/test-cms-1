@@ -128,8 +128,8 @@ abstract public class AbstractIdentity implements Identity {
                 modified = true;
             }
         }
-        for (Iterator itr = currentColumnSet.iterator(); itr.hasNext();) {
-            dropColumn(tableName, (String) itr.next(), force);
+        for (Iterator<String> itr = currentColumnSet.iterator(); itr.hasNext();) {
+            dropColumn(tableName, itr.next(), force);
             modified = true;
         }
 
