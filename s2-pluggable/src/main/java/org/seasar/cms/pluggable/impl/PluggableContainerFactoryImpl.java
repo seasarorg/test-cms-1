@@ -1,5 +1,9 @@
 package org.seasar.cms.pluggable.impl;
 
+import static org.seasar.cms.pluggable.Configuration.KEY_PROJECTSTATUS;
+import static org.seasar.cms.pluggable.Configuration.KEY_S2CONTAINER_DISABLE_HOTDEPLOY;
+import static org.seasar.cms.pluggable.Configuration.PROJECTSTATUS_DEVELOP;
+
 import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -364,13 +368,20 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
 
         rootContainer_.init();
 
-        String projectStatus = getConfiguration().getProperty(
-                Configuration.KEY_PROJECTSTATUS);
+        Configuration configuration = getConfiguration();
+        String projectStatus = configuration.getProperty(KEY_PROJECTSTATUS);
         logger_.info("Project status is: "
                 + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
 
-        getHotdeployBehavior().init(
-                Configuration.PROJECTSTATUS_DEVELOP.equals(projectStatus));
+        boolean hotdeployEnabled = PROJECTSTATUS_DEVELOP.equals(projectStatus)
+                && !"true".equals(configuration
+                        .getProperty(KEY_S2CONTAINER_DISABLE_HOTDEPLOY));
+        if (hotdeployEnabled) {
+            logger_.info("HOT Deploy is enabled");
+        } else {
+            logger_.info("HOT Deploy is disabled");
+        }
+        getHotdeployBehavior().init(hotdeployEnabled);
     }
 
     DistributedHotdeployBehavior getHotdeployBehavior() {
