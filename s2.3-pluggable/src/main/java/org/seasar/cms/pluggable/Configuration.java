@@ -6,11 +6,13 @@ import java.util.Enumeration;
 
 public interface Configuration {
 
-    String KEY_PROJECTSTATUS = "projectStatus";
-
     String PROJECTSTATUS_DEVELOP = "develop";
 
     String PROJECTSTATUS_RELEASE = "release";
+
+    String KEY_PROJECTSTATUS = "projectStatus";
+
+    String KEY_S2CONTAINER_DISABLE_HOTDEPLOY = "s2container.disableHotdeploy";
 
     String getProperty(String key);
 
