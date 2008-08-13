@@ -6,11 +6,11 @@ public class ThreadLocalComponentDef extends SimpleComponentDef {
 
     private ThreadLocal<Object> component_ = new ThreadLocal<Object>();
 
-    public ThreadLocalComponentDef(Class componentClass) {
+    public ThreadLocalComponentDef(Class<?> componentClass) {
         super(componentClass);
     }
 
-    public ThreadLocalComponentDef(Class componentClass, String componentName) {
+    public ThreadLocalComponentDef(Class<?> componentClass, String componentName) {
         super(componentClass, componentName);
     }
 

@@ -6,5 +6,5 @@ public interface ThreadContextComponentDefFactory {
 
     String getComponentName();
 
-    Class getComponentClass();
+    Class<?> getComponentClass();
 }

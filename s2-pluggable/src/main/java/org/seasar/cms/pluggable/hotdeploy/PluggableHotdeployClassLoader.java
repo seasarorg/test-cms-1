@@ -113,7 +113,7 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
     public synchronized Class<?> loadClass(String className, boolean resolve)
             throws ClassNotFoundException {
         if (classCache_.containsKey(className)) {
-            Class clazz = classCache_.get(className);
+            Class<?> clazz = classCache_.get(className);
             if (clazz != null) {
                 if (resolve) {
                     resolveClass(clazz);
@@ -189,7 +189,7 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
         }
     }
 
-    protected void definedClass(Class clazz) {
+    protected void definedClass(Class<?> clazz) {
         final int listenerSize = getHotdeployListenerSize();
         for (int i = 0; i < listenerSize; ++i) {
             HotdeployListener listener = getHotdeployListener(i);

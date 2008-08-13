@@ -89,7 +89,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
         referenceClassNames_.add(referenceClassName);
     }
 
-    public Map getStrategies() {
+    public Map<String, Strategy> getStrategies() {
         return strategies_;
     }
 
@@ -137,7 +137,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
             Thread.currentThread().setContextClassLoader(
                     getHotdeployClassLoader());
             if (key instanceof Class) {
-                cd = createComponentDef((Class) key);
+                cd = createComponentDef((Class<?>) key);
             } else if (key instanceof String) {
                 cd = createComponentDef((String) key);
             } else {
@@ -158,7 +158,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
         return (ComponentDef) componentDefCache_.get(key);
     }
 
-    protected ComponentDef createComponentDef(Class componentClass) {
+    protected ComponentDef createComponentDef(Class<?> componentClass) {
         for (int i = 0; i < creators_.length; ++i) {
             ComponentCreator creator = creators_[i];
             ComponentDef cd = creator.createComponentDef(componentClass);
@@ -195,7 +195,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     protected void registerByClass(ComponentDef componentDef) {
-        Class[] classes = S2ContainerUtil.getAssignableClasses(componentDef
+        Class<?>[] classes = S2ContainerUtil.getAssignableClasses(componentDef
                 .getComponentClass());
         for (int i = 0; i < classes.length; ++i) {
             registerMap(classes[i], componentDef);
@@ -281,8 +281,9 @@ public class LocalHotdeployS2Container implements ClassHandler {
                 }
             }
         } else {
-            for (Iterator itr = referenceClassNames_.iterator(); itr.hasNext();) {
-                String referenceClassName = (String) itr.next();
+            for (Iterator<String> itr = referenceClassNames_.iterator(); itr
+                    .hasNext();) {
+                String referenceClassName = itr.next();
                 String resourceName = referenceClassName.replace('.', '/')
                         .concat(".class");
                 URL url = classLoader.getResource(resourceName);
@@ -323,11 +324,11 @@ public class LocalHotdeployS2Container implements ClassHandler {
             Thread.currentThread().setContextClassLoader(
                     container_.getClassLoader());
 
-            Class clazz = ClassUtil.forName(className);
+            Class<?> clazz = ClassUtil.forName(className);
             if (namingConvention_.isTargetClassName(className)) {
                 ComponentDef cd = createComponentDef(clazz);
                 if (cd != null) {
-                    Class targetClass = namingConvention_
+                    Class<?> targetClass = namingConvention_
                             .toCompleteClass(clazz);
                     ComponentDef targetCd = getComponentDefFromCache(targetClass);
                     if (targetCd == null) {
