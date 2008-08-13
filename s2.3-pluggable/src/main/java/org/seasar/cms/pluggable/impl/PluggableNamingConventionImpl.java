@@ -7,6 +7,7 @@ import org.seasar.framework.util.Class24Util;
 import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.StringUtil;
 
+@SuppressWarnings("unchecked")
 public class PluggableNamingConventionImpl extends NamingConventionImpl
         implements PluggableNamingConvention {
 

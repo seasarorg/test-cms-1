@@ -11,7 +11,7 @@ public class Class24Util {
      * @return FQCNからパッケージ名を除いた名前
      * @see #getShortClassName(String)
      */
-    public static String getShortClassName(Class clazz) {
+    public static String getShortClassName(Class<?> clazz) {
         return getShortClassName(clazz.getName());
     }
 
@@ -36,7 +36,7 @@ public class Class24Util {
      * @return リソースパス
      * @see #getResourcePath(String)
      */
-    public static String getResourcePath(Class clazz) {
+    public static String getResourcePath(Class<?> clazz) {
         return getResourcePath(clazz.getName());
     }
 

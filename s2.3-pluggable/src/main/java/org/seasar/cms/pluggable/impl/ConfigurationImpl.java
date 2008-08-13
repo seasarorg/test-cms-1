@@ -80,9 +80,10 @@ public class ConfigurationImpl implements Configuration {
         return properties_.getProperty(key, defaultValue);
     }
 
-    public Enumeration propertyNames() {
+    @SuppressWarnings("unchecked")
+    public Enumeration<String> propertyNames() {
 
-        return properties_.propertyNames();
+        return (Enumeration<String>) properties_.propertyNames();
     }
 
     public void setProperty(String key, String value) {

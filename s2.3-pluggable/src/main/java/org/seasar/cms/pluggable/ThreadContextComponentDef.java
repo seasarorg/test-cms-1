@@ -4,9 +4,10 @@ import org.seasar.framework.container.impl.SimpleComponentDef;
 
 public class ThreadContextComponentDef extends SimpleComponentDef {
 
-    private Class componentClass_;
+    private Class<?> componentClass_;
 
-    public ThreadContextComponentDef(Class componentClass, String componentName) {
+    public ThreadContextComponentDef(Class<?> componentClass,
+            String componentName) {
         super(null, componentClass, componentName);
         componentClass_ = componentClass;
     }

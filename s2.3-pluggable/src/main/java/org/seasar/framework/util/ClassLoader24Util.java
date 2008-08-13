@@ -21,6 +21,7 @@ public class ClassLoader24Util {
      *         オブジェクトの列挙。リソースが見つからなかった場合、列挙は空になる。クラスローダがアクセスを持たないリソースは列挙に入らない
      * @see java.lang.ClassLoader#getResources(String)
      */
+    @SuppressWarnings("unchecked")
     public static Iterator getResources(final Class targetClass,
             final String name) {
         return getResources(ClassLoaderUtil.getClassLoader(targetClass), name);
@@ -37,6 +38,7 @@ public class ClassLoader24Util {
      *         オブジェクトの列挙。リソースが見つからなかった場合、列挙は空になる。クラスローダがアクセスを持たないリソースは列挙に入らない
      * @see java.lang.ClassLoader#getResources(String)
      */
+    @SuppressWarnings("unchecked")
     public static Iterator getResources(final ClassLoader loader,
             final String name) {
         try {

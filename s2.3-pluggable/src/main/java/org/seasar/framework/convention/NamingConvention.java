@@ -252,7 +252,7 @@ public interface NamingConvention {
      * @param componentName
      * @return {@link Class}
      */
-    Class fromComponentNameToClass(String componentName);
+    Class<?> fromComponentNameToClass(String componentName);
 
     /**
      * クラス名を実装クラス名に変換します。
@@ -276,7 +276,7 @@ public interface NamingConvention {
      * @param clazz
      * @return 規約に従っていないスキップすべきクラス
      */
-    boolean isSkipClass(Class clazz);
+    boolean isSkipClass(Class<?> clazz);
 
     /**
      * 最終的に利用されるクラスに変換します。 通常は、実装クラスですが、DaoのようにInterceptorで実体化される場合、
@@ -285,7 +285,7 @@ public interface NamingConvention {
      * @param clazz
      * @return 最終的に利用されるクラス
      */
-    Class toCompleteClass(Class clazz);
+    Class<?> toCompleteClass(Class<?> clazz);
 
     /**
      * コンポーネント名をクラス名の一部に変換します。 "_"は"."に"_"の後ろは大文字に変換されます。
@@ -343,7 +343,7 @@ public interface NamingConvention {
      * @param pageClass
      * @return <code>View</code>のパス
      */
-    String fromPageClassToPath(Class pageClass);
+    String fromPageClassToPath(Class<?> pageClass);
 
     /**
      * アクション名を<code>View</code>のパスに変換します。

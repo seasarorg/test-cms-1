@@ -59,9 +59,9 @@ public class PluggableUtils {
         ComponentDef[] componentDefs = findAscendantComponentDefs(container,
                 key);
 
-        Class clazz;
+        Class<?> clazz;
         if (key instanceof Class) {
-            clazz = (Class) key;
+            clazz = (Class<?>) key;
         } else {
             clazz = Object.class;
         }

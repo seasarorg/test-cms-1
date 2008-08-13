@@ -9,6 +9,7 @@ import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.util.Traversal.S2ContainerHandler;
 import org.seasar.framework.util.ArrayUtil;
 
+@SuppressWarnings("unchecked")
 public class Traversal24 {
     /**
      * 親の {@link S2Container}をトラバースします。

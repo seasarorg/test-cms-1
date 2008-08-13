@@ -16,7 +16,7 @@ public interface Configuration {
 
     String getProperty(String key, String defaultValue);
 
-    Enumeration propertyNames();
+    Enumeration<String> propertyNames();
 
     void setProperty(String key, String value);
 

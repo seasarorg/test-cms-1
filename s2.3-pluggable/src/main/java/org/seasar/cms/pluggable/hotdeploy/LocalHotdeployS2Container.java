@@ -1,7 +1,7 @@
 package org.seasar.cms.pluggable.hotdeploy;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -41,8 +41,8 @@ public class LocalHotdeployS2Container {
         referenceClassNames_.add(referenceClassName);
     }
 
-    public Map getStrategies() {
-        return new HashMap();
+    public Map<String, Strategy> getStrategies() {
+        return Collections.emptyMap();
     }
 
     public PluggableNamingConvention getNamingConvention() {
@@ -82,5 +82,8 @@ public class LocalHotdeployS2Container {
     }
 
     public void stop() {
+    }
+
+    protected interface Strategy {
     }
 }

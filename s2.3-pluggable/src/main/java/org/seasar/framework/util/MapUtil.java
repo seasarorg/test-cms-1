@@ -7,6 +7,7 @@ import java.util.Map;
 /**
  * Seasar2.4.17からのコピーです。
  */
+@SuppressWarnings("unchecked")
 public class MapUtil {
 
     /**

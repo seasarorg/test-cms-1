@@ -47,7 +47,7 @@ public class ProxyClassLoader extends ClassLoader {
     @Override
     protected synchronized Class<?> loadClass(String name, boolean resolve)
             throws ClassNotFoundException {
-        Class clazz = classLoader_.loadClass(name);
+        Class<?> clazz = classLoader_.loadClass(name);
         if (resolve) {
             resolveClass(clazz);
         }

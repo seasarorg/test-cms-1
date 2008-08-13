@@ -68,7 +68,7 @@ public class TraceS2Interceptor extends AbstractInterceptor {
         } else if (obj instanceof String) {
             sb.append('"').append(obj).append('"');
         } else if (obj instanceof Class) {
-            sb.append(((Class) obj).getName()).append(".class");
+            sb.append(((Class<?>) obj).getName()).append(".class");
         } else if (obj instanceof ComponentDef) {
             ComponentDef componentDef = (ComponentDef) obj;
             appendStringRepresentation(componentDef.getComponent(), sb).append(
@@ -85,7 +85,7 @@ public class TraceS2Interceptor extends AbstractInterceptor {
         return sb;
     }
 
-    String getClassNameSafely(Class clazz) {
+    String getClassNameSafely(Class<?> clazz) {
         return (clazz != null ? clazz.getName() : null);
     }
 }

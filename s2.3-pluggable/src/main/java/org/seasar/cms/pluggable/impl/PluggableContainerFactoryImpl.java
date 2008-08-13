@@ -129,7 +129,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
     void invokeAutoRegisters(S2Container container) {
         Traversal.forEachComponent(container, new ComponentDefHandler() {
             public Object processComponent(ComponentDef componentDef) {
-                Class componentClass = componentDef.getComponentClass();
+                Class<?> componentClass = componentDef.getComponentClass();
                 if (componentClass != null
                         && AbstractAutoRegister.class
                                 .isAssignableFrom(componentClass)) {

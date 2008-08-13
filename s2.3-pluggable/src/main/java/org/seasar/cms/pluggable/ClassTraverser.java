@@ -81,7 +81,7 @@ public class ClassTraverser {
         return isMatched(packageName, shortClassName, ignoreClassPatterns);
     }
 
-    public void addReferenceClass(final Class referenceClass) {
+    public void addReferenceClass(final Class<?> referenceClass) {
         referenceClasses.add(referenceClass);
     }
 
@@ -99,7 +99,7 @@ public class ClassTraverser {
 
     public void traverse() {
         for (int i = 0; i < referenceClasses.size(); ++i) {
-            final Class referenceClass = (Class) referenceClasses.get(i);
+            final Class<?> referenceClass = referenceClasses.get(i);
             final String baseClassPath = ResourceUtil
                     .getResourcePath(referenceClass);
             final URL url = ResourceUtil.getResource(baseClassPath);
@@ -125,8 +125,9 @@ public class ClassTraverser {
         if (classPatternList.isEmpty()) {
             return false;
         }
-        for (Iterator itr = classPatternList.iterator(); itr.hasNext();) {
-            ClassPattern cp = (ClassPattern) itr.next();
+        for (Iterator<ClassPattern> itr = classPatternList.iterator(); itr
+                .hasNext();) {
+            ClassPattern cp = itr.next();
             if (!cp.isAppliedPackageName(packageName)) {
                 continue;
             }
@@ -139,12 +140,12 @@ public class ClassTraverser {
 
     protected interface Strategy {
 
-        void process(Class referenceClass, URL url);
+        void process(Class<?> referenceClass, URL url);
     }
 
     protected class FileSystemStrategy implements Strategy {
 
-        public void process(final Class referenceClass, final URL url) {
+        public void process(final Class<?> referenceClass, final URL url) {
             final File rootDir = getRootDir(referenceClass, url);
             for (int i = 0; i < getClassPatternSize(); ++i) {
                 ClassTraversal.forEach(rootDir, getClassPattern(i)
@@ -152,7 +153,7 @@ public class ClassTraverser {
             }
         }
 
-        protected File getRootDir(final Class referenceClass, final URL url) {
+        protected File getRootDir(final Class<?> referenceClass, final URL url) {
             final String[] names = referenceClass.getName().split("\\.");
             File path = ResourceUtil.getFile(url);
             for (int i = 0; i < names.length; ++i) {
@@ -164,7 +165,7 @@ public class ClassTraverser {
 
     protected class JarFileStrategy implements Strategy {
 
-        public void process(final Class referenceClass, final URL url) {
+        public void process(final Class<?> referenceClass, final URL url) {
             final JarFile jarFile = createJarFile(url);
             ClassTraversal.forEach(jarFile, classHandler);
         }
@@ -183,7 +184,7 @@ public class ClassTraverser {
      */
     protected class ZipFileStrategy implements Strategy {
 
-        public void process(final Class referenceClass, final URL url) {
+        public void process(final Class<?> referenceClass, final URL url) {
             final JarFile jarFile = createJarFile(url);
             ClassTraversal.forEach(jarFile, classHandler);
         }
