@@ -71,7 +71,7 @@ public interface Beantable<T> {
 
     Identity getIdentity();
 
-    Object adjust(Object value, Class type);
+    Object adjust(Object value, Class<?> type);
 
     /*
      * for framework

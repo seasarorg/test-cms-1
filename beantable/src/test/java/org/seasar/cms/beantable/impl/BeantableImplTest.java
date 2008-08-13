@@ -134,7 +134,7 @@ public class BeantableImplTest extends S2TestCase {
         assertEquals(Boolean.TRUE, target
                 .adjust(Long.valueOf(1), Boolean.class));
         assertEquals(Boolean.FALSE, target.adjust(null, Boolean.class));
-        assertNull(target.adjust(new HashMap(), Boolean.class));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Boolean.class));
     }
 
     public void testAdjust_Character型に正しくadjustできること() throws Exception {
@@ -147,14 +147,15 @@ public class BeantableImplTest extends S2TestCase {
                 Long.valueOf(1), Character.TYPE));
         assertEquals(Character.valueOf((char) 0), target.adjust(null,
                 Character.TYPE));
-        assertNull(target.adjust(new HashMap(), Character.TYPE));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Character.TYPE));
 
         assertSame(value, target.adjust(value, Character.class));
         assertEquals(Character.valueOf((char) 1), target.adjust(
                 Long.valueOf(1), Character.class));
         assertEquals(Character.valueOf((char) 0), target.adjust(null,
                 Character.class));
-        assertNull(target.adjust(new HashMap(), Character.class));
+        assertNull(target
+                .adjust(new HashMap<Object, Object>(), Character.class));
     }
 
     public void testAdjust_Short型に正しくadjustできること() throws Exception {
@@ -166,13 +167,13 @@ public class BeantableImplTest extends S2TestCase {
         assertEquals(Short.valueOf((short) 1), target.adjust(Long.valueOf(1),
                 Short.TYPE));
         assertEquals(Short.valueOf((short) 0), target.adjust(null, Short.TYPE));
-        assertNull(target.adjust(new HashMap(), Short.TYPE));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Short.TYPE));
 
         assertSame(value, target.adjust(value, Short.class));
         assertEquals(Short.valueOf((short) 1), target.adjust(Long.valueOf(1),
                 Short.class));
         assertEquals(Short.valueOf((short) 0), target.adjust(null, Short.class));
-        assertNull(target.adjust(new HashMap(), Short.class));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Short.class));
     }
 
     public void testAdjust_Integer型に正しくadjustできること() throws Exception {
@@ -184,13 +185,13 @@ public class BeantableImplTest extends S2TestCase {
         assertEquals(Integer.valueOf(1), target.adjust(Long.valueOf(1),
                 Integer.TYPE));
         assertEquals(Integer.valueOf(0), target.adjust(null, Integer.TYPE));
-        assertNull(target.adjust(new HashMap(), Integer.TYPE));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Integer.TYPE));
 
         assertSame(value, target.adjust(value, Integer.class));
         assertEquals(Integer.valueOf(1), target.adjust(Long.valueOf(1),
                 Integer.class));
         assertEquals(Integer.valueOf(0), target.adjust(null, Integer.class));
-        assertNull(target.adjust(new HashMap(), Integer.class));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Integer.class));
     }
 
     public void testAdjust_Long型に正しくadjustできること() throws Exception {
@@ -201,13 +202,13 @@ public class BeantableImplTest extends S2TestCase {
         assertSame(value, target.adjust(value, Long.TYPE));
         assertEquals(Long.valueOf(1), target.adjust(Long.valueOf(1), Long.TYPE));
         assertEquals(Long.valueOf(0), target.adjust(null, Long.TYPE));
-        assertNull(target.adjust(new HashMap(), Long.TYPE));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Long.TYPE));
 
         assertSame(value, target.adjust(value, Long.class));
         assertEquals(Long.valueOf(1), target.adjust(Integer.valueOf(1),
                 Long.class));
         assertEquals(Long.valueOf(0), target.adjust(null, Long.class));
-        assertNull(target.adjust(new HashMap(), Long.class));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Long.class));
     }
 
     public void testAdjust_Float型に正しくadjustできること() throws Exception {
@@ -219,13 +220,13 @@ public class BeantableImplTest extends S2TestCase {
         assertEquals(Float.valueOf(1), target.adjust(Long.valueOf(1),
                 Float.TYPE));
         assertEquals(Float.valueOf(0), target.adjust(null, Float.TYPE));
-        assertNull(target.adjust(new HashMap(), Float.TYPE));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Float.TYPE));
 
         assertSame(value, target.adjust(value, Float.class));
         assertEquals(Float.valueOf(1), target.adjust(Long.valueOf(1),
                 Float.class));
         assertEquals(Float.valueOf(0), target.adjust(null, Float.class));
-        assertNull(target.adjust(new HashMap(), Float.class));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Float.class));
     }
 
     public void testAdjust_Double型に正しくadjustできること() throws Exception {
@@ -237,12 +238,12 @@ public class BeantableImplTest extends S2TestCase {
         assertEquals(Double.valueOf(1), target.adjust(Long.valueOf(1),
                 Double.TYPE));
         assertEquals(Double.valueOf(0), target.adjust(null, Double.TYPE));
-        assertNull(target.adjust(new HashMap(), Double.TYPE));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Double.TYPE));
 
         assertSame(value, target.adjust(value, Double.class));
         assertEquals(Double.valueOf(1), target.adjust(Long.valueOf(1),
                 Double.class));
         assertEquals(Double.valueOf(0), target.adjust(null, Double.class));
-        assertNull(target.adjust(new HashMap(), Double.class));
+        assertNull(target.adjust(new HashMap<Object, Object>(), Double.class));
     }
 }

@@ -77,7 +77,7 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
             throw new SQLRuntimeException(ex);
         }
 
-        Class[] classes = getInterfaceAndClasses(getClass());
+        Class<?>[] classes = getInterfaceAndClasses(getClass());
         for (int i = 0; i < classes.length; i++) {
             String queriesPath = classes[i].getName().replace('.', '/').concat(
                     ".sql");
@@ -105,12 +105,12 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
 
     abstract protected Class<T> getDtoClass();
 
-    Class[] getInterfaceAndClasses(Class clazz) {
-        List<Class> list = new ArrayList<Class>();
-        List<Class> classList = new ArrayList<Class>();
+    Class<?>[] getInterfaceAndClasses(Class<?> clazz) {
+        List<Class<?>> list = new ArrayList<Class<?>>();
+        List<Class<?>> classList = new ArrayList<Class<?>>();
         while (clazz != Object.class) {
             classList.add(clazz);
-            Class[] ifs = clazz.getInterfaces();
+            Class<?>[] ifs = clazz.getInterfaces();
             for (int i = 0; i < ifs.length; i++) {
                 list.add(ifs[i]);
             }
@@ -313,9 +313,9 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
         }
     }
 
-    ResultSetHandler findResultSetHandler(Class type) {
+    ResultSetHandler findResultSetHandler(Class<?> type) {
         boolean array = type.isArray();
-        Class componentType = (array ? type.getComponentType() : type);
+        Class<?> componentType = (array ? type.getComponentType() : type);
         if (componentType == getDtoClass()) {
             if (array) {
                 return beantableListHandler_;
@@ -349,7 +349,7 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
         }
     }
 
-    Object[] toArray(List<?> list, Class componentType) {
+    Object[] toArray(List<?> list, Class<?> componentType) {
         Object[] objs = (Object[]) Array
                 .newInstance(componentType, list.size());
         int idx = 0;
@@ -498,9 +498,9 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
     }
 
     void loadQueriesFromClass(Properties prop) {
-        Class clazz = getClass();
+        Class<?> clazz = getClass();
         while (clazz != Object.class) {
-            Class[] interfaces = clazz.getInterfaces();
+            Class<?>[] interfaces = clazz.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
                 loadQueriesFromMethods(prop, interfaces[i].getDeclaredMethods());
             }

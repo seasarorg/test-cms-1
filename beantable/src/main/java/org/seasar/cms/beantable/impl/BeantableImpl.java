@@ -750,7 +750,7 @@ public class BeantableImpl<T> implements Beantable<T> {
         invoke(bean, method, new Object[] { value });
     }
 
-    public Object adjust(Object value, Class type) {
+    public Object adjust(Object value, Class<?> type) {
         if (type.isInstance(value)) {
             return value;
         } else if (type == Boolean.TYPE || type == Boolean.class) {
