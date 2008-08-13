@@ -32,17 +32,17 @@ import org.seasar.framework.container.impl.S2ContainerImpl;
 
 public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
 {
-    public static final String  METHODPREFIX_DEFINE  = "define";
+    public static final String METHODPREFIX_DEFINE = "define";
 
-    public static final String  METHODPREFIX_NEW     = "new";
+    public static final String METHODPREFIX_NEW = "new";
 
-    public static final String  METHODPREFIX_DESTROY = "destroy";
+    public static final String METHODPREFIX_DESTROY = "destroy";
 
-    public static final String  SUFFIX               = ".class";
+    public static final String SUFFIX = ".class";
 
-    private static final String JAR_SUFFIX           = ".jar!/";
+    private static final String JAR_SUFFIX = ".jar!/";
 
-    private static final String DELIMITER            = "_";
+    private static final String DELIMITER = "_";
 
 
     public S2Container build(String path)
@@ -188,8 +188,8 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
                 "Definition method must have only one parameter but "
                     + parameterTypes.length + ": " + method.getName());
         }
-        Class componentClass = parameterTypes[0];
-        Class[] constructorParameterTypes = new Class[parameterTypes.length - 1];
+        Class<?> componentClass = parameterTypes[0];
+        Class<?>[] constructorParameterTypes = new Class[parameterTypes.length - 1];
         System.arraycopy(parameterTypes, 1, constructorParameterTypes, 0,
             constructorParameterTypes.length);
 
@@ -262,7 +262,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
     }
 
 
-    Class getClassFromURL(String path, ClassLoader classLoader)
+    Class<?> getClassFromURL(String path, ClassLoader classLoader)
     {
         String[] classNames;
         int jarSuffix = path.indexOf(JAR_SUFFIX);
@@ -293,7 +293,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder
     }
 
 
-    Class getClassFromClassName(String path, ClassLoader classLoader)
+    Class<?> getClassFromClassName(String path, ClassLoader classLoader)
     {
         String className = path.substring(0, path.length() - SUFFIX.length())
             .replace('/', '.');

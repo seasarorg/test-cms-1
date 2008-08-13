@@ -24,13 +24,13 @@ public class AppPreparer6 extends S2ContainerPreparer
 
 
     @Component(instance = InstanceType.PROTOTYPE)
-    public void defineList(ArrayList component)
+    public void defineList(ArrayList<String> component)
     {
     }
 
 
     @Aspect("interceptor")
-    public void defineMap(HashMap component)
+    public void defineMap(HashMap<String, String> component)
     {
     }
 

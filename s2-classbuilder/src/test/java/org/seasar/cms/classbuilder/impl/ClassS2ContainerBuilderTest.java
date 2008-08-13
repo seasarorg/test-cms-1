@@ -116,7 +116,7 @@ public class ClassS2ContainerBuilderTest extends S2TestCase
     {
         include(AppPreparer6.class.getName().replace('.', '/').concat(".class"));
         assertTrue(getContainer().hasComponentDef(Map.class));
-        Map map = (Map)getComponent(Map.class);
+        Map<?, ?> map = (Map<?, ?>)getComponent(Map.class);
         assertEquals("intercept!", map.get(null));
     }
 
@@ -144,10 +144,10 @@ public class ClassS2ContainerBuilderTest extends S2TestCase
     public void testGetClassFromURL_ファイルシステムにあるクラスリソースからクラスを取得できること()
         throws Exception
     {
-        Class actual = new ClassS2ContainerBuilder().getClassFromURL(getClass()
-            .getClassLoader().getResource(
+        Class<?> actual = new ClassS2ContainerBuilder().getClassFromURL(
+            getClass().getClassLoader().getResource(
                 Fuga.class.getName().replace('.', '/').concat(".class"))
-            .toExternalForm(), getClass().getClassLoader());
+                .toExternalForm(), getClass().getClassLoader());
         assertEquals(Fuga.class, actual);
     }
 
@@ -155,10 +155,10 @@ public class ClassS2ContainerBuilderTest extends S2TestCase
     public void testGetClassFromURL_Jarに含まれているクラスリソースからクラスを取得できること()
         throws Exception
     {
-        Class actual = new ClassS2ContainerBuilder().getClassFromURL(getClass()
-            .getClassLoader().getResource(
+        Class<?> actual = new ClassS2ContainerBuilder().getClassFromURL(
+            getClass().getClassLoader().getResource(
                 S2Container.class.getName().replace('.', '/').concat(".class"))
-            .toExternalForm(), getClass().getClassLoader());
+                .toExternalForm(), getClass().getClassLoader());
         assertEquals(S2Container.class, actual);
     }
 
