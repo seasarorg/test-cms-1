@@ -164,8 +164,8 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder {
                     "Definition method must have only one parameter but "
                             + parameterTypes.length + ": " + method.getName());
         }
-        Class componentClass = parameterTypes[0];
-        Class[] constructorParameterTypes = new Class[parameterTypes.length - 1];
+        Class<?> componentClass = parameterTypes[0];
+        Class<?>[] constructorParameterTypes = new Class[parameterTypes.length - 1];
         System.arraycopy(parameterTypes, 1, constructorParameterTypes, 0,
                 constructorParameterTypes.length);
 
@@ -231,7 +231,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder {
         }
     }
 
-    Class getClassFromURL(String path, ClassLoader classLoader) {
+    Class<?> getClassFromURL(String path, ClassLoader classLoader) {
         String[] classNames;
         int jarSuffix = path.indexOf(JAR_SUFFIX);
         if (jarSuffix >= 0) {
@@ -260,7 +260,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder {
         return null;
     }
 
-    Class getClassFromClassName(String path, ClassLoader classLoader) {
+    Class<?> getClassFromClassName(String path, ClassLoader classLoader) {
         String className = path.substring(0, path.length() - SUFFIX.length())
                 .replace('/', '.');
         try {
@@ -275,7 +275,7 @@ public class ClassS2ContainerBuilder extends AbstractS2ContainerBuilder {
                 .getContextClassLoader();
         // S2Container関連のクラスがコンテキストクラスローダから見えない場合に備えてこうしている。
         return new CompositeClassLoader(new ClassLoader[] { classLoader,
-                getClass().getClassLoader() });
+            getClass().getClassLoader() });
     }
 
     public S2Container include(S2Container parent, String path) {

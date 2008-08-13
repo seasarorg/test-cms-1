@@ -9,33 +9,22 @@ import org.seasar.cms.classbuilder.annotation.ManualBindingProperties;
 import org.seasar.framework.container.annotation.tiger.Aspect;
 import org.seasar.framework.container.annotation.tiger.InstanceType;
 
-
-public class AppPreparer6 extends S2ContainerPreparer
-{
-    public void defineGuu(GuuImpl guu)
-    {
+public class AppPreparer6 extends S2ContainerPreparer {
+    public void defineGuu(GuuImpl guu) {
     }
-
 
     @ManualBindingProperties("guu2")
-    public void defineHoe4(Hoe4 component)
-    {
+    public void defineHoe4(Hoe4 component) {
     }
-
 
     @Component(instance = InstanceType.PROTOTYPE)
-    public void defineList(ArrayList component)
-    {
+    public void defineList(ArrayList<String> component) {
     }
-
 
     @Aspect("interceptor")
-    public void defineMap(HashMap component)
-    {
+    public void defineMap(HashMap<String, String> component) {
     }
 
-
-    public void defineInterceptor(HoeInterceptor component)
-    {
+    public void defineInterceptor(HoeInterceptor component) {
     }
 }

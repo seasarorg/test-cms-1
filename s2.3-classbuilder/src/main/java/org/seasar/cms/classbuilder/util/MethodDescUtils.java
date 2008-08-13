@@ -51,7 +51,7 @@ public class MethodDescUtils {
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
 
-            Class clazz;
+            Class<?> clazz;
             try {
                 clazz = classLoader.loadClass(className);
             } catch (ClassNotFoundException ex) {
