@@ -9,8 +9,9 @@ import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.DisposableUtil;
 
 public class DistributedHotdeployBehavior extends DefaultProvider {
+    private boolean hotdeploy_;
 
-    private boolean hotdeployEnabled_;
+    private boolean dynamic_;
 
     private LocalHotdeployS2Container[] localHotdeployS2Containers_;
 
@@ -18,8 +19,9 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
 
     private Logger logger_ = Logger.getLogger(getClass());
 
-    public void init(boolean hotdeployEnabled) {
-        hotdeployEnabled_ = hotdeployEnabled;
+    public void init(boolean hotdeploy, boolean dynamic) {
+        hotdeploy_ = hotdeploy;
+        dynamic_ = dynamic;
         initializeLocalHotdeployS2Containers();
     }
 
@@ -49,7 +51,7 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
                 }
                 localContainer.addHotdeployListener(listener);
             }
-            localContainer.init(hotdeployEnabled_);
+            localContainer.init(hotdeploy_, dynamic_);
             localHotdeployS2Containers_[i] = localContainer;
         }
     }
@@ -64,14 +66,14 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
                 localHotdeployS2Containers_[i].destroy();
             }
         }
-        hotdeployEnabled_ = false;
+        hotdeploy_ = false;
     }
 
     public synchronized void start() {
         if (logger_.isDebugEnabled()) {
             logger_.debug("HotdeployBehavior's start() method called");
         }
-        if (!hotdeployEnabled_) {
+        if (!hotdeploy_ && !dynamic_) {
             return;
         }
 
@@ -97,7 +99,7 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
         if (logger_.isDebugEnabled()) {
             logger_.debug("HotdeployBehavior's stop() method called");
         }
-        if (!hotdeployEnabled_) {
+        if (!hotdeploy_ && !dynamic_) {
             return;
         }
 
@@ -121,7 +123,6 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
     }
 
     protected ComponentDef getComponentDef(S2Container container, Object key) {
-
         ComponentDef cd = super.getComponentDef(container, key);
         if (cd != null) {
             return cd;
@@ -131,7 +132,6 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
 
     protected ComponentDef findComponentDefFromHotdeployS2Containers(
             S2Container container, Object key) {
-
         LocalHotdeployS2Container[] localHotdeployS2Containers = (LocalHotdeployS2Container[]) container
                 .findAllComponents(LocalHotdeployS2Container.class);
         for (int i = 0; i < localHotdeployS2Containers.length; i++) {

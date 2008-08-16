@@ -12,7 +12,9 @@ public interface Configuration {
 
     String KEY_PROJECTSTATUS = "projectStatus";
 
-    String KEY_S2CONTAINER_DISABLE_HOTDEPLOY = "s2container.disableHotdeploy";
+    String KEY_S2CONTAINER_CLASSLOADING_DISABLEHOTDEPLOY = "s2container.classLoading.disableHotdeploy";
+
+    String KEY_S2CONTAINER_COMPONENTREGISTRATION_DISABLEDYNAMIC = "s2container.componentRegistration.disableDynamic";
 
     String getProperty(String key);
 

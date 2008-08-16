@@ -1,7 +1,8 @@
 package org.seasar.cms.pluggable.impl;
 
 import static org.seasar.cms.pluggable.Configuration.KEY_PROJECTSTATUS;
-import static org.seasar.cms.pluggable.Configuration.KEY_S2CONTAINER_DISABLE_HOTDEPLOY;
+import static org.seasar.cms.pluggable.Configuration.KEY_S2CONTAINER_CLASSLOADING_DISABLEHOTDEPLOY;
+import static org.seasar.cms.pluggable.Configuration.KEY_S2CONTAINER_COMPONENTREGISTRATION_DISABLEDYNAMIC;
 import static org.seasar.cms.pluggable.Configuration.PROJECTSTATUS_DEVELOP;
 
 import java.net.URL;
@@ -373,15 +374,26 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         logger_.info("Project status is: "
                 + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
 
-        boolean hotdeployEnabled = PROJECTSTATUS_DEVELOP.equals(projectStatus)
-                && !"true".equals(configuration
-                        .getProperty(KEY_S2CONTAINER_DISABLE_HOTDEPLOY));
-        if (hotdeployEnabled) {
-            logger_.info("HOT Deploy is enabled");
+        boolean hotdeploy = PROJECTSTATUS_DEVELOP.equals(projectStatus)
+                && !"true"
+                        .equals(configuration
+                                .getProperty(KEY_S2CONTAINER_CLASSLOADING_DISABLEHOTDEPLOY));
+        if (hotdeploy) {
+            logger_.info("Class loading strategy: HOT Deploy");
         } else {
-            logger_.info("HOT Deploy is disabled");
+            logger_.info("Class loading strategy: Static");
         }
-        getHotdeployBehavior().init(hotdeployEnabled);
+        boolean dynamic = PROJECTSTATUS_DEVELOP.equals(projectStatus)
+                && !"true"
+                        .equals(configuration
+                                .getProperty(KEY_S2CONTAINER_COMPONENTREGISTRATION_DISABLEDYNAMIC));
+        if (dynamic) {
+            logger_.info("Component registration strategy: Dynamic");
+        } else {
+            logger_.info("Component registration strategy: Static");
+        }
+
+        getHotdeployBehavior().init(hotdeploy, dynamic);
     }
 
     DistributedHotdeployBehavior getHotdeployBehavior() {

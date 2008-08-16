@@ -46,7 +46,9 @@ public class DistributedHotdeployBehaviorTest extends TestCase {
             ondemand.stop();
         }
 
-        assertNotSame(expected.getComponentClass(), actual.getComponentClass());
+        assertNotSame("ComponentDefオブジェクトは変わっていること", expected, actual);
+        assertNotSame("Classオブジェクトは変わっていること", expected.getComponentClass(),
+                actual.getComponentClass());
 
         ondemand.start();
         try {
@@ -62,7 +64,9 @@ public class DistributedHotdeployBehaviorTest extends TestCase {
             ondemand.stop();
         }
 
-        assertSame(expected.getComponentClass(), actual.getComponentClass());
+        assertSame("ComponentDefオブジェクトは変わっていないこと", expected, actual);
+        assertSame("Classオブジェクトは変わっていないこと", expected.getComponentClass(),
+                actual.getComponentClass());
     }
 
     public void test_本番モードではLocalHotdeployS2Containerのモードとは無関係にcooldeployになること()
@@ -97,7 +101,9 @@ public class DistributedHotdeployBehaviorTest extends TestCase {
             ondemand.stop();
         }
 
-        assertSame(expected.getComponentClass(), actual.getComponentClass());
+        assertSame("ComponentDefオブジェクトは変わっていないこと", expected, actual);
+        assertSame("Classオブジェクトは変わっていないこと", expected.getComponentClass(),
+                actual.getComponentClass());
 
         ondemand.start();
         try {
@@ -113,6 +119,116 @@ public class DistributedHotdeployBehaviorTest extends TestCase {
             ondemand.stop();
         }
 
-        assertSame(expected.getComponentClass(), actual.getComponentClass());
+        assertSame("ComponentDefオブジェクトは変わっていないこと", expected, actual);
+        assertSame("Classオブジェクトは変わっていないこと", expected.getComponentClass(),
+                actual.getComponentClass());
+    }
+
+    public void test_開発モード_hotdeployDisable() throws Exception {
+        SingletonPluggableContainerFactory.setConfigPath(getClass().getName()
+                .replace('.', '/').concat("_app3.dicon"));
+        SingletonPluggableContainerFactory.prepareForContainer();
+        SingletonPluggableContainerFactory.init();
+
+        S2Container rootContainer = SingletonPluggableContainerFactory
+                .getInstance().getRootContainer();
+        rootContainer.getExternalContext().setRequest(
+                new MockHttpServletRequestImpl(new MockServletContextImpl("/"),
+                        "/hoe.do"));
+
+        DistributedHotdeployBehavior ondemand = (DistributedHotdeployBehavior) S2ContainerBehavior
+                .getProvider();
+
+        ComponentDef expected;
+        ondemand.start();
+        try {
+            expected = rootContainer.getComponentDef("hotDto");
+        } finally {
+            ondemand.stop();
+        }
+
+        ComponentDef actual;
+        ondemand.start();
+        try {
+            actual = rootContainer.getComponentDef("hotDto");
+        } finally {
+            ondemand.stop();
+        }
+
+        assertNotSame("ComponentDefオブジェクトは変わっていること", expected, actual);
+        assertSame("Classオブジェクトは変わっていないこと", expected.getComponentClass(),
+                actual.getComponentClass());
+
+        ondemand.start();
+        try {
+            expected = rootContainer.getComponentDef("coolDto");
+        } finally {
+            ondemand.stop();
+        }
+
+        ondemand.start();
+        try {
+            actual = rootContainer.getComponentDef("coolDto");
+        } finally {
+            ondemand.stop();
+        }
+
+        assertSame("ComponentDefオブジェクトは変わっていないこと", expected, actual);
+        assertSame("Classオブジェクトは変わっていないこと", expected.getComponentClass(),
+                actual.getComponentClass());
+    }
+
+    public void test_開発モード_hotdeployDisable_dynamicDisable() throws Exception {
+        SingletonPluggableContainerFactory.setConfigPath(getClass().getName()
+                .replace('.', '/').concat("_app4.dicon"));
+        SingletonPluggableContainerFactory.prepareForContainer();
+        SingletonPluggableContainerFactory.init();
+
+        S2Container rootContainer = SingletonPluggableContainerFactory
+                .getInstance().getRootContainer();
+        rootContainer.getExternalContext().setRequest(
+                new MockHttpServletRequestImpl(new MockServletContextImpl("/"),
+                        "/hoe.do"));
+
+        DistributedHotdeployBehavior ondemand = (DistributedHotdeployBehavior) S2ContainerBehavior
+                .getProvider();
+
+        ComponentDef expected;
+        ondemand.start();
+        try {
+            expected = rootContainer.getComponentDef("hotDto");
+        } finally {
+            ondemand.stop();
+        }
+
+        ComponentDef actual;
+        ondemand.start();
+        try {
+            actual = rootContainer.getComponentDef("hotDto");
+        } finally {
+            ondemand.stop();
+        }
+
+        assertSame("ComponentDefオブジェクトは変わっていないこと", expected, actual);
+        assertSame("Classオブジェクトは変わっていないこと", expected.getComponentClass(),
+                actual.getComponentClass());
+
+        ondemand.start();
+        try {
+            expected = rootContainer.getComponentDef("coolDto");
+        } finally {
+            ondemand.stop();
+        }
+
+        ondemand.start();
+        try {
+            actual = rootContainer.getComponentDef("coolDto");
+        } finally {
+            ondemand.stop();
+        }
+
+        assertSame("ComponentDefオブジェクトは変わっていないこと", expected, actual);
+        assertSame("Classオブジェクトは変わっていないこと", expected.getComponentClass(),
+                actual.getComponentClass());
     }
 }

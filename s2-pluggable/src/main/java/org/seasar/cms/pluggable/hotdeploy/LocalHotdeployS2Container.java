@@ -28,7 +28,6 @@ import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
 public class LocalHotdeployS2Container implements ClassHandler {
-
     private S2Container container_;
 
     private ClassLoader originalClassLoader_;
@@ -51,7 +50,9 @@ public class LocalHotdeployS2Container implements ClassHandler {
 
     private File classesDirectory_;
 
-    private boolean hotdeployEnabled_ = true;
+    private boolean hotdeploy_ = true;
+
+    private boolean dynamic_ = true;
 
     private Logger logger_ = Logger.getLogger(getClass());
 
@@ -66,7 +67,11 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     public void setHotdeployDisabled() {
-        hotdeployEnabled_ = false;
+        hotdeploy_ = false;
+    }
+
+    public void setDynamicDisabled() {
+        dynamic_ = false;
     }
 
     public void addHotdeployListener(HotdeployListener listener) {
@@ -118,7 +123,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     public ComponentDef findComponentDef(Object key) {
-        if (hotdeployEnabled_) {
+        if (dynamic_) {
             synchronized (this) {
                 return findComponentDef0(key);
             }
@@ -134,8 +139,12 @@ public class LocalHotdeployS2Container implements ClassHandler {
         }
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(
-                    getHotdeployClassLoader());
+            HotdeployClassLoader hotdeployCl = getHotdeployClassLoader();
+            // hotdeplyがfalseでdynamicがtrueの場合でもクラスがロードできるように、
+            // hotdeployClがnullの場合のことを考慮するようにしている。
+            if (hotdeployCl != null) {
+                Thread.currentThread().setContextClassLoader(hotdeployCl);
+            }
             if (key instanceof Class) {
                 cd = createComponentDef((Class<?>) key);
             } else if (key instanceof String) {
@@ -233,24 +242,28 @@ public class LocalHotdeployS2Container implements ClassHandler {
         return originalClassLoader_;
     }
 
-    public void init(boolean hotdeployEnabled) {
-        if (!hotdeployEnabled) {
+    public void init(boolean hotdeploy, boolean dynamic) {
+        if (!hotdeploy) {
             // システムとしてhotdeployが無効なら無効にする。
             // システムとしてhotdeployが有効なら、もともとの状態を保持する。
-            hotdeployEnabled_ = false;
+            hotdeploy_ = false;
+        }
+        if (!dynamic) {
+            // システムとしてdynamicが無効なら無効にする。
+            // システムとしてdynamicが有効なら、もともとの状態を保持する。
+            dynamic_ = false;
         }
 
         // hotdeployがenableの時でも、reference resourceが登録されていないことをチェック
         // するためにgetReferenceResources()を呼び出している。こうすれば、開発環境で動いて
         // いたものがいきなり本番環境でエラーになる心配がなくなる。
         ReferenceResource[] resources = getReferenceResources();
-        if (!hotdeployEnabled_) {
+        if (!dynamic_) {
             registerComponents(resources);
         }
     }
 
     void registerComponents(ReferenceResource[] resources) {
-
         for (int i = 0; i < resources.length; i++) {
             Strategy strategy = getStrategy(resources[i].getURL().getProtocol());
             strategy.registerAll(resources[i]);
@@ -258,7 +271,6 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     ReferenceResource[] getReferenceResources() {
-
         ClassLoader classLoader = container_.getClassLoader();
         List<ReferenceResource> resourceList = new ArrayList<ReferenceResource>();
         if (referenceClassNames_.size() == 0) {
@@ -347,17 +359,17 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     public void destroy() {
-
         componentDefCache_.clear();
         creators_ = new ComponentCreator[0];
         namingConvention_ = null;
         referenceClassNames_.clear();
         listeners_ = new HotdeployListener[0];
-        hotdeployEnabled_ = true;
+        hotdeploy_ = true;
+        dynamic_ = true;
     }
 
     public void start() {
-        if (hotdeployEnabled_) {
+        if (hotdeploy_) {
             start0();
         }
     }
@@ -394,8 +406,14 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     public void stop() {
-        if (hotdeployEnabled_) {
+        if (hotdeploy_) {
             stop0();
+        }
+
+        if (dynamic_) {
+            synchronized (this) {
+                componentDefCache_.clear();
+            }
         }
     }
 
@@ -414,19 +432,13 @@ public class LocalHotdeployS2Container implements ClassHandler {
 
         hotdeployClassLoader_ = null;
         originalClassLoader_ = null;
-
-        synchronized (this) {
-            componentDefCache_.clear();
-        }
     }
 
     protected interface Strategy {
-
         void registerAll(ReferenceResource resource);
     }
 
     protected class FileSystemStrategy implements Strategy {
-
         public void registerAll(ReferenceResource resource) {
             File rootDir = getRootDir(resource);
             ClassTraversal.forEach(rootDir, LocalHotdeployS2Container.this);
@@ -443,7 +455,6 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     protected class JarFileStrategy implements Strategy {
-
         public void registerAll(ReferenceResource resource) {
             JarFile jarFile = createJarFile(resource.getURL());
             ClassTraversal.forEach(jarFile, LocalHotdeployS2Container.this);
@@ -461,7 +472,6 @@ public class LocalHotdeployS2Container implements ClassHandler {
      * WebLogic固有の<code>zip:</code>プロトコルで表現されるURLをサポートするストラテジです。
      */
     protected class ZipFileStrategy implements Strategy {
-
         public void registerAll(ReferenceResource resource) {
             final JarFile jarFile = createJarFile(resource.getURL());
             ClassTraversal.forEach(jarFile, LocalHotdeployS2Container.this);
@@ -477,7 +487,6 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     protected static class ReferenceResource {
-
         private URL url_;
 
         private String resourceName_;
