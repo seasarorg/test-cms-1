@@ -3,7 +3,6 @@ package org.seasar.cms.database.sql;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
 public class VoidDatabaseMetaData implements DatabaseMetaData {
@@ -699,45 +698,5 @@ public class VoidDatabaseMetaData implements DatabaseMetaData {
 
     public boolean usesLocalFiles() throws SQLException {
         return false;
-    }
-
-    public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
-        return false;
-    }
-
-    public ResultSet getClientInfoProperties() throws SQLException {
-        return null;
-    }
-
-    public ResultSet getFunctionColumns(String catalog, String schemaPattern,
-        String functionNamePattern, String columnNamePattern)
-        throws SQLException {
-        return null;
-    }
-
-    public ResultSet getFunctions(String catalog, String schemaPattern,
-        String functionNamePattern) throws SQLException {
-        return null;
-    }
-
-    public RowIdLifetime getRowIdLifetime() throws SQLException {
-        return null;
-    }
-
-    public ResultSet getSchemas(String catalog, String schemaPattern)
-        throws SQLException {
-        return null;
-    }
-
-    public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
-        return false;
-    }
-
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
-    }
-
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
     }
 }
