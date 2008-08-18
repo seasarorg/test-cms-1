@@ -5,6 +5,7 @@
   <include path="j2ee.dicon" />
   <component
     class="org.seasar.framework.container.autoregister.ComponentAutoRegister">
+    <property name="customizer" bindingType="none" />
     <initMethod name="addReferenceClass">
       <arg>@org.seasar.cms.database.identity.Identity@class</arg>
     </initMethod>
