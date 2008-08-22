@@ -25,6 +25,7 @@ import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.JarFileUtil;
 import org.seasar.framework.util.ResourceUtil;
 import org.seasar.framework.util.StringUtil;
+import org.seasar.framework.util.URLUtil;
 import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
 public class LocalHotdeployS2Container implements ClassHandler {
@@ -60,6 +61,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
         addStrategy("file", new FileSystemStrategy());
         addStrategy("jar", new JarFileStrategy());
         addStrategy("zip", new ZipFileStrategy());
+        addStrategy("code-source", new CodeSourceFileStrategy());
     }
 
     public void setClassesDirectory(String classesDirectory) {
@@ -483,6 +485,21 @@ public class LocalHotdeployS2Container implements ClassHandler {
             final String jarFileName = urlString
                     .substring("zip:".length(), pos);
             return JarFileUtil.create(new File(jarFileName));
+        }
+    }
+
+    /**
+     * OC4J固有の<code>code-source:</code>プロトコルで表現されるURLをサポートするストラテジです。
+     */
+    protected class CodeSourceFileStrategy implements Strategy {
+        public void registerAll(ReferenceResource resource) {
+            final JarFile jarFile = createJarFile(resource.getURL());
+            ClassTraversal.forEach(jarFile, LocalHotdeployS2Container.this);
+        }
+
+        protected JarFile createJarFile(URL url) {
+            final URL jarUrl = URLUtil.create("jar:file:" + url.getPath());
+            return JarFileUtil.toJarFile(jarUrl);
         }
     }
 
