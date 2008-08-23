@@ -202,7 +202,8 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
             S2Container[] dependencies, URL[] pathURLs) {
 
         for (int i = 0; i < pathURLs.length; i++) {
-            addAll(container, readS2Container(pathURLs[i].toExternalForm()));
+            addAll(container, readS2Container(root, pathURLs[i]
+                    .toExternalForm()));
         }
 
         includeToLeaves(container, dependencies);
@@ -224,8 +225,8 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         for (int i = 0; i < paths.length; i++) {
             URL[] urls = PluggableUtils.getResourceURLs(paths[i].trim());
             if (urls.length == 1) {
-                addAll(container, processExpanding(readS2Container(urls[0]
-                        .toExternalForm())));
+                addAll(container, processExpanding(readS2Container(container
+                        .getRoot(), urls[0].toExternalForm())));
             } else if (urls.length == 0) {
                 throw new RuntimeException(
                         "Resource to expand not found: container="
@@ -247,12 +248,12 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
         return container;
     }
 
-    S2Container readS2Container(String path) {
-        PluggableProvider.setUsingPluggableRoot(true);
+    S2Container readS2Container(S2Container root, String path) {
+        PluggableProvider.registerRoot(root);
         try {
             return createS2Container(path);
         } finally {
-            PluggableProvider.setUsingPluggableRoot(false);
+            PluggableProvider.registerRoot(null);
         }
     }
 
