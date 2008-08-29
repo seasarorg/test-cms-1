@@ -1,7 +1,11 @@
 package org.seasar.cms.classbuilder.impl;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.seasar.cms.classbuilder.util.S2ContainerBuilderUtils;
 import org.seasar.framework.container.S2Container;
@@ -9,53 +13,50 @@ import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.factory.XmlS2ContainerBuilder;
 import org.seasar.framework.xml.SaxHandlerParser;
 
-
-public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder
-{
+public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder {
     public static final String DELIMITER = "+";
 
     private static final String NAME_ADDITIONAL = "+";
 
-
-    public RedefinableXmlS2ContainerBuilder()
-    {
+    public RedefinableXmlS2ContainerBuilder() {
         getRule().addTagHandler("component",
-            new RedefinableComponentTagHandler());
+                new RedefinableComponentTagHandler());
     }
-
 
     @Override
     protected SaxHandlerParser createSaxHandlerParser(S2Container parent,
-        String path)
-    {
+            String path) {
         SaxHandlerParser parser = super.createSaxHandlerParser(parent, path);
         parser.getSaxHandler().getTagHandlerContext().addParameter("builder",
-            this);
+                this);
         return parser;
     }
 
-
     @Override
-    protected S2Container parse(S2Container parent, String path)
-    {
+    protected S2Container parse(S2Container parent, String path) {
         S2Container container = super.parse(parent, path);
 
         String[] additionalDiconPaths = constructAdditionalDiconPaths(path);
+        Set<URL> urlSet = new LinkedHashSet<URL>();
         for (int i = 0; i < additionalDiconPaths.length; i++) {
-            if (S2ContainerBuilderUtils.resourceExists(additionalDiconPaths[i],
-                this)) {
+            URL[] urls = S2ContainerBuilderUtils
+                    .getResourceURLs(additionalDiconPaths[i]);
+            for (int j = 0; j < urls.length; j++) {
+                urlSet.add(urls[j]);
+            }
+        }
+        for (Iterator<URL> itr = urlSet.iterator(); itr.hasNext();) {
+            String url = itr.next().toExternalForm();
+            if (S2ContainerBuilderUtils.resourceExists(url, this)) {
                 S2ContainerBuilderUtils.mergeContainer(container,
-                    S2ContainerFactory.create(additionalDiconPaths[i]));
-                break;
+                        S2ContainerFactory.create(url));
             }
         }
 
         return container;
     }
 
-
-    protected String[] constructAdditionalDiconPaths(String path)
-    {
+    protected String[] constructAdditionalDiconPaths(String path) {
         int delimiter = path.lastIndexOf(DELIMITER);
         int slash = path.lastIndexOf('/');
         if (delimiter >= 0 && delimiter > slash) {
@@ -75,7 +76,8 @@ public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder
             suffix = path.substring(dot);
         }
         String resourcePath = S2ContainerBuilderUtils
-            .fromURLToResourcePath(body + DELIMITER + NAME_ADDITIONAL + suffix);
+                .fromURLToResourcePath(body + DELIMITER + NAME_ADDITIONAL
+                        + suffix);
         if (resourcePath != null) {
             // パスがJarのURLの場合はURLをリソースパスに変換した上で作成したパスを候補に含める。
             pathList.add(resourcePath);

@@ -9,147 +9,133 @@ import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.util.ResourceUtil;
 
-
-public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase
-{
-    public void test_コンポーネントの再定義ができること()
-        throws Exception
-    {
+public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase {
+    public void test_コンポーネントの再定義ができること() throws Exception {
         include("test1.dicon");
-        Hoe hoe = (Hoe)getComponent(Hoe.class);
+        Hoe hoe = (Hoe) getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
 
-
     public void test_コンポーネント名が同じコンポーネント定義は再定義されてそれ以外のコンポーネント定義があれば追加されること()
-        throws Exception
-    {
+            throws Exception {
         include("test5.dicon");
-        Fuga fuga = (Fuga)getComponent(Fuga.class);
+        Fuga fuga = (Fuga) getComponent(Fuga.class);
         assertTrue(fuga instanceof FugaImpl2);
         assertTrue(getContainer().hasComponentDef(Hoe.class));
         assertNotNull("きちんとDIもされること", fuga.getHoe());
     }
 
-
-    public void test_コンポーネントの追加ができること()
-        throws Exception
-    {
+    public void test_コンポーネントの追加ができること() throws Exception {
         include("test2.dicon");
         assertNotNull(getComponent(Hoe.class));
     }
 
+    public void test_複数diconファイルからのコンポーネントの追加ができること() throws Exception {
+        URL url = new File(ResourceUtil.getBuildDir(
+                RedefinableXmlS2ContainerBuilderTest.class).getParentFile()
+                .getParentFile(), "src/test/resources2").toURI().toURL();
+        ClassLoader cl = new URLClassLoader(new URL[] { url }, getClass()
+                .getClassLoader());
 
-    public void test_コンポーネントの除去ができること()
-        throws Exception
-    {
+        S2Container container = S2ContainerFactory.create(cl.getResource(
+                "test7.dicon").toExternalForm(), cl);
+
+        assertTrue(container.hasComponentDef("hoe1"));
+        assertTrue(container.hasComponentDef("hoe2"));
+        assertTrue(container.hasComponentDef("hoe3"));
+    }
+
+    public void test_コンポーネントの除去ができること() throws Exception {
         include("test4.dicon");
         assertFalse(getContainer().hasComponentDef(Hoe.class));
     }
 
-
     public void test_JARの外にある差分diconによってJARに入っているdiconファイルのコンポーネントの再定義ができること()
-        throws Exception
-    {
+            throws Exception {
         ClassLoader cl = new URLClassLoader(new URL[] { new URL("jar:"
-            + ResourceUtil.getResource("testinjar1.jar").toExternalForm()
-            + "!/") }, getClass().getClassLoader());
+                + ResourceUtil.getResource("testinjar1.jar").toExternalForm()
+                + "!/") }, getClass().getClassLoader());
         S2Container container = S2ContainerFactory.create("testinjar1.dicon",
-            cl);
-        Hoe hoe = (Hoe)container.getComponent(Hoe.class);
+                cl);
+        Hoe hoe = (Hoe) container.getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
-
 
     public void test_diconのパスがURLであってもJARの外にある差分diconによってJARに入っているdiconファイルのコンポーネントの再定義ができること()
-        throws Exception
-    {
+            throws Exception {
         String jarPath = "jar:"
-            + ResourceUtil.getResource("testinjar1.jar").toExternalForm()
-            + "!/";
+                + ResourceUtil.getResource("testinjar1.jar").toExternalForm()
+                + "!/";
         ClassLoader cl = new URLClassLoader(new URL[] { new URL(jarPath) },
-            getClass().getClassLoader());
+                getClass().getClassLoader());
         S2Container container = S2ContainerFactory.create(jarPath
-            + "testinjar1.dicon", cl);
-        Hoe hoe = (Hoe)container.getComponent(Hoe.class);
+                + "testinjar1.dicon", cl);
+        Hoe hoe = (Hoe) container.getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
 
-
-    public void test_JARの外にある差分diconによってJARに入っているdiconの追加定義ができること()
-        throws Exception
-    {
+    public void test_JARの外にある差分diconによってJARに入っているdiconファイルの追加定義ができること()
+            throws Exception {
         ClassLoader cl = new URLClassLoader(new URL[] { new URL("jar:"
-            + ResourceUtil.getResource("testinjar2.jar").toExternalForm()
-            + "!/") }, getClass().getClassLoader());
+                + ResourceUtil.getResource("testinjar2.jar").toExternalForm()
+                + "!/") }, getClass().getClassLoader());
         S2Container container = S2ContainerFactory.create("testinjar2.dicon",
-            cl);
+                cl);
         assertNotNull(container.getComponent(Hoe.class));
     }
-
 
     public void test_diconのパスがURLであってもJARの外にある差分diconによってJARに入っているdiconファイルの追加定義ができること()
-        throws Exception
-    {
+            throws Exception {
         String jarPath = "jar:"
-            + ResourceUtil.getResource("testinjar2.jar").toExternalForm()
-            + "!/";
+                + ResourceUtil.getResource("testinjar2.jar").toExternalForm()
+                + "!/";
         ClassLoader cl = new URLClassLoader(new URL[] { new URL(jarPath) },
-            getClass().getClassLoader());
+                getClass().getClassLoader());
         S2Container container = S2ContainerFactory.create(jarPath
-            + "testinjar2.dicon", cl);
+                + "testinjar2.dicon", cl);
         assertNotNull(container.getComponent(Hoe.class));
     }
 
-
-    public void test_diconファイル全体の置き換えができること()
-        throws Exception
-    {
+    public void test_diconファイル全体の置き換えができること() throws Exception {
         include("test3.dicon");
-        Hoe hoe = (Hoe)getComponent(Hoe.class);
+        Hoe hoe = (Hoe) getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
-
 
     public void test_JARの外にある差分diconによってJARに入っているdiconファイル全体の置き換えができること()
-        throws Exception
-    {
+            throws Exception {
         ClassLoader cl = new URLClassLoader(new URL[] { new URL("jar:"
-            + ResourceUtil.getResource("testinjar3.jar").toExternalForm()
-            + "!/") }, getClass().getClassLoader());
+                + ResourceUtil.getResource("testinjar3.jar").toExternalForm()
+                + "!/") }, getClass().getClassLoader());
         S2Container container = S2ContainerFactory.create("testinjar3.dicon",
-            cl);
-        Hoe hoe = (Hoe)container.getComponent(Hoe.class);
+                cl);
+        Hoe hoe = (Hoe) container.getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
-
 
     public void test_diconのパスがURLであってもJARの外にある置き換えdiconによってJARに入っているdiconファイル全体の置き換えができること()
-        throws Exception
-    {
+            throws Exception {
         String jarPath = "jar:"
-            + ResourceUtil.getResource("testinjar3.jar").toExternalForm()
-            + "!/";
+                + ResourceUtil.getResource("testinjar3.jar").toExternalForm()
+                + "!/";
         ClassLoader cl = new URLClassLoader(new URL[] { new URL(jarPath) },
-            getClass().getClassLoader());
+                getClass().getClassLoader());
         S2Container container = S2ContainerFactory.create(jarPath
-            + "testinjar3.dicon", cl);
-        Hoe hoe = (Hoe)container.getComponent(Hoe.class);
+                + "testinjar3.dicon", cl);
+        Hoe hoe = (Hoe) container.getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
 
-
-    public void test_違うディレクトリにある差分diconによってdiconの追加定義ができること()
-        throws Exception
-    {
+    public void test_違うディレクトリにある差分diconによってdiconファイルの追加定義ができること()
+            throws Exception {
         URL url = new File(ResourceUtil.getBuildDir(
-            RedefinableXmlS2ContainerBuilderTest.class).getParentFile()
-            .getParentFile(), "src/test/resources2").toURI().toURL();
+                RedefinableXmlS2ContainerBuilderTest.class).getParentFile()
+                .getParentFile(), "src/test/resources2").toURI().toURL();
         ClassLoader cl = new URLClassLoader(new URL[] { url }, getClass()
-            .getClassLoader());
+                .getClassLoader());
 
         S2Container container = S2ContainerFactory.create(cl.getResource(
-            "test6.dicon").toExternalForm(), cl);
+                "test6.dicon").toExternalForm(), cl);
         assertTrue(container.hasComponentDef("fuga2"));
     }
 }

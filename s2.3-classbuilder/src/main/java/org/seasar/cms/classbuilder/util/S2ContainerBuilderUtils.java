@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
@@ -12,24 +15,20 @@ import org.seasar.framework.container.factory.AbstractS2ContainerBuilder;
 import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.util.ResourceUtil;
 
-
-public class S2ContainerBuilderUtils
-{
+public class S2ContainerBuilderUtils {
     private static final String PREFIX_JAR = "jar:";
 
     private static final String SUFFIX_JAR = "!/";
 
     private static final String PREFIX_FILE = "file:";
 
+    private static final char COLON = ':';
 
-    protected S2ContainerBuilderUtils()
-    {
+    protected S2ContainerBuilderUtils() {
     }
 
-
     public static boolean resourceExists(String path,
-        AbstractS2ContainerBuilder builder)
-    {
+            AbstractS2ContainerBuilder builder) {
         InputStream is;
         try {
             is = builder.getResourceResolver().getInputStream(path);
@@ -51,9 +50,7 @@ public class S2ContainerBuilderUtils
         }
     }
 
-
-    public static void mergeContainer(S2Container container, S2Container merged)
-    {
+    public static void mergeContainer(S2Container container, S2Container merged) {
         int size = merged.getChildSize();
         for (int i = 0; i < size; i++) {
             container.include(merged.getChild(i));
@@ -72,9 +69,7 @@ public class S2ContainerBuilderUtils
         }
     }
 
-
-    public static String fromURLToResourcePath(String path)
-    {
+    public static String fromURLToResourcePath(String path) {
         if (path == null) {
             return null;
         }
@@ -119,18 +114,40 @@ public class S2ContainerBuilderUtils
         return null;
     }
 
+    public static URL[] getResourceURLs(String path) {
+        return getResourceURLs(path, Thread.currentThread()
+                .getContextClassLoader());
+    }
 
-    static String encodeURL(String path)
-    {
+    public static URL[] getResourceURLs(String path, ClassLoader classLoader) {
+        if (path.indexOf(COLON) >= 0) {
+            try {
+                return new URL[] { new URL(path) };
+            } catch (MalformedURLException ignore) {
+            }
+        }
+
+        Enumeration<URL> enm;
+        try {
+            enm = classLoader.getResources(path);
+        } catch (IOException ex) {
+            throw new IORuntimeException(ex);
+        }
+        Set<URL> urlSet = new LinkedHashSet<URL>();
+        for (; enm.hasMoreElements();) {
+            urlSet.add(enm.nextElement());
+        }
+        return urlSet.toArray(new URL[0]);
+    }
+
+    static String encodeURL(String path) {
         if (path == null) {
             return null;
         }
         return path.replace("+", "%2B");
     }
 
-
-    static ClassLoader getClassLoader()
-    {
+    static ClassLoader getClassLoader() {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (cl == null) {
             cl = S2ContainerBuilderUtils.class.getClassLoader();
