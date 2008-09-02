@@ -13,7 +13,10 @@
   <groupId>org.seasar.cms.executable-war</groupId>
   <artifactId>executable-war</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <description></description>
+  <name>Executable WAR</name>
+  <description>
+    This provides parts to make executable WAR file.
+  </description>
   <build>
     <pluginManagement>
       <plugins>
