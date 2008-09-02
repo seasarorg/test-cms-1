@@ -224,5 +224,6 @@
     <module>../webdav-jp</module>
     <module>../ymir</module>
     <module>../ymir-extension</module>
+    <module>../executable-war</module>
   </modules>
 </project>
