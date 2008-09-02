@@ -41,6 +41,47 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.jvnet.maven-antrun-extended-plugin</groupId>
+        <artifactId>maven-antrun-extended-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>resgen</id>
+            <!-- Should use 'prepare-package' on Maven 2.1 or later. -->
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <!-- dependencies that goes to unusual locations -->
+                <resolveArtifact artifactId="winstone"
+                  tofile="${basedir}/target/classes/winstone.jar" />
+                <resolveArtifact artifactId="ant"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="ant-launcher"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="commons-el"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="commons-logging"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="el-api"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="jasper"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="jasper-el"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="servlet-api"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="jsp-api"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                <resolveArtifact artifactId="juli"
+                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <repositories>
@@ -64,6 +105,14 @@
       <name>The Seasar Foundation Maven2 Repository</name>
       <url>http://maven.seasar.org/maven2</url>
     </pluginRepository>
+    <pluginRepository>
+      <id>java.net2</id>
+      <url>http://download.java.net/maven/2</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+    </pluginRepository>
   </pluginRepositories>
   <dependencies>
     <dependency>
@@ -71,6 +120,52 @@
       <artifactId>junit</artifactId>
       <version>3.8.2</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.winstone</groupId>
+      <artifactId>winstone</artifactId>
+      <version>0.9.10</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>jasper</artifactId>
+      <version>6.0.18</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>catalina</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>catalina</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging-api</artifactId>
+      <version>1.0.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.7.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant-launcher</artifactId>
+      <version>1.7.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-el</groupId>
+      <artifactId>commons-el</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

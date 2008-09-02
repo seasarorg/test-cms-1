@@ -1,5 +1,7 @@
 package org.seasar.cms.executablewar;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,8 +14,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -28,7 +35,17 @@ import javax.naming.NamingException;
  * @author YOKOTA Takehiko
  */
 public class Main {
+    private static final String WINSTONE_JAR = "winstone.jar";
+
     private static final String EXECUTABLEWAR_HOME = "EXECUTABLEWAR_HOME";
+
+    private static final String OPTION_WEBROOT = "--webroot=";
+
+    private static final String OPTION_DEPLOY = "deploy";
+
+    private static final String OPTION_COMMON_LIB_FOLDER = "--commonLibFolder=";
+
+    private static final String OPTION_START = "start";
 
     public static void main(String[] args) throws Exception {
         // ウィンドウシステムが動作していない環境でもJava2Dのライブラリを利用できるようにします。
@@ -36,8 +53,57 @@ public class Main {
 
         File me = whoAmI();
 
+        // 引数を準備します。
+        List<String> arguments = new ArrayList<String>(Arrays.asList(args));
+
+        File webRoot = null;
+        boolean deploy = false;
+        boolean start = true;
+        for (Iterator<String> itr = arguments.iterator(); itr.hasNext();) {
+            String s = itr.next();
+            if (s.startsWith(OPTION_WEBROOT)) {
+                webRoot = new File(s.substring(OPTION_WEBROOT.length()).trim());
+            } else if (s.equals(OPTION_DEPLOY)) {
+                deploy = true;
+                start = false;
+            } else if (s.equals(OPTION_START)) {
+                start = true;
+            }
+        }
+
+        if (webRoot == null) {
+            webRoot = new File(getHomeDir(), me.getName());
+
+            // テンポラリディレクトリに展開したコンテンツがcronジョブによって削除されてしまうため、
+            // webrootが指定されていない場合でもwebrootを設定するようにします。
+            arguments.add(OPTION_WEBROOT + webRoot);
+        }
+
+        arguments.add(OPTION_COMMON_LIB_FOLDER + new File(webRoot, "WEB-INF/common/lib"));
+
+        if (deploy || !webRoot.exists()) {
+            // Warを展開します。winstoneに展開させないのは、War中の不要なファイルを削除するためです。
+            deleteContents(webRoot);
+            webRoot.mkdirs();
+            try {
+                unpackWar(me, webRoot, WINSTONE_JAR, "org");
+            } catch (IOException ex) {
+                IOException x = new IOException("Cannot unpack WAR: " + me);
+                x.initCause(ex);
+                throw x;
+            }
+            System.out.println("Deployed " + me + " to " + webRoot);
+        } else {
+            System.out.println("**NOT DEPLOYED** because " + webRoot
+                    + " already exists. If you want to re-deploy, run with 'deploy' option.");
+        }
+
+        if (!start) {
+            return;
+        }
+
         // WinstoneのjarファイルのURLを取得します。
-        URL jar = Main.class.getClassLoader().getResource("winstone.jar");
+        URL jar = Main.class.getClassLoader().getResource(WINSTONE_JAR);
 
         // Winstoneを動作させるためにJarファイルをファイルシステムに配置します。
         File tmpJar;
@@ -62,25 +128,39 @@ public class Main {
         Class<?> launcher = cl.loadClass("winstone.Launcher");
         Method mainMethod = launcher.getMethod("main", new Class[] { String[].class });
 
-        // 引数をfigure out the arguments
-        List<String> arguments = new ArrayList<String>(Arrays.asList(args));
-        arguments.add(0, "--warfile=" + me.getAbsolutePath());
-        if (!hasWebRoot(arguments))
-            // テンポラリディレクトリに展開したコンテンツがcronジョブによって削除されてしまうため、
-            // webrootが指定されていない場合でもwebrootを設定するようにします。
-            arguments.add("--webroot=" + new File(getHomeDir(), me.getName()));
-
         // winstoneを実行します。
         mainMethod.invoke(null, new Object[] { arguments.toArray(new String[0]) });
     }
 
-    private static boolean hasWebRoot(List<String> arguments) {
-        for (Iterator<String> itr = arguments.iterator(); itr.hasNext();) {
-            String s = itr.next();
-            if (s.startsWith("--webroot="))
-                return true;
+    private static void unpackWar(File warFile, File destination, String... excludes) throws IOException {
+        Set<String> excludeSet = new HashSet<String>(Arrays.asList(excludes));
+        JarFile jarFile = new JarFile(warFile);
+        for (Enumeration<JarEntry> enm = jarFile.entries(); enm.hasMoreElements();) {
+            JarEntry entry = enm.nextElement();
+            String name = entry.getName();
+            if (excludeSet.contains(getFirstSegment(name))) {
+                continue;
+            }
+            File to = new File(destination, name);
+            if (name.endsWith("/")) {
+                to.mkdirs();
+            } else {
+                copyStream(jarFile.getInputStream(entry), new FileOutputStream(to));
+            }
         }
-        return false;
+        jarFile.close();
+    }
+
+    private static String getFirstSegment(String name) {
+        if (name == null) {
+            return null;
+        }
+        int slash = name.indexOf('/');
+        if (slash < 0) {
+            return name;
+        } else {
+            return name.substring(0, slash);
+        }
     }
 
     /**
@@ -97,6 +177,8 @@ public class Main {
     }
 
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
+        in = new BufferedInputStream(in);
+        out = new BufferedOutputStream(out);
         byte[] buf = new byte[8192];
         int len;
         while ((len = in.read(buf)) > 0)
