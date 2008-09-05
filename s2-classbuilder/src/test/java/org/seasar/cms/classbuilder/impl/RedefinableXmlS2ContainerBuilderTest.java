@@ -7,9 +7,18 @@ import java.net.URLClassLoader;
 import org.seasar.extension.unit.S2TestCase;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.S2ContainerFactory;
+import org.seasar.framework.env.Env;
 import org.seasar.framework.util.ResourceUtil;
 
 public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        Env.setFilePath(ENV_PATH);
+        // S2.4.11からモードがutにされてしまうようになったので…。
+        Env.setValueIfAbsent(Env.PRODUCT);
+    }
+
     public void test_コンポーネントの再定義ができること() throws Exception {
         include("test1.dicon");
         Hoe hoe = (Hoe) getComponent(Hoe.class);
