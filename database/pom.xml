@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms.database</groupId>
   <artifactId>database</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.4</version>
   <name>CMS-Database</name>
   <description>Database module for CMS system.</description>
   <build>
