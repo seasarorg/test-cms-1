@@ -12,7 +12,7 @@
   </parent>
   <groupId>org.seasar.cms.executable-war</groupId>
   <artifactId>executable-war</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>Executable WAR</name>
   <description>
     This provides parts to make executable WAR file.
@@ -58,25 +58,25 @@
                 <resolveArtifact artifactId="winstone"
                   tofile="${basedir}/target/classes/winstone.jar" />
                 <resolveArtifact artifactId="ant"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="ant-launcher"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="commons-el"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="commons-logging"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="el-api"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="jasper"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="jasper-el"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="servlet-api"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="jsp-api"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
                 <resolveArtifact artifactId="juli"
-                  todir="${basedir}/target/classes/WEB-INF/common/lib" />
+                  todir="${basedir}/target/classes/META-INF/winstone/lib" />
               </tasks>
             </configuration>
           </execution>

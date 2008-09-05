@@ -79,7 +79,7 @@ public class Main {
             arguments.add(OPTION_WEBROOT + webRoot);
         }
 
-        arguments.add(OPTION_COMMON_LIB_FOLDER + new File(webRoot, "WEB-INF/common/lib"));
+        arguments.add(OPTION_COMMON_LIB_FOLDER + new File(webRoot, "META-INF/winstone/lib"));
 
         if (deploy || !webRoot.exists()) {
             // Warを展開します。winstoneに展開させないのは、War中の不要なファイルを削除するためです。
@@ -92,7 +92,7 @@ public class Main {
                 x.initCause(ex);
                 throw x;
             }
-            System.out.println("Deployed " + me + " to " + webRoot);
+            System.out.println("Successfully deployed " + me + " to " + webRoot);
         } else {
             System.out.println("**NOT DEPLOYED** because " + webRoot
                     + " already exists. If you want to re-deploy, run with 'deploy' option.");
