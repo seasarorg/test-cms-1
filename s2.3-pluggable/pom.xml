@@ -11,7 +11,7 @@
   </parent>
   <groupId>org.seasar.cms.s2-pluggable</groupId>
   <artifactId>s2.3-pluggable</artifactId>
-  <version>0.0.9</version>
+  <version>0.0.10-SNAPSHOT</version>
   <name>S2.3-Pluggable</name>
   <description>
     S2.3-Pluggable is sub-set of S2-Pluggable for Seasar 2.3.
