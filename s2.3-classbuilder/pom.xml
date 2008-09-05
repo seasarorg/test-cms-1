@@ -11,7 +11,7 @@
   </parent>
   <groupId>org.seasar.cms.s2-classbuilder</groupId>
   <artifactId>s2.3-classbuilder</artifactId>
-  <version>0.0.6</version>
+  <version>0.0.7-SNAPSHOT</version>
   <name>S2-ClassBuilder</name>
   <description>
     S2.3-ClassBuilder is sub-set of S2-ClassBuilder for Seasar 2.3.
