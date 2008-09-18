@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,8 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.beantable.Beantable;
 import org.seasar.cms.beantable.BeantableDao;
 import org.seasar.cms.beantable.Formula;
@@ -63,6 +66,8 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
     private String queriesPath_;
 
     private Properties sql_;
+
+    private final Log log_ = LogFactory.getLog(BeantableDaoBase.class);
 
     @Binding(bindingType = BindingType.MAY)
     public void setBeantable(Beantable<T> beantable) {
@@ -134,11 +139,16 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
     }
 
     public final String getQueryIfExists(String name) {
+        String query;
         if (sql_ != null) {
-            return sql_.getProperty(name);
+            query = sql_.getProperty(name);
         } else {
-            return null;
+            query = null;
         }
+        if (log_.isDebugEnabled()) {
+            log_.debug("getQueryIfExists(" + name + ")=" + query);
+        }
+        return query;
     }
 
     public final Pair constructPair(String name, String[] blocks,
@@ -245,10 +255,20 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
     public Object execute(String queryName, Object[] params,
             Class<?>[] paramTypes, Class<?> returnType) throws SQLException {
 
+        if (log_.isDebugEnabled()) {
+            log_.debug("execute(" + queryName + ", " + Arrays.asList(params)
+                    + ")");
+        }
         if (returnType == Void.TYPE && paramTypes.length == 1
                 && paramTypes[0] == getDtoClass()) {
             // insert。
+            if (log_.isDebugEnabled()) {
+                log_.debug("BEGIN insert");
+            }
             beantable_.insertColumn((T) params[0]);
+            if (log_.isDebugEnabled()) {
+                log_.debug("END insert");
+            }
             return null;
         }
 
@@ -270,7 +290,16 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
                         formula.setObject(i, params[i]);
                     }
                 }
-                return beantable_.updateColumns((T) params[0], formula);
+                if (log_.isDebugEnabled()) {
+                    log_.debug("BEGIN update");
+                }
+                try {
+                    return beantable_.updateColumns((T) params[0], formula);
+                } finally {
+                    if (log_.isDebugEnabled()) {
+                        log_.debug("END update");
+                    }
+                }
             }
 
             update = true;
@@ -287,11 +316,28 @@ abstract public class BeantableDaoBase<T> implements BeantableDao {
             con = getConnection();
             QueryRunner runner = new QueryRunner();
             if (update) {
-                return runner.update(con, pair.getTemplate(), pair
-                        .getParameters());
+                if (log_.isDebugEnabled()) {
+                    log_.debug("BEGIN updateQuery: " + pair.getTemplate()
+                            + ", " + Arrays.asList(pair.getParameters()));
+                }
+                try {
+                    return runner.update(con, pair.getTemplate(), pair
+                            .getParameters());
+                } finally {
+                    if (log_.isDebugEnabled()) {
+                        log_.debug("END updateQuery");
+                    }
+                }
             } else {
+                if (log_.isDebugEnabled()) {
+                    log_.debug("BEGIN executeQuery: " + pair.getTemplate()
+                            + ", " + Arrays.asList(pair.getParameters()));
+                }
                 Object result = runner.query(con, pair.getTemplate(), pair
                         .getParameters(), handler);
+                if (log_.isDebugEnabled()) {
+                    log_.debug("END executeQuery");
+                }
                 if (returnType.isArray()) {
                     return toArray((List) result, returnType.getComponentType());
                 } else {
