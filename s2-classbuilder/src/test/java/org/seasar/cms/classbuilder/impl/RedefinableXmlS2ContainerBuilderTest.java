@@ -147,4 +147,13 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase {
                 "test6.dicon").toExternalForm(), cl);
         assertTrue(container.hasComponentDef("fuga2"));
     }
+
+    public void test_コンポーネントの再定義と追加が同時にできること() throws Exception {
+        include("test8.dicon");
+
+        Hoe hoe = (Hoe) getComponent(Hoe.class);
+        assertEquals("redefined", hoe.getName());
+        Fuga fuga = (Fuga) getComponent(Fuga.class);
+        assertSame(hoe, fuga.getHoe());
+    }
 }
