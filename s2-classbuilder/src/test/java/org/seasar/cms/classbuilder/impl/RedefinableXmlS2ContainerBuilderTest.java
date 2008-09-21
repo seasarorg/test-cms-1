@@ -156,4 +156,25 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase {
         Fuga fuga = (Fuga) getComponent(Fuga.class);
         assertSame(hoe, fuga.getHoe());
     }
+
+    public void test_コンポーネントを先頭に追加できること() throws Exception {
+        include("test9.dicon");
+
+        Hoe[] actual = (Hoe[]) getContainer().findAllComponents(Hoe.class);
+        int idx = 0;
+        assertEquals(2, actual.length);
+        assertEquals("added", actual[idx++].getName());
+        assertEquals("original", actual[idx++].getName());
+    }
+
+    public void test_コンポーネントを先頭と末尾に同時に追加できること() throws Exception {
+        include("test10.dicon");
+
+        Hoe[] actual = (Hoe[]) getContainer().findAllComponents(Hoe.class);
+        int idx = 0;
+        assertEquals(3, actual.length);
+        assertEquals("prefix", actual[idx++].getName());
+        assertEquals("original", actual[idx++].getName());
+        assertEquals("suffix", actual[idx++].getName());
+    }
 }
