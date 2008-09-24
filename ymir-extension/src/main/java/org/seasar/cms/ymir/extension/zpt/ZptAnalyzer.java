@@ -27,6 +27,7 @@ import net.skirnir.freyja.IllegalSyntaxException;
 import net.skirnir.freyja.TagEvaluator;
 import net.skirnir.freyja.TagEvaluatorWrapper;
 import net.skirnir.freyja.TemplateEvaluator;
+import net.skirnir.freyja.impl.TemplateEvaluatorImpl;
 import net.skirnir.freyja.zpt.tales.TalesExpressionEvaluator;
 import net.skirnir.freyja.zpt.webapp.PageTypePrefixHandler;
 
@@ -134,7 +135,8 @@ public class ZptAnalyzer implements TemplateAnalyzer {
                                     .getTypePrefixHandler(TYPE_PAGE)));
             evaluator.addPathResolver(new AnalyzerPathResolver());
         }
-        evaluator_ = new TemplateEvaluator(tagEvaluator, expressionEvaluator);
+        evaluator_ = new TemplateEvaluatorImpl(tagEvaluator,
+                expressionEvaluator);
     }
 
     AnalyzerTalTagEvaluator newAnalyzerTalTagEvaluator() {

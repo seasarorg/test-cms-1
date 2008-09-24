@@ -13,6 +13,7 @@ import org.seasar.cms.ymir.response.SelfContainedResponse;
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.TemplateEvaluator;
 import net.skirnir.freyja.VariableResolver;
+import net.skirnir.freyja.impl.TemplateEvaluatorImpl;
 import net.skirnir.freyja.impl.VariableResolverImpl;
 import net.skirnir.freyja.zpt.MetalTagEvaluator;
 import net.skirnir.freyja.zpt.tales.TalesExpressionEvaluator;
@@ -23,7 +24,7 @@ public class ZptResponseCreator implements ResponseCreator {
 
     private static final String TEMPLATE_SUFFIX = ".zpt";
 
-    private TemplateEvaluator evaluator_ = new TemplateEvaluator(
+    private TemplateEvaluator evaluator_ = new TemplateEvaluatorImpl(
             new MetalTagEvaluator(), new TalesExpressionEvaluator());
 
     public Response createResponse(String templateName, Map variableMap) {

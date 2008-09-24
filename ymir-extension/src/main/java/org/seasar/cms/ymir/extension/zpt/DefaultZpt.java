@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.skirnir.freyja.TemplateContext;
 import net.skirnir.freyja.TemplateEvaluator;
 import net.skirnir.freyja.VariableResolver;
+import net.skirnir.freyja.impl.TemplateEvaluatorImpl;
 import net.skirnir.freyja.webapp.FreyjaServlet;
 import net.skirnir.freyja.webapp.ServletVariableResolverFactory;
 import net.skirnir.freyja.webapp.VariableResolverFactory;
@@ -18,7 +19,7 @@ import net.skirnir.freyja.zpt.webapp.ServletTalesExpressionEvaluator;
 
 public class DefaultZpt implements Zpt {
 
-    private TemplateEvaluator evaluator_ = new TemplateEvaluator(
+    private TemplateEvaluator evaluator_ = new TemplateEvaluatorImpl(
             new MetalTagEvaluator(new TalTagEvaluator()),
             new ServletTalesExpressionEvaluator());
 

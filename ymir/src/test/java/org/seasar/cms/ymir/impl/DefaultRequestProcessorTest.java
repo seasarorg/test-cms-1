@@ -13,6 +13,7 @@ import org.seasar.cms.ymir.mock.MockApplication;
 import org.seasar.cms.ymir.mock.MockRequest;
 import org.seasar.cms.ymir.response.ForwardResponse;
 import org.seasar.extension.unit.S2TestCase;
+import org.seasar.framework.env.Env;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
 
 public class DefaultRequestProcessorTest extends S2TestCase {
@@ -42,6 +43,9 @@ public class DefaultRequestProcessorTest extends S2TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
+        Env.setFilePath(ENV_PATH);
+        // S2.4.11からモードがutにされてしまうようになったので…。
+        Env.setValueIfAbsent(Env.PRODUCT);
 
         include("DefaultRequestProcessor.dicon");
 

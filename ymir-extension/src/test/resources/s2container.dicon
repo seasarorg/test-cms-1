@@ -24,8 +24,12 @@
   <component class="org.seasar.cms.pluggable.PluggablePathResolver" />
 
   <!-- For S2ClassBuilder -->
+  <component name="dicon"
+    class="org.seasar.cms.classbuilder.impl.RedefinableXmlS2ContainerBuilder" />
   <component name="class"
     class="org.seasar.cms.classbuilder.impl.ClassS2ContainerBuilder" />
   <component
-    class="org.seasar.cms.classbuilder.impl.PluggableAssemblerProvider" />
+    class="org.seasar.cms.classbuilder.impl.ClassAssemblerProvider" />
+  <component
+    class="org.seasar.cms.classbuilder.impl.RedefinableResourceResolver" />
 </components>
