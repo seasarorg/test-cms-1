@@ -18,6 +18,18 @@
   </description>
   <build>
     <defaultGoal>install</defaultGoal>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <encoding>UTF-8</encoding>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
@@ -127,13 +139,18 @@
       <version>2.4.20</version>
     </dependency>
     <dependency>
+      <groupId>org.seasar.container</groupId>
+      <artifactId>s2-tiger</artifactId>
+      <version>2.4.20</version>
+    </dependency>
+    <dependency>
       <groupId>org.seasar.cms.s2-pluggable</groupId>
       <artifactId>s2-pluggable</artifactId>
-      <version>0.0.2</version>
+      <version>0.0.9</version>
     </dependency>
     <dependency>
       <groupId>org.seasar.dao</groupId>
-      <artifactId>s2-dao</artifactId>
+      <artifactId>s2-dao-tiger</artifactId>
       <version>1.0.47</version>
     </dependency>
     <dependency>

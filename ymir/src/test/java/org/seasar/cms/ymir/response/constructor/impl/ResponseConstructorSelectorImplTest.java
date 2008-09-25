@@ -16,11 +16,11 @@ public class ResponseConstructorSelectorImplTest extends TestCase {
         super.setUp();
 
         container_ = S2ContainerFactory.create(getClass().getName().replace(
-            '.', '/')
-            + "_root.dicon");
+                '.', '/')
+                + "_root.dicon");
         container_.init();
         target_ = (ResponseConstructorSelectorImpl) container_
-            .getComponent(ResponseConstructorSelectorImpl.class);
+                .getComponent(ResponseConstructorSelectorImpl.class);
     }
 
     /*
