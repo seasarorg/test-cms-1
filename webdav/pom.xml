@@ -10,9 +10,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms.webdav</groupId>
-  <artifactId>webdav</artifactId>
+  <artifactId>webdav_5.5.20</artifactId>
   <name>WebDAV Servlet</name>
-  <version>5.5.20</version>
+  <version>0.0.1-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>
