@@ -2,7 +2,6 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
   "http://www.seasar.org/dtd/components24.dtd">
 <components>
-  <!-- For S2Pluggable -->
   <include path="external.dicon" />
   <include path="global.dicon" />
   <component class="org.seasar.cms.pluggable.PluggableProvider" />
@@ -22,14 +21,4 @@
     <aspect>statusFilterInterceptor</aspect>
   </component>
   <component class="org.seasar.cms.pluggable.PluggablePathResolver" />
-
-  <!-- For S2ClassBuilder -->
-  <component name="dicon"
-    class="org.seasar.cms.classbuilder.impl.RedefinableXmlS2ContainerBuilder" />
-  <component name="class"
-    class="org.seasar.cms.classbuilder.impl.ClassS2ContainerBuilder" />
-  <component
-    class="org.seasar.cms.classbuilder.impl.ClassAssemblerProvider" />
-  <component
-    class="org.seasar.cms.classbuilder.impl.RedefinableResourceResolver" />
 </components>

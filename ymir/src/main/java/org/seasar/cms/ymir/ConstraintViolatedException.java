@@ -84,7 +84,7 @@ abstract public class ConstraintViolatedException extends Exception {
         }
 
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            StringBuffer sb = new StringBuffer();
             sb.append("key=").append(key_).append(", parameters={");
             for (int i = 0; i < parameters_.length; i++) {
                 sb.append(parameters_[i]);
