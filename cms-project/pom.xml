@@ -167,6 +167,17 @@
       </properties>
     </profile>
   </profiles>
+  <scm>
+    <connection>
+      scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/${project.artifactId}
+    </connection>
+    <developerConnection>
+      scm:svn:https://www.seasar.org/svn/sandbox/cms/trunk/${project.artifactId}
+    </developerConnection>
+    <url>
+      http://svn.seasar.org/browse/trunk/${project.artifactId}?root=sandbox.cms
+    </url>
+  </scm>
   <repositories>
     <repository>
       <id>maven.seasar.org</id>
