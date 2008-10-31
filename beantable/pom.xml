@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.seasar.cms.beantable</groupId>
   <artifactId>beantable</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.6-SNAPSHOT</version>
   <name>Beantable</name>
   <description />
   <build>
@@ -105,10 +105,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:https://www.seasar.org/svn/sandbox/cms/tags/beantable-0.0.5</connection>
-    <developerConnection>scm:svn:https://www.seasar.org/svn/sandbox/cms/tags/beantable-0.0.5</developerConnection>
-    <url>http://svn.seasar.org/browse/tags/beantable-0.0.5</url>
-  </scm>
 </project>
