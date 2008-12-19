@@ -14,6 +14,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.pluggable.ThreadContext;
 import org.seasar.cms.ymir.AnnotationHandler;
 import org.seasar.cms.ymir.AttributeContainer;
@@ -44,7 +46,6 @@ import org.seasar.cms.ymir.util.BeanUtils;
 import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
-import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 import org.seasar.kvasir.util.el.VariableResolver;
@@ -69,7 +70,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private ThreadContext threadContext_;
 
-    private final Logger logger_ = Logger.getLogger(getClass());
+    private final Log log_ = LogFactory.getLog(getClass());
 
     public DefaultRequestProcessor() {
 
@@ -220,8 +221,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
             }
         }
 
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("FINAL RESPONSE: " + response);
+        if (log_.isDebugEnabled()) {
+            log_.debug("FINAL RESPONSE: " + response);
         }
 
         if (ymir_.isUnderDevelopment()) {
@@ -370,8 +371,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
         }
 
         if (action != null) {
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("INVOKE: " + component.getClass().getName() + "#"
+            if (log_.isDebugEnabled()) {
+                log_.debug("INVOKE: " + component.getClass().getName() + "#"
                         + action);
             }
             Object returnValue;
@@ -387,8 +388,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
             }
             response = constructResponse(component, action.getReturnType(),
                     returnValue);
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("RESPONSE: " + response);
+            if (log_.isDebugEnabled()) {
+                log_.debug("RESPONSE: " + response);
             }
         }
 
@@ -400,8 +401,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
             Request request) {
         if (dispatchingByParamter) {
             Method[] methods = component.getClass().getMethods();
-            if (logger_.isDebugEnabled()) {
-                logger_
+            if (log_.isDebugEnabled()) {
+                log_
                         .debug("getActionMethod: dispatchingByRequestParameter=true. search "
                                 + component.getClass()
                                 + " for "
@@ -419,9 +420,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
                             .substring(actionName.length()));
                     if (parameterName != null
                             && request.getParameter(parameterName) != null) {
-                        if (logger_.isDebugEnabled()) {
-                            logger_.debug("getActionMethod: Found: "
-                                    + methods[i]);
+                        if (log_.isDebugEnabled()) {
+                            log_.debug("getActionMethod: Found: " + methods[i]);
                         }
                         return methods[i];
                     }
@@ -429,8 +429,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 list.add(methods[i]);
             }
             if (defaultActionName != null) {
-                if (logger_.isDebugEnabled()) {
-                    logger_.debug("getActionMethod: search "
+                if (log_.isDebugEnabled()) {
+                    log_.debug("getActionMethod: search "
                             + component.getClass() + " for "
                             + defaultActionName + " method...");
                 }
@@ -443,9 +443,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
                                         .substring(defaultActionName.length()));
                         if (parameterName != null
                                 && request.getParameter(parameterName) != null) {
-                            if (logger_.isDebugEnabled()) {
-                                logger_.debug("getActionMethod: Found: "
-                                        + method);
+                            if (log_.isDebugEnabled()) {
+                                log_.debug("getActionMethod: Found: " + method);
                             }
                             return method;
                         }
@@ -459,8 +458,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
             method = getActionMethod(component, defaultActionName);
         }
 
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("getActionMethod: Found: " + method);
+        if (log_.isDebugEnabled()) {
+            log_.debug("getActionMethod: Found: " + method);
         }
         return method;
     }
@@ -470,8 +469,8 @@ public class DefaultRequestProcessor implements RequestProcessor {
             response = constructDefaultResponse(request, component);
         }
 
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("[4]RESPONSE: " + response);
+        if (log_.isDebugEnabled()) {
+            log_.debug("[4]RESPONSE: " + response);
         }
 
         return response;

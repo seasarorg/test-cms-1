@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
@@ -24,7 +26,6 @@ import org.seasar.cms.ymir.RequestProcessor;
 import org.seasar.cms.ymir.Response;
 import org.seasar.cms.ymir.ResponseProcessor;
 import org.seasar.cms.ymir.Ymir;
-import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
@@ -42,7 +43,7 @@ public class YmirImpl implements Ymir {
 
     private ExceptionProcessor exceptionProcessor_;
 
-    private Logger logger_ = Logger.getLogger(getClass());
+    private Log log_ = LogFactory.getLog(getClass());
 
     public void setLifecycleListeners(LifecycleListener[] lifecycleListeners) {
 
@@ -76,7 +77,7 @@ public class YmirImpl implements Ymir {
 
     public void init() {
 
-        logger_.debug("Ymir initialize start");
+        log_.debug("Ymir initialize start");
 
         initializeListeners();
 
@@ -86,7 +87,7 @@ public class YmirImpl implements Ymir {
             }
         });
 
-        logger_.debug("Ymir initialize end");
+        log_.debug("Ymir initialize end");
     }
 
     void initializeListeners() {
@@ -123,12 +124,12 @@ public class YmirImpl implements Ymir {
 
     public void destroy() {
 
-        logger_.debug("Ymir destroy start");
+        log_.debug("Ymir destroy start");
 
         destroyListeners();
         requestProcessor_ = null;
 
-        logger_.debug("Ymir destroy end");
+        log_.debug("Ymir destroy end");
     }
 
     void destroyListeners() {
@@ -138,7 +139,7 @@ public class YmirImpl implements Ymir {
                 try {
                     lifecycleListeners_[i].destroy();
                 } catch (Throwable t) {
-                    logger_.error("Can't destroy lifecycleListener: "
+                    log_.error("Can't destroy lifecycleListener: "
                             + lifecycleListeners_[i], t);
                 }
             }

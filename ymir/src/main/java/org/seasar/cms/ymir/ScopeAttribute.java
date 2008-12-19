@@ -2,8 +2,9 @@ package org.seasar.cms.ymir;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.ymir.scope.Scope;
-import org.seasar.framework.log.Logger;
 import org.seasar.kvasir.util.io.IORuntimeException;
 
 public class ScopeAttribute {
@@ -16,8 +17,7 @@ public class ScopeAttribute {
 
     private Method readMethod_;
 
-    private static final Logger logger_ = Logger
-            .getLogger(ScopeAttribute.class);
+    private static final Log log_ = LogFactory.getLog(ScopeAttribute.class);
 
     public ScopeAttribute(String name, Scope scope, Method writeMethod,
             Method readMethod) {
@@ -34,7 +34,7 @@ public class ScopeAttribute {
                 writeMethod_.invoke(component, new Object[] { value });
             } catch (IllegalArgumentException ex) {
                 // 型が合わなかった場合は単に無視する。
-                logger_.warn("Can't inject scope attribute: scope=" + scope_
+                log_.warn("Can't inject scope attribute: scope=" + scope_
                         + ", attribute name=" + name_ + ", value=" + value
                         + ", write method=" + writeMethod_, ex);
             } catch (Throwable t) {

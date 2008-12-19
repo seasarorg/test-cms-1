@@ -4,11 +4,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
-import org.seasar.framework.log.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class BeanUtils {
 
-    private static final Logger logger_ = Logger.getLogger(BeanUtils.class);
+    private static final Log log_ = LogFactory.getLog(BeanUtils.class);
 
     protected BeanUtils() {
     }
@@ -27,8 +28,8 @@ public class BeanUtils {
             try {
                 beanUtilsBean.setProperty(bean, name, properties.get(name));
             } catch (Throwable t) {
-                if (logger_.isDebugEnabled()) {
-                    logger_.debug("Can't populate property '" + name + "'", t);
+                if (log_.isDebugEnabled()) {
+                    log_.debug("Can't populate property '" + name + "'", t);
                 }
             }
         }
@@ -50,8 +51,8 @@ public class BeanUtils {
                     beanUtilsBean
                             .copyProperty(bean, name, properties.get(name));
                 } catch (Throwable t) {
-                    if (logger_.isDebugEnabled()) {
-                        logger_.debug("Can't copy property '" + name + "'", t);
+                    if (log_.isDebugEnabled()) {
+                        log_.debug("Can't copy property '" + name + "'", t);
                     }
                 }
             }
