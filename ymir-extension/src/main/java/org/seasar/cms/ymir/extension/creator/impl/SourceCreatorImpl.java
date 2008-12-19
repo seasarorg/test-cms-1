@@ -38,6 +38,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.pluggable.hotdeploy.LocalHotdeployS2Container;
 import org.seasar.cms.ymir.Application;
 import org.seasar.cms.ymir.ApplicationManager;
@@ -90,7 +92,6 @@ import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.convention.NamingConvention;
-import org.seasar.framework.log.Logger;
 import org.seasar.framework.mock.servlet.MockHttpServletRequestImpl;
 import org.seasar.framework.mock.servlet.MockHttpServletResponseImpl;
 import org.seasar.framework.mock.servlet.MockServletContextImpl;
@@ -174,7 +175,7 @@ public class SourceCreatorImpl implements SourceCreator {
                     new CreateMessageAction(this)).register("createMessage",
                     new CreateMessageAction(this));
 
-    public Logger logger_ = Logger.getLogger(getClass());
+    public Log log_ = LogFactory.getLog(getClass());
 
     public Response update(Request request, Response response) {
 
@@ -458,7 +459,7 @@ public class SourceCreatorImpl implements SourceCreator {
             propertyDesc.setMode(mode);
             Class propertyType = pds[i].getPropertyType();
             if (propertyType == null) {
-                logger_.info("**** PropertyType is NULL: name=" + name);
+                log_.info("**** PropertyType is NULL: name=" + name);
                 continue;
             }
 
@@ -895,7 +896,7 @@ public class SourceCreatorImpl implements SourceCreator {
                     fis = new FileInputStream(file);
                     sourceCreatorProperties_.load(new BufferedInputStream(fis));
                 } catch (IOException ex) {
-                    logger_.error("Can't read properties: " + file);
+                    log_.error("Can't read properties: " + file);
                 } finally {
                     if (fis != null) {
                         try {
@@ -934,7 +935,7 @@ public class SourceCreatorImpl implements SourceCreator {
             prop.store(new BufferedOutputStream(fos), "ISO-8859-1");
             fos = null;
         } catch (IOException ex) {
-            logger_.error("Can't write properties: " + file);
+            log_.error("Can't write properties: " + file);
         } finally {
             if (fos != null) {
                 try {
