@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.pluggable.Configuration;
 import org.seasar.cms.pluggable.PluggableContainerFactory;
 import org.seasar.cms.pluggable.PluggableProvider;
@@ -29,7 +31,6 @@ import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.container.util.Traversal;
 import org.seasar.framework.container.util.Traversal.ComponentDefHandler;
 import org.seasar.framework.exception.EmptyRuntimeException;
-import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.DisposableUtil;
 
 public class PluggableContainerFactoryImpl implements PluggableContainerFactory {
@@ -44,7 +45,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
 
     private S2Container rootContainer_;
 
-    private Logger logger_ = Logger.getLogger(getClass());
+    private Log log_ = LogFactory.getLog(getClass());
 
     private boolean initialized_;
 
@@ -372,7 +373,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
 
         Configuration configuration = getConfiguration();
         String projectStatus = configuration.getProperty(KEY_PROJECTSTATUS);
-        logger_.info("Project status is: "
+        log_.info("Project status is: "
                 + (projectStatus != null ? projectStatus : "(UNDEFINED)"));
 
         boolean hotdeploy = PROJECTSTATUS_DEVELOP.equals(projectStatus)
@@ -380,18 +381,18 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
                         .equals(configuration
                                 .getProperty(KEY_S2CONTAINER_CLASSLOADING_DISABLEHOTDEPLOY));
         if (hotdeploy) {
-            logger_.info("Class loading strategy: HOT Deploy");
+            log_.info("Class loading strategy: HOT Deploy");
         } else {
-            logger_.info("Class loading strategy: Static");
+            log_.info("Class loading strategy: Static");
         }
         boolean dynamic = PROJECTSTATUS_DEVELOP.equals(projectStatus)
                 && !"true"
                         .equals(configuration
                                 .getProperty(KEY_S2CONTAINER_COMPONENTREGISTRATION_DISABLEDYNAMIC));
         if (dynamic) {
-            logger_.info("Component registration strategy: Dynamic");
+            log_.info("Component registration strategy: Dynamic");
         } else {
-            logger_.info("Component registration strategy: Static");
+            log_.info("Component registration strategy: Static");
         }
 
         getHotdeployBehavior().init(hotdeploy, dynamic);

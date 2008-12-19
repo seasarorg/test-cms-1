@@ -14,9 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
 import org.seasar.framework.convention.NamingConvention;
-import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.ResourceUtil;
 
@@ -37,7 +38,7 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
     private Map<String, Vector<URL>> resourcesCache_ = Collections
             .synchronizedMap(new HashMap<String, Vector<URL>>());
 
-    private static Logger logger = Logger.getLogger(HotdeployClassLoader.class);
+    private static Log log = LogFactory.getLog(HotdeployClassLoader.class);
 
     public PluggableHotdeployClassLoader(ClassLoader classLoader,
             NamingConvention namingConvention) {
@@ -127,28 +128,27 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
         Class<?> clazz = null;
         try {
             if (isTargetClass(className)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("isTargetClass(" + className + ") == true");
+                if (log.isDebugEnabled()) {
+                    log.debug("isTargetClass(" + className + ") == true");
                 }
                 clazz = findLoadedClass(className);
                 if (clazz != null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Class " + className
-                                + " is already loaded");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Class " + className + " is already loaded");
                     }
                     return clazz;
                 }
                 if (classesDirectory_ != null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Try to load class " + className
+                    if (log.isDebugEnabled()) {
+                        log.debug("Try to load class " + className
                                 + " from classes directory '"
                                 + classesDirectory_ + "'");
                     }
                     File file = new File(classesDirectory_, className.replace(
                             '.', '/').concat(".class"));
                     if (file.exists()) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Class resource has been found in '"
+                        if (log.isDebugEnabled()) {
+                            log.debug("Class resource has been found in '"
                                     + classesDirectory_ + "'");
                         }
                         try {
@@ -167,9 +167,9 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
                 InputStream is = ResourceUtil
                         .getResourceAsStreamNoException(path);
                 if (is != null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Class resource has been found as '"
-                                + path + "'");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Class resource has been found as '" + path
+                                + "'");
                     }
                     clazz = defineClass(className, is);
                     definedClass(clazz);

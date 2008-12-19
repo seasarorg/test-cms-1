@@ -1,10 +1,11 @@
 package org.seasar.cms.pluggable.aop.interceptors;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.framework.aop.interceptors.AbstractInterceptor;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
-import org.seasar.framework.log.Logger;
 
 public class TraceS2Interceptor extends AbstractInterceptor {
 
@@ -12,11 +13,11 @@ public class TraceS2Interceptor extends AbstractInterceptor {
 
     private static final String METHOD_ACQUIRE_FROM_GET_COMPONENT = "acquireFromGetComponent";
 
-    private static Logger logger = Logger.getLogger(TraceS2Interceptor.class);
+    private static Log log = LogFactory.getLog(TraceS2Interceptor.class);
 
     public Object invoke(MethodInvocation invocation) throws Throwable {
 
-        if (!isSuitable(invocation) || !logger.isDebugEnabled()) {
+        if (!isSuitable(invocation) || !log.isDebugEnabled()) {
             return invocation.proceed();
         }
 
@@ -26,7 +27,7 @@ public class TraceS2Interceptor extends AbstractInterceptor {
         StringBuffer sb = new StringBuffer("[TRACE] getComponent(");
         appendStringRepresentation(key, sb).append(") from ").append(
                 container.getPath());
-        logger.debug(sb.toString());
+        log.debug(sb.toString());
 
         Object ret = null;
         Throwable cause = null;
@@ -39,7 +40,7 @@ public class TraceS2Interceptor extends AbstractInterceptor {
                     .append(")");
             cause = t;
         }
-        logger.debug(sb.toString());
+        log.debug(sb.toString());
         if (cause == null) {
             return ret;
         }

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.pluggable.PluggableNamingConvention;
 import org.seasar.framework.container.ComponentCreator;
 import org.seasar.framework.container.ComponentDef;
@@ -18,7 +20,6 @@ import org.seasar.framework.container.hotdeploy.HotdeployClassLoader;
 import org.seasar.framework.container.impl.S2ContainerBehavior;
 import org.seasar.framework.container.impl.S2ContainerImpl;
 import org.seasar.framework.container.util.S2ContainerUtil;
-import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.ArrayUtil;
 import org.seasar.framework.util.ClassTraversal;
 import org.seasar.framework.util.ClassUtil;
@@ -55,7 +56,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
 
     private boolean dynamic_ = true;
 
-    private Logger logger_ = Logger.getLogger(getClass());
+    private Log log_ = LogFactory.getLog(getClass());
 
     public LocalHotdeployS2Container() {
         addStrategy("file", new FileSystemStrategy());
@@ -377,8 +378,8 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     void start0() {
-        if (logger_.isDebugEnabled()) {
-            logger_
+        if (log_.isDebugEnabled()) {
+            log_
                     .debug("LocalHotdeployS2Container's start0() method called: classesDirectory="
                             + classesDirectory_);
         }
@@ -390,8 +391,8 @@ public class LocalHotdeployS2Container implements ClassHandler {
             hotdeployClassLoader_.addHotdeployListener(listeners_[i]);
         }
 
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("Set HotdeployClassLoader: id="
+        if (log_.isDebugEnabled()) {
+            log_.debug("Set HotdeployClassLoader: id="
                     + System.identityHashCode(hotdeployClassLoader_)
                     + ", classDirectory=" + classesDirectory_);
         }
@@ -420,14 +421,14 @@ public class LocalHotdeployS2Container implements ClassHandler {
     }
 
     void stop0() {
-        if (logger_.isDebugEnabled()) {
-            logger_
+        if (log_.isDebugEnabled()) {
+            log_
                     .debug("LocalHotdeployS2Container's stop0() method called: objectId="
                             + System.identityHashCode(this)
                             + ", classesDirectory=" + classesDirectory_);
         }
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("Unset HotdeployClassLoader: id="
+        if (log_.isDebugEnabled()) {
+            log_.debug("Unset HotdeployClassLoader: id="
                     + System.identityHashCode(hotdeployClassLoader_));
         }
         container_.setClassLoader(originalClassLoader_);

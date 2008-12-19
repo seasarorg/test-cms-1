@@ -8,14 +8,15 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.pluggable.Configuration;
-import org.seasar.framework.log.Logger;
 
 public class ConfigurationImpl implements Configuration {
 
     private Properties properties_ = new Properties();
 
-    private Logger log_ = Logger.getLogger(getClass());
+    private Log log_ = LogFactory.getLog(getClass());
 
     public void load(String configPath) {
 

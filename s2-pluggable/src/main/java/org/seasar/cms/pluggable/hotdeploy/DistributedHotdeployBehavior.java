@@ -1,11 +1,12 @@
 package org.seasar.cms.pluggable.hotdeploy;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.cms.pluggable.SingletonPluggableContainerFactory;
 import org.seasar.cms.pluggable.util.HotdeployEventUtils;
 import org.seasar.framework.container.ComponentDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.impl.S2ContainerBehavior.DefaultProvider;
-import org.seasar.framework.log.Logger;
 import org.seasar.framework.util.DisposableUtil;
 
 public class DistributedHotdeployBehavior extends DefaultProvider {
@@ -17,7 +18,7 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
 
     private int counter_ = 0;
 
-    private Logger logger_ = Logger.getLogger(getClass());
+    private Log log_ = LogFactory.getLog(getClass());
 
     public void init(boolean hotdeploy, boolean dynamic) {
         hotdeploy_ = hotdeploy;
@@ -70,23 +71,23 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
     }
 
     public synchronized void start() {
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("HotdeployBehavior's start() method called");
+        if (log_.isDebugEnabled()) {
+            log_.debug("HotdeployBehavior's start() method called");
         }
         if (!hotdeploy_ && !dynamic_) {
             return;
         }
 
         if (counter_++ == 0) {
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("HOTDEPLOY BEHAVIOR STARTING...");
+            if (log_.isDebugEnabled()) {
+                log_.debug("HOTDEPLOY BEHAVIOR STARTING...");
             }
             for (int i = 0; i < localHotdeployS2Containers_.length; i++) {
                 localHotdeployS2Containers_[i].start();
             }
             HotdeployEventUtils.start();
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("HOTDEPLOY BEHAVIOR STARTED");
+            if (log_.isDebugEnabled()) {
+                log_.debug("HOTDEPLOY BEHAVIOR STARTED");
             }
         }
     }
@@ -96,16 +97,16 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
     }
 
     public synchronized void stop() {
-        if (logger_.isDebugEnabled()) {
-            logger_.debug("HotdeployBehavior's stop() method called");
+        if (log_.isDebugEnabled()) {
+            log_.debug("HotdeployBehavior's stop() method called");
         }
         if (!hotdeploy_ && !dynamic_) {
             return;
         }
 
         if (--counter_ == 0) {
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("HOTDEPLOY BEHAVIOR STOPPING...");
+            if (log_.isDebugEnabled()) {
+                log_.debug("HOTDEPLOY BEHAVIOR STOPPING...");
             }
             HotdeployEventUtils.stop();
             DisposableUtil.dispose();
@@ -114,8 +115,8 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
                 localHotdeployS2Containers_[i].stop();
             }
 
-            if (logger_.isDebugEnabled()) {
-                logger_.debug("HOTDEPLOY BEHAVIOR STOPPED");
+            if (log_.isDebugEnabled()) {
+                log_.debug("HOTDEPLOY BEHAVIOR STOPPED");
             }
         } else if (counter_ < 0) {
             throw new IllegalStateException("Unbalanced stop() calling");
