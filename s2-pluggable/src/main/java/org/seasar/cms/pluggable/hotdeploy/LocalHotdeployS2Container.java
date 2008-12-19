@@ -56,7 +56,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
 
     private boolean dynamic_ = true;
 
-    private Log log_ = LogFactory.getLog(getClass());
+    private Log log_ = LogFactory.getLog(LocalHotdeployS2Container.class);
 
     public LocalHotdeployS2Container() {
         addStrategy("file", new FileSystemStrategy());

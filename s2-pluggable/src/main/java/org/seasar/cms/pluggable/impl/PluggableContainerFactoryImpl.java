@@ -45,7 +45,7 @@ public class PluggableContainerFactoryImpl implements PluggableContainerFactory 
 
     private S2Container rootContainer_;
 
-    private Log log_ = LogFactory.getLog(getClass());
+    private Log log_ = LogFactory.getLog(PluggableContainerFactoryImpl.class);
 
     private boolean initialized_;
 

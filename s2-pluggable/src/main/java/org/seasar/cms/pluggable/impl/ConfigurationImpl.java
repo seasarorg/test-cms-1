@@ -16,7 +16,7 @@ public class ConfigurationImpl implements Configuration {
 
     private Properties properties_ = new Properties();
 
-    private Log log_ = LogFactory.getLog(getClass());
+    private Log log_ = LogFactory.getLog(ConfigurationImpl.class);
 
     public void load(String configPath) {
 

@@ -18,7 +18,7 @@ public class DistributedHotdeployBehavior extends DefaultProvider {
 
     private int counter_ = 0;
 
-    private Log log_ = LogFactory.getLog(getClass());
+    private Log log_ = LogFactory.getLog(DistributedHotdeployBehavior.class);
 
     public void init(boolean hotdeploy, boolean dynamic) {
         hotdeploy_ = hotdeploy;
