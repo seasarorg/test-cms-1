@@ -38,7 +38,8 @@ public class PluggableHotdeployClassLoader extends HotdeployClassLoader {
     private Map<String, Vector<URL>> resourcesCache_ = Collections
             .synchronizedMap(new HashMap<String, Vector<URL>>());
 
-    private static Log log = LogFactory.getLog(HotdeployClassLoader.class);
+    private static Log log = LogFactory
+            .getLog(PluggableHotdeployClassLoader.class);
 
     public PluggableHotdeployClassLoader(ClassLoader classLoader,
             NamingConvention namingConvention) {
