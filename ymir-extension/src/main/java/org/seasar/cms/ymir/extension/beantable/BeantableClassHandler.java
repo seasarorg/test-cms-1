@@ -12,7 +12,7 @@ import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
 public class BeantableClassHandler implements ClassHandler {
 
-    private Log log_ = LogFactory.getLog(getClass());
+    private Log log_ = LogFactory.getLog(BeantableClassHandler.class);
 
     private S2Container container_;
 

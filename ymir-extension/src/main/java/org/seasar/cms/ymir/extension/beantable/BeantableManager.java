@@ -33,7 +33,7 @@ public class BeantableManager implements LifecycleListener, HotdeployListener {
 
     private ClassTraverserBag[] traverserBags_;
 
-    private Log log_ = LogFactory.getLog(getClass());
+    private Log log_ = LogFactory.getLog(BeantableManager.class);
 
     /*
      * LifecycleListener

@@ -175,7 +175,7 @@ public class SourceCreatorImpl implements SourceCreator {
                     new CreateMessageAction(this)).register("createMessage",
                     new CreateMessageAction(this));
 
-    public Log log_ = LogFactory.getLog(getClass());
+    public Log log_ = LogFactory.getLog(SourceCreatorImpl.class);
 
     public Response update(Request request, Response response) {
 
