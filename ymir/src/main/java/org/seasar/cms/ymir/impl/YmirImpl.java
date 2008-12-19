@@ -43,7 +43,7 @@ public class YmirImpl implements Ymir {
 
     private ExceptionProcessor exceptionProcessor_;
 
-    private Log log_ = LogFactory.getLog(getClass());
+    private Log log_ = LogFactory.getLog(YmirImpl.class);
 
     public void setLifecycleListeners(LifecycleListener[] lifecycleListeners) {
 

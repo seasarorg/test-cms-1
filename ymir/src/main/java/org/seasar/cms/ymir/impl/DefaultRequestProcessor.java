@@ -70,7 +70,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
 
     private ThreadContext threadContext_;
 
-    private final Log log_ = LogFactory.getLog(getClass());
+    private final Log log_ = LogFactory.getLog(DefaultRequestProcessor.class);
 
     public DefaultRequestProcessor() {
 
