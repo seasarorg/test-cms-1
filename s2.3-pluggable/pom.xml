@@ -1,7 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <relativePath>../cms-project/pom.xml</relativePath>
@@ -11,7 +8,7 @@
   </parent>
   <groupId>org.seasar.cms.s2-pluggable</groupId>
   <artifactId>s2.3-pluggable</artifactId>
-  <version>0.0.10-SNAPSHOT</version>
+  <version>0.0.10</version>
   <name>S2.3-Pluggable</name>
   <description>
     S2.3-Pluggable is sub-set of S2-Pluggable for Seasar 2.3.
@@ -89,4 +86,10 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:https://www.seasar.org/svn/sandbox/cms/tags/s2.3-pluggable/s2.3-pluggable-0.0.10</connection>
+    <developerConnection>scm:svn:https://www.seasar.org/svn/sandbox/cms/tags/s2.3-pluggable/s2.3-pluggable-0.0.10</developerConnection>
+    <url>http://svn.seasar.org/browse/tags/s2.3-pluggable/s2.3-pluggable-0.0.10?root=sandbox.cms/s2.3-pluggable</url>
+  </scm>
 </project>
