@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.seasar.framework.container.ComponentDef;
+import org.seasar.framework.container.MetaDef;
 import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.AbstractS2ContainerBuilder;
 import org.seasar.framework.exception.IORuntimeException;
@@ -58,7 +59,9 @@ public class S2ContainerBuilderUtils {
 
         size = merged.getMetaDefSize();
         for (int i = 0; i < size; i++) {
-            container.addMetaDef(merged.getMetaDef(i));
+            MetaDef metaDef = merged.getMetaDef(i);
+            metaDef.setContainer(container);
+            container.addMetaDef(metaDef);
         }
 
         size = merged.getComponentDefSize();
