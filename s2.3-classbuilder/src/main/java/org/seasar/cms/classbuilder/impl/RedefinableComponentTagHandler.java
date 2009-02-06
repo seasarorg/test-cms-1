@@ -46,12 +46,15 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler {
         if (context.peek() instanceof S2Container) {
             S2Container container = (S2Container) context.peek();
             if (componentDef.getComponentName() != null) {
-                ComponentDef[] redefined = redefine(componentDef,
-                        (String) context.getParameter("path"),
+                S2Container redefined = redefine(componentDef, (String) context
+                        .getParameter("path"),
                         (RedefinableXmlS2ContainerBuilder) context
                                 .getParameter("builder"));
-                for (int i = 0; i < redefined.length; i++) {
-                    container.register(redefined[i]);
+                if (redefined != null) {
+                    S2ContainerBuilderUtils
+                            .mergeContainer(container, redefined);
+                } else {
+                    container.register(componentDef);
                 }
             } else {
                 container.register(componentDef);
@@ -62,13 +65,13 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler {
         }
     }
 
-    ComponentDef[] redefine(ComponentDef componentDef, String path,
+    S2Container redefine(ComponentDef componentDef, String path,
             RedefinableXmlS2ContainerBuilder builder) {
         int delimiter = path.lastIndexOf(DELIMITER);
         int slash = path.lastIndexOf('/');
         if (delimiter >= 0 && delimiter > slash) {
             // リソース名に「+」が含まれている場合は特別な処理を行なわない。
-            return new ComponentDef[] { componentDef };
+            return null;
         }
 
         String name = componentDef.getComponentName();
@@ -81,18 +84,10 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler {
             }
         }
         if (diconPath == null) {
-            return new ComponentDef[] { componentDef };
+            return null;
         }
 
-        S2Container container = S2ContainerFactory.create(diconPath);
-        int size = container.getComponentDefSize();
-        ComponentDef[] redefined = new ComponentDef[size];
-        for (int i = 0; i < size; i++) {
-            redefined[i] = container.getComponentDef(i);
-            redefined[i].setContainer(componentDef.getContainer());
-        }
-
-        return redefined;
+        return S2ContainerFactory.create(diconPath);
     }
 
     protected String[] constructRedifinitionDiconPaths(String path, String name) {

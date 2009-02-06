@@ -168,4 +168,48 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase {
         assertEquals("original", actual[idx++].getName());
         assertEquals("suffix", actual[idx++].getName());
     }
+
+    public void test_コンポーネントの差し替え時にincludeタグも考慮されること() throws Exception {
+        include("test11.dicon");
+
+        Hoe actual = (Hoe) getContainer().getComponent(Hoe.class);
+
+        assertNotNull(actual.getFuga());
+
+        boolean include1Found = false;
+        boolean include2Found = false;
+        S2Container container = getContainer().getChild(0);
+        for (int i = 0; i < container.getChildSize(); i++) {
+            S2Container child = container.getChild(i);
+            if ("test11Include1.dicon".equals(child.getPath())) {
+                include1Found = true;
+            } else if ("test11Include2.dicon".equals(child.getPath())) {
+                include2Found = true;
+            }
+        }
+        assertTrue(include1Found);
+        assertTrue(include2Found);
+    }
+
+    public void test_コンポーネントの追加にincludeタグも追加されること() throws Exception {
+        include("test12.dicon");
+
+        Hoe actual = (Hoe) getContainer().getComponent(Hoe.class);
+
+        assertNotNull(actual.getFuga());
+
+        boolean include1Found = false;
+        boolean include2Found = false;
+        S2Container container = getContainer().getChild(0);
+        for (int i = 0; i < container.getChildSize(); i++) {
+            S2Container child = container.getChild(i);
+            if ("test12Include1.dicon".equals(child.getPath())) {
+                include1Found = true;
+            } else if ("test12Include2.dicon".equals(child.getPath())) {
+                include2Found = true;
+            }
+        }
+        assertTrue(include1Found);
+        assertTrue(include2Found);
+    }
 }
