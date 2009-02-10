@@ -236,5 +236,6 @@
     <module>../ymir</module>
     <module>../ymir-extension</module>
     <module>../executable-war</module>
+    <module>../mailsender</module>
   </modules>
 </project>
