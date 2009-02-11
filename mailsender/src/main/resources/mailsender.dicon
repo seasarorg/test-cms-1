@@ -2,23 +2,21 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
   "http://www.seasar.org/dtd/components24.dtd">
 <components>
-  <component name="mailsenderInterceptor"
-    class="org.seasar.cms.mailsender.interceptor.MailsenderInterceptor" />
+  <component name="mailsenderInterceptor" class="org.seasar.cms.mailsender.interceptor.MailsenderInterceptor" />
 
-  <component name="mailsender"
-    class="org.seasar.cms.mailsender.impl.MailsenderImpl" />
+  <component name="mailsender" class="org.seasar.cms.mailsender.impl.MailsenderImpl" />
 
-  <component name="sendMail"
-    class="org.seasar.cms.mailsender.impl.MockSendMail" />
+  <component name="sendMail" class="org.seasar.cms.mailsender.impl.MockSendMail" />
 
-  <component name="templateEvaluator"
-    class="org.seasar.cms.mailsender.impl.FreemarkerTemplateEvaluator" />
-  <component name="configuration"
-    class="freemarker.template.Configuration">
+  <component name="templateEvaluator" class="org.seasar.cms.mailsender.impl.FreemarkerTemplateEvaluator" />
+  <component name="configuration" class="freemarker.template.Configuration">
     <property name="defaultEncoding">"UTF-8"</property>
+    <property name="allSharedVariables" bindingType="may" />
+    <property name="objectWrapper" bindingType="may" />
+    <property name="templateExceptionHandler" bindingType="may" />
+    <property name="cacheStorage" bindingType="may" />
   </component>
-  <component name="templateLoader"
-    class="freemarker.cache.ClassTemplateLoader">
+  <component name="templateLoader" class="freemarker.cache.ClassTemplateLoader">
     <arg>@org.seasar.cms.mailsender.Mailsender@class</arg>
     <arg>"/"</arg>
   </component>
