@@ -23,7 +23,7 @@ public class MockSendMail implements SendMail {
     private static final String LS = System.getProperty("line.separator");
 
     public void send(Mail mail) throws MailException {
-        log.info(LS + "********* Start sending mail ********");
+        log.info("********* Start sending mail ********");
         log.info(LS + render(mail));
         log.info("********* End sending mail ********" + LS);
     }
@@ -35,7 +35,7 @@ public class MockSendMail implements SendMail {
     }
 
     public void send(MimeMessage mimeMessage) throws MailException {
-        log.info(LS + "********* Start sending mail (MimeMessage) ********");
+        log.info("********* Start sending mail (MimeMessage) ********");
         log.info(LS + render(mimeMessage));
         log.info("********* End sending mail (MimeMessage) ********" + LS);
     }
