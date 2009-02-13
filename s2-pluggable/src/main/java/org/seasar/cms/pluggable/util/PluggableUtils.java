@@ -2,6 +2,7 @@ package org.seasar.cms.pluggable.util;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,8 @@ public class PluggableUtils {
 
     private static final String PATH_PREFIX = "unique:";
 
+    private static final char COLON = ':';
+
     private static int id;
 
     private PluggableUtils() {
@@ -39,20 +42,28 @@ public class PluggableUtils {
 
     public static URL[] getResourceURLs(String path, ClassLoader classLoader) {
 
-        if (classLoader == null) {
-            classLoader = PluggableUtils.class.getClassLoader();
+        if (path.indexOf(COLON) >= 0) {
+            try {
+                return new URL[] { new URL(path) };
+            } catch (MalformedURLException ex) {
+                return new URL[0];
+            }
+        } else {
+            if (classLoader == null) {
+                classLoader = PluggableUtils.class.getClassLoader();
+            }
+            Enumeration<URL> enm;
+            try {
+                enm = classLoader.getResources(path);
+            } catch (IOException ex) {
+                throw new IORuntimeException(ex);
+            }
+            Set<URL> urlSet = new LinkedHashSet<URL>();
+            for (; enm.hasMoreElements();) {
+                urlSet.add(enm.nextElement());
+            }
+            return urlSet.toArray(new URL[0]);
         }
-        Enumeration<URL> enm;
-        try {
-            enm = classLoader.getResources(path);
-        } catch (IOException ex) {
-            throw new IORuntimeException(ex);
-        }
-        Set<URL> urlSet = new LinkedHashSet<URL>();
-        for (; enm.hasMoreElements();) {
-            urlSet.add(enm.nextElement());
-        }
-        return urlSet.toArray(new URL[0]);
     }
 
     public static Object[] findAscendantComponents(S2Container container,
