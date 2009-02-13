@@ -22,7 +22,13 @@ public class MockSendMail implements SendMail {
 
     private static final String LS = System.getProperty("line.separator");
 
+    private List<Mail> mailList = new ArrayList<Mail>();
+
+    private List<MimeMessage> mimeMessageList = new ArrayList<MimeMessage>();
+
     public void send(Mail mail) throws MailException {
+        mailList.add(mail);
+
         log.info("********* Start sending mail ********");
         log.info(LS + render(mail));
         log.info("********* End sending mail ********" + LS);
@@ -35,6 +41,8 @@ public class MockSendMail implements SendMail {
     }
 
     public void send(MimeMessage mimeMessage) throws MailException {
+        mimeMessageList.add(mimeMessage);
+
         log.info("********* Start sending mail (MimeMessage) ********");
         log.info(LS + render(mimeMessage));
         log.info("********* End sending mail (MimeMessage) ********" + LS);
@@ -44,6 +52,27 @@ public class MockSendMail implements SendMail {
         for (MimeMessage mimeMessage : mimeMessages) {
             send(mimeMessage);
         }
+    }
+
+    public Mail[] getMails() {
+        return mailList.toArray(new Mail[0]);
+    }
+
+    protected List<Mail> getMailList() {
+        return mailList;
+    }
+
+    public MimeMessage[] getMimeMessages() {
+        return mimeMessageList.toArray(new MimeMessage[0]);
+    }
+
+    protected List<MimeMessage> getMimeMessageList() {
+        return mimeMessageList;
+    }
+
+    public void clear() {
+        mailList.clear();
+        mimeMessageList.clear();
     }
 
     protected String render(Mail mail) {
