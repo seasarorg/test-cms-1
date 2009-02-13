@@ -1,6 +1,10 @@
 package org.seasar.cms.pluggable.impl;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.List;
 
@@ -170,6 +174,76 @@ public class PluggableContainerFactoryImplTest extends TestCase {
                 '.', '/')
                 + "_testIntegrate9.dicon", new S2Container[0]);
         assertTrue("include先のexpandも展開されること", actual
+                .hasComponentDef(List.class));
+    }
+
+    public void testIntegrate10() throws Exception {
+
+        target_.prepareForContainer();
+
+        File buildDir = ResourceUtil.getBuildDir(getClass());
+        File dicon = new File(buildDir, "testIntegrate10.dicon");
+        dicon.deleteOnExit();
+
+        File tempFile = File.createTempFile("pluggable", ".dicon");
+        tempFile.deleteOnExit();
+
+        OutputStream os = new FileOutputStream(dicon);
+        try {
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os,
+                    "UTF-8"));
+            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            bw.newLine();
+            bw.write("<!DOCTYPE components"
+                    + " PUBLIC \"-//SEASAR//DTD S2Container 2.4//EN\"");
+            bw.newLine();
+            bw.write("\"http://www.seasar.org/dtd/components24.dtd\">");
+            bw.newLine();
+            bw.write("<components>");
+            bw.newLine();
+            bw.write("<meta name=\"expand\">\"");
+            bw.write(tempFile.toURI().toURL().toExternalForm());
+            bw.write("\"</meta>");
+            bw.newLine();
+            bw.write("</components>");
+            bw.newLine();
+            bw.close();
+            os = null;
+        } finally {
+            if (os != null) {
+                os.close();
+            }
+        }
+
+        os = new FileOutputStream(tempFile);
+        try {
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os,
+                    "UTF-8"));
+            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            bw.newLine();
+            bw.write("<!DOCTYPE components"
+                    + " PUBLIC \"-//SEASAR//DTD S2Container 2.4//EN\"");
+            bw.newLine();
+            bw.write("\"http://www.seasar.org/dtd/components24.dtd\">");
+            bw.newLine();
+            bw.write("<components>");
+            bw.newLine();
+            bw.write("<component name=\"list\""
+                    + " class=\"java.util.ArrayList\" />");
+            bw.newLine();
+            bw.write("</components>");
+            bw.newLine();
+            bw.close();
+            os = null;
+        } finally {
+            if (os != null) {
+                os.close();
+            }
+        }
+
+        S2Container actual = target_.integrate("testIntegrate10.dicon",
+                new S2Container[0]);
+        assertTrue("expandにURL形式のパスを指定しても正しく解釈されること", actual
                 .hasComponentDef(List.class));
     }
 
