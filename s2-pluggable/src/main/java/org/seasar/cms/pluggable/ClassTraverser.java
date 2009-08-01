@@ -13,6 +13,7 @@ import org.seasar.framework.container.autoregister.ClassPattern;
 import org.seasar.framework.util.ClassTraversal;
 import org.seasar.framework.util.JarFileUtil;
 import org.seasar.framework.util.ResourceUtil;
+import org.seasar.framework.util.URLUtil;
 import org.seasar.framework.util.ClassTraversal.ClassHandler;
 
 public class ClassTraverser {
@@ -31,6 +32,7 @@ public class ClassTraverser {
         strategies.put("file", new FileSystemStrategy());
         strategies.put("jar", new JarFileStrategy());
         strategies.put("zip", new ZipFileStrategy());
+        strategies.put("code-source", new CodeSourceFileStrategy());
     }
 
     public int getClassPatternSize() {
@@ -196,6 +198,23 @@ public class ClassTraverser {
                     .substring("zip:".length(), pos);
             return JarFileUtil.create(new File(jarFileName));
         }
+    }
+
+    /**
+     * OC4J固有の<code>code-source:</code>プロトコルで表現されるURLをサポートするストラテジです。
+     */
+    protected class CodeSourceFileStrategy implements Strategy {
+
+        public void process(Class<?> referenceClass, URL url) {
+            final JarFile jarFile = createJarFile(url);
+            ClassTraversal.forEach(jarFile, classHandler);
+        }
+
+        protected JarFile createJarFile(final URL url) {
+            final URL jarUrl = URLUtil.create("jar:file:" + url.getPath());
+            return JarFileUtil.toJarFile(jarUrl);
+        }
+
     }
 
     class FilteredClassHandler implements ClassHandler {
