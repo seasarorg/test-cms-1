@@ -23,6 +23,10 @@ public class S2ContainerBuilderUtils {
 
     private static final String PREFIX_FILE = "file:";
 
+    public static final String PREFIX_CODE_SOURCE = "code-source:";
+
+    public static final String SUFFIX_CODE_SOURCE = "!/";
+
     private static final char COLON = ':';
 
     protected S2ContainerBuilderUtils() {
@@ -112,6 +116,13 @@ public class S2ContainerBuilderUtils {
                 if (cl.getResource(resourcePath) != null) {
                     return resourcePath;
                 }
+            }
+        } else if (path.startsWith(PREFIX_CODE_SOURCE)) {
+            int idx = path.indexOf(SUFFIX_CODE_SOURCE);
+            if (idx >= 0) {
+                return path.substring(idx + SUFFIX_CODE_SOURCE.length());
+            } else {
+                return null;
             }
         }
         return null;
