@@ -14,6 +14,7 @@ import org.seasar.cms.mailsender.InconsistencyRuntimeException;
 import org.seasar.cms.mailsender.Mailsender;
 import org.seasar.cms.mailsender.TemplateEvaluator;
 import org.seasar.cms.mailsender.annotation.BodyTemplate;
+import org.seasar.cms.mailsender.annotation.Subject;
 import org.seasar.framework.aop.interceptors.AbstractInterceptor;
 import org.seasar.framework.container.annotation.tiger.Binding;
 import org.seasar.framework.container.annotation.tiger.BindingType;
@@ -149,6 +150,47 @@ public class MailsenderInterceptor extends AbstractInterceptor {
         if (mailSpecified && mimeMessageSpecified) {
             throw new InconsistencyRuntimeException(
                     "Both Mail and MimeMessage are specified");
+        }
+
+        Subject subject = method.getAnnotation(Subject.class);
+        if (subject != null) {
+            if (multipleMailSpecified) {
+                throw new InconsistencyRuntimeException(
+                        "@Subject exists despite that multiple Mail parameters are specified");
+            } else if (mailSpecified) {
+                if (mailList.size() == 1) {
+                    Mail mail = mailList.get(0);
+                    String sbj;
+                    if (subject.template().length() > 0) {
+                        sbj = templateEvaluator.evaluateTemple(configuration,
+                                constructTemplatePath(method, subject
+                                        .template()), root);
+                    } else {
+                        sbj = subject.value();
+                    }
+                    mail.setSubject(sbj);
+                } else if (mailList.size() == 0) {
+                    ;
+                } else {
+                    throw new RuntimeException(
+                            "Logic error. Please contact Mailsender's committer");
+                }
+            } else if (mimeMessageSpecified) {
+                throw new InconsistencyRuntimeException(
+                        "@Subject exists despite that MimeMessage object is specified");
+            } else {
+                if (method.getReturnType() != String.class) {
+                    throw new InconsistencyRuntimeException(
+                            "@Subject exists, no Mail object is specified, but return type is not String");
+                }
+                if (subject.template().length() > 0) {
+                    return templateEvaluator.evaluateTemple(configuration,
+                            constructTemplatePath(method, subject.template()),
+                            root);
+                } else {
+                    return subject.value();
+                }
+            }
         }
 
         BodyTemplate bodyTemplate = method.getAnnotation(BodyTemplate.class);

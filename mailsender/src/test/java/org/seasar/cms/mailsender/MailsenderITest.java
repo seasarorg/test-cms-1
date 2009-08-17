@@ -127,19 +127,20 @@ public class MailsenderITest extends S2TestCase {
 
         getTarget().sendToCustomer(new Mail(), hoeDto, cfg);
 
+        assertEquals("件名", getHoeSendMail().getMails()[0].getSubject());
         assertEquals(expected("test6_expected.txt"), getHoeSendMail()
                 .getMails()[0].getText());
     }
 
-    public void test7_テンプレートを評価した結果がボディであるようなメールが正しく送信されること() throws Exception {
+    public void test7_テンプレートを評価した結果が件名・ボディであるようなメールが正しく送信されること()
+            throws Exception {
         HoeDto hoeDto = new HoeDto();
         hoeDto.setMessage("お客");
         hoeDto.setDate(new Date(0L));
 
         getTarget().sendToCustomer(new Mail(), hoeDto);
 
-        assertEquals(expected("test7_expected.txt"), getHoeSendMail()
-                .getMails()[0].getText());
+        assertEquals("件名：お客", getHoeSendMail().getMails()[0].getSubject());
     }
 
     public void test8_複数のメールが正しく送信できること() throws Exception {
@@ -154,5 +155,12 @@ public class MailsenderITest extends S2TestCase {
         int idx = 0;
         assertSame(mail1, actual[idx++]);
         assertSame(mail2, actual[idx++]);
+    }
+
+    public void test9_件名のテンプレートを指定した場合に正しく件名が設定されること() throws Exception {
+        HoeDto hoeDto = new HoeDto();
+        hoeDto.setMessage("メッセージ");
+
+        assertEquals("件名：メッセージ", getTarget().evaluateSubject(hoeDto));
     }
 }

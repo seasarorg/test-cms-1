@@ -3,6 +3,7 @@ package org.seasar.cms.mailsender;
 import java.util.List;
 
 import org.seasar.cms.mailsender.annotation.BodyTemplate;
+import org.seasar.cms.mailsender.annotation.Subject;
 
 import com.ozacc.mail.Mail;
 
@@ -19,9 +20,11 @@ abstract public class HoeMailsender {
     public void send() {
     }
 
+    @Subject(template = "subject.ftl")
     @BodyTemplate("customer.ftl")
     abstract public void sendToCustomer(Mail mail, HoeDto dto);
 
+    @Subject("件名")
     @BodyTemplate("customer.ftl")
     abstract public void sendToCustomer(Mail mail, HoeDto dto,
             Configuration configuration);
@@ -30,4 +33,7 @@ abstract public class HoeMailsender {
     abstract public String evaluateBody(HoeDto dto);
 
     abstract public void send(Mail mail1, Mail[] mails, List<Mail> mailList);
+
+    @Subject(template = "subject.ftl")
+    abstract public String evaluateSubject(HoeDto dto);
 }
