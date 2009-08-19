@@ -127,13 +127,11 @@ public class MailsenderITest extends S2TestCase {
 
         getTarget().sendToCustomer(new Mail(), hoeDto, cfg);
 
-        assertEquals("件名", getHoeSendMail().getMails()[0].getSubject());
         assertEquals(expected("test6_expected.txt"), getHoeSendMail()
                 .getMails()[0].getText());
     }
 
-    public void test7_テンプレートを評価した結果が件名・ボディであるようなメールが正しく送信されること()
-            throws Exception {
+    public void test7_件名・ボディをテンプレートから正しく構築できること() throws Exception {
         HoeDto hoeDto = new HoeDto();
         hoeDto.setMessage("お客");
         hoeDto.setDate(new Date(0L));
@@ -157,10 +155,26 @@ public class MailsenderITest extends S2TestCase {
         assertSame(mail2, actual[idx++]);
     }
 
-    public void test9_件名のテンプレートを指定した場合に正しく件名が設定されること() throws Exception {
+    public void test9_件名・ボディが既に指定されている場合はそれが使われること() throws Exception {
         HoeDto hoeDto = new HoeDto();
-        hoeDto.setMessage("メッセージ");
+        hoeDto.setMessage("お客");
+        hoeDto.setDate(new Date(0L));
 
-        assertEquals("件名：メッセージ", getTarget().evaluateSubject(hoeDto));
+        Mail mail = new Mail();
+        mail.setSubject("題名");
+        mail.setText("ボディ");
+        getTarget().sendToCustomer(mail, hoeDto);
+
+        assertEquals("題名", getHoeSendMail().getMails()[0].getSubject());
+        assertEquals("ボディ", getHoeSendMail().getMails()[0].getText());
+    }
+
+    public void test10_Mailオブジェクトが引数になく返り値がStringでSubjectアノテーションが付与されている場合は単にテンプレートを評価すること()
+            throws Exception {
+        HoeDto hoeDto = new HoeDto();
+        hoeDto.setMessage("OK");
+        hoeDto.setDate(new Date(0L));
+
+        assertEquals("評価されました：OK", getTarget().evaluateSubject(hoeDto));
     }
 }

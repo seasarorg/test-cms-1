@@ -160,15 +160,13 @@ public class MailsenderInterceptor extends AbstractInterceptor {
             } else if (mailSpecified) {
                 if (mailList.size() == 1) {
                     Mail mail = mailList.get(0);
-                    String sbj;
-                    if (subject.template().length() > 0) {
-                        sbj = templateEvaluator.evaluateTemple(configuration,
-                                constructTemplatePath(method, subject
-                                        .template()), root);
-                    } else {
-                        sbj = subject.value();
+                    // Mail#getSubject()は、subjectフィールドがnullでも空文字列を返すようなので…。
+                    if (mail.getSubject() == null
+                            || mail.getSubject().length() == 0) {
+                        mail.setSubject(templateEvaluator
+                                .evaluateStringTemplate(configuration, subject
+                                        .value(), root));
                     }
-                    mail.setSubject(sbj);
                 } else if (mailList.size() == 0) {
                     ;
                 } else {
@@ -183,13 +181,8 @@ public class MailsenderInterceptor extends AbstractInterceptor {
                     throw new InconsistencyRuntimeException(
                             "@Subject exists, no Mail object is specified, but return type is not String");
                 }
-                if (subject.template().length() > 0) {
-                    return templateEvaluator.evaluateTemple(configuration,
-                            constructTemplatePath(method, subject.template()),
-                            root);
-                } else {
-                    return subject.value();
-                }
+                return templateEvaluator.evaluateStringTemplate(configuration,
+                        subject.value(), root);
             }
         }
 
@@ -201,9 +194,13 @@ public class MailsenderInterceptor extends AbstractInterceptor {
             } else if (mailSpecified) {
                 if (mailList.size() == 1) {
                     Mail mail = mailList.get(0);
-                    mail.setText(templateEvaluator.evaluateTemple(
-                            configuration, constructTemplatePath(method,
-                                    bodyTemplate.value()), root));
+                    // Mail#getText()は、textフィールドがnullでも空文字列を返すようなので…。
+                    if (mail.getText() == null || mail.getText().length() == 0) {
+                        mail.setText(templateEvaluator
+                                .evaluateResourceTemplate(configuration,
+                                        constructTemplatePath(method,
+                                                bodyTemplate.value()), root));
+                    }
                     mailsender.send(mail);
                 } else if (mailList.size() == 0) {
                     ;
@@ -219,9 +216,9 @@ public class MailsenderInterceptor extends AbstractInterceptor {
                     throw new InconsistencyRuntimeException(
                             "@BodyTemplate exists, no Mail object is specified, but return type is not String");
                 }
-                return templateEvaluator.evaluateTemple(configuration,
-                        constructTemplatePath(method, bodyTemplate.value()),
-                        root);
+                return templateEvaluator.evaluateResourceTemplate(
+                        configuration, constructTemplatePath(method,
+                                bodyTemplate.value()), root);
             }
         } else {
             if (mailSpecified) {

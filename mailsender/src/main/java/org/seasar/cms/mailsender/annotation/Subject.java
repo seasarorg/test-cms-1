@@ -16,21 +16,10 @@ import java.lang.annotation.Target;
 public @interface Subject {
     /**
      * 件名です。
-     * <p>{@link #value()}か{@link #template()}か
-     * どちらか一方は指定する必要があります。
+     * <p>指定された文字列はテンプレートとして解釈されます。
      * </p>
      * 
      * @return 件名
      */
-    String value() default "";
-
-    /**
-     * 件名を構築するためのテンプレート名です。
-     * <p>{@link #value()}か{@link #template()}か
-     * どちらか一方は指定する必要があります。
-     * </p>
-     * 
-     * @return 件名を構築するためのテンプレート名
-     */
-    String template() default "";
+    String value();
 }

@@ -20,11 +20,10 @@ abstract public class HoeMailsender {
     public void send() {
     }
 
-    @Subject(template = "subject.ftl")
+    @Subject("件名：${message}")
     @BodyTemplate("customer.ftl")
     abstract public void sendToCustomer(Mail mail, HoeDto dto);
 
-    @Subject("件名")
     @BodyTemplate("customer.ftl")
     abstract public void sendToCustomer(Mail mail, HoeDto dto,
             Configuration configuration);
@@ -34,6 +33,6 @@ abstract public class HoeMailsender {
 
     abstract public void send(Mail mail1, Mail[] mails, List<Mail> mailList);
 
-    @Subject(template = "subject.ftl")
+    @Subject("評価されました：${message}")
     abstract public String evaluateSubject(HoeDto dto);
 }
