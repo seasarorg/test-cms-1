@@ -48,10 +48,11 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler {
         if (context.peek() instanceof S2Container) {
             S2Container container = (S2Container) context.peek();
             if (componentDef.getComponentName() != null) {
-                S2Container redefined = redefine(componentDef, (String) context
-                        .getParameter("path"),
+                S2Container redefined = redefine(
+                        componentDef,
+                        (String) context.getParameter("path"),
                         (RedefinableXmlS2ContainerBuilder) context
-                                .getParameter("builder"));
+                                .getParameter(RedefinableXmlS2ContainerBuilder.PARAMETER_BUILDER));
                 if (redefined != null) {
                     S2ContainerBuilderUtils
                             .mergeContainer(container, redefined);
