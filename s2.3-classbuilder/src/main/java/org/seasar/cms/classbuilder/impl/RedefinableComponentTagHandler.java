@@ -1,6 +1,8 @@
 package org.seasar.cms.classbuilder.impl;
 
 import static org.seasar.cms.classbuilder.impl.RedefinableXmlS2ContainerBuilder.DELIMITER;
+import static org.seasar.cms.classbuilder.impl.RedefinableXmlS2ContainerBuilder.PARAMETER_BUILDER;
+import static org.seasar.cms.classbuilder.impl.RedefinableXmlS2ContainerBuilder.PARAMETER_BASEPATH;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +48,10 @@ public class RedefinableComponentTagHandler extends ComponentTagHandler {
         if (context.peek() instanceof S2Container) {
             S2Container container = (S2Container) context.peek();
             if (componentDef.getComponentName() != null) {
-                S2Container redefined = redefine(
-                        componentDef,
-                        (String) context.getParameter("path"),
+                S2Container redefined = redefine(componentDef, (String) context
+                        .getParameter(PARAMETER_BASEPATH),
                         (RedefinableXmlS2ContainerBuilder) context
-                                .getParameter(RedefinableXmlS2ContainerBuilder.PARAMETER_BUILDER));
+                                .getParameter(PARAMETER_BUILDER));
                 if (redefined != null) {
                     S2ContainerBuilderUtils
                             .mergeContainer(container, redefined);

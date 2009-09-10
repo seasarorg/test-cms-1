@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
+  "http://www.seasar.org/dtd/components24.dtd">
+<components>
+  <component name="hoe"
+    class="org.seasar.cms.classbuilder.impl.HoeImpl">
+    <property name="name">"redefined"</property>
+  </component>
+</components>
