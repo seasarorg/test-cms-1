@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -12,13 +13,18 @@ import org.seasar.framework.container.S2Container;
 import org.seasar.framework.container.factory.S2ContainerFactory;
 import org.seasar.framework.container.factory.XmlS2ContainerBuilder;
 import org.seasar.framework.xml.SaxHandlerParser;
+import org.seasar.framework.xml.TagHandlerContext;
 
 public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder {
     static final String PARAMETER_BUILDER = "builder";
 
+    static final String PARAMETER_BASEPATH = "originalPath";
+
     public static final String DELIMITER = "+";
 
     private static final String NAME_ADDITIONAL = "+";
+
+    private static final ThreadLocal<LinkedList<String>> basePathStack_ = new ThreadLocal<LinkedList<String>>();
 
     public RedefinableXmlS2ContainerBuilder() {
         rule
@@ -31,18 +37,64 @@ public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder {
     protected SaxHandlerParser createSaxHandlerParser(S2Container parent,
             String path) {
         SaxHandlerParser parser = super.createSaxHandlerParser(parent, path);
-        parser.getSaxHandler().getTagHandlerContext().addParameter(
-                PARAMETER_BUILDER, this);
+        TagHandlerContext context = parser.getSaxHandler()
+                .getTagHandlerContext();
+        context.addParameter(PARAMETER_BUILDER, this);
+        context.addParameter(PARAMETER_BASEPATH, getCurrentBasePath());
         return parser;
     }
 
     @Override
     protected S2Container parse(S2Container parent, String path) {
-        S2Container container = super.parse(parent, path);
+        pushPath(path);
+        try {
+            S2Container container = super.parse(parent, path);
 
-        mergeContainers(container, path, true);
+            mergeContainers(container, path, true);
 
-        return container;
+            return container;
+        } finally {
+            popPath(path);
+        }
+    }
+
+    private void popPath(String path) {
+        if (path.equals(getCurrentBasePath())) {
+            LinkedList<String> pathStack = basePathStack_.get();
+            pathStack.removeFirst();
+            if (pathStack.isEmpty()) {
+                basePathStack_.set(null);
+            }
+        }
+    }
+
+    private String getCurrentBasePath() {
+        LinkedList<String> pathStack = basePathStack_.get();
+        if (pathStack == null || pathStack.isEmpty()) {
+            return null;
+        }
+        return pathStack.peek();
+    }
+
+    private void pushPath(String path) {
+        LinkedList<String> pathStack = basePathStack_.get();
+        if (pathStack == null) {
+            pathStack = new LinkedList<String>();
+            basePathStack_.set(pathStack);
+        }
+        if (isBasePath(path)) {
+            pathStack.addFirst(path);
+        }
+    }
+
+    private boolean isBasePath(String path) {
+        // 厳密には「～+.dicon」形式もbaseでないと判定しなければいけないが、「～+.dicon」は他のリソースと別の仕組みで扱われている
+        // ため、このロジックを通ることはない。そのためここで「～+.dicon」形式の判定を行なわなくても問題ない。
+        if (path == null) {
+            return true;
+        }
+        return path.indexOf(DELIMITER + NAME_ADDITIONAL) < 0
+                && path.indexOf(NAME_ADDITIONAL + DELIMITER) < 0;
     }
 
     protected void mergeContainers(S2Container container, String path,

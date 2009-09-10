@@ -221,4 +221,18 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase {
         assertTrue(include1Found);
         assertTrue(include2Found);
     }
+
+    public void test_追加されたコンポーネントを再定義できること() throws Exception {
+        include("test13.dicon");
+
+        Fuga fuga = (Fuga) getComponent(Fuga.class);
+        assertEquals("redefined", fuga.getHoe().getName());
+    }
+
+    public void test_置き換えられたコンポーネントを再定義できること() throws Exception {
+        include("test14.dicon");
+
+        Hoe hoe = (Hoe) getComponent(Hoe.class);
+        assertEquals("redefined", hoe.getName());
+    }
 }
