@@ -6,9 +6,6 @@ import org.seasar.framework.container.impl.S2ContainerBehavior.DefaultProvider;
 import org.seasar.framework.log.Logger;
 
 public class DistributedHotdeployBehavior extends DefaultProvider {
-
-    private LocalHotdeployS2Container[] localHotdeployS2Containers_;
-
     private Logger logger_ = Logger.getLogger(getClass());
 
     public void init(boolean hotdeployEnabled) {
