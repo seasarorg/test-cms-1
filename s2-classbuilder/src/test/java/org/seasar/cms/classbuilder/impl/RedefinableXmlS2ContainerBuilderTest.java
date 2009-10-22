@@ -235,4 +235,15 @@ public class RedefinableXmlS2ContainerBuilderTest extends S2TestCase {
         Hoe hoe = (Hoe) getComponent(Hoe.class);
         assertEquals("redefined", hoe.getName());
     }
+
+    public void test_CMS_42_diconがルート階層にない場合でもコンポーネントを先頭に追加できること()
+            throws Exception {
+        include("test/test15.dicon");
+
+        Hoe[] actual = (Hoe[]) getContainer().findAllComponents(Hoe.class);
+        int idx = 0;
+        assertEquals(2, actual.length);
+        assertEquals("added", actual[idx++].getName());
+        assertEquals("original", actual[idx++].getName());
+    }
 }
