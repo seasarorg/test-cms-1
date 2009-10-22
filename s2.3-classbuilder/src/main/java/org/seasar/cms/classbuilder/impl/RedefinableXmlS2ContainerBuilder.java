@@ -134,21 +134,31 @@ public class RedefinableXmlS2ContainerBuilder extends XmlS2ContainerBuilder {
         }
 
         List<String> pathList = new ArrayList<String>();
-        String body;
+
+        String dir;
+        String name;
+        if (slash < 0) {
+            dir = "";
+            name = path;
+        } else {
+            dir = path.substring(0, slash + 1);
+            name = path.substring(slash + 1);
+        }
         String suffix;
-        int dot = path.lastIndexOf('.');
+        int dot = name.lastIndexOf('.');
         if (dot < 0) {
-            body = path;
             suffix = "";
         } else {
-            body = path.substring(0, dot);
-            suffix = path.substring(dot);
+            suffix = name.substring(dot);
+            name = name.substring(0, dot);
         }
+
         StringBuilder sb = new StringBuilder();
+        sb.append(dir);
         if (!addToTail) {
             sb.append(NAME_ADDITIONAL).append(DELIMITER);
         }
-        sb.append(body);
+        sb.append(name);
         if (addToTail) {
             sb.append(DELIMITER).append(NAME_ADDITIONAL);
         }
