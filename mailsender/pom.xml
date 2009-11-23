@@ -66,7 +66,7 @@
     <repository>
       <id>java.net</id>
       <name>java.net</name>
-      <url>https://maven-repository.dev.java.net/nonav/repository</url>
+      <url>http://download.java.net/maven/1</url>
       <layout>legacy</layout>
     </repository>
   </repositories>
@@ -96,12 +96,7 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-      <version>1.4</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>activation</artifactId>
-      <version>1.1</version>
+      <version>1.4.1</version>
     </dependency>
     <dependency>
       <groupId>org.freemarker</groupId>
