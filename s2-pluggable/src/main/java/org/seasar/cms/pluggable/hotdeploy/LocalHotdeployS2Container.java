@@ -148,7 +148,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
             if (hotdeployCl != null) {
                 Thread.currentThread().setContextClassLoader(hotdeployCl);
             }
-            if (key instanceof Class) {
+            if (key instanceof Class<?>) {
                 cd = createComponentDef((Class<?>) key);
             } else if (key instanceof String) {
                 cd = createComponentDef((String) key);

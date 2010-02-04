@@ -118,7 +118,6 @@ public class MapUtil {
      * 
      * @author koichik
      */
-    @SuppressWarnings("unchecked")
     public static class SynchronizedMapFactory implements MapFactory {
 
         public Map create() {

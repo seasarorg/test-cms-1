@@ -71,7 +71,7 @@ public class PluggableUtils {
                 key);
 
         Class<?> clazz;
-        if (key instanceof Class) {
+        if (key instanceof Class<?>) {
             clazz = (Class<?>) key;
         } else {
             clazz = Object.class;

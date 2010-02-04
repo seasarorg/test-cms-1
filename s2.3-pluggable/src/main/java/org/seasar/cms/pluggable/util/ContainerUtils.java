@@ -24,7 +24,7 @@ public class ContainerUtils {
     public static Object[] toComponents(Object componentKey,
             ComponentDef[] componentDefs) {
         Class<?> clazz;
-        if (componentKey instanceof Class) {
+        if (componentKey instanceof Class<?>) {
             clazz = (Class<?>) componentKey;
         } else {
             clazz = Object.class;

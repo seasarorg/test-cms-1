@@ -59,7 +59,6 @@ public class Traversal24 {
                 processed, new ContainerGraph(container));
     }
 
-    @SuppressWarnings("unchecked")
     protected static Object forEachParentContainer(final S2Container container,
             final S2ContainerHandler handler, final boolean childFirst,
             final Set processed, final ContainerGraph graph) {

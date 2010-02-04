@@ -23,8 +23,8 @@ public class PluggableNamingConventionImpl extends NamingConventionImpl
         String partOfClassName = fromComponentNameToPartOfClassName(componentName);
         String[] rootPackageNames = getRootPackageNames();
         boolean subAppSuffix = isSubApplicationSuffix(suffix);
-        for (int i = 0; i < rootPackageNames.length; ++i) {
-            String rootPackageName = rootPackageNames[i];
+        if (rootPackageNames.length > 0) {
+            String rootPackageName = rootPackageNames[0];
             if (subAppSuffix) {
                 return concatClassName(rootPackageName,
                         getSubApplicationRootPackageName(), partOfClassName);

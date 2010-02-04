@@ -68,7 +68,7 @@ public class TraceS2Interceptor extends AbstractInterceptor {
             sb.append("null");
         } else if (obj instanceof String) {
             sb.append('"').append(obj).append('"');
-        } else if (obj instanceof Class) {
+        } else if (obj instanceof Class<?>) {
             sb.append(((Class<?>) obj).getName()).append(".class");
         } else if (obj instanceof ComponentDef) {
             ComponentDef componentDef = (ComponentDef) obj;
