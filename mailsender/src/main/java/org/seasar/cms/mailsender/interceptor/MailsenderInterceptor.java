@@ -103,7 +103,7 @@ public class MailsenderInterceptor extends AbstractInterceptor {
                 if (genericParameterType instanceof ParameterizedType) {
                     Type listParameterType = ((ParameterizedType) genericParameterType)
                             .getActualTypeArguments()[0];
-                    if (listParameterType instanceof Class) {
+                    if (listParameterType instanceof Class<?>) {
                         Class<?> listParameterClass = (Class<?>) listParameterType;
                         if (Mail.class.isAssignableFrom(listParameterClass)) {
                             @SuppressWarnings("unchecked")
