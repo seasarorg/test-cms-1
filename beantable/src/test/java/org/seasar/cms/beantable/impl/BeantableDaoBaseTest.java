@@ -195,7 +195,7 @@ public class BeantableDaoBaseTest extends BeantableDaoTestCase<Hoge> {
     }
 
     public void testExecute_返り値がNumberでも正しく動作することTx() throws Exception {
-        assertEquals(0, hogeDao_.getDtoCount());
+        assertEquals(0, hogeDao_.getDtoCount().intValue());
     }
 
     public void testExecute_返り値がNumberの配列でも正しく動作することTx() throws Exception {
