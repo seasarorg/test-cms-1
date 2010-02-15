@@ -23,6 +23,10 @@ public class S2ContainerBuilderUtils {
 
     private static final String PREFIX_FILE = "file:";
 
+    private static final String PREFIX_ZIP = "zip:";
+
+    public static final String SUFFIX_ZIP = "!/";
+
     public static final String PREFIX_CODE_SOURCE = "code-source:";
 
     public static final String SUFFIX_CODE_SOURCE = "!/";
@@ -116,6 +120,13 @@ public class S2ContainerBuilderUtils {
                 if (cl.getResource(resourcePath) != null) {
                     return resourcePath;
                 }
+            }
+        } else if (path.startsWith(PREFIX_ZIP)) {
+            int idx = path.indexOf(SUFFIX_ZIP);
+            if (idx >= 0) {
+                return path.substring(idx + SUFFIX_ZIP.length());
+            } else {
+                return null;
             }
         } else if (path.startsWith(PREFIX_CODE_SOURCE)) {
             int idx = path.indexOf(SUFFIX_CODE_SOURCE);
