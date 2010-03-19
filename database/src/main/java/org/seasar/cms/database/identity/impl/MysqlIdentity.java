@@ -10,46 +10,45 @@ package org.seasar.cms.database.identity.impl;
 public class MysqlIdentity extends AbstractIdentity {
 
     public String getDatabaseProductId() {
-
         return "mysql";
     }
 
     public boolean isMatched(String productName, String productVersion) {
-        // XXX 実装しよう。
-        return false;
+        return productName.equalsIgnoreCase("mysql");
     }
 
     @Override
     public SQLToDefineIdColumn getSQLToDefineIdColumn(String tableName,
-        String columnName, String sequenceName) {
+            String columnName, String sequenceName) {
         if (sequenceName == null) {
-            return new SQLToDefineIdColumn("INTEGER NOT NULL AUTO INCREMENT",
-                new String[0]);
+            return new SQLToDefineIdColumn(
+                    "INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY",
+                    new String[0]);
         } else {
             return super.getSQLToDefineIdColumn(tableName, columnName,
-                sequenceName);
+                    sequenceName);
         }
     }
 
     @Override
     public SQLToDeleteIdColumn getSQLToDeleteIdColumn(String tableName,
-        String columnName, String sequenceName) {
+            String columnName, String sequenceName) {
         if (sequenceName == null) {
             return new SQLToDeleteIdColumn(new String[0]);
         } else {
             return super.getSQLToDeleteIdColumn(tableName, columnName,
-                sequenceName);
+                    sequenceName);
         }
     }
 
     @Override
     public String getSQLToGetGeneratedId(String tableName, String columnName,
-        String sequenceName) {
+            String sequenceName) {
         if (sequenceName == null) {
             return "SELECT LAST_INSERT_ID()";
         } else {
             return super.getSQLToGetGeneratedId(tableName, columnName,
-                sequenceName);
+                    sequenceName);
         }
     }
 }

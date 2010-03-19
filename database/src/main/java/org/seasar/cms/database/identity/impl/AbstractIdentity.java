@@ -50,13 +50,13 @@ abstract public class AbstractIdentity implements Identity {
      * @return 自動採番されるカラムを定義するための部分SQL。
      */
     public SQLToDefineIdColumn getSQLToDefineIdColumn(String tableName,
-        String columnName, String sequenceName) {
+            String columnName, String sequenceName) {
         if (sequenceName == null) {
             sequenceName = getSequenceName(tableName, columnName);
         }
         return new SQLToDefineIdColumn("INTEGER DEFAULT NEXTVAL('"
-            + sequenceName + "') NOT NULL PRIMARY KEY",
-            new String[] { "CREATE SEQUENCE " + sequenceName });
+                + sequenceName + "') NOT NULL PRIMARY KEY",
+                new String[] { "CREATE SEQUENCE " + sequenceName });
     }
 
     public boolean startUsingDatabase() {
@@ -89,7 +89,7 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     public boolean createTable(TableMetaData table, boolean force)
-        throws SQLException {
+            throws SQLException {
 
         if (!force && existsTable(table.getName())) {
             return false;
@@ -107,7 +107,7 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     public boolean correctTableSchema(TableMetaData table, boolean force)
-        throws SQLException {
+            throws SQLException {
 
         boolean modified = false;
 
@@ -141,7 +141,7 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     public boolean dropTable(TableMetaData table, boolean force)
-        throws SQLException {
+            throws SQLException {
 
         if (!force && !existsTable(table.getName())) {
             return false;
@@ -154,14 +154,14 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     void addColumn(String tableName, ColumnMetaData column, boolean force)
-        throws SQLException {
+            throws SQLException {
         executeUpdate(getSQLToAlterTableAddColumn(tableName, column), force);
     }
 
     void dropColumn(String tableName, String columnName, boolean force)
-        throws SQLException {
+            throws SQLException {
         executeUpdate(getSQLToAlterTableDropColumn(tableName, columnName),
-            force);
+                force);
     }
 
     protected String[] constructCreateTableSQLs(TableMetaData table) {
@@ -179,9 +179,9 @@ abstract public class AbstractIdentity implements Identity {
             delim = ", ";
             String columnName = columns[i].getName();
             sb.append(columnName).append(" ").append(
-                constructColumnDefinitionSQL(tableName, columns[i]));
+                    constructColumnDefinitionSQL(tableName, columns[i]));
             sqlList.addAll(Arrays.asList(constructAdditionalDefinitionSQLs(
-                tableName, columns[i])));
+                    tableName, columns[i])));
         }
         for (int i = 0; i < constraints.length; i++) {
             sb.append(delim);
@@ -222,8 +222,8 @@ abstract public class AbstractIdentity implements Identity {
                 continue;
             }
             indexList.add("CREATE INDEX "
-                + getIndexName(tableName, columns[i].getName()) + " ("
-                + columns[i].getName() + ")");
+                    + getIndexName(tableName, columns[i].getName()) + " ("
+                    + columns[i].getName() + ")");
         }
 
         for (int i = 0; i < indexes.length; i++) {
@@ -254,7 +254,7 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     StringBuffer appendIndexName(StringBuffer sb, String tableName,
-        String[] columnNames) {
+            String[] columnNames) {
         sb.append("_IDX_").append(tableName);
         for (int i = 0; i < columnNames.length; i++) {
             sb.append("_").append(columnNames[i]);
@@ -271,7 +271,7 @@ abstract public class AbstractIdentity implements Identity {
         sqlList.add("DROP TABLE " + tableName);
         for (int i = 0; i < columns.length; i++) {
             sqlList.addAll(Arrays.asList(constructDeletionSQLs(tableName,
-                columns[i])));
+                    columns[i])));
         }
 
         return sqlList.toArray(new String[0]);
@@ -289,7 +289,7 @@ abstract public class AbstractIdentity implements Identity {
                 continue;
             }
             indexList.add("DROP INDEX "
-                + getIndexName(tableName, columns[i].getName()));
+                    + getIndexName(tableName, columns[i].getName()));
         }
 
         for (int i = 0; i < indexes.length; i++) {
@@ -319,9 +319,9 @@ abstract public class AbstractIdentity implements Identity {
      * @return カラムを追加するためのSQL。
      */
     protected String getSQLToAlterTableAddColumn(String tableName,
-        ColumnMetaData column) {
+            ColumnMetaData column) {
         return "ALTER TABLE " + tableName + " ADD COLUMN " + column.getName()
-            + " " + constructColumnDefinitionSQL(tableName, column);
+                + " " + constructColumnDefinitionSQL(tableName, column);
     }
 
     /**
@@ -332,7 +332,7 @@ abstract public class AbstractIdentity implements Identity {
      * @return カラムを削除するためのSQL。
      */
     protected String getSQLToAlterTableDropColumn(String tableName,
-        String columnName) {
+            String columnName) {
         return "ALTER TABLE " + tableName + " DROP COLUMN " + columnName;
     }
 
@@ -366,12 +366,12 @@ abstract public class AbstractIdentity implements Identity {
      * @return 自動採番されるカラムを削除するための部分SQL。
      */
     public SQLToDeleteIdColumn getSQLToDeleteIdColumn(String tableName,
-        String columnName, String sequenceName) {
+            String columnName, String sequenceName) {
         if (sequenceName == null) {
             sequenceName = getSequenceName(tableName, columnName);
         }
         return new SQLToDeleteIdColumn(new String[] { "DROP SEQUENCE "
-            + sequenceName });
+                + sequenceName });
     }
 
     protected String getSequenceName(String tableName, String columnName) {
@@ -379,14 +379,14 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     protected String constructColumnDefinitionSQL(String tableName,
-        ColumnMetaData column) {
+            ColumnMetaData column) {
         if (column.isId()) {
             return getSQLToDefineIdColumn(tableName, column.getName(),
-                column.getSequenceName()).getColumnDefinitionSQL();
+                    column.getSequenceName()).getColumnDefinitionSQL();
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append(column.getJdbcTypeName());
+        sb.append(toTypeDefinitionFromJdbcTypeName(column.getJdbcTypeName()));
         String defaults = column.getDefault();
         if (defaults != null && defaults.length() > 0) {
             sb.append(" DEFAULT ").append(defaults);
@@ -423,21 +423,29 @@ abstract public class AbstractIdentity implements Identity {
         return sb.toString();
     }
 
+    protected String toTypeDefinitionFromJdbcTypeName(String jdbcTypeName) {
+        if (jdbcTypeName.toUpperCase().endsWith("VARCHAR")) {
+            return jdbcTypeName + "(255)";
+        } else {
+            return jdbcTypeName;
+        }
+    }
+
     protected String[] constructAdditionalDefinitionSQLs(String tableName,
-        ColumnMetaData column) {
+            ColumnMetaData column) {
         if (column.isId()) {
             return getSQLToDefineIdColumn(tableName, column.getName(),
-                column.getSequenceName()).getAdditionalCreationSQLs();
+                    column.getSequenceName()).getAdditionalCreationSQLs();
         } else {
             return new String[0];
         }
     }
 
     protected String[] constructDeletionSQLs(String tableName,
-        ColumnMetaData column) {
+            ColumnMetaData column) {
         if (column.isId()) {
             return getSQLToDeleteIdColumn(tableName, column.getName(),
-                column.getSequenceName()).getDeletionSQLs();
+                    column.getSequenceName()).getDeletionSQLs();
         } else {
             return new String[0];
         }
@@ -452,7 +460,7 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     protected void executeUpdate(String[] sqls, boolean force)
-        throws SQLException {
+            throws SQLException {
 
         Connection con = null;
         try {
@@ -490,7 +498,7 @@ abstract public class AbstractIdentity implements Identity {
             con = ds_.getConnection();
             st = con.createStatement();
             rs = st.executeQuery(getSQLToGetGeneratedId(table.getName(),
-                idColumn.getName(), idColumn.getSequenceName()));
+                    idColumn.getName(), idColumn.getSequenceName()));
             rs.next();
             return new Integer(rs.getInt(1));
         } finally {
@@ -499,7 +507,7 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     public String getSQLToGetGeneratedId(String tableName, String columnName,
-        String sequenceName) {
+            String sequenceName) {
         if (sequenceName == null) {
             sequenceName = getSequenceName(tableName, columnName);
         }
@@ -507,7 +515,7 @@ abstract public class AbstractIdentity implements Identity {
     }
 
     public String getSQLToGenerateNextId(TableMetaData table,
-        ColumnMetaData column) {
+            ColumnMetaData column) {
         return null;
     }
 
