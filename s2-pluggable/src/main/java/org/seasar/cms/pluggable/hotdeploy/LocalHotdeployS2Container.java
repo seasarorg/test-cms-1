@@ -140,14 +140,20 @@ public class LocalHotdeployS2Container implements ClassHandler {
         if (cd != null) {
             return cd;
         }
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try {
-            HotdeployClassLoader hotdeployCl = getHotdeployClassLoader();
+            ClassLoader cl = getHotdeployClassLoader();
             // hotdeplyがfalseでdynamicがtrueの場合でもクラスがロードできるように、
-            // hotdeployClがnullの場合のことを考慮するようにしている。
-            if (hotdeployCl != null) {
-                Thread.currentThread().setContextClassLoader(hotdeployCl);
+            // hotdeployClassLoaderがnullの場合のことを考慮するようにしている。
+            if (cl == null && container_ != null) {
+                // 初期化の段階でこのメソッドが呼ばれることがあり、その場合container_がnullである
+                // ことが起きうるのでこうしている。
+                cl = container_.getClassLoader();
             }
+            if (cl != null) {
+                Thread.currentThread().setContextClassLoader(cl);
+            }
+
             if (key instanceof Class<?>) {
                 cd = createComponentDef((Class<?>) key);
             } else if (key instanceof String) {
@@ -156,7 +162,7 @@ public class LocalHotdeployS2Container implements ClassHandler {
                 throw new IllegalArgumentException("key");
             }
         } finally {
-            Thread.currentThread().setContextClassLoader(cl);
+            Thread.currentThread().setContextClassLoader(oldCl);
         }
         if (cd != null) {
             register(cd);
