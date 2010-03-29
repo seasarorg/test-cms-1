@@ -2,10 +2,15 @@
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
   "http://www.seasar.org/dtd/components24.dtd">
 <components>
-  <component class="org.seasar.cms.ymir.creator.PageCreator" />
-  <component
-    class="org.seasar.cms.ymir.creator.ExceptionHandlerCreator" />
-  <component class="org.seasar.framework.container.creator.DtoCreator" />
+  <component class="org.seasar.cms.ymir.creator.PageCreator">
+    <property name="pageCustomizer" bindingType="none" />
+  </component>
+  <component class="org.seasar.cms.ymir.creator.ExceptionHandlerCreator">
+    <property name="exceptionHandlerCustomizer" bindingType="none" />
+  </component>
+  <component class="org.seasar.framework.container.creator.DtoCreator">
+    <property name="dtoCustomizer" bindingType="none" />
+  </component>
   <component name="daoOndemandCreatorInterceptor"
     class="org.seasar.framework.aop.interceptors.InterceptorChain"
     instance="prototype">
@@ -16,30 +21,24 @@
       <arg>dao.interceptor</arg>
     </initMethod>
   </component>
-  <component
-    class="org.seasar.framework.container.creator.DaoCreator">
-    <initMethod name="setDaoCustomizer">
-      <arg>
-        <component
-          class="org.seasar.framework.container.customizer.AspectCustomizer"
-          autoBinding="none">
-          <property name="interceptorName">
-            "daoOndemandCreatorInterceptor"
-          </property>
-        </component>
-      </arg>
-    </initMethod>
+  <component class="org.seasar.framework.container.creator.DaoCreator">
+    <property name="daoCustomizer">
+      <component
+        class="org.seasar.framework.container.customizer.AspectCustomizer"
+        autoBinding="none">
+        <property name="interceptorName">
+          "daoOndemandCreatorInterceptor"
+        </property>
+      </component>
+    </property>
   </component>
-  <component
-    class="org.seasar.framework.container.creator.DxoCreator">
-    <initMethod name="setDxoCustomizer">
-      <arg>
-        <component
-          class="org.seasar.framework.container.customizer.AspectCustomizer"
-          autoBinding="none">
-          <property name="interceptorName">"dxo.interceptor"</property>
-        </component>
-      </arg>
-    </initMethod>
+  <component class="org.seasar.framework.container.creator.DxoCreator">
+    <property name="dxoCustomizer">
+      <component
+        class="org.seasar.framework.container.customizer.AspectCustomizer"
+        autoBinding="none">
+        <property name="interceptorName">"dxo.interceptor"</property>
+      </component>
+    </property>
   </component>
 </components>
