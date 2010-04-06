@@ -155,6 +155,10 @@ public class AnalyzerTalTagEvaluator extends TalTagEvaluator {
     }
 
     String toAbsolutePath(String basePath, String path) {
+        // KvasirのExternalTemplateではbasePathがnullになることがあるためこうしている。
+        if (basePath == null) {
+            basePath = "";
+        }
         if (path == null) {
             return null;
         } else if (path.length() == 0 || path.startsWith(";")
