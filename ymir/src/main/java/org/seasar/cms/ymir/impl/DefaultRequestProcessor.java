@@ -40,6 +40,7 @@ import org.seasar.cms.ymir.Ymir;
 import org.seasar.cms.ymir.beanutils.FormFileArrayConverter;
 import org.seasar.cms.ymir.beanutils.FormFileConverter;
 import org.seasar.cms.ymir.response.PassthroughResponse;
+import org.seasar.cms.ymir.response.VoidResponse;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructor;
 import org.seasar.cms.ymir.response.constructor.ResponseConstructorSelector;
 import org.seasar.cms.ymir.util.BeanUtils;
@@ -390,6 +391,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
                     returnValue);
             if (log_.isDebugEnabled()) {
                 log_.debug("RESPONSE: " + response);
+            }
+        } else {
+            if (Request.DISPATCHER_REQUEST.equals(request.getDispatcher())) {
+                // リクエストに対応するアクションが存在しない場合はリクエストを受け付けない。
+                log_
+                        .info("IGNORE: Action corresponding to the request not found");
+                response = VoidResponse.INSTANCE;
             }
         }
 
