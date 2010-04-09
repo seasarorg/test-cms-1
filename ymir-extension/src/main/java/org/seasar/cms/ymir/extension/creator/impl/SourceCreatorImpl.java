@@ -1147,6 +1147,9 @@ public class SourceCreatorImpl implements SourceCreator {
     }
 
     public String filterResponse(String response) {
+        if (!shouldUpdate(getApplication())) {
+            return response;
+        }
 
         String jsPrefix = "<script type=\"text/javascript\" src=\""
                 + getHttpServletRequest().getContextPath() + PATH_PREFIX
