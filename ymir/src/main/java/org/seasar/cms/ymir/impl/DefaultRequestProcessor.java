@@ -264,8 +264,13 @@ public class DefaultRequestProcessor implements RequestProcessor {
                 ConstraintViolatedException.Message[] messages = ex
                         .getMessages();
                 for (int j = 0; j < messages.length; j++) {
-                    notes.add(new Note(messages[j].getKey(), messages[j]
-                            .getParameters()));
+                    Object[] parameters = messages[j].getParameters();
+                    Note note = new Note(messages[j].getKey(), parameters);
+                    if (parameters.length > 0) {
+                        notes.add(parameters[0].toString(), note);
+                    } else {
+                        notes.add(note);
+                    }
                 }
             } catch (ConstraintViolatedException ex) {
                 throw new RuntimeException("May logic error", ex);
