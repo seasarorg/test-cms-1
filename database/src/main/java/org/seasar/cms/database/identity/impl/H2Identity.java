@@ -39,24 +39,24 @@ public class H2Identity extends AbstractIdentity {
 
     @Override
     public SQLToDefineIdColumn getSQLToDefineIdColumn(String tableName,
-        String columnName, String sequenceName) {
+            String columnName, String sequenceName) {
         if (sequenceName == null) {
             return new SQLToDefineIdColumn("INTEGER NOT NULL IDENTITY",
-                new String[0]);
+                    new String[0]);
         } else {
             return super.getSQLToDefineIdColumn(tableName, columnName,
-                sequenceName);
+                    sequenceName);
         }
     }
 
     @Override
     public SQLToDeleteIdColumn getSQLToDeleteIdColumn(String tableName,
-        String columnName, String sequenceName) {
+            String columnName, String sequenceName) {
         if (sequenceName == null) {
             return new SQLToDeleteIdColumn(new String[0]);
         } else {
             return super.getSQLToDeleteIdColumn(tableName, columnName,
-                sequenceName);
+                    sequenceName);
         }
     }
 
@@ -68,22 +68,27 @@ public class H2Identity extends AbstractIdentity {
             con = ds_.getConnection();
             st = con.createStatement();
             st.executeUpdate("SHUTDOWN COMPACT");
-        } catch (SQLException ignore) {
+        } catch (Throwable t) {
             // H2はデフォルトでシャットダウンフックにDatabaseのクローズ処理を登録しているため、
             // ここでは処理が続行できないことがある。その場合は無視する。
         } finally {
-            DbUtils.closeQuietly(con, st, null);
+            try {
+                DbUtils.closeQuietly(con, st, null);
+            } catch (Throwable ignore) {
+                // S2のConnectionPoolImplはSQLExceptionをSQLRuntimeExceptionにラップしてスローすることがあるため
+                // こうしている。
+            }
         }
     }
 
     @Override
     public String getSQLToGetGeneratedId(String tableName, String columnName,
-        String sequenceName) {
+            String sequenceName) {
         if (sequenceName == null) {
             return "CALL IDENTITY()";
         } else {
             return super.getSQLToGetGeneratedId(tableName, columnName,
-                sequenceName);
+                    sequenceName);
         }
     }
 }
