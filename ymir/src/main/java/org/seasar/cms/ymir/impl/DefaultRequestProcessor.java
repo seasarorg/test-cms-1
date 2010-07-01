@@ -341,7 +341,7 @@ public class DefaultRequestProcessor implements RequestProcessor {
         Response response = PassthroughResponse.INSTANCE;
         Object[] params = new Object[0];
 
-        if (confirmConstraints) {
+        if (confirmConstraints && action != null) {
             // 制約チェックを行なう。
             try {
                 Notes notes = confirmConstraint(component, action, request);
