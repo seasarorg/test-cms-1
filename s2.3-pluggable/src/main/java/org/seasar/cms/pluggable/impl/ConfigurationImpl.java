@@ -25,6 +25,10 @@ public class ConfigurationImpl implements Configuration {
         for (int i = configPaths.length - 1; i >= 0; i--) {
             properties = load0(configPaths[i], properties);
         }
+        if (properties == null) {
+            properties = new Properties();
+        }
+
         properties_ = properties;
     }
 
