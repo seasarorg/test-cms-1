@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.seasar.cms.s2-pluggable</groupId>
   <artifactId>s2-pluggable</artifactId>
-  <version>0.0.14</version>
+  <version>0.0.15-SNAPSHOT</version>
   <name>S2-Pluggable</name>
   <description>
     S2-Pluggable is an extension for Seasar2 to add pluggable
@@ -87,10 +87,4 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:https://www.seasar.org/svn/sandbox/cms/tags/s2-pluggable-0.0.14</connection>
-    <developerConnection>scm:svn:https://www.seasar.org/svn/sandbox/cms/tags/s2-pluggable-0.0.14</developerConnection>
-    <url>http://svn.seasar.org/browse/tags/s2-pluggable-0.0.14</url>
-  </scm>
 </project>
