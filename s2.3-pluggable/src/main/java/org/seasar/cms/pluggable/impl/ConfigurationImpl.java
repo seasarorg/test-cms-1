@@ -12,26 +12,23 @@ import org.seasar.cms.pluggable.Configuration;
 import org.seasar.framework.log.Logger;
 
 public class ConfigurationImpl implements Configuration {
-
     private Properties properties_ = new Properties();
 
     private Logger log_ = Logger.getLogger(getClass());
 
     public void load(String configPath) {
-
         load(new String[] { configPath });
     }
 
     public void load(String[] configPaths) {
-
-        properties_.clear();
-        for (int i = 0; i < configPaths.length; i++) {
-            load0(configPaths[i]);
+        Properties properties = null;
+        for (int i = configPaths.length - 1; i >= 0; i--) {
+            properties = load0(configPaths[i], properties);
         }
+        properties_ = properties;
     }
 
-    void load0(String configPath) {
-
+    Properties load0(String configPath, Properties defaults) {
         InputStream is = null;
         if (configPath.indexOf(':') >= 0) {
             try {
@@ -44,7 +41,7 @@ public class ConfigurationImpl implements Configuration {
                     log_.debug("Can't open configuration resource: path="
                             + configPath, ex);
                 }
-                return;
+                return defaults;
             }
         }
         if (is == null) {
@@ -53,7 +50,9 @@ public class ConfigurationImpl implements Configuration {
         }
         if (is != null) {
             try {
-                properties_.load(is);
+                Properties properties = new Properties(defaults);
+                properties.load(is);
+                return properties;
             } catch (IOException ex) {
                 throw new RuntimeException(
                         "Can't load configration resource: path=" + configPath,
@@ -67,47 +66,40 @@ public class ConfigurationImpl implements Configuration {
         } else {
             log_.info("Configuration resource does not exist: path="
                     + configPath);
+            return defaults;
         }
     }
 
     public String getProperty(String key) {
-
         return properties_.getProperty(key);
     }
 
     public String getProperty(String key, String defaultValue) {
-
         return properties_.getProperty(key, defaultValue);
     }
 
     @SuppressWarnings("unchecked")
     public Enumeration<String> propertyNames() {
-
         return (Enumeration<String>) properties_.propertyNames();
     }
 
     public void setProperty(String key, String value) {
-
         properties_.setProperty(key, value);
     }
 
     public void removeProperty(String key) {
-
         properties_.remove(key);
     }
 
     public void save(OutputStream out, String header) throws IOException {
-
         properties_.store(out, header);
     }
 
     public boolean equalsProjectStatus(String status) {
-
         return status.equals(getProperty(KEY_PROJECTSTATUS));
     }
 
     public boolean isUnderDevelopment() {
-
         return equalsProjectStatus(PROJECTSTATUS_DEVELOP);
     }
 }
