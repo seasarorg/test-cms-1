@@ -48,6 +48,7 @@ import org.seasar.cms.beantable.annotation.PrimaryKey;
 import org.seasar.cms.beantable.annotation.References;
 import org.seasar.cms.beantable.annotation.TableConstraint;
 import org.seasar.cms.beantable.annotation.Unique;
+import org.seasar.cms.beantable.annotation.VersionNo;
 import org.seasar.cms.beantable.handler.BeantableHandler;
 import org.seasar.cms.beantable.handler.BeantableListHandler;
 import org.seasar.cms.database.identity.ColumnMetaData;
@@ -362,10 +363,20 @@ public class BeantableImpl<T> implements Beantable<T> {
                 .isAnnotationPresent(PrimaryKey.class);
         boolean uniquePresent = method.isAnnotationPresent(Unique.class);
         boolean notNullPresent = method.isAnnotationPresent(NotNull.class);
-        columnMetaData.setPrimaryKey(primaryKeyPresent);
-        columnMetaData.setUnique(uniquePresent);
-        columnMetaData.setNotNull(primaryKeyPresent || uniquePresent
-                || notNullPresent);
+        boolean versionNoPresent = method.isAnnotationPresent(VersionNo.class);
+        if (primaryKeyPresent) {
+            columnMetaData.setPrimaryKey(true);
+        }
+        if (uniquePresent) {
+            columnMetaData.setUnique(true);
+        }
+        if (columnMetaData.isPrimaryKey() || columnMetaData.isUnique()
+                || notNullPresent) {
+            columnMetaData.setNotNull(true);
+        }
+        if (versionNoPresent) {
+            columnMetaData.setVersionNo(true);
+        }
 
         Default defaults = method.getAnnotation(Default.class);
         if (defaults != null) {
@@ -899,7 +910,6 @@ public class BeantableImpl<T> implements Beantable<T> {
                 sb.append(" WHERE ");
             }
             sb.append(versionNoColumn.getName()).append("=?");
-            list.add(versionNoValue);
         }
 
         PreparedStatement pst = con.prepareStatement(sb.toString());
@@ -914,6 +924,10 @@ public class BeantableImpl<T> implements Beantable<T> {
                 setObject(pst, cnt++, params[i]);
             }
         }
+        if (versionNoValue != null) {
+            setObject(pst, cnt++, versionNoValue);
+        }
+
         return pst;
     }
 

@@ -246,4 +246,13 @@ public class BeantableImplTest extends S2TestCase {
         assertEquals(Double.valueOf(0), target.adjust(null, Double.class));
         assertNull(target.adjust(new HashMap<Object, Object>(), Double.class));
     }
+
+    public void test_VersionNoアノテーション指定が正しく解釈されること() throws Exception {
+
+        BeantableImpl<Hoge3> target = newBeantable(Hoge3.class);
+        target.activate();
+
+        assertTrue(target.getTableMetaData().getColumn("VERSIONNO")
+                .isVersionNo());
+    }
 }
